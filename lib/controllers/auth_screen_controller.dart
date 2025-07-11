@@ -1,0 +1,93 @@
+import 'package:flutter/material.dart';
+import 'package:wifiber/components/ui/snackbars.dart';
+import 'package:wifiber/providers/auth_provider.dart';
+import 'package:wifiber/screens/dashboard/home_dashboard_screen.dart';
+
+class LoginScreenController {
+  final BuildContext context;
+
+  LoginScreenController(this.context);
+
+  final formKey = GlobalKey<FormState>();
+  final usernameController = TextEditingController();
+  final passwordController = TextEditingController();
+
+  bool obscurePassword = true;
+  bool formLoading = false;
+
+  String? validateUsername(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Nama pengguna tidak boleh kosong';
+    }
+    if (value.trim().length < 3) {
+      return 'Nama pengguna minimal 3 karakter';
+    }
+    if (value.trim().length > 20) {
+      return 'Nama pengguna maksimal 20 karakter';
+    }
+    if (!RegExp(r'^[a-zA-Z0-9_.]+$').hasMatch(value.trim())) {
+      return 'Nama pengguna hanya boleh berisi huruf, angka, underscore, dan titik';
+    }
+    return null;
+  }
+
+  String? validatePassword(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Kata sandi tidak boleh kosong';
+    }
+    if (value.trim().length < 6) {
+      return 'Kata sandi minimal 6 karakter';
+    }
+    if (value.trim().length > 50) {
+      return 'Kata sandi maksimal 50 karakter';
+    }
+    return null;
+  }
+
+  Future<void> submitForm({
+    required VoidCallback onLoading,
+    required VoidCallback onComplete,
+    required AuthProvider authProvider,
+  }) async {
+    final isValid = formKey.currentState?.validate() ?? false;
+    if (!isValid) return;
+
+    onLoading();
+
+    final username = usernameController.text.trim();
+    final password = passwordController.text.trim();
+
+    try {
+      await authProvider.login(username, password);
+
+      if (context.mounted) {
+        SnackBars.success(
+          context,
+          "Selamat datang kembali, ${authProvider.user?.username ?? username}.",
+        ).clearSnackBars();
+
+        await Future.delayed(const Duration(seconds: 2));
+
+        if (context.mounted) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (_) => const HomeDashboardScreen()),
+          );
+        }
+      }
+    } catch (e) {
+      if (context.mounted) {
+        SnackBars.error(
+          context,
+          "Ada masalah, silahkan coba lagi. Atau hubungi admin untuk bantuan lebih lanjut.",
+        ).clearSnackBars();
+      }
+    } finally {
+      onComplete();
+    }
+  }
+
+  void dispose() {
+    usernameController.dispose();
+    passwordController.dispose();
+  }
+}
