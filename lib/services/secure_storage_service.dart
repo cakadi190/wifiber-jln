@@ -1,21 +1,18 @@
-import 'package:flutter_secure_storage/flutter_secure_storage.dart';
-import 'dart:typed_data';
 import 'dart:convert';
+import 'dart:typed_data';
+
 import 'package:crypto/crypto.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class SecureStorageService {
   static const storage = FlutterSecureStorage();
 
-  // Keys yang sudah ada
   static const String userKey = 'user';
   static const String firstLaunchKey = 'first_launch';
   static const String avatarKey = 'avatar';
 
-  // Keys untuk avatar cache
   static const String avatarCachePrefix = 'avatar_cache_';
   static const String userAvatarPrefix = 'user_avatar_';
-
-  // === AVATAR CACHE METHODS ===
 
   /// Cache avatar berdasarkan URL
   static Future<void> cacheAvatarByUrl(String url, Uint8List imageData) async {
@@ -28,7 +25,10 @@ class SecureStorageService {
   }
 
   /// Ambil cached avatar berdasarkan URL
-  static Future<Uint8List?> getCachedAvatarByUrl(String url, {Duration? maxAge}) async {
+  static Future<Uint8List?> getCachedAvatarByUrl(
+    String url, {
+    Duration? maxAge,
+  }) async {
     final key = _getUrlCacheKey(url);
     final base64String = await storage.read(key: key);
     final timestampStr = await storage.read(key: '${key}_timestamp');
@@ -43,7 +43,6 @@ class SecureStorageService {
         if (cacheAge < maxCacheAge) {
           return base64Decode(base64String);
         } else {
-          // Cache expired, hapus
           await storage.delete(key: key);
           await storage.delete(key: '${key}_timestamp');
         }
@@ -54,7 +53,10 @@ class SecureStorageService {
   }
 
   /// Cache avatar berdasarkan user ID
-  static Future<void> cacheUserAvatar(String userId, Uint8List imageData) async {
+  static Future<void> cacheUserAvatar(
+    String userId,
+    Uint8List imageData,
+  ) async {
     final key = '${userAvatarPrefix}$userId';
     final base64String = base64Encode(imageData);
     final timestamp = DateTime.now().millisecondsSinceEpoch;
@@ -64,7 +66,10 @@ class SecureStorageService {
   }
 
   /// Ambil cached avatar berdasarkan user ID
-  static Future<Uint8List?> getUserAvatar(String userId, {Duration? maxAge}) async {
+  static Future<Uint8List?> getUserAvatar(
+    String userId, {
+    Duration? maxAge,
+  }) async {
     final key = '${userAvatarPrefix}$userId';
     final base64String = await storage.read(key: key);
     final timestampStr = await storage.read(key: '${key}_timestamp');
@@ -79,7 +84,6 @@ class SecureStorageService {
         if (cacheAge < maxCacheAge) {
           return base64Decode(base64String);
         } else {
-          // Cache expired, hapus
           await storage.delete(key: key);
           await storage.delete(key: '${key}_timestamp');
         }
@@ -99,8 +103,9 @@ class SecureStorageService {
   /// Clear semua avatar cache
   static Future<void> clearAllAvatarCache() async {
     final allKeys = await storage.readAll();
-    final avatarKeys = allKeys.keys.where((key) =>
-    key.startsWith(avatarCachePrefix) || key.startsWith(userAvatarPrefix)
+    final avatarKeys = allKeys.keys.where(
+      (key) =>
+          key.startsWith(avatarCachePrefix) || key.startsWith(userAvatarPrefix),
     );
 
     for (final key in avatarKeys) {
@@ -115,8 +120,9 @@ class SecureStorageService {
     final now = DateTime.now().millisecondsSinceEpoch;
     const defaultCacheDuration = Duration(days: 7);
 
-    final avatarKeys = allKeys.keys.where((key) =>
-    key.startsWith(avatarCachePrefix) || key.startsWith(userAvatarPrefix)
+    final avatarKeys = allKeys.keys.where(
+      (key) =>
+          key.startsWith(avatarCachePrefix) || key.startsWith(userAvatarPrefix),
     );
 
     for (final key in avatarKeys) {
@@ -139,8 +145,9 @@ class SecureStorageService {
     final allKeys = await storage.readAll();
     double totalSize = 0;
 
-    final avatarKeys = allKeys.keys.where((key) =>
-    key.startsWith(avatarCachePrefix) || key.startsWith(userAvatarPrefix)
+    final avatarKeys = allKeys.keys.where(
+      (key) =>
+          key.startsWith(avatarCachePrefix) || key.startsWith(userAvatarPrefix),
     );
 
     for (final key in avatarKeys) {
@@ -150,10 +157,8 @@ class SecureStorageService {
       }
     }
 
-    return totalSize / 1024 / 1024; // Return in MB
+    return totalSize / 1024 / 1024;
   }
-
-  // === USER METHODS (existing) ===
 
   /// Save user data
   static Future<void> saveUser(String userData) async {
@@ -195,15 +200,12 @@ class SecureStorageService {
   static Future<void> clearAllUserData() async {
     await storage.delete(key: userKey);
     await storage.delete(key: avatarKey);
-    // Keep first launch status
   }
 
   /// Clear everything (reset app)
   static Future<void> clearAll() async {
     await storage.deleteAll();
   }
-
-  // === PRIVATE METHODS ===
 
   static String _getUrlCacheKey(String url) {
     return '${avatarCachePrefix}${md5.convert(utf8.encode(url)).toString()}';
