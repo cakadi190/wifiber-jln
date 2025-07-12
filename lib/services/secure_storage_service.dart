@@ -14,7 +14,6 @@ class SecureStorageService {
   static const String avatarCachePrefix = 'avatar_cache_';
   static const String userAvatarPrefix = 'user_avatar_';
 
-  /// Cache avatar berdasarkan URL
   static Future<void> cacheAvatarByUrl(String url, Uint8List imageData) async {
     final key = _getUrlCacheKey(url);
     final base64String = base64Encode(imageData);
@@ -24,7 +23,6 @@ class SecureStorageService {
     await storage.write(key: '${key}_timestamp', value: timestamp.toString());
   }
 
-  /// Ambil cached avatar berdasarkan URL
   static Future<Uint8List?> getCachedAvatarByUrl(
     String url, {
     Duration? maxAge,
@@ -52,7 +50,6 @@ class SecureStorageService {
     return null;
   }
 
-  /// Cache avatar berdasarkan user ID
   static Future<void> cacheUserAvatar(
     String userId,
     Uint8List imageData,
@@ -65,7 +62,6 @@ class SecureStorageService {
     await storage.write(key: '${key}_timestamp', value: timestamp.toString());
   }
 
-  /// Ambil cached avatar berdasarkan user ID
   static Future<Uint8List?> getUserAvatar(
     String userId, {
     Duration? maxAge,
@@ -93,14 +89,12 @@ class SecureStorageService {
     return null;
   }
 
-  /// Clear avatar cache untuk user tertentu
   static Future<void> clearUserAvatar(String userId) async {
     final key = '${userAvatarPrefix}$userId';
     await storage.delete(key: key);
     await storage.delete(key: '${key}_timestamp');
   }
 
-  /// Clear semua avatar cache
   static Future<void> clearAllAvatarCache() async {
     final allKeys = await storage.readAll();
     final avatarKeys = allKeys.keys.where(
@@ -114,7 +108,6 @@ class SecureStorageService {
     }
   }
 
-  /// Clear expired avatar cache
   static Future<void> clearExpiredAvatarCache() async {
     final allKeys = await storage.readAll();
     final now = DateTime.now().millisecondsSinceEpoch;
@@ -140,7 +133,6 @@ class SecureStorageService {
     }
   }
 
-  /// Get total cache size in MB
   static Future<double> getAvatarCacheSize() async {
     final allKeys = await storage.readAll();
     double totalSize = 0;
@@ -160,49 +152,40 @@ class SecureStorageService {
     return totalSize / 1024 / 1024;
   }
 
-  /// Save user data
   static Future<void> saveUser(String userData) async {
     await storage.write(key: userKey, value: userData);
   }
 
-  /// Get user data
   static Future<String?> getUser() async {
     return await storage.read(key: userKey);
   }
 
-  /// Clear user data
   static Future<void> clearUser() async {
     await storage.delete(key: userKey);
   }
 
-  /// Save first launch status
   static Future<void> setFirstLaunch(bool isFirstLaunch) async {
     await storage.write(key: firstLaunchKey, value: isFirstLaunch.toString());
   }
 
-  /// Get first launch status
   static Future<bool> isFirstLaunch() async {
     final value = await storage.read(key: firstLaunchKey);
     return value == null || value == 'true';
   }
 
-  /// Save current user avatar URL/path
   static Future<void> saveUserAvatarUrl(String avatarUrl) async {
     await storage.write(key: avatarKey, value: avatarUrl);
   }
 
-  /// Get current user avatar URL/path
   static Future<String?> getUserAvatarUrl() async {
     return await storage.read(key: avatarKey);
   }
 
-  /// Clear all user data (logout)
   static Future<void> clearAllUserData() async {
     await storage.delete(key: userKey);
     await storage.delete(key: avatarKey);
   }
 
-  /// Clear everything (reset app)
   static Future<void> clearAll() async {
     await storage.deleteAll();
   }
