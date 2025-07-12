@@ -63,14 +63,13 @@ class _HomeTabState extends State<HomeTab> {
                   ),
                   onPressed: () async {
                     final navigator = Navigator.of(context);
-                    final scaffoldMessenger = ScaffoldMessenger.of(context);
 
                     try {
                       await authProvider.logout();
                       if (!mounted) return;
 
                       SnackBars.success(
-                        scaffoldMessenger.context,
+                        context,
                         "Berhasil mengeluarkan anda dari sesi saat ini. Sampai jumpa di lain waktu!",
                       ).clearSnackBars();
 
@@ -81,7 +80,7 @@ class _HomeTabState extends State<HomeTab> {
 
                       navigator.pop();
                       SnackBars.error(
-                        scaffoldMessenger.context,
+                        context,
                         "Ada kesalahan saat mengeluarkan sesi. Buka ulang aplikasi atau coba keluar sekali lagi.",
                       ).clearSnackBars();
                     }

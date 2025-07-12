@@ -10,6 +10,10 @@ class AuthUser {
   final String name;
   final List<String> permissions;
   String accessToken;
+  int? groupId;
+  String? picture;
+  DateTime? createdAt;
+  String? groupName;
 
   AuthUser({
     required this.userId,
@@ -18,6 +22,10 @@ class AuthUser {
     required this.name,
     required this.permissions,
     required this.accessToken,
+    this.groupId,
+    this.picture,
+    this.createdAt,
+    this.groupName,
   });
 
   factory AuthUser.fromToken(String token) {
@@ -34,6 +42,10 @@ class AuthUser {
       name: decoded['name'] ?? '',
       permissions: List<String>.from(decoded['permissions'] ?? []),
       accessToken: token,
+      groupId: int.tryParse(decoded['groupId'].toString()) ?? 0,
+      groupName: decoded['groupName'] ?? '',
+      picture: decoded['picture'] ?? '',
+      createdAt: DateTime.tryParse(decoded['createdAt'] ?? ''),
     );
   }
 
@@ -43,28 +55,43 @@ class AuthUser {
     return initials;
   }
 
-  String toJson() {
-    return jsonEncode({
+  Map<String, dynamic> toMap() {
+    return {
       "userId": userId,
       "username": username,
       "email": email,
       "name": name,
       "permissions": permissions,
       "access": accessToken,
-    });
+      "groupId": groupId,
+      "groupName": groupName,
+      "picture": picture,
+      "createdAt": createdAt?.toIso8601String(),
+    };
+  }
+
+  String toJson() {
+    return jsonEncode(toMap());
   }
 
   factory AuthUser.fromJson(Map<String, dynamic> json) {
     return AuthUser(
-      userId: json['userId'],
-      username: json['username'],
-      email: json['email'],
-      name: json['name'],
-      permissions: List<String>.from(json['permissions']),
-      accessToken: json['access'],
+      userId: json['userId'] ?? json['user_id'] ?? json['id'] ?? 0,
+      username: json['username'] ?? '',
+      email: json['email'] ?? '',
+      name: json['name'] ?? '',
+      permissions: List<String>.from(json['permissions'] ?? []),
+      accessToken: json['access'] ?? '',
+      groupId: json['groupId'] ?? json['group_id'],
+      groupName: json['GroupName'] ?? json['group_name'],
+      picture: json['picture'],
+      createdAt: DateTime.tryParse(
+        json['createdAt'] ?? json['created_at'] ?? '',
+      ),
     );
   }
 
   bool get isTokenExpired => JwtDecoder.isExpired(accessToken);
+
   DateTime get tokenExpiryDate => JwtDecoder.getExpirationDate(accessToken);
 }

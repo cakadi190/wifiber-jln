@@ -244,7 +244,7 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
                   ),
                   onPressed: () async {
                     final navigator = Navigator.of(context);
-                    final scaffoldMessenger = ScaffoldMessenger.of(context);
+                    final scaffoldMessenger = ScaffoldMessenger.of(this.context);
 
                     try {
                       await authProvider.logout();
