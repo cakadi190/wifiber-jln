@@ -19,6 +19,7 @@ class _AuthLayoutState extends State<AuthLayout> {
   @override
   Widget build(BuildContext context) {
     final appTheme = Theme.of(context);
+    final canPop = ModalRoute.of(context)?.canPop ?? false;
 
     return SystemUiWrapper(
       style: SystemUiHelper.duotone(
@@ -32,9 +33,27 @@ class _AuthLayoutState extends State<AuthLayout> {
             width: double.infinity,
             child: Column(
               children: [
-                const Padding(
-                  padding: EdgeInsets.symmetric(vertical: 48),
-                  child: AppLogo(logoType: LogoType.white),
+                Stack(
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.symmetric(vertical: 48),
+                      child: Center(
+                        child: AppLogo(logoType: LogoType.white),
+                      ),
+                    ),
+                    if (canPop)
+                      Positioned(
+                        left: 16,
+                        top: 72,
+                        child: IconButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          icon: const Icon(
+                            Icons.arrow_back_ios,
+                            color: Colors.white,
+                          ),
+                        ),
+                      ),
+                  ],
                 ),
                 Expanded(
                   child: Container(
