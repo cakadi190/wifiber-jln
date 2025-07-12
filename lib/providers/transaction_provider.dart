@@ -94,38 +94,6 @@ class TransactionProvider with ChangeNotifier {
     _filteredTransactions = filtered;
   }
 
-  Future<void> addTransaction(Transaction tx) async {
-    try {
-      await _service.createTransaction(tx);
-      await loadTransactions();
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
-    }
-  }
-
-  Future<void> updateTransaction(int id, Transaction tx) async {
-    try {
-      await _service.updateTransaction(id, tx);
-      await loadTransactions();
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
-    }
-  }
-
-  Future<void> deleteTransaction(int id) async {
-    try {
-      await _service.deleteTransaction(id);
-      _transactions.removeWhere((tx) => tx.id == id);
-      _applyFilter();
-      notifyListeners();
-    } catch (e) {
-      _error = e.toString();
-      notifyListeners();
-    }
-  }
-
   Transaction? findById(int id) {
     try {
       return _transactions.firstWhere((tx) => tx.id == id);
