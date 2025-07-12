@@ -7,12 +7,8 @@ class HomeController {
   final BuildContext context;
   final AuthProvider authProvider;
 
-  HomeController({
-    required this.context,
-    required this.authProvider,
-  });
+  HomeController({required this.context, required this.authProvider});
 
-  /// Handle logout confirmation dialog and logout process
   Future<void> handleLogout({VoidCallback? onLogoutSuccess}) async {
     final shouldLogout = await _showLogoutConfirmationDialog();
     if (shouldLogout == true) {
@@ -20,7 +16,6 @@ class HomeController {
     }
   }
 
-  /// Show logout confirmation dialog
   Future<bool?> _showLogoutConfirmationDialog() {
     return showDialog<bool>(
       context: context,
@@ -31,7 +26,6 @@ class HomeController {
     );
   }
 
-  /// Perform the actual logout process
   Future<void> _performLogout(VoidCallback? onLogoutSuccess) async {
     try {
       await authProvider.logout();
@@ -45,7 +39,6 @@ class HomeController {
     }
   }
 
-  /// Show success message after logout
   void _showLogoutSuccessMessage() {
     SnackBars.success(
       context,
@@ -53,7 +46,6 @@ class HomeController {
     ).clearSnackBars();
   }
 
-  /// Show error message if logout fails
   void _showLogoutErrorMessage() {
     SnackBars.error(
       context,
@@ -61,26 +53,19 @@ class HomeController {
     ).clearSnackBars();
   }
 
-  /// Get user display name
   String get userDisplayName => authProvider.user?.name ?? 'User';
 
-  /// Get user initials for avatar
   String get userInitials => authProvider.user?.nameInitials ?? 'U';
 
-  /// Get user profile picture URL
   String? get userPictureUrl => authProvider.user?.picture;
 
-  /// Get user access token for image headers
   String? get userAccessToken => authProvider.user?.accessToken;
 
-  /// Check if user has profile picture
   bool get hasProfilePicture => authProvider.user?.picture != null;
 
-  /// Check if user is authenticated
   bool get isAuthenticated => authProvider.user != null;
 }
 
-/// Separate widget for logout confirmation dialog
 class _LogoutConfirmationDialog extends StatelessWidget {
   final VoidCallback onConfirm;
   final VoidCallback onCancel;

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/widgets/home/dashboard_summary.dart';
+import 'package:wifiber/components/widgets/user_avatar.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/controllers/tabs/home_tab.dart';
 import 'package:wifiber/providers/auth_provider.dart';
@@ -75,7 +76,17 @@ class _ProfileHeader extends StatelessWidget {
 
     return Row(
       children: [
-        _UserAvatar(controller: controller),
+        UserAvatar(
+          imageUrl: controller.isAuthenticated && controller.hasProfilePicture
+              ? controller.userPictureUrl
+              : null,
+          name: controller.userDisplayName,
+          radius: 24,
+          backgroundColor: Colors.black,
+          headers: controller.userAccessToken != null
+              ? {'Authorization': 'Bearer ${controller.userAccessToken}'}
+              : null,
+        ),
         const SizedBox(width: 8),
         Expanded(
           child: Column(
@@ -101,77 +112,6 @@ class _ProfileHeader extends StatelessWidget {
           ),
         ),
       ],
-    );
-  }
-}
-
-/// Separate widget for user avatar
-class _UserAvatar extends StatelessWidget {
-  final HomeController controller;
-
-  const _UserAvatar({required this.controller});
-
-  @override
-  Widget build(BuildContext context) {
-    return CircleAvatar(
-      radius: 24,
-      backgroundColor: Colors.black,
-      child: !controller.isAuthenticated
-          ? const Text('U')
-          : !controller.hasProfilePicture
-          ? Text(controller.userInitials)
-          : ClipOval(
-        child: Image.network(
-          controller.userPictureUrl!,
-          width: 48,
-          height: 48,
-          fit: BoxFit.cover,
-          headers: controller.userAccessToken != null
-              ? {'Authorization': 'Bearer ${controller.userAccessToken}'}
-              : {},
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return Center(
-              child: CircularProgressIndicator(
-                value: loadingProgress.expectedTotalBytes != null
-                    ? loadingProgress.cumulativeBytesLoaded /
-                    loadingProgress.expectedTotalBytes!
-                    : null,
-              ),
-            );
-          },
-          errorBuilder: (context, error, stackTrace) {
-            return _AvatarFallback(initials: controller.userInitials);
-          },
-        ),
-      ),
-    );
-  }
-}
-
-class _AvatarFallback extends StatelessWidget {
-  final String initials;
-
-  const _AvatarFallback({required this.initials});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 48,
-      height: 48,
-      decoration: const BoxDecoration(
-        color: Colors.grey,
-        shape: BoxShape.circle,
-      ),
-      child: Center(
-        child: Text(
-          initials,
-          style: const TextStyle(
-            color: Colors.white,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
     );
   }
 }

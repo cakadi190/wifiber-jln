@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/ui/snackbars.dart';
+import 'package:wifiber/components/widgets/user_avatar.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/controllers/tabs/account_center_controller.dart';
 import 'package:wifiber/providers/auth_provider.dart';
@@ -27,86 +28,97 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                color: AppColors.primary,
-                borderRadius: const BorderRadius.only(
-                  bottomLeft: Radius.circular(560),
-                  bottomRight: Radius.circular(560),
-                ),
-              ),
-              height: 250,
-              width: double.infinity,
-              child: Consumer<AuthProvider>(
-                builder: (context, authProvider, child) {
-                  final authUser = authProvider.user;
-
-                  return Column(
-                    children: [
-                      const CircleAvatar(
-                        radius: 48,
-                        backgroundImage: NetworkImage(
-                          'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        authUser?.name ?? 'User',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                        maxLines: 1,
-                        overflow: TextOverflow.ellipsis,
-                      ),
-                      Text(
-                        authUser?.email ?? 'mail@wifiber.id',
-                        style: TextStyle(
-                          color: Colors.white.withValues(alpha: 0.5),
-                          fontSize: 14,
-                          fontWeight: FontWeight.normal,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      GestureDetector(
-                        onTap: () {
-                          _accountCenterController.navigateToScreen(
-                            screen: const MainProfileScreen(),
-                            context: context,
-                          );
-                        },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                            vertical: 8,
-                            horizontal: 12,
-                          ),
-                          decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: const Text(
-                            'Ubah Profil',
-                            style: TextStyle(
-                              color: AppColors.primary,
-                              fontSize: 12,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  );
-                },
-              ),
-            ),
+            _buildHeader(context),
 
             const SizedBox(height: 8),
 
             _buildActionTileLists(context),
           ],
         ),
+      ),
+    );
+  }
+
+  Widget _buildHeader(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        borderRadius: const BorderRadius.only(
+          bottomLeft: Radius.circular(560),
+          bottomRight: Radius.circular(560),
+        ),
+      ),
+      height: 250,
+      width: double.infinity,
+      child: Consumer<AuthProvider>(
+        builder: (context, authProvider, child) {
+          final authUser = authProvider.user;
+
+          return Column(
+            children: [
+              UserAvatar(
+                imageUrl:
+                    authUser?.picture != null && authUser!.picture!.isNotEmpty
+                    ? authUser.picture
+                    : null,
+                name: authUser?.nameInitials ?? 'U',
+                radius: 48,
+                backgroundColor: Colors.black,
+                headers: authUser?.accessToken != null
+                    ? {'Authorization': 'Bearer ${authUser?.accessToken}'}
+                    : null,
+                cacheDuration: Duration(days: 2),
+              ),
+              const SizedBox(height: 8),
+              Text(
+                authUser?.name ?? 'User',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              Text(
+                authUser?.email ?? 'mail@wifiber.id',
+                style: TextStyle(
+                  color: Colors.white.withValues(alpha: 0.5),
+                  fontSize: 14,
+                  fontWeight: FontWeight.normal,
+                ),
+              ),
+              const SizedBox(height: 8),
+              GestureDetector(
+                onTap: () {
+                  _accountCenterController.navigateToScreen(
+                    screen: const MainProfileScreen(),
+                    context: context,
+                  );
+                },
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    vertical: 8,
+                    horizontal: 12,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: const Text(
+                    'Ubah Profil',
+                    style: TextStyle(
+                      color: AppColors.primary,
+                      fontSize: 12,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          );
+        },
       ),
     );
   }
@@ -188,10 +200,7 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
             color: Colors.red,
           ),
           title: const Text('Keluar', style: TextStyle(color: Colors.red)),
-          trailing: const Icon(
-            Icons.chevron_right_rounded,
-            color: Colors.red,
-          ),
+          trailing: const Icon(Icons.chevron_right_rounded, color: Colors.red),
           onTap: () => _logout(context, context.read<AuthProvider>()),
         ),
       ],
@@ -244,7 +253,9 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
                   ),
                   onPressed: () async {
                     final navigator = Navigator.of(context);
-                    final scaffoldMessenger = ScaffoldMessenger.of(this.context);
+                    final scaffoldMessenger = ScaffoldMessenger.of(
+                      this.context,
+                    );
 
                     try {
                       await authProvider.logout();
