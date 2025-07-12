@@ -1,5 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:wifiber/models/transaction.dart';
 import 'package:wifiber/providers/transaction_provider.dart';
+import 'package:wifiber/screens/login_screen.dart';
 
 enum TransactionFilter { all, income, expense }
 
@@ -29,7 +31,6 @@ class TransactionTabController {
 
   void setFilter(TransactionFilter filter) {
     _currentFilter = filter;
-    // Notifier tidak perlu karena UI akan watch provider
   }
 
   Future<void> refreshTransactions() async {
@@ -42,5 +43,13 @@ class TransactionTabController {
 
   Future<void> addTransaction(Transaction tx) async {
     await provider.addTransaction(tx);
+  }
+
+  Future<void> logout(BuildContext context) async {
+    Navigator.pushAndRemoveUntil(
+      context,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+      (_) => false,
+    );
   }
 }

@@ -35,7 +35,7 @@ class TransactionService {
       "nominal": tx.amount.toString(),
       "description": tx.description,
       "proof": tx.proof,
-      "type": "income",
+      "type": tx.type,
     });
 
     final response = await _http.post(
