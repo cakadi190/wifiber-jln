@@ -81,7 +81,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     }
 
     setState(() {
-      _selectedIndex = index;
+      _selectedIndex = index == 2 ? _selectedIndex : index;
     });
   }
 

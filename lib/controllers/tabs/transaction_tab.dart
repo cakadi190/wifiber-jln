@@ -37,14 +37,6 @@ class TransactionTabController {
     await provider.loadTransactions();
   }
 
-  Future<void> deleteTransaction(int id) async {
-    await provider.deleteTransaction(id);
-  }
-
-  Future<void> addTransaction(Transaction tx) async {
-    await provider.addTransaction(tx);
-  }
-
   Future<void> logout(BuildContext context) async {
     Navigator.pushAndRemoveUntil(
       context,
