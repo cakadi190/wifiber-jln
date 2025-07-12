@@ -119,7 +119,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     horizontal: 12,
                   ),
                   decoration: BoxDecoration(
-                    color: AppColors.primary, // warna ungu kamu
+                    color: AppColors.primary,
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Column(

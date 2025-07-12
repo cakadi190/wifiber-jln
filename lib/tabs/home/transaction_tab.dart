@@ -42,81 +42,70 @@ class TransactionTab extends StatelessWidget {
   }
 
   Widget _buildFilter(BuildContext context, TransactionProvider provider) {
-    if (provider.isLoading) {
-      return Container();
-    } else {
-      return Container(
-        height: 60, // Fixed height for compact layout
-        padding: EdgeInsets.only(bottom: 16.0),
-        child: SingleChildScrollView(
-          scrollDirection: Axis.horizontal,
-          padding: EdgeInsets.symmetric(horizontal: 16.0),
-          child: Row(
-            children: [
-              // Type Filter Chips
-              _buildFilterChip(
-                context,
-                label: "Semua",
-                isSelected:
-                    provider.selectedFilter == 'all' ||
-                    provider.selectedFilter == null,
-                onTap: () => provider.setFilter('all'),
-              ),
-              SizedBox(width: 8),
-              _buildFilterChip(
-                context,
-                label: "Pemasukan",
-                isSelected: provider.selectedFilter == 'income',
-                onTap: () => provider.setFilter('income'),
-              ),
-              SizedBox(width: 8),
-              _buildFilterChip(
-                context,
-                label: "Pengeluaran",
-                isSelected: provider.selectedFilter == 'expense',
-                onTap: () => provider.setFilter('expense'),
-              ),
-              SizedBox(width: 12), // Extra space before date filter
-              Container(
-                width: 1,
-                height: 24,
-                color: Colors.white.withValues(alpha: 0.25),
-              ),
-              SizedBox(width: 12), // Extra space before date filter
-              // Date Filter Chip
-              _buildDateFilterChip(
-                context,
-                provider,
-                onTap: () => _showDateFilterModal(context, provider),
-              ),
+    return Container(
+      height: 60,
+      padding: EdgeInsets.only(bottom: 16.0),
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: EdgeInsets.symmetric(horizontal: 16.0),
+        child: Row(
+          children: [
+            _buildFilterChip(
+              context,
+              label: "Semua",
+              isSelected:
+                  provider.selectedFilter == 'all' ||
+                  provider.selectedFilter == null,
+              onTap: () => provider.setFilter('all'),
+            ),
+            SizedBox(width: 8),
+            _buildFilterChip(
+              context,
+              label: "Pemasukan",
+              isSelected: provider.selectedFilter == 'income',
+              onTap: () => provider.setFilter('income'),
+            ),
+            SizedBox(width: 8),
+            _buildFilterChip(
+              context,
+              label: "Pengeluaran",
+              isSelected: provider.selectedFilter == 'expense',
+              onTap: () => provider.setFilter('expense'),
+            ),
+            SizedBox(width: 12),
+            Container(
+              width: 1,
+              height: 24,
+              color: Colors.white.withValues(alpha: 0.25),
+            ),
+            SizedBox(width: 12),
 
-              // Clear Date Filter Button
-              if (provider.startDate != null && provider.endDate != null) ...[
-                SizedBox(width: 8),
-                GestureDetector(
-                  onTap: () => provider.clearDateFilter(),
-                  child: Container(
-                    padding: EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    child: Icon(
-                      Icons.clear,
-                      color: AppColors.primary,
-                      size: 16,
-                    ),
+            _buildDateFilterChip(
+              context,
+              provider,
+              onTap: () => _showDateFilterModal(context, provider),
+            ),
+
+            if (provider.startDate != null && provider.endDate != null) ...[
+              SizedBox(width: 8),
+              GestureDetector(
+                onTap: () => provider.clearDateFilter(),
+                child: Container(
+                  padding: EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(20),
                   ),
+                  child: Icon(Icons.clear, color: AppColors.primary, size: 16),
                 ),
-              ],
-
-              // Extra padding at the end
-              SizedBox(width: 16),
+              ),
             ],
-          ),
+
+            SizedBox(width: 16),
+          ],
         ),
-      );
-    }
+      ),
+    );
   }
 
   Widget _buildDateFilterChip(
@@ -131,7 +120,7 @@ class TransactionTab extends StatelessWidget {
     if (hasDateFilter) {
       final startDate = provider.startDate!;
       final endDate = provider.endDate!;
-      // Shortened date format for compact display
+
       label =
           "${startDate.day}/${startDate.month} - ${endDate.day}/${endDate.month}";
     }
@@ -141,10 +130,7 @@ class TransactionTab extends StatelessWidget {
       child: AnimatedContainer(
         duration: Duration(milliseconds: 200),
         padding: EdgeInsets.symmetric(horizontal: 12, vertical: 8),
-        constraints: BoxConstraints(
-          minWidth: 120, // Minimum width for date filter
-          maxWidth: 160, // Maximum width to prevent overflow
-        ),
+        constraints: BoxConstraints(minWidth: 120, maxWidth: 160),
         decoration: BoxDecoration(
           color: hasDateFilter
               ? Colors.white
@@ -208,7 +194,6 @@ class TransactionTab extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -226,7 +211,6 @@ class TransactionTab extends StatelessWidget {
               ),
               SizedBox(height: 16),
 
-              // Start Date
               _buildDatePickerTile(
                 context,
                 'Tanggal Mulai',
@@ -248,7 +232,6 @@ class TransactionTab extends StatelessWidget {
               ),
               SizedBox(height: 16),
 
-              // End Date
               _buildDatePickerTile(
                 context,
                 'Tanggal Akhir',
@@ -270,7 +253,6 @@ class TransactionTab extends StatelessWidget {
               ),
               SizedBox(height: 32),
 
-              // Action Buttons
               Row(
                 children: [
                   Expanded(
@@ -570,7 +552,6 @@ class TransactionTab extends StatelessWidget {
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -588,7 +569,6 @@ class TransactionTab extends StatelessWidget {
               ),
               SizedBox(height: 8),
 
-              // Transaction ID
               _buildDetailRow(
                 context,
                 'ID Transaksi',
@@ -597,7 +577,6 @@ class TransactionTab extends StatelessWidget {
               ),
               SizedBox(height: 16),
 
-              // Transaction Type
               _buildDetailRow(
                 context,
                 'Tipe Transaksi',
@@ -609,7 +588,6 @@ class TransactionTab extends StatelessWidget {
               ),
               SizedBox(height: 16),
 
-              // Description
               _buildDetailRow(
                 context,
                 'Deskripsi',
@@ -618,7 +596,6 @@ class TransactionTab extends StatelessWidget {
               ),
               SizedBox(height: 16),
 
-              // Amount
               _buildDetailRow(
                 context,
                 'Jumlah',
@@ -628,7 +605,6 @@ class TransactionTab extends StatelessWidget {
               ),
               SizedBox(height: 16),
 
-              // Date
               _buildDetailRow(
                 context,
                 'Tanggal',
@@ -637,7 +613,6 @@ class TransactionTab extends StatelessWidget {
               ),
               SizedBox(height: 32),
 
-              // Close button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
