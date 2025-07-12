@@ -10,6 +10,7 @@ import 'package:wifiber/middlewares/auth_middleware.dart';
 import 'package:wifiber/providers/transaction_provider.dart';
 import 'package:wifiber/screens/dashboard/bills_screen.dart';
 import 'package:wifiber/screens/login_screen.dart';
+import 'package:wifiber/tabs/home/account_center_screen.dart';
 import 'package:wifiber/tabs/home/complaints_tab.dart';
 import 'package:wifiber/tabs/home/home_tab.dart';
 import 'package:wifiber/tabs/home/transaction_tab.dart';
@@ -46,7 +47,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
       TransactionTab(controller: _transactionTabController),
       Container(),
       ComplaintsTab(),
-      const Center(child: Text('Akun')),
+      AccountCenterScreen(),
     ];
   }
 
