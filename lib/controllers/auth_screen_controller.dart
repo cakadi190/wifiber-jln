@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/screens/dashboard/home_dashboard_screen.dart';
+import 'package:wifiber/screens/forgot_password_screen.dart';
 
 class LoginScreenController {
   final BuildContext context;
@@ -42,6 +43,12 @@ class LoginScreenController {
       return 'Kata sandi maksimal 50 karakter';
     }
     return null;
+  }
+
+  Future<void> navigateToForgotPassword() async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
+    );
   }
 
   Future<void> submitForm({

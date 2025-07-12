@@ -1,30 +1,29 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:remixicon/remixicon.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:wifiber/config/app_colors.dart';
-import 'package:wifiber/controllers/auth_screen_controller.dart';
+import 'package:wifiber/controllers/forgot_password_controller.dart';
 import 'package:wifiber/helpers/network_helper.dart';
 import 'package:wifiber/layouts/auth_layout.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 
-class LoginScreen extends StatefulWidget {
-  const LoginScreen({super.key});
+class ForgotPasswordScreen extends StatefulWidget {
+  const ForgotPasswordScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  late LoginScreenController _controller;
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+  late ForgotPasswordController _controller;
   String _ipAddress = 'Unknown';
   bool _loadingIpAddress = true;
 
   @override
   void initState() {
     super.initState();
-    _controller = LoginScreenController(context);
+    _controller = ForgotPasswordController(context);
     _getPublicIp();
   }
 
@@ -60,61 +59,24 @@ class _LoginScreenState extends State<LoginScreen> {
             child: Column(
               children: [
                 Padding(
-                  padding: const EdgeInsets.only(top: 16, bottom: 8),
+                  padding: const EdgeInsets.only(top: 16, bottom: 16),
                   child: TextFormField(
-                    controller: _controller.usernameController,
-                    textInputAction: TextInputAction.next,
-                    keyboardType: TextInputType.text,
+                    controller: _controller.emailController,
+                    textInputAction: TextInputAction.done,
+                    keyboardType: TextInputType.emailAddress,
                     enabled: !_controller.formLoading,
-
                     autofillHints: const [
-                      AutofillHints.username,
                       AutofillHints.email,
                     ],
                     decoration: InputDecoration(
-                      labelText: 'Nama Pengguna',
-                      hintText: 'Masukkan nama pengguna anda',
+                      labelText: 'Surel',
+                      hintText: 'Masukkan surel anda',
                       prefixIcon: Icon(
-                        RemixIcons.user_fill,
+                        RemixIcons.mail_fill,
                         color: AppColors.primary,
                       ),
                     ),
-                    validator: _controller.validateUsername,
-                    onFieldSubmitted: (_) => _handleSubmit(),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 8, bottom: 16),
-                  child: TextFormField(
-                    controller: _controller.passwordController,
-                    obscureText: _controller.obscurePassword,
-                    textInputAction: TextInputAction.done,
-                    enabled: !_controller.formLoading,
-
-                    autofillHints: const [AutofillHints.password],
-                    decoration: InputDecoration(
-                      labelText: 'Kata Sandi',
-                      hintText: 'Masukkan kata sandi anda',
-                      prefixIcon: Icon(
-                        RemixIcons.lock_2_fill,
-                        color: AppColors.primary,
-                      ),
-                      suffixIcon: InkWell(
-                        onTap: () {
-                          setState(() {
-                            _controller.obscurePassword =
-                                !_controller.obscurePassword;
-                          });
-                        },
-                        child: Icon(
-                          _controller.obscurePassword
-                              ? RemixIcons.eye_fill
-                              : RemixIcons.eye_close_fill,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ),
-                    validator: _controller.validatePassword,
+                    validator: _controller.validateEmail,
                     onFieldSubmitted: (_) => _handleSubmit(),
                   ),
                 ),
@@ -134,23 +96,27 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
             ),
             child: _controller.formLoading
-                ? const CircularProgressIndicator(color: AppColors.primary)
+                ? const CircularProgressIndicator(color: Colors.white)
                 : const Text(
-                    "Masuk Sekarang",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+              "Kirim Instruksinya!",
+              style: TextStyle(
+                color: Colors.white,
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
           ),
         ),
         SizedBox(
           width: double.infinity,
           child: TextButton(
-            onPressed: () => _controller.navigateToForgotPassword(),
+            onPressed: _controller.formLoading
+                ? null
+                : () {
+              Navigator.of(context).pop();
+            },
             child: Text(
-              "Lupa Kata Sandi",
+              "Kembali ke Login",
               style: TextStyle(
                 color: AppColors.primary,
                 fontWeight: FontWeight.bold,
@@ -171,15 +137,9 @@ class _LoginScreenState extends State<LoginScreen> {
       onLoading: () => setState(() => _controller.formLoading = true),
       onComplete: () {
         setState(() => _controller.formLoading = false);
-
-        _saveCredentialsToPasswordManager();
       },
       authProvider: authProvider,
     );
-  }
-
-  void _saveCredentialsToPasswordManager() {
-    TextInput.finishAutofillContext(shouldSave: true);
   }
 
   Widget _buildHeader(BuildContext context) {
@@ -190,7 +150,7 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Column(
         children: [
           Text(
-            "Selamat Datang!",
+            "Lupa Kata Sandi?",
             style: appTheme.textTheme.bodyLarge?.copyWith(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -200,7 +160,7 @@ class _LoginScreenState extends State<LoginScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            "Silahkan masuk dengan akun anda untuk melanjutkan ke dalam sistem.",
+            "Masukkan email Anda dan kami akan mengirimkan instruksi reset kata sandi ke email Anda.",
             style: appTheme.textTheme.bodySmall,
             textAlign: TextAlign.center,
           ),
@@ -226,7 +186,7 @@ class _LoginScreenState extends State<LoginScreen> {
       child: Text.rich(
         TextSpan(
           children: [
-            const TextSpan(text: "Butuh ID?"),
+            const TextSpan(text: "Butuh bantuan?"),
             TextSpan(
               text: " Silahkan Hubungi Kami di WhatsApp.",
               style: TextStyle(

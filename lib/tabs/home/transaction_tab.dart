@@ -455,7 +455,7 @@ class TransactionTab extends StatelessWidget {
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 crossAxisAlignment: CrossAxisAlignment.center,
-                mainAxisSize: MainAxisSize.min, // Add this to make row compact
+                mainAxisSize: MainAxisSize.min,
                 children: [
                   SizedBox(
                     height: 32,
