@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/controllers/tabs/transaction_tab.dart';
 import 'package:wifiber/helpers/currency_helper.dart';
+import 'package:wifiber/helpers/datetime_helper.dart';
 import 'package:wifiber/models/transaction.dart';
 import 'package:wifiber/providers/transaction_provider.dart';
 
@@ -433,61 +434,118 @@ class TransactionTab extends StatelessWidget {
 
     return RefreshIndicator(
       onRefresh: () => controller.refreshTransactions(),
-      child: ListView.builder(
-        itemCount: transactions.length,
-        itemBuilder: (_, i) {
-          final tx = transactions[i];
-          final isIncome = tx.type == "income";
-
-          return ListTile(
-            leading: Container(
-              decoration: BoxDecoration(
-                color: isIncome ? Colors.green : Colors.red,
-                border: Border.all(color: isIncome ? Colors.green : Colors.red),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              height: 40,
-              width: 40,
-              child: Center(
-                child: Icon(
-                  isIncome ? Icons.arrow_downward : Icons.arrow_upward,
-                  color: Colors.white,
-                ),
-              ),
-            ),
-            title: Text("#${tx.id.toString()}"),
-            subtitle: Text(
-              tx.description,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            trailing: Text(CurrencyHelper.formatCurrency(tx.amount)),
-            onTap: () => _showTransactionDetailModal(context, tx),
-          );
-        },
-      ),
+      child: _buildTransactionList(context, transactions, provider),
     );
   }
 
-  Widget _buildErrorWidget(BuildContext context, String error) {
-    if (error.contains("401")) {
+  Widget _buildTransactionList(
+    BuildContext context,
+    List<Transaction> transactions,
+    TransactionProvider provider,
+  ) {
+    if (transactions.isEmpty) {
       return Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Text(
-              "Sesi anda telah habis. Mohon autentikasikan diri anda kembali.",
-            ),
-            TextButton(
-              onPressed: () => controller.logout(context),
-              child: Text("Logout"),
-            ),
-          ],
+        child: Padding(
+          padding: EdgeInsets.all(16),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              Icon(
+                Icons.info,
+                size: 64,
+                color: Colors.black.withValues(alpha: 0.6),
+              ),
+              Text(
+                "Tidak ada transaksi",
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 24,
+                  color: Colors.black.withValues(alpha: 0.6),
+                ),
+              ),
+              Text(
+                "Tidak ada transaksi yang sesuai dengan filter yang telah dipilih. Silahkan cari atau ganti opsi filter yang lainnya.",
+                textAlign: TextAlign.center,
+                style: TextStyle(color: Colors.black.withValues(alpha: 0.6)),
+              ),
+              TextButton(
+                onPressed: () => _showDateFilterModal(context, provider),
+                child: Text(
+                  "Pilih tanggal",
+                  style: TextStyle(color: Colors.black.withValues(alpha: 0.6)),
+                ),
+              ),
+            ],
+          ),
         ),
       );
     }
 
-    return Center(child: Text("Ada kesalahan dari sistem. Mohon coba lagi."));
+    return ListView.builder(
+      itemCount: transactions.length,
+      itemBuilder: (_, i) {
+        final tx = transactions[i];
+        final isIncome = tx.type == "income";
+
+        return ListTile(
+          leading: Container(
+            decoration: BoxDecoration(
+              color: isIncome ? Colors.green : Colors.red,
+              border: Border.all(color: isIncome ? Colors.green : Colors.red),
+              borderRadius: BorderRadius.circular(12),
+            ),
+            height: 40,
+            width: 40,
+            child: Center(
+              child: Icon(
+                isIncome ? Icons.arrow_downward : Icons.arrow_upward,
+                color: Colors.white,
+              ),
+            ),
+          ),
+          title: Text(
+            DateHelper.formatDate(tx.createdAt),
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          subtitle: Text(
+            tx.description,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          trailing: Text(CurrencyHelper.formatCurrency(tx.amount)),
+          onTap: () => _showTransactionDetailModal(context, tx),
+        );
+      },
+    );
+  }
+
+  Widget _buildErrorWidget(BuildContext context, String error) {
+    return Center(
+      child: Padding(
+        padding: EdgeInsets.all(16),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(color: Colors.red, Icons.warning, size: 64),
+            Text(
+              "Ada Kesalahan!",
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 24,
+                color: Colors.red,
+              ),
+            ),
+            Text(error, textAlign: TextAlign.center),
+            TextButton(
+              onPressed: () => controller.logout(context),
+              child: Text("Autentikasi ulang"),
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _showTransactionDetailModal(
@@ -507,89 +565,100 @@ class TransactionTab extends StatelessWidget {
           right: 16,
           top: 16,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Header
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  'Detail Transaksi',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Detail Transaksi',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-                IconButton(
+                  IconButton(
+                    onPressed: () => Navigator.pop(context),
+                    icon: Icon(Icons.close),
+                  ),
+                ],
+              ),
+              SizedBox(height: 8),
+
+              // Transaction ID
+              _buildDetailRow(
+                context,
+                'ID Transaksi',
+                '#${transaction.id.toString()}',
+                Icons.tag,
+              ),
+              SizedBox(height: 16),
+
+              // Transaction Type
+              _buildDetailRow(
+                context,
+                'Tipe Transaksi',
+                transaction.type == 'income' ? 'Pemasukan' : 'Pengeluaran',
+                transaction.type == 'income'
+                    ? Icons.arrow_downward
+                    : Icons.arrow_upward,
+                color: transaction.type == 'income' ? Colors.green : Colors.red,
+              ),
+              SizedBox(height: 16),
+
+              // Description
+              _buildDetailRow(
+                context,
+                'Deskripsi',
+                transaction.description,
+                Icons.description,
+              ),
+              SizedBox(height: 16),
+
+              // Amount
+              _buildDetailRow(
+                context,
+                'Jumlah',
+                CurrencyHelper.formatCurrency(transaction.amount),
+                Icons.attach_money,
+                color: transaction.type == 'income' ? Colors.green : Colors.red,
+              ),
+              SizedBox(height: 16),
+
+              // Date
+              _buildDetailRow(
+                context,
+                'Tanggal',
+                DateHelper.formatDate(transaction.createdAt, format: 'full'),
+                Icons.calendar_month,
+              ),
+              SizedBox(height: 32),
+
+              // Close button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
                   onPressed: () => Navigator.pop(context),
-                  icon: Icon(Icons.close),
-                ),
-              ],
-            ),
-            SizedBox(height: 8),
-
-            // Transaction ID
-            _buildDetailRow(
-              context,
-              'ID Transaksi',
-              '#${transaction.id.toString()}',
-              Icons.tag,
-            ),
-            SizedBox(height: 16),
-
-            // Transaction Type
-            _buildDetailRow(
-              context,
-              'Tipe Transaksi',
-              transaction.type == 'income' ? 'Pemasukan' : 'Pengeluaran',
-              transaction.type == 'income'
-                  ? Icons.arrow_downward
-                  : Icons.arrow_upward,
-              color: transaction.type == 'income' ? Colors.green : Colors.red,
-            ),
-            SizedBox(height: 16),
-
-            // Description
-            _buildDetailRow(
-              context,
-              'Deskripsi',
-              transaction.description,
-              Icons.description,
-            ),
-            SizedBox(height: 16),
-
-            // Amount
-            _buildDetailRow(
-              context,
-              'Jumlah',
-              CurrencyHelper.formatCurrency(transaction.amount),
-              Icons.attach_money,
-              color: transaction.type == 'income' ? Colors.green : Colors.red,
-            ),
-            SizedBox(height: 32),
-
-            // Close button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () => Navigator.pop(context),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: AppColors.primary,
-                  padding: EdgeInsets.symmetric(vertical: 16),
-                ),
-                child: Text(
-                  'Tutup',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    padding: EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  child: Text(
+                    'Tutup',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                 ),
               ),
-            ),
-            SizedBox(height: 16),
-          ],
+              SizedBox(height: 16),
+            ],
+          ),
         ),
       ),
     );

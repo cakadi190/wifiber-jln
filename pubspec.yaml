@@ -49,6 +49,7 @@ dependencies:
   phosphor_flutter: ^2.1.0
   remixicon: ^1.4.1
   font_awesome_flutter: ^10.8.0
+  intl: ^0.18.0
 
 dev_dependencies:
   flutter_test:
