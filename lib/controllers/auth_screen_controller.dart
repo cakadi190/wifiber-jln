@@ -82,10 +82,18 @@ class LoginScreenController {
         }
       }
     } catch (e) {
+      String message = e.toString();
+
+      if(e.toString().contains("400")) {
+        message = "Nama pengguna atau kata sandi salah.";
+      } else {
+        message = e.toString();
+      }
+
       if (context.mounted) {
         SnackBars.error(
           context,
-          "Ada masalah, silahkan coba lagi. Atau hubungi admin untuk bantuan lebih lanjut.",
+          message,
         ).clearSnackBars();
       }
     } finally {
