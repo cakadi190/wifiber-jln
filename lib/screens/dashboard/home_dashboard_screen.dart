@@ -1,13 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
+import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/config/app_colors.dart';
+import 'package:wifiber/controllers/tabs/transaction_tab.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/middlewares/auth_middleware.dart';
+import 'package:wifiber/providers/transaction_provider.dart';
 import 'package:wifiber/screens/dashboard/bills_screen.dart';
 import 'package:wifiber/screens/login_screen.dart';
 import 'package:wifiber/tabs/home/home_tab.dart';
+import 'package:wifiber/tabs/home/transaction_tab.dart';
 
 class HomeDashboardScreen extends StatefulWidget {
   const HomeDashboardScreen({super.key});
@@ -19,6 +23,7 @@ class HomeDashboardScreen extends StatefulWidget {
 class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   int _selectedIndex = 0;
   late final List<Widget> _widgetOptions;
+  late final TransactionTabController _transactionTabController;
 
   SystemUiOverlayStyle _internalStyle = SystemUiHelper.duotone(
     statusBarColor: Colors.transparent,
@@ -29,12 +34,15 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   void initState() {
     super.initState();
 
+    final provider = context.read<TransactionProvider>();
+    _transactionTabController = TransactionTabController(provider);
+
     _widgetOptions = [
       HomeTab(
         onTransactionTap: () => _onItemTapped(1),
         onLogoutTap: _onLogoutRedirect,
       ),
-      const Center(child: Text('Transaksi')),
+      TransactionTab(controller: _transactionTabController),
       const Center(child: Text('Pengaduan')),
       const Center(child: Text('Pengaduan')),
       const Center(child: Text('Akun')),
@@ -56,6 +64,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
           navigationBarColor: AppColor.violet50,
         );
       });
+    } else if (index == 1) {
+      _transactionTabController.refreshTransactions();
     } else if (index == 2) {
       Navigator.of(
         context,

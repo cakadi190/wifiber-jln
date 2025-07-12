@@ -3,12 +3,19 @@ import 'package:provider/provider.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/config/app_font.dart';
 import 'package:wifiber/providers/auth_provider.dart';
+import 'package:wifiber/providers/transaction_provider.dart';
 import 'package:wifiber/screens/splash_screen.dart';
+import 'package:wifiber/services/transaction_service.dart';
 
 void main() {
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => AuthProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+        ChangeNotifierProvider(
+          create: (_) => TransactionProvider(TransactionService()),
+        ),
+      ],
       child: const CoreApp(),
     ),
   );
@@ -34,31 +41,19 @@ class CoreApp extends StatelessWidget {
         inputDecorationTheme: InputDecorationTheme(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
-            borderSide: const BorderSide(
-              color: Color(0xFFE5E1EF),
-              width: 1.0,
-            ),
+            borderSide: const BorderSide(color: Color(0xFFE5E1EF), width: 1.0),
           ),
           enabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
-            borderSide: const BorderSide(
-              color: Color(0xFFE5E1EF),
-              width: 1.0,
-            ),
+            borderSide: const BorderSide(color: Color(0xFFE5E1EF), width: 1.0),
           ),
           focusedBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
-            borderSide: const BorderSide(
-              color: AppColors.primary,
-              width: 1.0,
-            ),
+            borderSide: const BorderSide(color: AppColors.primary, width: 1.0),
           ),
           disabledBorder: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
-            borderSide: const BorderSide(
-              color: Color(0xFFE5E1EF),
-              width: 1.0,
-            ),
+            borderSide: const BorderSide(color: Color(0xFFE5E1EF), width: 1.0),
           ),
         ),
       ),
