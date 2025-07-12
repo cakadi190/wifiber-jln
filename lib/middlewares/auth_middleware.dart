@@ -28,7 +28,7 @@ class AuthGuard extends StatelessWidget {
           SnackBars.info(
             context,
             "Silahkan login terlebih dahulu untuk melanjutkan.",
-          ).clearSnackBars();
+          );
 
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (_) => const LoginScreen()),

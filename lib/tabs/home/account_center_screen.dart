@@ -36,7 +36,7 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
                   bottomRight: Radius.circular(560),
                 ),
               ),
-              height: 280,
+              height: 250,
               width: double.infinity,
               child: Consumer<AuthProvider>(
                 builder: (context, authProvider, child) {
@@ -45,7 +45,7 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
                   return Column(
                     children: [
                       const CircleAvatar(
-                        radius: 56,
+                        radius: 48,
                         backgroundImage: NetworkImage(
                           'https://images.pexels.com/photos/220453/pexels-photo-220453.jpeg?auto=compress&cs=tinysrgb&w=1260&h=750&dpr=1',
                         ),
@@ -65,7 +65,7 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
                         authUser?.email ?? 'mail@wifiber.id',
                         style: TextStyle(
                           color: Colors.white.withValues(alpha: 0.5),
-                          fontSize: 16,
+                          fontSize: 14,
                           fontWeight: FontWeight.normal,
                         ),
                       ),
@@ -102,7 +102,7 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
               ),
             ),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: 8),
 
             _buildActionTileLists(context),
           ],
@@ -111,7 +111,6 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
     );
   }
 
-  /* <<<<<<<<<<<<<<  ✨ Windsurf Command 🌟 >>>>>>>>>>>>>>>> */
   Widget _buildActionTileLists(BuildContext context) {
     return Column(
       children: [
@@ -198,8 +197,6 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
       ],
     );
   }
-
-  /* <<<<<<<<<<  0cc34574-fb20-4e94-a4d7-d8fcde555010  >>>>>>>>>>> */
 
   void _logout(BuildContext context, AuthProvider authProvider) {
     showDialog(
