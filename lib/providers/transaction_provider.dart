@@ -12,12 +12,22 @@ class TransactionProvider with ChangeNotifier {
   bool _isLoading = false;
   String? _error;
   String? _selectedFilter = 'all';
+  DateTime? _startDate;
+  DateTime? _endDate;
 
   List<Transaction> get transactions => _filteredTransactions;
+
   List<Transaction> get allTransactions => _transactions;
+
   bool get isLoading => _isLoading;
+
   String? get error => _error;
+
   String? get selectedFilter => _selectedFilter;
+
+  DateTime? get startDate => _startDate;
+
+  DateTime? get endDate => _endDate;
 
   Future<void> loadTransactions() async {
     _isLoading = true;
@@ -35,26 +45,53 @@ class TransactionProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void setDateFilter(DateTime? startDate, DateTime? endDate) {
+    _startDate = startDate;
+    _endDate = endDate;
+    loadTransactions();
+    _applyFilter();
+    notifyListeners();
+  }
+
+  void clearDateFilter() {
+    _startDate = null;
+    _endDate = null;
+    loadTransactions();
+    _applyFilter();
+    notifyListeners();
+  }
+
   void setFilter(String filter) {
     _selectedFilter = filter;
-    _applyFilter();
     loadTransactions();
+    _applyFilter();
     notifyListeners();
   }
 
   void _applyFilter() {
+    List<Transaction> filtered = List.from(_transactions);
+
     switch (_selectedFilter) {
       case 'income':
-        _filteredTransactions = _transactions.where((tx) => tx.type == 'income').toList();
+        filtered = filtered.where((tx) => tx.type == 'income').toList();
         break;
       case 'expense':
-        _filteredTransactions = _transactions.where((tx) => tx.type == 'expense').toList();
+        filtered = filtered.where((tx) => tx.type == 'expense').toList();
         break;
       case 'all':
       default:
-        _filteredTransactions = List.from(_transactions);
         break;
     }
+
+    if (_startDate != null && _endDate != null) {
+      filtered = filtered.where((tx) {
+        final txDate = tx.createdAt;
+        return txDate.isAfter(_startDate!.subtract(Duration(days: 1))) &&
+            txDate.isBefore(_endDate!.add(Duration(days: 1)));
+      }).toList();
+    }
+
+    _filteredTransactions = filtered;
   }
 
   Future<void> addTransaction(Transaction tx) async {

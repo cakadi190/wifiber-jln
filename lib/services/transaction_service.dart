@@ -6,8 +6,19 @@ import 'package:wifiber/services/http_service.dart';
 class TransactionService {
   static final HttpService _http = HttpService();
 
-  Future<List<Transaction>> getTransactions() async {
-    final response = await _http.get('/transactions', requiresAuth: true);
+  Future<List<Transaction>> getTransactions({
+    DateTime? startDate,
+    DateTime? endDate,
+  }) async {
+    String endpoint = '/transactions';
+
+    if (startDate != null && endDate != null) {
+      final startDateStr = "${startDate.year}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}";
+      final endDateStr = "${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}";
+      endpoint += "?start_date=$startDateStr&end_date=$endDateStr";
+    }
+
+    final response = await _http.get(endpoint, requiresAuth: true);
 
     if (response.statusCode == 200) {
       final jsonData = json.decode(response.body);
