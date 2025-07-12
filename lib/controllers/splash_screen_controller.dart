@@ -8,7 +8,7 @@ import 'package:wifiber/services/first_launch_service.dart';
 
 class SplashScreenController extends ChangeNotifier {
   final BuildContext context;
-  String _splashText = "Loading...";
+  String _splashText = "Memuat...";
 
   SplashScreenController(this.context);
 
@@ -21,11 +21,12 @@ class SplashScreenController extends ChangeNotifier {
 
   Future<void> initializeApp() async {
     try {
-      _updateSplashText("Initializing...");
-
+      _updateSplashText("Menginisialisasi sistem...");
       final auth = Provider.of<AuthProvider>(context, listen: false);
 
-      _updateSplashText("Checking authentication...");
+      await Future.delayed(const Duration(milliseconds: 500));
+
+      _updateSplashText("Memeriksa peluncuran dan autentikasi...");
 
       final results = await Future.wait([
         Future.delayed(const Duration(seconds: 1)),
@@ -34,34 +35,34 @@ class SplashScreenController extends ChangeNotifier {
 
       final isFirstLaunch = results[1] as bool;
 
-      _updateSplashText("Preparing app...");
+      _updateSplashText("Mengarahkan...");
 
-      await Future.delayed(const Duration(milliseconds: 500));
+      await Future.delayed(const Duration(milliseconds: 300));
 
       _navigateToRoute(_getTargetRoute(isFirstLaunch, auth.isLoggedIn));
     } catch (e) {
-      _updateSplashText("Error occurred, redirecting...");
+      _updateSplashText("Terjadi kesalahan...");
       await Future.delayed(const Duration(seconds: 1));
       _navigateToRoute(const LoginScreen());
     }
   }
 
   Future<bool> _checkFirstLaunch() async {
-    _updateSplashText("Preparing the system...");
+    _updateSplashText("Mempersiapkan sistem...");
     return await FirstLaunchService.isFirstLaunch();
   }
 
   Widget _getTargetRoute(bool isFirstLaunch, bool isLoggedIn) {
     if (isFirstLaunch && !isLoggedIn) {
-      _updateSplashText("Welcome! Redirecting...");
+      _updateSplashText("Selamat datang! Mengalihkan...");
       return const OnboardingScreen();
     }
 
     if (isLoggedIn) {
-      _updateSplashText("Welcome back!");
+      _updateSplashText("Selamat datang kembali!");
       return const HomeDashboardScreen();
     } else {
-      _updateSplashText("Please sign in...");
+      _updateSplashText("Silakan masuk...");
       return const LoginScreen();
     }
   }
