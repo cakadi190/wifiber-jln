@@ -387,7 +387,7 @@ class TransactionTab extends StatelessWidget {
               : Colors.white.withValues(alpha: 0.10),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? Colors.white : Colors.grey.shade300,
+            color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.50),
             width: 1,
           ),
         ),
