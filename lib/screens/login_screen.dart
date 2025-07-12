@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:remixicon/remixicon.dart';
 import 'package:skeletonizer/skeletonizer.dart';
@@ -53,63 +54,72 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget _buildBody() {
     return Column(
       children: [
-        Form(
-          key: _controller.formKey,
-          child: Column(
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(top: 16, bottom: 8),
-                child: TextFormField(
-                  controller: _controller.usernameController,
-                  textInputAction: TextInputAction.next,
-                  keyboardType: TextInputType.text,
-                  enabled: !_controller.formLoading,
-                  decoration: InputDecoration(
-                    labelText: 'Nama Pengguna',
-                    hintText: 'Masukkan nama pengguna anda',
-                    prefixIcon: Icon(
-                      RemixIcons.user_fill,
-                      color: AppColors.primary,
-                    ),
-                  ),
-                  validator: _controller.validateUsername,
-                  onFieldSubmitted: (_) => _handleSubmit(),
-                ),
-              ),
-              Padding(
-                padding: const EdgeInsets.only(top: 8, bottom: 16),
-                child: TextFormField(
-                  controller: _controller.passwordController,
-                  obscureText: _controller.obscurePassword,
-                  textInputAction: TextInputAction.done,
-                  enabled: !_controller.formLoading,
-                  decoration: InputDecoration(
-                    labelText: 'Kata Sandi',
-                    hintText: 'Masukkan kata sandi anda',
-                    prefixIcon: Icon(
-                      RemixIcons.lock_2_fill,
-                      color: AppColors.primary,
-                    ),
-                    suffixIcon: InkWell(
-                      onTap: () {
-                        setState(() {
-                          _controller.obscurePassword =
-                              !_controller.obscurePassword;
-                        });
-                      },
-                      child: Icon(
-                        _controller.obscurePassword
-                            ? RemixIcons.eye_fill
-                            : RemixIcons.eye_close_fill,
+        AutofillGroup(
+          child: Form(
+            key: _controller.formKey,
+            child: Column(
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(top: 16, bottom: 8),
+                  child: TextFormField(
+                    controller: _controller.usernameController,
+                    textInputAction: TextInputAction.next,
+                    keyboardType: TextInputType.text,
+                    enabled: !_controller.formLoading,
+
+                    autofillHints: const [
+                      AutofillHints.username,
+                      AutofillHints.email,
+                    ],
+                    decoration: InputDecoration(
+                      labelText: 'Nama Pengguna',
+                      hintText: 'Masukkan nama pengguna anda',
+                      prefixIcon: Icon(
+                        RemixIcons.user_fill,
                         color: AppColors.primary,
                       ),
                     ),
+                    validator: _controller.validateUsername,
+                    onFieldSubmitted: (_) => _handleSubmit(),
                   ),
-                  validator: _controller.validatePassword,
-                  onFieldSubmitted: (_) => _handleSubmit(),
                 ),
-              ),
-            ],
+                Padding(
+                  padding: const EdgeInsets.only(top: 8, bottom: 16),
+                  child: TextFormField(
+                    controller: _controller.passwordController,
+                    obscureText: _controller.obscurePassword,
+                    textInputAction: TextInputAction.done,
+                    enabled: !_controller.formLoading,
+
+                    autofillHints: const [AutofillHints.password],
+                    decoration: InputDecoration(
+                      labelText: 'Kata Sandi',
+                      hintText: 'Masukkan kata sandi anda',
+                      prefixIcon: Icon(
+                        RemixIcons.lock_2_fill,
+                        color: AppColors.primary,
+                      ),
+                      suffixIcon: InkWell(
+                        onTap: () {
+                          setState(() {
+                            _controller.obscurePassword =
+                                !_controller.obscurePassword;
+                          });
+                        },
+                        child: Icon(
+                          _controller.obscurePassword
+                              ? RemixIcons.eye_fill
+                              : RemixIcons.eye_close_fill,
+                          color: AppColors.primary,
+                        ),
+                      ),
+                    ),
+                    validator: _controller.validatePassword,
+                    onFieldSubmitted: (_) => _handleSubmit(),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
         SizedBox(
@@ -159,9 +169,17 @@ class _LoginScreenState extends State<LoginScreen> {
 
     _controller.submitForm(
       onLoading: () => setState(() => _controller.formLoading = true),
-      onComplete: () => setState(() => _controller.formLoading = false),
+      onComplete: () {
+        setState(() => _controller.formLoading = false);
+
+        _saveCredentialsToPasswordManager();
+      },
       authProvider: authProvider,
     );
+  }
+
+  void _saveCredentialsToPasswordManager() {
+    TextInput.finishAutofillContext(shouldSave: true);
   }
 
   Widget _buildHeader(BuildContext context) {

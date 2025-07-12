@@ -62,23 +62,26 @@ class _HomeTabState extends State<HomeTab> {
                     ),
                   ),
                   onPressed: () async {
+                    final navigator = Navigator.of(context);
+                    final scaffoldMessenger = ScaffoldMessenger.of(context);
+
                     try {
                       await authProvider.logout();
                       if (!mounted) return;
 
                       SnackBars.success(
-                        context,
+                        scaffoldMessenger.context,
                         "Berhasil mengeluarkan anda dari sesi saat ini. Sampai jumpa di lain waktu!",
                       ).clearSnackBars();
 
-                      Navigator.of(context).pop();
+                      navigator.pop();
                       widget.onLogoutTap?.call();
                     } catch (e) {
                       if (!mounted) return;
 
-                      Navigator.of(context).pop();
+                      navigator.pop();
                       SnackBars.error(
-                        context,
+                        scaffoldMessenger.context,
                         "Ada kesalahan saat mengeluarkan sesi. Buka ulang aplikasi atau coba keluar sekali lagi.",
                       ).clearSnackBars();
                     }
