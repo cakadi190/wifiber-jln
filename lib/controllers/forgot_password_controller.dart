@@ -23,7 +23,9 @@ class ForgotPasswordController {
       return 'Kolom surel tidak boleh kosong';
     }
 
-    final emailRegex = RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$');
+    final emailRegex = RegExp(
+      r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$',
+    );
     if (!emailRegex.hasMatch(value.trim())) {
       return 'Format kolom surel tidak valid';
     }
@@ -58,7 +60,7 @@ class ForgotPasswordController {
         await Future.delayed(const Duration(seconds: 3));
 
         if (context.mounted) {
-          if(authProvider.isLoggedIn) {
+          if (authProvider.isLoggedIn) {
             authProvider.logout();
 
             SnackBars.info(
@@ -66,8 +68,9 @@ class ForgotPasswordController {
               "Silahkan masuk terlebih dahulu untuk melanjutkan ke dalam sistem setelah reset kata sandi.",
             );
 
-            Navigator.of(context).pushReplacement(
+            Navigator.of(context).pushAndRemoveUntil(
               MaterialPageRoute(builder: (_) => const LoginScreen()),
+              (_) => false,
             );
           } else {
             Navigator.of(context).pop();
@@ -84,7 +87,8 @@ class ForgotPasswordController {
           errorMessage = "Data yang dikirim tidak valid.";
         } else if (e.message.contains('ERR_500') ||
             e.message.contains('SERVER_ERROR')) {
-          errorMessage = "Terjadi kesalahan pada server. Silahkan coba lagi nanti.";
+          errorMessage =
+              "Terjadi kesalahan pada server. Silahkan coba lagi nanti.";
         } else if (e.message.contains('ERR_401')) {
           errorMessage = "Tidak memiliki akses untuk melakukan reset password.";
         } else if (e.message.contains('ERR_429')) {
@@ -101,7 +105,7 @@ class ForgotPasswordController {
           errorMessage = "Koneksi timeout. Periksa koneksi internet Anda.";
         } else if (e.toString().contains('SocketException')) {
           errorMessage =
-          "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.";
+              "Tidak dapat terhubung ke server. Periksa koneksi internet Anda.";
         }
 
         SnackBars.error(context, errorMessage).clearSnackBars();
