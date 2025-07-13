@@ -28,6 +28,44 @@ class HttpService {
     return response;
   }
 
+  Future<http.Response> put(
+    String path, {
+    Map<String, String>? headers,
+    Object? body,
+    bool requiresAuth = false,
+  }) async {
+    final uri = HelperService.buildUri(path);
+    final completeHeaders = await _buildHeaders(headers, requiresAuth);
+
+    final response = await _client.put(
+      uri,
+      headers: completeHeaders,
+      body: body,
+    );
+
+    _handleResponseErrors(response);
+    return response;
+  }
+
+  Future<http.Response> delete(
+    String path, {
+    Map<String, String>? headers,
+    Object? body,
+    bool requiresAuth = false,
+  }) async {
+    final uri = HelperService.buildUri(path);
+    final completeHeaders = await _buildHeaders(headers, requiresAuth);
+
+    final response = await _client.delete(
+      uri,
+      headers: completeHeaders,
+      body: body,
+    );
+
+    _handleResponseErrors(response);
+    return response;
+  }
+
   Future<http.Response> get(
     String path, {
     Map<String, String>? headers,
@@ -163,21 +201,31 @@ class HttpService {
     final errorCode = _buildErrorCodeMessage(response);
 
     if (response.statusCode == 401) {
-      throw StringException('Sesi Anda telah habis. Silakan login kembali. $errorCode');
+      throw StringException(
+        'Sesi Anda telah habis. Silakan login kembali. $errorCode',
+      );
     } else if (response.statusCode == 403) {
       throw StringException('Anda tidak memiliki izin. $errorCode');
     } else if (response.statusCode == 404) {
       throw StringException('Halaman tidak ditemukan. $errorCode');
     } else if (response.statusCode == 400) {
-      throw StringException('Terjadi kesalahan: request Anda salah. $errorCode');
+      throw StringException(
+        'Terjadi kesalahan: request Anda salah. $errorCode',
+      );
     } else if (response.statusCode == 402) {
-      throw StringException('Terjadi kesalahan: request Anda tidak valid. $errorCode');
+      throw StringException(
+        'Terjadi kesalahan: request Anda tidak valid. $errorCode',
+      );
     } else if (response.statusCode == 405) {
-      throw StringException('Terjadi kesalahan: metode request Anda tidak diperbolehkan. $errorCode');
+      throw StringException(
+        'Terjadi kesalahan: metode request Anda tidak diperbolehkan. $errorCode',
+      );
     } else if (response.statusCode >= 500) {
       throw StringException('Terjadi kesalahan server. $errorCode');
     } else if (response.statusCode >= 400) {
-      throw StringException('Terjadi kesalahan, coba lagi beberapa saat. $errorCode');
+      throw StringException(
+        'Terjadi kesalahan, coba lagi beberapa saat. $errorCode',
+      );
     }
   }
 }

@@ -7,6 +7,7 @@ import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/controllers/tabs/account_center_controller.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/screens/dashboard/profile/main_profile_screen.dart';
+import 'package:wifiber/screens/profile/change_password_screen.dart';
 
 class AccountCenterScreen extends StatefulWidget {
   const AccountCenterScreen({super.key, this.onLogoutTap});
@@ -137,10 +138,10 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
             color: AppColors.primary,
           ),
           onTap: () {
-            // _accountCenterController.navigateToScreen(
-            //   screen: const ChangePasswordScreen(),
-            //   context: context,
-            // );
+            _accountCenterController.navigateToScreen(
+              screen: ChangePasswordScreen(),
+              context: context,
+            );
           },
         ),
         ListTile(
