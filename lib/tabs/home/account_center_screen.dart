@@ -31,9 +31,7 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
         child: Column(
           children: [
             _buildHeader(context),
-
             const SizedBox(height: 8),
-
             _buildActionTileLists(context),
           ],
         ),
@@ -212,7 +210,7 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
   void _logout(BuildContext context, AuthProvider authProvider) {
     showDialog(
       context: context,
-      builder: (context) {
+      builder: (dialogContext) {
         return AlertDialog(
           contentPadding: const EdgeInsets.all(24),
           content: Column(
@@ -227,7 +225,7 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
               Text(
                 "Keluar Sekarang?",
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                style: Theme.of(dialogContext).textTheme.titleMedium?.copyWith(
                   fontWeight: FontWeight.bold,
                   color: Colors.red,
                 ),
@@ -236,7 +234,7 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
               Text(
                 "Apakah anda yakin ingin keluar dari sesi ini? Harap simpan data sebelum keluar ya.",
                 textAlign: TextAlign.center,
-                style: Theme.of(context).textTheme.bodyMedium,
+                style: Theme.of(dialogContext).textTheme.bodyMedium,
               ),
             ],
           ),
@@ -254,30 +252,31 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
                     ),
                   ),
                   onPressed: () async {
-                    final navigator = Navigator.of(context);
-                    final scaffoldMessenger = ScaffoldMessenger.of(
-                      this.context,
-                    );
+                    final navigator = Navigator.of(dialogContext);
+                    final mainContext = context;
 
                     try {
                       await authProvider.logout();
-                      if (!mounted) return;
-
-                      SnackBars.success(
-                        scaffoldMessenger.context,
-                        "Berhasil mengeluarkan anda dari sesi saat ini. Sampai jumpa di lain waktu!",
-                      ).clearSnackBars();
 
                       navigator.pop();
+
+                      if(mounted) {
+                        SnackBars.success(
+                          mainContext,
+                          "Berhasil mengeluarkan anda dari sesi saat ini. Sampai jumpa di lain waktu!",
+                        ).clearSnackBars();
+                      }
+
                       widget.onLogoutTap?.call();
                     } catch (e) {
-                      if (!mounted) return;
-
                       navigator.pop();
-                      SnackBars.error(
-                        scaffoldMessenger.context,
-                        "Ada kesalahan saat mengeluarkan sesi. Buka ulang aplikasi atau coba keluar sekali lagi.",
-                      ).clearSnackBars();
+
+                      if(mounted) {
+                        SnackBars.error(
+                          mainContext,
+                          "Gagal mengeluarkan anda dari sesi saat ini. Silahkan coba lagi.",
+                        ).clearSnackBars();
+                      }
                     }
                   },
                   child: const Text("Keluar Sekarang"),
@@ -293,7 +292,7 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
                     ),
                   ),
                   onPressed: () {
-                    Navigator.of(context).pop();
+                    Navigator.of(dialogContext).pop();
                   },
                   child: const Text("Batal"),
                 ),

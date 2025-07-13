@@ -6,6 +6,7 @@ import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/providers/customer_provider.dart';
 import 'package:wifiber/providers/transaction_provider.dart';
 import 'package:wifiber/screens/splash_screen.dart';
+import 'package:wifiber/services/customer_service.dart';
 import 'package:wifiber/services/transaction_service.dart';
 
 void main() {
@@ -16,7 +17,9 @@ void main() {
         ChangeNotifierProvider(
           create: (_) => TransactionProvider(TransactionService()),
         ),
-        ChangeNotifierProvider(create: (_) => CustomerProvider()),
+        ChangeNotifierProvider(
+          create: (_) => CustomerProvider(CustomerService()),
+        ),
       ],
       child: const CoreApp(),
     ),

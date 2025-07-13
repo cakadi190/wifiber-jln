@@ -3,7 +3,9 @@ import 'package:wifiber/models/customer.dart';
 import 'package:wifiber/services/customer_service.dart';
 
 class CustomerProvider extends ChangeNotifier {
-  final CustomerService _customerService = CustomerService();
+  final CustomerService _customerService;
+
+  CustomerProvider(this._customerService);
 
   List<Customer> _customers = [];
   Customer? _selectedCustomer;
