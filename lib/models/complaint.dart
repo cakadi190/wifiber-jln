@@ -84,6 +84,6 @@ class ComplaintResponse {
       );
 }
 
-enum ComplaintStatus { pending, inProgress, resolved }
+enum ComplaintStatus { pending, ongoing, completed }
 
-enum ComplaintType { complaint, suggestion }
+enum ComplaintType { complaint, registration }
