@@ -8,7 +8,7 @@ class ComplaintService {
 
   Future<ComplaintResponse> getAllComplaints() async {
     try {
-      final response = await _http.get('/complaints', requiresAuth: true);
+      final response = await _http.get('/complaint-tickets', requiresAuth: true);
 
       if (response.statusCode == 200) {
         return ComplaintResponse.fromJson(json.decode(response.body));
@@ -22,7 +22,7 @@ class ComplaintService {
 
   Future<Complaint> getComplaintById(int id) async {
     try {
-      final response = await _http.get('/complaints/$id', requiresAuth: true);
+      final response = await _http.get('/complaint-tickets/$id', requiresAuth: true);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);

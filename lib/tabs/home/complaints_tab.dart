@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/controllers/tabs/complaint_tab_controller.dart';
+import 'package:wifiber/helpers/datetime_helper.dart';
 import 'package:wifiber/models/complaint.dart';
 import 'package:wifiber/providers/complaint_provider.dart';
 import 'package:wifiber/screens/dashboard/complainment/create_complainment_screen.dart';
-import 'package:wifiber/helpers/datetime_helper.dart';
 
 class ComplaintsTab extends StatelessWidget {
   final ComplaintTabController controller;
@@ -74,22 +74,28 @@ class ComplaintsTab extends StatelessWidget {
             _buildFilterChip(
               context,
               label: "Pending",
-              isSelected: provider.selectedComplaintFilter == ComplaintStatus.pending,
+              isSelected:
+                  provider.selectedComplaintFilter == ComplaintStatus.pending,
               onTap: () => provider.setComplaintFilter(ComplaintStatus.pending),
             ),
             SizedBox(width: 8),
             _buildFilterChip(
               context,
               label: "Diproses",
-              isSelected: provider.selectedComplaintFilter == ComplaintStatus.processing,
-              onTap: () => provider.setComplaintFilter(ComplaintStatus.processing),
+              isSelected:
+                  provider.selectedComplaintFilter ==
+                  ComplaintStatus.processing,
+              onTap: () =>
+                  provider.setComplaintFilter(ComplaintStatus.processing),
             ),
             SizedBox(width: 8),
             _buildFilterChip(
               context,
               label: "Selesai",
-              isSelected: provider.selectedComplaintFilter == ComplaintStatus.resolved,
-              onTap: () => provider.setComplaintFilter(ComplaintStatus.resolved),
+              isSelected:
+                  provider.selectedComplaintFilter == ComplaintStatus.resolved,
+              onTap: () =>
+                  provider.setComplaintFilter(ComplaintStatus.resolved),
             ),
             SizedBox(width: 12),
             Container(
@@ -101,22 +107,30 @@ class ComplaintsTab extends StatelessWidget {
             _buildFilterChip(
               context,
               label: "Internet",
-              isSelected: provider.selectedComplaintTypeFilter == ComplaintType.internet,
-              onTap: () => provider.setComplaintTypeFilter(ComplaintType.internet),
+              isSelected:
+                  provider.selectedComplaintTypeFilter ==
+                  ComplaintType.internet,
+              onTap: () =>
+                  provider.setComplaintTypeFilter(ComplaintType.internet),
             ),
             SizedBox(width: 8),
             _buildFilterChip(
               context,
               label: "Billing",
-              isSelected: provider.selectedComplaintTypeFilter == ComplaintType.billing,
-              onTap: () => provider.setComplaintTypeFilter(ComplaintType.billing),
+              isSelected:
+                  provider.selectedComplaintTypeFilter == ComplaintType.billing,
+              onTap: () =>
+                  provider.setComplaintTypeFilter(ComplaintType.billing),
             ),
             SizedBox(width: 8),
             _buildFilterChip(
               context,
               label: "Teknis",
-              isSelected: provider.selectedComplaintTypeFilter == ComplaintType.technical,
-              onTap: () => provider.setComplaintTypeFilter(ComplaintType.technical),
+              isSelected:
+                  provider.selectedComplaintTypeFilter ==
+                  ComplaintType.technical,
+              onTap: () =>
+                  provider.setComplaintTypeFilter(ComplaintType.technical),
             ),
             SizedBox(width: 16),
           ],
@@ -126,11 +140,11 @@ class ComplaintsTab extends StatelessWidget {
   }
 
   Widget _buildFilterChip(
-      BuildContext context, {
-        required String label,
-        required bool isSelected,
-        required VoidCallback onTap,
-      }) {
+    BuildContext context, {
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -142,7 +156,9 @@ class ComplaintsTab extends StatelessWidget {
               : Colors.white.withValues(alpha: 0.10),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.50),
+            color: isSelected
+                ? Colors.white
+                : Colors.white.withValues(alpha: 0.50),
             width: 1,
           ),
         ),
@@ -176,10 +192,10 @@ class ComplaintsTab extends StatelessWidget {
   }
 
   Widget _buildComplaintList(
-      BuildContext context,
-      List<Complaint> complaints,
-      ComplaintProvider provider,
-      ) {
+    BuildContext context,
+    List<Complaint> complaints,
+    ComplaintProvider provider,
+  ) {
     if (complaints.isEmpty) {
       return Center(
         child: Padding(
@@ -307,11 +323,7 @@ class ComplaintsTab extends StatelessWidget {
               height: 40,
               width: 40,
               child: Center(
-                child: Icon(
-                  typeIcon,
-                  color: statusColor,
-                  size: 20,
-                ),
+                child: Icon(typeIcon, color: statusColor, size: 20),
               ),
             ),
             title: Text(
@@ -360,10 +372,7 @@ class ComplaintsTab extends StatelessWidget {
             ),
             trailing: Text(
               DateHelper.formatDate(complaint.date),
-              style: TextStyle(
-                color: Colors.grey.shade600,
-                fontSize: 12,
-              ),
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
             ),
             onTap: () => _showComplaintDetailModal(context, complaint),
           ),
@@ -390,20 +399,19 @@ class ComplaintsTab extends StatelessWidget {
               ),
             ),
             Text(error, textAlign: TextAlign.center),
-            TextButton(
-              onPressed: () => controller.logout(context),
-              child: Text("Autentikasi ulang"),
-            ),
+
+            if (error.contains("401"))
+              TextButton(
+                onPressed: () => controller.logout(context),
+                child: Text("Autentikasi ulang"),
+              ),
           ],
         ),
       ),
     );
   }
 
-  void _showComplaintDetailModal(
-      BuildContext context,
-      Complaint complaint,
-      ) {
+  void _showComplaintDetailModal(BuildContext context, Complaint complaint) {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -449,12 +457,7 @@ class ComplaintsTab extends StatelessWidget {
               // ),
               SizedBox(height: 16),
 
-              _buildDetailRow(
-                context,
-                'Topik',
-                complaint.topic,
-                Icons.topic,
-              ),
+              _buildDetailRow(context, 'Topik', complaint.topic, Icons.topic),
               SizedBox(height: 16),
 
               // _buildDetailRow(
@@ -534,12 +537,12 @@ class ComplaintsTab extends StatelessWidget {
   }
 
   Widget _buildDetailRow(
-      BuildContext context,
-      String label,
-      String value,
-      IconData icon, {
-        Color? color,
-      }) {
+    BuildContext context,
+    String label,
+    String value,
+    IconData icon, {
+    Color? color,
+  }) {
     return Container(
       padding: EdgeInsets.all(16),
       decoration: BoxDecoration(
