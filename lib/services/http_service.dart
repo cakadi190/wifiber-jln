@@ -14,7 +14,7 @@ class HttpService {
     Map<String, String>? headers,
     Object? body,
     bool requiresAuth = false,
-    Map<String, dynamic>? parameters = const {},
+    Map<String, dynamic>? parameters,
   }) async {
     final uri = HttpHelper.buildUri(path, parameters);
     final completeHeaders = await _buildHeaders(headers, requiresAuth);
@@ -34,7 +34,7 @@ class HttpService {
     Map<String, String>? headers,
     Object? body,
     bool requiresAuth = false,
-    Map<String, dynamic>? parameters = const {},
+    Map<String, dynamic>? parameters,
   }) async {
     final uri = HttpHelper.buildUri(path, parameters);
     final completeHeaders = await _buildHeaders(headers, requiresAuth);
@@ -54,7 +54,7 @@ class HttpService {
     Map<String, String>? headers,
     Object? body,
     bool requiresAuth = false,
-    Map<String, dynamic>? parameters = const {},
+    Map<String, dynamic>? parameters,
   }) async {
     final uri = HttpHelper.buildUri(path, parameters);
     final completeHeaders = await _buildHeaders(headers, requiresAuth);
@@ -73,38 +73,57 @@ class HttpService {
     String path, {
     Map<String, String>? headers,
     bool requiresAuth = false,
-    Map<String, dynamic>? parameters = const {},
+    Map<String, dynamic>? parameters,
   }) async {
-    final uri = HttpHelper.buildUri(path, parameters);
-    final completeHeaders = await _buildHeaders(headers, requiresAuth);
+    try {
+      final uri = HttpHelper.buildUri(path, parameters);
+      final completeHeaders = await _buildHeaders(headers, requiresAuth);
 
-    final response = await _client.get(uri, headers: completeHeaders);
-    _handleResponseErrors(response);
-    return response;
+      final response = await _client.get(uri, headers: completeHeaders);
+
+      _handleResponseErrors(response);
+      return response;
+    } catch (e) {
+      rethrow;
+    }
   }
 
   Future<Map<String, String>> _buildHeaders(
     Map<String, String>? headers,
     bool requiresAuth,
   ) async {
-    final baseHeaders = <String, String>{
-      'Content-Type': 'application/json',
-      'Accept': 'application/json',
-    };
+    try {
+      final baseHeaders = <String, String>{
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      };
 
-    if (requiresAuth) {
-      final json = await SecureStorageService.storage.read(
-        key: SecureStorageService.userKey,
-      );
+      if (requiresAuth) {
+        final json = await SecureStorageService.storage.read(
+          key: SecureStorageService.userKey,
+        );
 
-      if (json == null) throw SecureStorageNotFoundException();
+        if (json == null) throw SecureStorageNotFoundException();
 
-      final token = jsonDecode(json)['access'];
-      baseHeaders['Authorization'] = 'Bearer $token';
+        final userdata = jsonDecode(json);
+        if (userdata is Map<String, dynamic> &&
+            userdata.containsKey('access')) {
+          final token = userdata['access'];
+          if (token is String) {
+            baseHeaders['Authorization'] = 'Bearer $token';
+          } else {
+            throw Exception('Invalid token format');
+          }
+        } else {
+          throw Exception('Access token not found in user data');
+        }
+      }
+
+      if (headers != null) baseHeaders.addAll(headers);
+      return baseHeaders;
+    } catch (e) {
+      rethrow;
     }
-
-    if (headers != null) baseHeaders.addAll(headers);
-    return baseHeaders;
   }
 
   String? _buildErrorCodeMessage(http.Response response) {

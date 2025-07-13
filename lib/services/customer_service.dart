@@ -15,7 +15,7 @@ class CustomerService {
     int? areaId,
   ) async {
     try {
-      final queryParams = <String, String>{};
+      final queryParams = <String, dynamic>{};
       if (status != null) {
         queryParams['status'] = status.toString().split('.').last;
       }
@@ -49,10 +49,12 @@ class CustomerService {
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
-        if (jsonData['success']) {
+        if (jsonData['success'] == true) {
           return Customer.fromJson(jsonData['data']);
         } else {
-          throw Exception('Failed to get customer: ${jsonData['message']}');
+          throw Exception(
+            'Failed to get customer: ${jsonData['message'] ?? 'Unknown error'}',
+          );
         }
       } else {
         throw Exception('Failed to load customer: ${response.statusCode}');
@@ -72,10 +74,12 @@ class CustomerService {
 
       if (response.statusCode == 201) {
         final jsonData = json.decode(response.body);
-        if (jsonData['success']) {
+        if (jsonData['success'] == true) {
           return Customer.fromJson(jsonData['data']);
         } else {
-          throw Exception('Failed to create customer: ${jsonData['message']}');
+          throw Exception(
+            'Failed to create customer: ${jsonData['message'] ?? 'Unknown error'}',
+          );
         }
       } else {
         throw Exception('Failed to create customer: ${response.statusCode}');
@@ -98,10 +102,12 @@ class CustomerService {
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
-        if (jsonData['success']) {
+        if (jsonData['success'] == true) {
           return Customer.fromJson(jsonData['data']);
         } else {
-          throw Exception('Failed to update customer: ${jsonData['message']}');
+          throw Exception(
+            'Failed to update customer: ${jsonData['message'] ?? 'Unknown error'}',
+          );
         }
       } else {
         throw Exception('Failed to update customer: ${response.statusCode}');
@@ -117,7 +123,7 @@ class CustomerService {
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
-        return jsonData['success'];
+        return jsonData['success'] == true;
       } else {
         throw Exception('Failed to delete customer: ${response.statusCode}');
       }
@@ -128,15 +134,34 @@ class CustomerService {
 
   Future<CustomerResponse> searchCustomers(String query) async {
     try {
+      if (query.isEmpty) {
+        return getAllCustomers(null, null, null);
+      }
+
+      final Map<String, dynamic> queryParams = {
+        'search': query.toString().trim(),
+      };
+
       final response = await _http.get(
         path,
         requiresAuth: true,
-        parameters: {'search': query},
+        parameters: queryParams,
       );
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
-        return CustomerResponse.fromJson(jsonData);
+        final customerResponse = CustomerResponse.fromJson(jsonData);
+
+        if (!customerResponse.success && customerResponse.data.isEmpty) {
+          return CustomerResponse(
+            success: true,
+            message: 'No customers found',
+            data: [],
+            error: null,
+          );
+        }
+
+        return customerResponse;
       } else {
         throw Exception('Failed to search customers: ${response.statusCode}');
       }
@@ -150,7 +175,7 @@ class CustomerService {
       final response = await _http.get(
         path,
         requiresAuth: true,
-        parameters: {'status': status},
+        parameters: <String, dynamic>{'status': status},
       );
 
       if (response.statusCode == 200) {

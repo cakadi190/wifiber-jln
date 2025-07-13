@@ -118,7 +118,7 @@ class CustomerResponse {
   final bool success;
   final String message;
   final List<Customer> data;
-  final String? error;
+  final Map<String, dynamic>? error;
 
   CustomerResponse({
     required this.success,

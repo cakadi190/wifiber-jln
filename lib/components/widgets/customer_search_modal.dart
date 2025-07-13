@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/config/app_colors.dart';
@@ -24,6 +26,9 @@ class CustomerSearchModal extends StatefulWidget {
 class _CustomerSearchModalState extends State<CustomerSearchModal> {
   late CustomerController _customerController;
   final TextEditingController _searchController = TextEditingController();
+  Timer? _debounceTimer;
+
+  static const Duration _debounceDuration = Duration(milliseconds: 500);
 
   @override
   void initState() {
@@ -40,8 +45,27 @@ class _CustomerSearchModalState extends State<CustomerSearchModal> {
 
   @override
   void dispose() {
+    _debounceTimer?.cancel();
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _onSearchChanged(String value) {
+    _debounceTimer?.cancel();
+
+    _debounceTimer = Timer(_debounceDuration, () {
+      if (value.isNotEmpty) {
+        _customerController.searchCustomers(value);
+      } else {
+        _customerController.getAllCustomers(showLoading: false);
+      }
+    });
+  }
+
+  void _onClearSearch() {
+    _debounceTimer?.cancel();
+    _searchController.clear();
+    _customerController.getAllCustomers(showLoading: false);
   }
 
   @override
@@ -71,52 +95,33 @@ class _CustomerSearchModalState extends State<CustomerSearchModal> {
 
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      widget.title,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    IconButton(
-                      onPressed: () => Navigator.pop(context),
-                      icon: const Icon(Icons.close),
-                    ),
-                  ],
+                child: Text(
+                  widget.title,
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
               ),
+
+              const SizedBox(height: 16),
 
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 child: TextFormField(
                   controller: _searchController,
                   decoration: InputDecoration(
-                    labelText: 'Cari Pelanggan',
                     hintText: 'Masukkan nama atau email pelanggan',
                     prefixIcon: const Icon(Icons.search),
                     border: const OutlineInputBorder(),
                     suffixIcon: _searchController.text.isNotEmpty
                         ? IconButton(
                             icon: const Icon(Icons.clear),
-                            onPressed: () {
-                              _searchController.clear();
-                              _customerController.getAllCustomers(
-                                showLoading: false,
-                              );
-                            },
+                            onPressed: _onClearSearch,
                           )
                         : null,
                   ),
-                  onChanged: (value) {
-                    if (value.isNotEmpty) {
-                      _customerController.searchCustomers(value);
-                    } else {
-                      _customerController.getAllCustomers(showLoading: false);
-                    }
-                  },
+                  onChanged: _onSearchChanged,
                 ),
               ),
 
@@ -139,40 +144,49 @@ class _CustomerSearchModalState extends State<CustomerSearchModal> {
                     }
 
                     if (provider.error != null) {
-                      return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.error_outline,
-                              size: 48,
-                              color: Colors.red,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'Terjadi kesalahan',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                                color: Colors.grey.shade800,
+                      return Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.error_outline,
+                                size: 48,
+                                color: Colors.red,
                               ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              provider.error!,
-                              textAlign: TextAlign.center,
-                              style: TextStyle(color: Colors.grey.shade600),
-                            ),
-                            const SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: () {
-                                _customerController.getAllCustomers(
-                                  showLoading: false,
-                                );
-                              },
-                              child: const Text('Coba Lagi'),
-                            ),
-                          ],
+                              const SizedBox(height: 16),
+                              Text(
+                                'Terjadi kesalahan',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                  color: Colors.grey.shade800,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                provider.error!,
+                                textAlign: TextAlign.center,
+                                style: TextStyle(color: Colors.grey.shade600),
+                              ),
+                              const SizedBox(height: 16),
+                              ElevatedButton(
+                                onPressed: () {
+                                  if (_searchController.text.isNotEmpty) {
+                                    _customerController.searchCustomers(
+                                      _searchController.text,
+                                    );
+                                  } else {
+                                    _customerController.getAllCustomers(
+                                      showLoading: false,
+                                    );
+                                  }
+                                },
+                                child: const Text('Coba Lagi'),
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     }
@@ -190,18 +204,23 @@ class _CustomerSearchModalState extends State<CustomerSearchModal> {
                             const SizedBox(height: 16),
                             Text(
                               _searchController.text.isNotEmpty
-                                  ? 'Tidak ada pelanggan ditemukan'
+                                  ? 'Tidak ditemukan apapun.'
                                   : 'Belum ada data pelanggan',
                               style: TextStyle(
-                                fontSize: 16,
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
                                 color: Colors.grey.shade600,
                               ),
                             ),
                             if (_searchController.text.isNotEmpty)
                               Padding(
-                                padding: const EdgeInsets.only(top: 8),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 16,
+                                  vertical: 4,
+                                ),
                                 child: Text(
-                                  'untuk "${_searchController.text}"',
+                                  'Mohon maaf, tidak ditemukan pelanggan untuk pencarian "${_searchController.text}". Coba cari nama pelanggan lainnya.',
+                                  textAlign: TextAlign.center,
                                   style: TextStyle(
                                     fontSize: 14,
                                     color: Colors.grey.shade500,
@@ -234,7 +253,11 @@ class _CustomerSearchModalState extends State<CustomerSearchModal> {
                                   ? AppColors.primary
                                   : AppColors.primary.withValues(alpha: 0.8),
                               child: Text(
-                                customer.name.substring(0, 1).toUpperCase(),
+                                customer.name.isNotEmpty
+                                    ? customer.name
+                                          .substring(0, 1)
+                                          .toUpperCase()
+                                    : '?',
                                 style: const TextStyle(
                                   color: Colors.white,
                                   fontWeight: FontWeight.bold,
