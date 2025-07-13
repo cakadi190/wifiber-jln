@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/exceptions/string_exceptions.dart';
 import 'package:wifiber/providers/auth_provider.dart';
+import 'package:wifiber/screens/login_screen.dart';
 import 'package:wifiber/services/http_service.dart';
 
 class ForgotPasswordController {
@@ -52,12 +53,25 @@ class ForgotPasswordController {
         SnackBars.success(
           context,
           "Permintaan reset kata sandi berhasil dikirim. Silahkan cek surel anda dan ikuti instruksi yang ada.",
-        ).clearSnackBars();
+        );
 
         await Future.delayed(const Duration(seconds: 3));
 
         if (context.mounted) {
-          Navigator.of(context).pop();
+          if(authProvider.isLoggedIn) {
+            authProvider.logout();
+
+            SnackBars.info(
+              context,
+              "Silahkan masuk terlebih dahulu untuk melanjutkan ke dalam sistem setelah reset kata sandi.",
+            );
+
+            Navigator.of(context).pushReplacement(
+              MaterialPageRoute(builder: (_) => const LoginScreen()),
+            );
+          } else {
+            Navigator.of(context).pop();
+          }
         }
       }
     } on StringException catch (e) {
