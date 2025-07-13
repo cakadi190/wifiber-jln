@@ -1,5 +1,5 @@
 class Complaint {
-  int? id;
+  String id;
   String? number;
   String? customerId;
   String? subject;
@@ -13,7 +13,7 @@ class Complaint {
   String? locationPhoto;
 
   Complaint({
-    this.id,
+    required this.id,
     this.number,
     this.customerId,
     this.subject,
@@ -27,11 +27,10 @@ class Complaint {
     this.locationPhoto,
   });
 
-  // Add these getter methods for UI compatibility
   String get topic => subject ?? '';
+
   DateTime get date => DateTime.tryParse(createdAt ?? '') ?? DateTime.now();
 
-  // Convert string status to enum
   ComplaintStatus get statusEnum {
     switch (status?.toLowerCase()) {
       case 'pending':
@@ -47,7 +46,6 @@ class Complaint {
     }
   }
 
-  // Convert string type to enum
   ComplaintType get typeEnum {
     switch (type?.toLowerCase()) {
       case 'internet':
