@@ -54,6 +54,9 @@ dependencies:
   sqflite: ^2.3.0
   path: ^1.8.0
   crypto: ^3.0.3
+  build_runner: ^2.3.3
+  build: ^2.4.0
+  url_launcher: ^6.3.2
 
 dev_dependencies:
   flutter_test:
