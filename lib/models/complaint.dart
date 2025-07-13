@@ -60,6 +60,60 @@ class Complaint {
   };
 }
 
+class CreateComplaint {
+  final String subject;
+  final String topic;
+  final DateTime date;
+
+  CreateComplaint({
+    required this.subject,
+    required this.topic,
+    required this.date,
+  });
+
+  factory CreateComplaint.fromJson(Map<String, dynamic> json) =>
+      CreateComplaint(
+        subject: json['subject'],
+        topic: json['topic'],
+        date: DateTime.parse(json['date']),
+      );
+
+  Map<String, dynamic> toJson() => {
+    'subject': subject,
+    'topic': topic,
+    'date': date.toIso8601String(),
+  };
+}
+
+class UpdateComplaint {
+  final int id;
+  final String detail;
+  final String name;
+  final bool ticketIsDone;
+
+  UpdateComplaint({
+    required this.id,
+    required this.detail,
+    required this.name,
+    required this.ticketIsDone,
+  });
+
+  factory UpdateComplaint.fromJson(Map<String, dynamic> json) =>
+      UpdateComplaint(
+        id: json['id'],
+        detail: json['detail'],
+        name: json['name'],
+        ticketIsDone: json['ticket_is_done'],
+      );
+
+  Map<String, dynamic> toJson() => {
+    'id': id,
+    'detail': detail,
+    'name': name,
+    'ticket_is_done': ticketIsDone,
+  };
+}
+
 class ComplaintResponse {
   final bool success;
   final String message;

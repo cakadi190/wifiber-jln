@@ -20,46 +20,30 @@ class ComplaintController {
   }
 
   Future<bool> addComplaint({
-    required String customerId,
     required String subject,
-    required String type,
-    required String name,
-    required String phone,
-    required String address,
-    String? nickname,
-    String? locationPhoto,
+    required String topic,
+    required DateTime date,
   }) async {
-    final complaint = Complaint(
-      customerId: customerId,
+    final complaint = CreateComplaint(
       subject: subject,
-      type: type,
-      status: ComplaintStatus.pending.name,
-      name: name,
-      nickname: nickname,
-      phone: phone,
-      address: address,
-      locationPhoto: locationPhoto,
-      createdAt: DateTime.now().toIso8601String(),
+      topic: topic,
+      date: date,
     );
 
     return await _provider.createComplaint(complaint);
   }
 
-  Future<bool> updateComplaintStatus(int id, ComplaintStatus status) async {
-    final complaint = _provider.complaints.firstWhere((c) => c.id == id);
-    final updatedComplaint = Complaint(
-      id: complaint.id,
-      number: complaint.number,
-      customerId: complaint.customerId,
-      subject: complaint.subject,
-      type: complaint.type,
-      status: status.name,
-      createdAt: complaint.createdAt,
-      name: complaint.name,
-      nickname: complaint.nickname,
-      phone: complaint.phone,
-      address: complaint.address,
-      locationPhoto: complaint.locationPhoto,
+  Future<bool> updateComplaintStatus(
+    int id,
+    String detail,
+    String name,
+    bool ticketIsDone,
+  ) async {
+    final updatedComplaint = UpdateComplaint(
+      id: id,
+      detail: detail,
+      name: name,
+      ticketIsDone: !ticketIsDone,
     );
 
     return await _provider.updateComplaint(id, updatedComplaint);

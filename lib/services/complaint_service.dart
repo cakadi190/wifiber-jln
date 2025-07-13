@@ -1,20 +1,14 @@
 import 'dart:convert';
 
-import 'package:http/http.dart' as http;
 import 'package:wifiber/models/complaint.dart';
+import 'package:wifiber/services/http_service.dart';
 
 class ComplaintService {
-  static const String baseUrl = 'https://your-api-url.com/api';
+  final HttpService _http = HttpService();
 
   Future<ComplaintResponse> getAllComplaints() async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/complaints'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer YOUR_TOKEN',
-        },
-      );
+      final response = await _http.get('/complaints', requiresAuth: true);
 
       if (response.statusCode == 200) {
         return ComplaintResponse.fromJson(json.decode(response.body));
@@ -28,13 +22,7 @@ class ComplaintService {
 
   Future<Complaint> getComplaintById(int id) async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/complaints/$id'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer YOUR_TOKEN',
-        },
-      );
+      final response = await _http.get('/complaints/$id', requiresAuth: true);
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -47,15 +35,12 @@ class ComplaintService {
     }
   }
 
-  Future<ComplaintResponse> createComplaint(Complaint complaint) async {
+  Future<ComplaintResponse> createComplaint(CreateComplaint complaint) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/complaints'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer YOUR_TOKEN',
-        },
+      final response = await _http.post(
+        '/complaint-tickets',
         body: json.encode(complaint.toJson()),
+        requiresAuth: true,
       );
 
       if (response.statusCode == 201) {
@@ -68,15 +53,15 @@ class ComplaintService {
     }
   }
 
-  Future<ComplaintResponse> updateComplaint(int id, Complaint complaint) async {
+  Future<ComplaintResponse> updateComplaint(
+    int id,
+    UpdateComplaint complaint,
+  ) async {
     try {
-      final response = await http.put(
-        Uri.parse('$baseUrl/complaints/$id'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer YOUR_TOKEN',
-        },
+      final response = await _http.post(
+        '/complaint-ticket-update',
         body: json.encode(complaint.toJson()),
+        requiresAuth: true,
       );
 
       if (response.statusCode == 200) {
@@ -91,12 +76,9 @@ class ComplaintService {
 
   Future<bool> deleteComplaint(int id) async {
     try {
-      final response = await http.delete(
-        Uri.parse('$baseUrl/complaints/$id'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer YOUR_TOKEN',
-        },
+      final response = await _http.delete(
+        '/complaint-tickets/$id',
+        requiresAuth: true,
       );
 
       return response.statusCode == 200;
@@ -109,12 +91,10 @@ class ComplaintService {
     ComplaintStatus status,
   ) async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/complaints?status=${status.name}'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer YOUR_TOKEN',
-        },
+      final response = await _http.get(
+        '/complaints',
+        requiresAuth: true,
+        parameters: {'status': status.name},
       );
 
       if (response.statusCode == 200) {
@@ -129,12 +109,10 @@ class ComplaintService {
 
   Future<ComplaintResponse> getComplaintsByType(ComplaintType type) async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/complaints?type=${type.name}'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer YOUR_TOKEN',
-        },
+      final response = await _http.get(
+        '/complaints',
+        requiresAuth: true,
+        parameters: {'type': type.name},
       );
 
       if (response.statusCode == 200) {

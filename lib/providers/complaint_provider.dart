@@ -51,7 +51,7 @@ class ComplaintProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> createComplaint(Complaint complaint) async {
+  Future<bool> createComplaint(CreateComplaint complaint) async {
     _setLoading(true);
     _setError(null);
 
@@ -73,7 +73,7 @@ class ComplaintProvider extends ChangeNotifier {
     }
   }
 
-  Future<bool> updateComplaint(int id, Complaint complaint) async {
+  Future<bool> updateComplaint(int id, UpdateComplaint complaint) async {
     _setLoading(true);
     _setError(null);
 
