@@ -297,8 +297,8 @@ class _AlertOpaque extends Alert {
       width: fullWidth ? double.infinity : null,
       child: Material(
         color: disabled
-            ? color.withAlpha(5)
-            : color.withAlpha(10),
+            ? color.withValues(alpha: 0.5)
+            : color.withValues(alpha: 0.10),
         borderRadius: BorderRadius.circular(8),
         child: InkWell(
           onTap: disabled ? null : onClick,
