@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
@@ -8,6 +9,7 @@ import 'package:wifiber/controllers/change_password_controller.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:remixicon/remixicon.dart';
 import 'package:wifiber/providers/auth_provider.dart';
+import 'package:wifiber/screens/forgot_password_screen.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -131,6 +133,34 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                               validator: _controller.validateCurrentPassword,
                             );
                           },
+                        ),
+                        const SizedBox(height: 8),
+                        RichText(
+                          text: TextSpan(
+                            text: 'Wah, lupa sandinya nih? ',
+                            style: theme.textTheme.bodySmall,
+                            children: [
+                              TextSpan(
+                                text: 'Klik disini',
+                                style: theme.textTheme.bodySmall?.copyWith(
+                                  decoration: TextDecoration.underline,
+                                  color: AppColors.primary,
+                                ),
+                                recognizer: TapGestureRecognizer()
+                                  ..onTap = () {
+                                    Navigator.of(context).push(
+                                      MaterialPageRoute(
+                                        builder: (context) => const ForgotPasswordScreen(),
+                                      ),
+                                    );
+                                  },
+                              ),
+                              TextSpan(
+                                text: ' untuk memulihkan kata sandi anda yang terlupa.'
+                              )
+                            ],
+                          ),
+                          textAlign: TextAlign.start,
                         ),
                         const SizedBox(height: 16),
 
