@@ -1,82 +1,66 @@
-import 'package:flutter/foundation.dart';
-import 'package:wifiber/models/customer.dart';
+import 'package:flutter/material.dart';
+import 'package:wifiber/providers/customer_provider.dart';
 import 'package:wifiber/services/customer_service.dart';
 
-class CustomerController extends ChangeNotifier {
-  final CustomerService _customerService = CustomerService();
+class CustomerController {
+  final CustomerProvider _provider;
+  final BuildContext context;
 
-  List<Customer> _customers = [];
-  bool _isLoading = false;
-  String _errorMessage = '';
-  Customer? _selectedCustomer;
+  CustomerController({
+    required CustomerProvider provider,
+    required this.context,
+  }) : _provider = provider;
 
-  List<Customer> get customers => _customers;
+  Future<void> getAllCustomers({
+    CustomerStatus? status,
+    int? routerId,
+    int? areaId,
+    bool showLoading = true,
+  }) async {
+    if (showLoading) {
+      _showLoadingDialog();
+    }
 
-  bool get isLoading => _isLoading;
+    await _provider.loadCustomers(
+      status: status,
+      routerId: routerId,
+      areaId: areaId,
+    );
 
-  String get errorMessage => _errorMessage;
+    if (showLoading) {
+      Navigator.of(context).pop();
+    }
 
-  Customer? get selectedCustomer => _selectedCustomer;
-
-  Future<void> loadCustomers() async {
-    try {
-      _isLoading = true;
-      _errorMessage = '';
-      notifyListeners();
-
-      final response = await _customerService.getAllCustomers();
-      _customers = response.data;
-    } catch (e) {
-      _errorMessage = e.toString();
-      if (kDebugMode) {
-        debugPrint('Error loading customers: $e');
-      }
-    } finally {
-      _isLoading = false;
-      notifyListeners();
+    if (_provider.error != null) {
+      _showErrorDialog(_provider.error!);
     }
   }
 
   Future<void> getCustomerById(String id) async {
-    try {
-      _isLoading = true;
-      _errorMessage = '';
-      notifyListeners();
+    _showLoadingDialog();
 
-      final customer = await _customerService.getCustomerById(id);
-      _selectedCustomer = customer;
-    } catch (e) {
-      _errorMessage = e.toString();
-      if (kDebugMode) {
-        debugPrint('Error fetching customer: $e');
-      }
-    } finally {
-      _isLoading = false;
-      notifyListeners();
+    await _provider.loadCustomerById(id);
+
+    Navigator.of(context).pop();
+
+    if (_provider.error != null) {
+      _showErrorDialog(_provider.error!);
     }
   }
 
   Future<bool> createCustomer(Map<String, dynamic> customerData) async {
-    try {
-      _isLoading = true;
-      _errorMessage = '';
-      notifyListeners();
+    _showLoadingDialog();
 
-      final customer = await _customerService.createCustomer(customerData);
-      _customers.add(customer);
+    final success = await _provider.createCustomer(customerData);
 
-      notifyListeners();
+    Navigator.of(context).pop();
+
+    if (success) {
+      _showSuccessDialog('Customer berhasil dibuat');
       return true;
-    } catch (e) {
-      _errorMessage = e.toString();
-      if (kDebugMode) {
-        debugPrint('Error creating customer: $e');
-      }
-      notifyListeners();
+    } else {
+      _showErrorDialog(_provider.error ?? 'Gagal membuat customer');
       return false;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
     }
   }
 
@@ -84,120 +68,211 @@ class CustomerController extends ChangeNotifier {
     String id,
     Map<String, dynamic> customerData,
   ) async {
-    try {
-      _isLoading = true;
-      _errorMessage = '';
-      notifyListeners();
+    _showLoadingDialog();
 
-      final updatedCustomer = await _customerService.updateCustomer(
-        id,
-        customerData,
-      );
+    final success = await _provider.updateCustomer(id, customerData);
 
-      final index = _customers.indexWhere((c) => c.id == id);
-      if (index != -1) {
-        _customers[index] = updatedCustomer;
-      }
+    Navigator.of(context).pop();
 
-      _selectedCustomer = updatedCustomer;
-
-      notifyListeners();
+    if (success) {
+      _showSuccessDialog('Customer berhasil diupdate');
       return true;
-    } catch (e) {
-      _errorMessage = e.toString();
-      if (kDebugMode) {
-        debugPrint('Error updating customer: $e');
-      }
-      notifyListeners();
+    } else {
+      _showErrorDialog(_provider.error ?? 'Gagal mengupdate customer');
       return false;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
     }
   }
 
   Future<bool> deleteCustomer(String id) async {
-    try {
-      _isLoading = true;
-      _errorMessage = '';
-      notifyListeners();
+    final confirmed = await _showConfirmationDialog(
+      'Hapus Customer',
+      'Apakah Anda yakin ingin menghapus customer ini?',
+    );
 
-      final success = await _customerService.deleteCustomer(id);
+    if (!confirmed) return false;
 
-      if (success) {
-        _customers.removeWhere((c) => c.id == id);
-        notifyListeners();
-        return true;
-      }
+    _showLoadingDialog();
+
+    final success = await _provider.deleteCustomer(id);
+
+    Navigator.of(context).pop();
+
+    if (success) {
+      _showSuccessDialog('Customer berhasil dihapus');
+      return true;
+    } else {
+      _showErrorDialog(_provider.error ?? 'Gagal menghapus customer');
       return false;
-    } catch (e) {
-      _errorMessage = e.toString();
-      if (kDebugMode) {
-        debugPrint('Error deleting customer: $e');
-      }
-      notifyListeners();
-      return false;
-    } finally {
-      _isLoading = false;
-      notifyListeners();
     }
   }
 
   Future<void> searchCustomers(String query) async {
-    try {
-      _isLoading = true;
-      _errorMessage = '';
-      notifyListeners();
+    if (query.isEmpty) {
+      await getAllCustomers(showLoading: false);
+      return;
+    }
 
-      final response = await _customerService.searchCustomers(query);
-      _customers = response.data;
-    } catch (e) {
-      _errorMessage = e.toString();
-      if (kDebugMode) {
-        debugPrint('Error searching customers: $e');
-      }
-    } finally {
-      _isLoading = false;
-      notifyListeners();
+    await _provider.searchCustomers(query);
+
+    if (_provider.error != null) {
+      _showErrorDialog(_provider.error!);
     }
   }
 
-  Future<void> filterByStatus(String status) async {
-    try {
-      _isLoading = true;
-      _errorMessage = '';
-      notifyListeners();
+  Future<void> getCustomersByStatus(String status) async {
+    _showLoadingDialog();
 
-      final response = await _customerService.getCustomersByStatus(status);
-      _customers = response.data;
-    } catch (e) {
-      _errorMessage = e.toString();
-      if (kDebugMode) {
-        debugPrint('Error filtering customers: $e');
-      }
-    } finally {
-      _isLoading = false;
-      notifyListeners();
+    await _provider.getCustomersByStatus(status);
+
+    Navigator.of(context).pop();
+
+    if (_provider.error != null) {
+      _showErrorDialog(_provider.error!);
     }
   }
 
-  List<Customer> get activeCustomers =>
-      _customers.where((c) => c.status == 'customer').toList();
+  Future<void> refreshData() async {
+    await _provider.refresh();
 
-  List<Customer> get registrants =>
-      _customers.where((c) => c.status == 'registrant').toList();
-
-  void clearSelection() {
-    _selectedCustomer = null;
-    notifyListeners();
+    if (_provider.error != null) {
+      _showErrorDialog(_provider.error!);
+    }
   }
 
-  void refresh() {
-    loadCustomers();
+  void clearSelectedCustomer() {
+    _provider.clearSelectedCustomer();
   }
 
-  void clearError() {
-    _errorMessage = '';
-    notifyListeners();
+  void clearData() {
+    _provider.clearData();
+  }
+
+  void _showLoadingDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => const AlertDialog(
+        content: Row(
+          children: [
+            CircularProgressIndicator(),
+            SizedBox(width: 16),
+            Text('Loading...'),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showSuccessDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Icon(Icons.check_circle, color: Colors.green, size: 48),
+        content: Text(message, textAlign: TextAlign.center),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Tutup'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showErrorDialog(String message) {
+    showDialog(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Icon(Icons.error, color: Colors.red, size: 48),
+        content: Text(message, textAlign: TextAlign.center),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('Tutup'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<bool> _showConfirmationDialog(String title, String message) async {
+    return await showDialog<bool>(
+          context: context,
+          builder: (context) => AlertDialog(
+            title: Text(title),
+            content: Text(message),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(false),
+                child: const Text('Batal'),
+              ),
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(true),
+                style: TextButton.styleFrom(foregroundColor: Colors.red),
+                child: const Text('Hapus'),
+              ),
+            ],
+          ),
+        ) ??
+        false;
+  }
+
+  void showStatusFilter() {
+    showModalBottomSheet(
+      context: context,
+      builder: (context) => Container(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            const Text(
+              'Filter Status',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 16),
+            ListTile(
+              leading: const Icon(Icons.all_inclusive),
+              title: const Text('Semua'),
+              onTap: () {
+                Navigator.pop(context);
+                getAllCustomers();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.person),
+              title: const Text('Customer'),
+              onTap: () {
+                Navigator.pop(context);
+                getAllCustomers(status: CustomerStatus.customer);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.person_off),
+              title: const Text('Inactive'),
+              onTap: () {
+                Navigator.pop(context);
+                getAllCustomers(status: CustomerStatus.inactive);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.free_breakfast),
+              title: const Text('Free'),
+              onTap: () {
+                Navigator.pop(context);
+                getAllCustomers(status: CustomerStatus.free);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.block),
+              title: const Text('Isolir'),
+              onTap: () {
+                Navigator.pop(context);
+                getAllCustomers(status: CustomerStatus.isolir);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 }

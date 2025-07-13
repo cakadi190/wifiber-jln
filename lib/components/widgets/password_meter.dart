@@ -14,7 +14,7 @@ class PasswordMeterWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    
+
     if (passwordMeter == null || password.isEmpty) {
       return const SizedBox.shrink();
     }
@@ -23,8 +23,7 @@ class PasswordMeterWidget extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const SizedBox(height: 8),
-        
-        // Progress bar
+
         Row(
           children: [
             Expanded(
@@ -56,10 +55,9 @@ class PasswordMeterWidget extends StatelessWidget {
             ),
           ],
         ),
-        
+
         const SizedBox(height: 8),
-        
-        // Password requirements
+
         _buildRequirements(theme),
       ],
     );
@@ -67,10 +65,7 @@ class PasswordMeterWidget extends StatelessWidget {
 
   Widget _buildRequirements(ThemeData theme) {
     final requirements = [
-      {
-        'text': 'Minimal 8 karakter',
-        'isValid': password.length >= 8,
-      },
+      {'text': 'Minimal 8 karakter', 'isValid': password.length >= 8},
       {
         'text': 'Mengandung huruf kecil',
         'isValid': RegExp(r'[a-z]').hasMatch(password),

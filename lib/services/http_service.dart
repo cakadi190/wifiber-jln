@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:wifiber/exceptions/secure_storage_exceptions.dart';
 import 'package:wifiber/exceptions/string_exceptions.dart';
-import 'package:wifiber/services/helper_service.dart';
+import 'package:wifiber/helpers/http_helper.dart';
 import 'package:wifiber/services/secure_storage_service.dart';
 
 class HttpService {
@@ -14,8 +14,9 @@ class HttpService {
     Map<String, String>? headers,
     Object? body,
     bool requiresAuth = false,
+    Map<String, dynamic>? parameters = const {},
   }) async {
-    final uri = HelperService.buildUri(path);
+    final uri = HttpHelper.buildUri(path, parameters);
     final completeHeaders = await _buildHeaders(headers, requiresAuth);
 
     final response = await _client.post(
@@ -33,8 +34,9 @@ class HttpService {
     Map<String, String>? headers,
     Object? body,
     bool requiresAuth = false,
+    Map<String, dynamic>? parameters = const {},
   }) async {
-    final uri = HelperService.buildUri(path);
+    final uri = HttpHelper.buildUri(path, parameters);
     final completeHeaders = await _buildHeaders(headers, requiresAuth);
 
     final response = await _client.put(
@@ -52,8 +54,9 @@ class HttpService {
     Map<String, String>? headers,
     Object? body,
     bool requiresAuth = false,
+    Map<String, dynamic>? parameters = const {},
   }) async {
-    final uri = HelperService.buildUri(path);
+    final uri = HttpHelper.buildUri(path, parameters);
     final completeHeaders = await _buildHeaders(headers, requiresAuth);
 
     final response = await _client.delete(
@@ -70,8 +73,9 @@ class HttpService {
     String path, {
     Map<String, String>? headers,
     bool requiresAuth = false,
+    Map<String, dynamic>? parameters = const {},
   }) async {
-    final uri = HelperService.buildUri(path);
+    final uri = HttpHelper.buildUri(path, parameters);
     final completeHeaders = await _buildHeaders(headers, requiresAuth);
 
     final response = await _client.get(uri, headers: completeHeaders);

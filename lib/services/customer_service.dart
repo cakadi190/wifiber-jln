@@ -3,13 +3,34 @@ import 'dart:convert';
 import 'package:wifiber/models/customer.dart';
 import 'package:wifiber/services/http_service.dart';
 
+enum CustomerStatus { customer, inactive, free, isolir }
+
 class CustomerService {
   static final HttpService _http = HttpService();
-  static const String path = '/customers';
+  static const String path = 'customers';
 
-  Future<CustomerResponse> getAllCustomers() async {
+  Future<CustomerResponse> getAllCustomers(
+    CustomerStatus? status,
+    int? routerId,
+    int? areaId,
+  ) async {
     try {
-      final response = await _http.get('/customers', requiresAuth: true);
+      final queryParams = <String, String>{};
+      if (status != null) {
+        queryParams['status'] = status.toString().split('.').last;
+      }
+      if (routerId != null) {
+        queryParams['router_id'] = routerId.toString();
+      }
+      if (areaId != null) {
+        queryParams['area_id'] = areaId.toString();
+      }
+
+      final response = await _http.get(
+        path,
+        requiresAuth: true,
+        parameters: queryParams,
+      );
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -24,7 +45,7 @@ class CustomerService {
 
   Future<Customer> getCustomerById(String id) async {
     try {
-      final response = await _http.get('/customers/$id', requiresAuth: true);
+      final response = await _http.get('$path/$id', requiresAuth: true);
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -44,7 +65,7 @@ class CustomerService {
   Future<Customer> createCustomer(Map<String, dynamic> customerData) async {
     try {
       final response = await _http.post(
-        '/customers/',
+        path,
         body: json.encode(customerData),
         requiresAuth: true,
       );
@@ -70,7 +91,7 @@ class CustomerService {
   ) async {
     try {
       final response = await _http.put(
-        '/customers/$id',
+        '$path/$id',
         body: json.encode(customerData),
         requiresAuth: true,
       );
@@ -92,7 +113,7 @@ class CustomerService {
 
   Future<bool> deleteCustomer(String id) async {
     try {
-      final response = await _http.delete('/customers/$id', requiresAuth: true);
+      final response = await _http.delete('$path/$id', requiresAuth: true);
 
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
@@ -108,8 +129,9 @@ class CustomerService {
   Future<CustomerResponse> searchCustomers(String query) async {
     try {
       final response = await _http.get(
-        '/customers?search=$query',
+        path,
         requiresAuth: true,
+        parameters: {'search': query},
       );
 
       if (response.statusCode == 200) {
@@ -126,8 +148,9 @@ class CustomerService {
   Future<CustomerResponse> getCustomersByStatus(String status) async {
     try {
       final response = await _http.get(
-        '/customers?status=$status',
+        path,
         requiresAuth: true,
+        parameters: {'status': status},
       );
 
       if (response.statusCode == 200) {

@@ -115,7 +115,6 @@ class AuthService {
         return null;
       }
     } catch (e) {
-      // debugPrint('Error fetching profile: $e');
       return null;
     }
   }

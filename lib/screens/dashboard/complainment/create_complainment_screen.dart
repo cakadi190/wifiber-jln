@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
+import 'package:wifiber/components/widgets/customer_search_modal.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
+import 'package:wifiber/models/customer.dart';
 
 class CreateComplaintScreen extends StatefulWidget {
   const CreateComplaintScreen({super.key});
@@ -13,22 +15,11 @@ class CreateComplaintScreen extends StatefulWidget {
 class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  // Variables untuk menyimpan data form
-  String? selectedUser;
+  Customer? selectedCustomer;
   String? complaintDescription;
   DateTime? selectedDate;
 
-  // Dummy data untuk user target
-  final List<String> userTargets = [
-    'Admin Jaringan',
-    'Teknisi Lapangan',
-    'Customer Service',
-    'Supervisor',
-    'Manager IT',
-  ];
-
-  // Function untuk menampilkan modal bottom sheet
-  void _showUserTargetModal() {
+  void _showCustomerSearchModal() {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -38,88 +29,19 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.4,
-          minChildSize: 0.2,
-          maxChildSize: 0.9,
-          expand: false,
-          builder: (context, scrollController) {
-            return Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-              ),
-              child: Column(
-                children: [
-                  // Handle bar untuk drag
-                  Container(
-                    margin: const EdgeInsets.symmetric(vertical: 8),
-                    height: 4,
-                    width: 40,
-                    decoration: BoxDecoration(
-                      color: Colors.grey.shade300,
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                  Expanded(
-                    child: SingleChildScrollView(
-                      controller: scrollController,
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              const Text(
-                                'Pilih Pelanggan',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              IconButton(
-                                onPressed: () => Navigator.pop(context),
-                                icon: const Icon(Icons.close),
-                              ),
-                            ],
-                          ),
-                          const SizedBox(height: 16),
-                          TextFormField(
-                            decoration: const InputDecoration(
-                              labelText: 'Cari Pelanggan',
-                              prefixIcon: Icon(Icons.search),
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-                          ...userTargets.map((user) {
-                            return ListTile(
-                              title: Text(user),
-                              leading: const Icon(Icons.person),
-                              onTap: () {
-                                setState(() {
-                                  selectedUser = user;
-                                });
-                                Navigator.pop(context);
-                              },
-                            );
-                          }),
-                          const SizedBox(height: 16),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            );
+        return CustomerSearchModal(
+          title: 'Pilih Pelanggan',
+          selectedCustomer: selectedCustomer,
+          onCustomerSelected: (customer) {
+            setState(() {
+              selectedCustomer = customer;
+            });
           },
         );
       },
     );
   }
 
-  // Function untuk menampilkan date picker
   Future<void> _selectDate() async {
     final DateTime? picked = await showDatePicker(
       context: context,
@@ -134,7 +56,6 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
     }
   }
 
-  // Function untuk format tanggal
   String _formatDate(DateTime date) {
     return '${date.day}/${date.month}/${date.year}';
   }
@@ -176,7 +97,6 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
                           children: [
                             const SizedBox(height: 16),
 
-                            // User Target Selection
                             const Text(
                               'Pelanggan',
                               style: TextStyle(
@@ -186,7 +106,7 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
                             ),
                             const SizedBox(height: 8),
                             InkWell(
-                              onTap: _showUserTargetModal,
+                              onTap: _showCustomerSearchModal,
                               child: Container(
                                 width: double.infinity,
                                 padding: const EdgeInsets.symmetric(
@@ -201,15 +121,36 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
                                 ),
                                 child: Row(
                                   mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
-                                    Text(
-                                      selectedUser ?? 'Pilih Pelanggan',
-                                      style: TextStyle(
-                                        color: selectedUser != null
-                                            ? Colors.black
-                                            : Colors.grey.shade600,
-                                        fontSize: 16,
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            selectedCustomer?.name ??
+                                                'Pilih Pelanggan',
+                                            style: TextStyle(
+                                              color: selectedCustomer != null
+                                                  ? Colors.black
+                                                  : Colors.grey.shade600,
+                                              fontSize: 16,
+                                              fontWeight:
+                                                  selectedCustomer != null
+                                                  ? FontWeight.w500
+                                                  : FontWeight.normal,
+                                            ),
+                                          ),
+                                          if (selectedCustomer != null)
+                                            Text(
+                                              selectedCustomer!.phone,
+                                              style: TextStyle(
+                                                color: Colors.grey.shade600,
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                        ],
                                       ),
                                     ),
                                     Icon(
@@ -222,14 +163,13 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
                             ),
                             const SizedBox(height: 24),
 
-                            // Topic / Description of Complaint
                             TextFormField(
                               decoration: InputDecoration(
                                 hintText: 'Masukkan topik pengaduan',
                                 border: OutlineInputBorder(),
                                 labelText: 'Topik / Deskripsi Pengaduan',
                                 floatingLabelBehavior:
-                                FloatingLabelBehavior.always,
+                                    FloatingLabelBehavior.always,
                               ),
                               maxLines: null,
                               minLines: 3,
@@ -240,7 +180,6 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
                             ),
                             const SizedBox(height: 24),
 
-                            // Date Picker
                             const Text(
                               'Tanggal Pengaduan',
                               style: TextStyle(
@@ -265,7 +204,7 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
                                 ),
                                 child: Row(
                                   mainAxisAlignment:
-                                  MainAxisAlignment.spaceBetween,
+                                      MainAxisAlignment.spaceBetween,
                                   children: [
                                     Text(
                                       selectedDate != null
@@ -290,21 +229,18 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
 
                             const Spacer(),
 
-                            // Submit Button
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
                                 onPressed: () {
-                                  // Validasi form nanti ditambahkan
-                                  if (selectedUser != null &&
+                                  if (selectedCustomer != null &&
                                       complaintDescription != null &&
                                       complaintDescription!.isNotEmpty &&
                                       selectedDate != null) {
-                                    // Show success message
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
+                                      SnackBar(
                                         content: Text(
-                                          'Pengaduan berhasil dibuat!',
+                                          'Pengaduan untuk ${selectedCustomer!.name} berhasil dibuat!',
                                         ),
                                         backgroundColor: Colors.green,
                                       ),
