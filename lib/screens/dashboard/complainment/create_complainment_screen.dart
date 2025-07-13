@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/components/widgets/customer_search_modal.dart';
 import 'package:wifiber/config/app_colors.dart';
+import 'package:wifiber/controllers/complaint_controller.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/models/customer.dart';
 
@@ -15,9 +16,12 @@ class CreateComplaintScreen extends StatefulWidget {
 class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
+  late final ComplaintController _complaintController;
+
   Customer? selectedCustomer;
   String? complaintDescription;
   DateTime? selectedDate;
+  bool _isLoading = false;
 
   void _showCustomerSearchModal() {
     showModalBottomSheet(
@@ -60,6 +64,57 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
     return '${date.day}/${date.month}/${date.year}';
   }
 
+  Future<void> _handleSubmit() async {
+    if (!_validateForm()) {
+      _complaintController.showErrorMessage('Mohon lengkapi semua field!');
+      return;
+    }
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final success = await _complaintController.addComplaint(
+        subject: selectedCustomer!.id,
+        topic: complaintDescription!,
+        date: selectedDate!,
+      );
+
+      print(success);
+
+      if (success) {
+        _complaintController.showSuccessMessage(
+          'Pengaduan untuk ${selectedCustomer!.name} berhasil dibuat!',
+        );
+        Navigator.pop(context, true); // Return true untuk menandakan success
+      } else {
+        _complaintController.showErrorMessage('Gagal membuat pengaduan!');
+      }
+    } catch (e) {
+      _complaintController.showErrorMessage(
+        'Terjadi kesalahan: ${e.toString()}',
+      );
+    } finally {
+      setState(() {
+        _isLoading = false;
+      });
+    }
+  }
+
+  bool _validateForm() {
+    return selectedCustomer != null &&
+        complaintDescription != null &&
+        complaintDescription!.trim().isNotEmpty &&
+        selectedDate != null;
+  }
+
+  @override
+  void initState() {
+    super.initState();
+    _complaintController = ComplaintController(context);
+  }
+
   @override
   Widget build(BuildContext context) {
     return SystemUiWrapper(
@@ -97,6 +152,7 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
                           children: [
                             const SizedBox(height: 16),
 
+                            // Customer Selection
                             const Text(
                               'Pelanggan',
                               style: TextStyle(
@@ -106,7 +162,9 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
                             ),
                             const SizedBox(height: 8),
                             InkWell(
-                              onTap: _showCustomerSearchModal,
+                              onTap: _isLoading
+                                  ? null
+                                  : _showCustomerSearchModal,
                               child: Container(
                                 width: double.infinity,
                                 padding: const EdgeInsets.symmetric(
@@ -115,9 +173,14 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
                                 ),
                                 decoration: BoxDecoration(
                                   border: Border.all(
-                                    color: Colors.grey.shade300,
+                                    color: _isLoading
+                                        ? Colors.grey.shade400
+                                        : Colors.grey.shade300,
                                   ),
                                   borderRadius: BorderRadius.circular(8),
+                                  color: _isLoading
+                                      ? Colors.grey.shade50
+                                      : null,
                                 ),
                                 child: Row(
                                   mainAxisAlignment:
@@ -155,7 +218,9 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
                                     ),
                                     Icon(
                                       Icons.arrow_drop_down,
-                                      color: Colors.grey.shade600,
+                                      color: _isLoading
+                                          ? Colors.grey.shade400
+                                          : Colors.grey.shade600,
                                     ),
                                   ],
                                 ),
@@ -163,6 +228,7 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
                             ),
                             const SizedBox(height: 24),
 
+                            // Complaint Description
                             TextFormField(
                               decoration: InputDecoration(
                                 hintText: 'Masukkan topik pengaduan',
@@ -174,12 +240,22 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
                               maxLines: null,
                               minLines: 3,
                               keyboardType: TextInputType.multiline,
+                              enabled: !_isLoading,
                               onChanged: (value) {
-                                complaintDescription = value;
+                                setState(() {
+                                  complaintDescription = value;
+                                });
+                              },
+                              validator: (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Deskripsi pengaduan tidak boleh kosong';
+                                }
+                                return null;
                               },
                             ),
                             const SizedBox(height: 24),
 
+                            // Date Selection
                             const Text(
                               'Tanggal Pengaduan',
                               style: TextStyle(
@@ -189,7 +265,7 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
                             ),
                             const SizedBox(height: 8),
                             InkWell(
-                              onTap: _selectDate,
+                              onTap: _isLoading ? null : _selectDate,
                               child: Container(
                                 width: double.infinity,
                                 padding: const EdgeInsets.symmetric(
@@ -198,9 +274,14 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
                                 ),
                                 decoration: BoxDecoration(
                                   border: Border.all(
-                                    color: Colors.grey.shade300,
+                                    color: _isLoading
+                                        ? Colors.grey.shade400
+                                        : Colors.grey.shade300,
                                   ),
                                   borderRadius: BorderRadius.circular(8),
+                                  color: _isLoading
+                                      ? Colors.grey.shade50
+                                      : null,
                                 ),
                                 child: Row(
                                   mainAxisAlignment:
@@ -219,7 +300,9 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
                                     ),
                                     Icon(
                                       Icons.calendar_today,
-                                      color: Colors.grey.shade600,
+                                      color: _isLoading
+                                          ? Colors.grey.shade400
+                                          : Colors.grey.shade600,
                                       size: 20,
                                     ),
                                   ],
@@ -229,36 +312,15 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
 
                             const Spacer(),
 
+                            // Submit Button
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(
-                                onPressed: () {
-                                  if (selectedCustomer != null &&
-                                      complaintDescription != null &&
-                                      complaintDescription!.isNotEmpty &&
-                                      selectedDate != null) {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                        content: Text(
-                                          'Pengaduan untuk ${selectedCustomer!.name} berhasil dibuat!',
-                                        ),
-                                        backgroundColor: Colors.green,
-                                      ),
-                                    );
-                                    Navigator.pop(context);
-                                  } else {
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                        content: Text(
-                                          'Mohon lengkapi semua field!',
-                                        ),
-                                        backgroundColor: Colors.red,
-                                      ),
-                                    );
-                                  }
-                                },
+                                onPressed: _isLoading ? null : _handleSubmit,
                                 style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primary,
+                                  backgroundColor: _isLoading
+                                      ? Colors.grey.shade400
+                                      : AppColors.primary,
                                   foregroundColor: Colors.white,
                                   padding: const EdgeInsets.symmetric(
                                     vertical: 16,
@@ -267,13 +329,25 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
                                     borderRadius: BorderRadius.circular(8),
                                   ),
                                 ),
-                                child: const Text(
-                                  'Buat Pengaduan',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
+                                child: _isLoading
+                                    ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                Colors.white,
+                                              ),
+                                        ),
+                                      )
+                                    : const Text(
+                                        'Buat Pengaduan',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
                               ),
                             ),
                             const SizedBox(height: 16),

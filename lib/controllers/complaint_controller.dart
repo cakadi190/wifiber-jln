@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/models/complaint.dart';
 import 'package:wifiber/providers/complaint_provider.dart';
 
@@ -74,14 +75,10 @@ class ComplaintController {
   }
 
   void showSuccessMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.green),
-    );
+    SnackBars.success(context, message);
   }
 
   void showErrorMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
-    );
+    SnackBars.error(context, message);
   }
 }
