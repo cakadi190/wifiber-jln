@@ -112,7 +112,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                 icon: PhosphorIcon(
                   PhosphorIcons.wallet(PhosphorIconsStyle.duotone),
                 ),
-                label: 'Transaksi',
+                label: 'Keuangan',
               ),
               BottomNavigationBarItem(
                 icon: Container(

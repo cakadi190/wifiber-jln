@@ -16,7 +16,7 @@ class TransactionTab extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.primary,
-      appBar: AppBar(title: const Text('Transaksi & Keuangan')),
+      appBar: AppBar(title: const Text('Keuangan')),
       body: Consumer<TransactionProvider>(
         builder: (context, provider, child) {
           return Column(
@@ -616,28 +616,22 @@ class TransactionTab extends StatelessWidget {
         child: SingleChildScrollView(
           child: Column(
             mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Detail Transaksi',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: Icon(Icons.close),
-                  ),
-                ],
+              Container(
+                margin: const EdgeInsets.symmetric(vertical: 8),
+                height: 4,
+                width: 40,
+                decoration: BoxDecoration(
+                  color: Colors.grey.shade300,
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
               SizedBox(height: 8),
 
               _buildDetailRow(
                 context,
-                'ID Transaksi',
+                'ID Keuangan',
                 '#${transaction.id.toString()}',
                 Icons.tag,
               ),
