@@ -96,7 +96,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ),
             ),
             child: _controller.formLoading
-                ? const CircularProgressIndicator(color: Colors.white)
+                ? const CircularProgressIndicator(color: AppColors.primary)
                 : const Text(
               "Kirim Instruksinya!",
               style: TextStyle(
