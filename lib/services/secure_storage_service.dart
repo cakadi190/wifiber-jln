@@ -54,7 +54,7 @@ class SecureStorageService {
     String userId,
     Uint8List imageData,
   ) async {
-    final key = '${userAvatarPrefix}$userId';
+    final key = '$userAvatarPrefix$userId';
     final base64String = base64Encode(imageData);
     final timestamp = DateTime.now().millisecondsSinceEpoch;
 
@@ -66,7 +66,7 @@ class SecureStorageService {
     String userId, {
     Duration? maxAge,
   }) async {
-    final key = '${userAvatarPrefix}$userId';
+    final key = '$userAvatarPrefix$userId';
     final base64String = await storage.read(key: key);
     final timestampStr = await storage.read(key: '${key}_timestamp');
 
@@ -90,7 +90,7 @@ class SecureStorageService {
   }
 
   static Future<void> clearUserAvatar(String userId) async {
-    final key = '${userAvatarPrefix}$userId';
+    final key = '$userAvatarPrefix$userId';
     await storage.delete(key: key);
     await storage.delete(key: '${key}_timestamp');
   }
@@ -191,6 +191,6 @@ class SecureStorageService {
   }
 
   static String _getUrlCacheKey(String url) {
-    return '${avatarCachePrefix}${md5.convert(utf8.encode(url)).toString()}';
+    return '$avatarCachePrefix${md5.convert(utf8.encode(url)).toString()}';
   }
 }

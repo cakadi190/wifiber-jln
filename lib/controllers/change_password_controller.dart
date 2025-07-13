@@ -24,10 +24,10 @@ class PasswordMeter {
 class ChangePasswordController extends ChangeNotifier {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController currentPasswordController =
-      TextEditingController();
+  TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
-      TextEditingController();
+  TextEditingController();
 
   final String resetPasswordPath = '/reset-password';
   final HttpService _http = HttpService();
@@ -206,14 +206,6 @@ class ChangePasswordController extends ChangeNotifier {
 
     setLoading(true);
 
-    print(
-      {
-        'username': user.username,
-        'existing_password': currentPasswordController.text,
-        'new_password': passwordController.text,
-      }.toString(),
-    );
-
     try {
       final response = await _http.post(
         resetPasswordPath,
@@ -225,6 +217,8 @@ class ChangePasswordController extends ChangeNotifier {
         requiresAuth: true,
       );
 
+      if (!context.mounted) return false;
+
       if (response.statusCode == 200) {
         _showSuccessMessage(context);
         _clearControllers();
@@ -234,6 +228,8 @@ class ChangePasswordController extends ChangeNotifier {
         return false;
       }
     } catch (e) {
+      if (!context.mounted) return false;
+
       if (e.toString().contains("401")) {
         _showErrorMessage(
           context,
