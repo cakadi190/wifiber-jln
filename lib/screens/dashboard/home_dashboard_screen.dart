@@ -4,6 +4,7 @@ import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/config/app_colors.dart';
+import 'package:wifiber/controllers/tabs/complaint_tab_controller.dart';
 import 'package:wifiber/controllers/tabs/transaction_tab.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/middlewares/auth_middleware.dart';
@@ -26,6 +27,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   int _selectedIndex = 0;
   late final List<Widget> _widgetOptions;
   late final TransactionTabController _transactionTabController;
+  late final ComplaintTabController _complaintController;
 
   SystemUiOverlayStyle _internalStyle = SystemUiHelper.duotone(
     statusBarColor: Colors.transparent,
@@ -38,6 +40,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
 
     final provider = context.read<TransactionProvider>();
     _transactionTabController = TransactionTabController(provider);
+    _complaintController = ComplaintTabController(context);
 
     _widgetOptions = [
       HomeTab(
@@ -46,7 +49,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
       ),
       TransactionTab(controller: _transactionTabController),
       Container(),
-      ComplaintsTab(),
+      ComplaintsTab(controller: _complaintController),
       AccountCenterScreen(),
     ];
   }

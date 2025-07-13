@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/components/widgets/customer_search_modal.dart';
 import 'package:wifiber/config/app_colors.dart';
-import 'package:wifiber/controllers/complaint_controller.dart';
+import 'package:wifiber/controllers/tabs/complaint_tab_controller.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/models/customer.dart';
 
@@ -16,7 +16,7 @@ class CreateComplaintScreen extends StatefulWidget {
 class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
   GlobalKey<FormState> formKey = GlobalKey<FormState>();
 
-  late final ComplaintController _complaintController;
+  late final ComplaintTabController _complaintController;
 
   Customer? selectedCustomer;
   String? complaintDescription;
@@ -112,7 +112,7 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
   @override
   void initState() {
     super.initState();
-    _complaintController = ComplaintController(context);
+    _complaintController = ComplaintTabController(context);
   }
 
   @override

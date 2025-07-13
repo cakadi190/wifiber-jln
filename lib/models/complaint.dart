@@ -27,6 +27,41 @@ class Complaint {
     this.locationPhoto,
   });
 
+  // Add these getter methods for UI compatibility
+  String get topic => subject ?? '';
+  DateTime get date => DateTime.tryParse(createdAt ?? '') ?? DateTime.now();
+
+  // Convert string status to enum
+  ComplaintStatus get statusEnum {
+    switch (status?.toLowerCase()) {
+      case 'pending':
+        return ComplaintStatus.pending;
+      case 'ongoing':
+      case 'processing':
+        return ComplaintStatus.processing;
+      case 'completed':
+      case 'resolved':
+        return ComplaintStatus.resolved;
+      default:
+        return ComplaintStatus.pending;
+    }
+  }
+
+  // Convert string type to enum
+  ComplaintType get typeEnum {
+    switch (type?.toLowerCase()) {
+      case 'internet':
+        return ComplaintType.internet;
+      case 'billing':
+        return ComplaintType.billing;
+      case 'technical':
+      case 'teknis':
+        return ComplaintType.technical;
+      default:
+        return ComplaintType.internet;
+    }
+  }
+
   factory Complaint.fromJson(Map<String, dynamic> json) => Complaint(
     id: json['id'],
     number: json['number'],
@@ -138,6 +173,6 @@ class ComplaintResponse {
       );
 }
 
-enum ComplaintStatus { pending, ongoing, completed }
+enum ComplaintStatus { pending, processing, resolved }
 
-enum ComplaintType { complaint, registration }
+enum ComplaintType { internet, billing, technical }

@@ -8,17 +8,22 @@ class ComplaintProvider extends ChangeNotifier {
   ComplaintProvider(this._complaintService);
 
   List<Complaint> _complaints = [];
+  List<Complaint> _allComplaints = []; // Keep original data for filtering
   Complaint? _selectedComplaint;
   bool _isLoading = false;
   String? _error;
 
+  // Filter states
+  ComplaintStatus? _selectedComplaintFilter;
+  ComplaintType? _selectedComplaintTypeFilter;
+
+  // Getters
   List<Complaint> get complaints => _complaints;
-
   Complaint? get selectedComplaint => _selectedComplaint;
-
   bool get isLoading => _isLoading;
-
   String? get error => _error;
+  ComplaintStatus? get selectedComplaintFilter => _selectedComplaintFilter;
+  ComplaintType? get selectedComplaintTypeFilter => _selectedComplaintTypeFilter;
 
   Future<void> fetchComplaints() async {
     _setLoading(true);
@@ -27,7 +32,8 @@ class ComplaintProvider extends ChangeNotifier {
     try {
       final response = await _complaintService.getAllComplaints();
       if (response.success) {
-        _complaints = response.data;
+        _allComplaints = response.data;
+        _applyFilters(); // Apply current filters
       } else {
         _setError(response.message);
       }
@@ -59,8 +65,8 @@ class ComplaintProvider extends ChangeNotifier {
       final response = await _complaintService.createComplaint(complaint);
 
       if (response.success) {
-        _complaints.addAll(response.data);
-        notifyListeners();
+        _allComplaints.addAll(response.data);
+        _applyFilters();
         return true;
       } else {
         _setError(response.message);
@@ -81,10 +87,10 @@ class ComplaintProvider extends ChangeNotifier {
     try {
       final response = await _complaintService.updateComplaint(id, complaint);
       if (response.success) {
-        final index = _complaints.indexWhere((c) => c.id == id);
+        final index = _allComplaints.indexWhere((c) => c.id == id);
         if (index != -1) {
-          _complaints[index] = response.data.first;
-          notifyListeners();
+          _allComplaints[index] = response.data.first;
+          _applyFilters();
         }
         return true;
       } else {
@@ -106,8 +112,8 @@ class ComplaintProvider extends ChangeNotifier {
     try {
       final success = await _complaintService.deleteComplaint(id);
       if (success) {
-        _complaints.removeWhere((c) => c.id == id);
-        notifyListeners();
+        _allComplaints.removeWhere((c) => c.id == id);
+        _applyFilters();
         return true;
       } else {
         _setError('Failed to delete complaint');
@@ -119,6 +125,36 @@ class ComplaintProvider extends ChangeNotifier {
     } finally {
       _setLoading(false);
     }
+  }
+
+  // Filter methods
+  void setComplaintFilter(ComplaintStatus? status) {
+    _selectedComplaintFilter = status;
+    _applyFilters();
+  }
+
+  void setComplaintTypeFilter(ComplaintType? type) {
+    _selectedComplaintTypeFilter = type;
+    _applyFilters();
+  }
+
+  void _applyFilters() {
+    List<Complaint> filtered = List.from(_allComplaints);
+
+    // Apply status filter
+    if (_selectedComplaintFilter != null) {
+      filtered = filtered.where((complaint) =>
+      complaint.statusEnum == _selectedComplaintFilter).toList();
+    }
+
+    // Apply type filter
+    if (_selectedComplaintTypeFilter != null) {
+      filtered = filtered.where((complaint) =>
+      complaint.typeEnum == _selectedComplaintTypeFilter).toList();
+    }
+
+    _complaints = filtered;
+    notifyListeners();
   }
 
   Future<void> fetchComplaintsByStatus(ComplaintStatus status) async {
@@ -159,13 +195,13 @@ class ComplaintProvider extends ChangeNotifier {
 
   List<Complaint> getComplaintsByStatusLocal(ComplaintStatus status) {
     return _complaints
-        .where((complaint) => complaint.status == status.name)
+        .where((complaint) => complaint.statusEnum == status)
         .toList();
   }
 
   List<Complaint> getComplaintsByTypeLocal(ComplaintType type) {
     return _complaints
-        .where((complaint) => complaint.type == type.name)
+        .where((complaint) => complaint.typeEnum == type)
         .toList();
   }
 

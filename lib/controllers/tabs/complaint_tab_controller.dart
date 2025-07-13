@@ -4,12 +4,17 @@ import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/models/complaint.dart';
 import 'package:wifiber/providers/complaint_provider.dart';
 
-class ComplaintController {
+class ComplaintTabController {
   final BuildContext context;
   late final ComplaintProvider _provider;
 
-  ComplaintController(this.context) {
+  ComplaintTabController(this.context) {
     _provider = Provider.of<ComplaintProvider>(context, listen: false);
+  }
+
+  // Get filtered complaints based on current filters
+  List<Complaint> get filteredComplaints {
+    return _provider.complaints;
   }
 
   Future<void> loadComplaints() async {
@@ -35,11 +40,11 @@ class ComplaintController {
   }
 
   Future<bool> updateComplaintStatus(
-    int id,
-    String detail,
-    String name,
-    bool ticketIsDone,
-  ) async {
+      int id,
+      String detail,
+      String name,
+      bool ticketIsDone,
+      ) async {
     final updatedComplaint = UpdateComplaint(
       id: id,
       detail: detail,
@@ -80,5 +85,12 @@ class ComplaintController {
 
   void showErrorMessage(String message) {
     SnackBars.error(context, message);
+  }
+
+  // Add logout method (you'll need to implement this based on your auth system)
+  Future<void> logout(BuildContext context) async {
+    // Implement logout logic here
+    // This is just a placeholder
+    Navigator.pushReplacementNamed(context, '/login');
   }
 }
