@@ -131,9 +131,7 @@ class CustomerResponse {
     return CustomerResponse(
       success: json['success'],
       message: json['message'],
-      data: (json['data'] as List)
-          .map((item) => Customer.fromJson(item))
-          .toList(),
+      data: List<Customer>.from(json['data'].map((x) => Customer.fromJson(x))),
       error: json['error'],
     );
   }
