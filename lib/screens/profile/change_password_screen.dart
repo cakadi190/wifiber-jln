@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/components/ui/alert.dart';
 import 'package:wifiber/components/widgets/password_meter.dart';
@@ -6,6 +7,7 @@ import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/controllers/change_password_controller.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:remixicon/remixicon.dart';
+import 'package:wifiber/providers/auth_provider.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -252,7 +254,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
   }
 
   void _handleSubmit() async {
-    final success = await _controller.changePassword(context);
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final user = authProvider.user;
+
+    final success = await _controller.changePassword(context, user);
     if (success && mounted) {
       Navigator.pop(context);
     }

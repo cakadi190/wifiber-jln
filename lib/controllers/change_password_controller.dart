@@ -1,4 +1,9 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:wifiber/components/ui/snackbars.dart';
+import 'package:wifiber/models/auth_user.dart';
+import 'package:wifiber/services/http_service.dart';
 
 enum PasswordStrength { weak, medium, strong, veryStrong }
 
@@ -24,6 +29,9 @@ class ChangePasswordController extends ChangeNotifier {
   final TextEditingController confirmPasswordController =
       TextEditingController();
 
+  final String resetPasswordPath = '/reset-password';
+  final HttpService _http = HttpService();
+
   bool _obscureCurrentPassword = true;
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
@@ -33,17 +41,26 @@ class ChangePasswordController extends ChangeNotifier {
   PasswordMeter? _passwordMeter;
 
   bool get obscureCurrentPassword => _obscureCurrentPassword;
+
   bool get obscurePassword => _obscurePassword;
+
   bool get obscureConfirmPassword => _obscureConfirmPassword;
+
   bool get isLoading => _isLoading;
+
   PasswordMeter? get passwordMeter => _passwordMeter;
 
   ChangePasswordController() {
     passwordController.addListener(_onPasswordChanged);
+    confirmPasswordController.addListener(_onConfirmPasswordChanged);
   }
 
   void _onPasswordChanged() {
     _passwordMeter = _calculatePasswordStrength(passwordController.text);
+    notifyListeners();
+  }
+
+  void _onConfirmPasswordChanged() {
     notifyListeners();
   }
 
@@ -151,6 +168,9 @@ class ChangePasswordController extends ChangeNotifier {
     ).hasMatch(value)) {
       return 'Kata sandi harus mengandung huruf besar, huruf kecil, angka, dan simbol';
     }
+    if (value == currentPasswordController.text) {
+      return 'Kata sandi baru tidak boleh sama dengan kata sandi sekarang';
+    }
     return null;
   }
 
@@ -158,25 +178,54 @@ class ChangePasswordController extends ChangeNotifier {
     if (value == null || value.isEmpty) {
       return 'Konfirmasi kata sandi tidak boleh kosong';
     }
+    if (value.length < 8) {
+      return 'Kata sandi minimal 8 karakter';
+    }
+    if (!RegExp(
+      r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]',
+    ).hasMatch(value)) {
+      return 'Kata sandi harus mengandung huruf besar, huruf kecil, angka, dan simbol';
+    }
     if (value != passwordController.text) {
       return 'Konfirmasi kata sandi tidak cocok';
+    }
+    if (value == currentPasswordController.text) {
+      return 'Kata sandi baru tidak boleh sama dengan kata sandi sekarang';
     }
     return null;
   }
 
-  Future<bool> changePassword(BuildContext context) async {
+  Future<bool> changePassword(BuildContext context, AuthUser? user) async {
+    if (user == null) {
+      return false;
+    }
+
     if (!formKey.currentState!.validate()) {
       return false;
     }
 
     setLoading(true);
 
+    print(
+      {
+        'username': user.username,
+        'existing_password': currentPasswordController.text,
+        'new_password': passwordController.text,
+      }.toString(),
+    );
+
     try {
-      await Future.delayed(const Duration(seconds: 2));
+      final response = await _http.post(
+        resetPasswordPath,
+        body: jsonEncode({
+          'username': user.username,
+          'existing_password': currentPasswordController.text,
+          'new_password': passwordController.text,
+        }),
+        requiresAuth: true,
+      );
 
-      final success = true;
-
-      if (success) {
+      if (response.statusCode == 200) {
         _showSuccessMessage(context);
         _clearControllers();
         return true;
@@ -185,7 +234,22 @@ class ChangePasswordController extends ChangeNotifier {
         return false;
       }
     } catch (e) {
-      _showErrorMessage(context, 'Terjadi kesalahan saat mengubah kata sandi');
+      if (e.toString().contains("401")) {
+        _showErrorMessage(
+          context,
+          'Silahkan autentikasikan diri anda terlebih dahulu sebelum mengganti sandi!',
+        );
+      } else if (e.toString().contains("422")) {
+        _showErrorMessage(
+          context,
+          'Ups, kata sandi akun anda saat ini tidak valid. Periksa kembali ya!',
+        );
+      } else {
+        _showErrorMessage(
+          context,
+          'Terjadi kesalahan saat mengubah kata sandi',
+        );
+      }
       return false;
     } finally {
       setLoading(false);
@@ -193,18 +257,11 @@ class ChangePasswordController extends ChangeNotifier {
   }
 
   void _showSuccessMessage(BuildContext context) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(
-        content: Text('Kata sandi berhasil diubah!'),
-        backgroundColor: Colors.green,
-      ),
-    );
+    SnackBars.success(context, "Kata sandi berhasil diubah!").clearSnackBars();
   }
 
   void _showErrorMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message), backgroundColor: Colors.red),
-    );
+    SnackBars.error(context, message);
   }
 
   void _clearControllers() {
@@ -218,6 +275,7 @@ class ChangePasswordController extends ChangeNotifier {
   @override
   void dispose() {
     passwordController.removeListener(_onPasswordChanged);
+    confirmPasswordController.removeListener(_onConfirmPasswordChanged);
     currentPasswordController.dispose();
     passwordController.dispose();
     confirmPasswordController.dispose();
