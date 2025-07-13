@@ -586,7 +586,7 @@ class TransactionTab extends StatelessWidget {
               ),
             ),
             Text(error, textAlign: TextAlign.center),
-            TextButton(
+            if(error.contains("401")) TextButton(
               onPressed: () => controller.logout(context),
               child: Text("Autentikasi ulang"),
             ),
