@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/controllers/tabs/complaint_tab_controller.dart';
 import 'package:wifiber/helpers/datetime_helper.dart';
@@ -415,8 +416,9 @@ class ComplaintsTab extends StatelessWidget {
 
   Future<void> _showComplaintDeleteModal(
     BuildContext context,
-    Complaint complaint,
-  ) async {
+    Complaint complaint, [
+    VoidCallback? onSuccess,
+  ]) async {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -463,7 +465,12 @@ class ComplaintsTab extends StatelessWidget {
                     onPressed: () async {
                       int id = int.parse(complaint.id.toString());
                       final success = await controller.removeComplaint(id);
-                      if (success) Navigator.pop(context);
+                      if (success) {
+                        Navigator.pop(context);
+                        onSuccess?.call();
+
+                        SnackBars.success(context, "Pengaduan berhasil dihapus");
+                      }
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Colors.red,
@@ -566,7 +573,9 @@ class ComplaintsTab extends StatelessWidget {
                   Expanded(
                     child: OutlinedButton(
                       onPressed: () =>
-                          _showComplaintDeleteModal(context, complaint),
+                          _showComplaintDeleteModal(context, complaint, () {
+                            Navigator.pop(context);
+                          }),
                       style: OutlinedButton.styleFrom(
                         padding: EdgeInsets.symmetric(vertical: 16),
                         side: BorderSide(color: Colors.red),

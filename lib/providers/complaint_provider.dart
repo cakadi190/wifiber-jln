@@ -123,6 +123,7 @@ class ComplaintProvider extends ChangeNotifier {
       if (success) {
         _allComplaints.removeWhere((c) => c.id == id);
         _applyFilters();
+        fetchComplaints();
         return true;
       } else {
         _setError('Failed to delete complaint');
