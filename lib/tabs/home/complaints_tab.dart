@@ -8,6 +8,7 @@ import 'package:wifiber/helpers/datetime_helper.dart';
 import 'package:wifiber/models/complaint.dart';
 import 'package:wifiber/providers/complaint_provider.dart';
 import 'package:wifiber/screens/dashboard/complainment/create_complainment_screen.dart';
+import 'package:wifiber/screens/dashboard/complainment/edit_complainment_screen.dart';
 
 class ComplaintsTab extends StatelessWidget {
   final ComplaintTabController controller;
@@ -437,8 +438,6 @@ class ComplaintsTab extends StatelessWidget {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              const SizedBox(height: 16),
-              Center(child: SizedBox(width: 40, child: _buildModalHandle())),
               const SizedBox(height: 8),
 
               _buildComplaintCard(context, complaint),
@@ -451,7 +450,12 @@ class ComplaintsTab extends StatelessWidget {
               }),
               _buildButton(context, "Tindak Lanjuti (Perbarui Laporan)", () {
                 Navigator.pop(context);
-                _showComplaintDetailModal(context, complaint);
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => EditComplaintScreen(),
+                  ),
+                );
               }),
               _buildButton(context, "Hapus Pengaduan", () {
                 Navigator.pop(context);
@@ -475,8 +479,16 @@ class ComplaintsTab extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: ListTile(
         visualDensity: VisualDensity.comfortable,
-        title: Text(label, style: TextStyle(color: isDangerZone != null && isDangerZone ? Colors.red : null)),
-        trailing: Icon(Icons.chevron_right_rounded, color: isDangerZone != null && isDangerZone ? Colors.red : null),
+        title: Text(
+          label,
+          style: TextStyle(
+            color: isDangerZone != null && isDangerZone ? Colors.red : null,
+          ),
+        ),
+        trailing: Icon(
+          Icons.chevron_right_rounded,
+          color: isDangerZone != null && isDangerZone ? Colors.red : null,
+        ),
         onTap: onPressed,
       ),
     );
@@ -608,72 +620,82 @@ class ComplaintsTab extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
+      enableDrag: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-          left: 16,
-          right: 16,
-          top: 16,
-        ),
-        child: SingleChildScrollView(
-          physics: const BouncingScrollPhysics(),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              _buildModalHandle(),
-              const SizedBox(height: 8),
-              _buildDetailRow(
-                context,
-                'ID Pengaduan',
-                '#${complaint.number.toString()}',
-                Icons.tag,
+      builder: (context) => DraggableScrollableSheet(
+        initialChildSize: 0.9,
+        minChildSize: 0.2,
+        maxChildSize: 1.0,
+        expand: false,
+        builder: (context, scrollController) {
+          return Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+              left: 16,
+              right: 16,
+              top: 16,
+            ),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              controller: scrollController,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _buildModalHandle(),
+                  const SizedBox(height: 8),
+                  _buildDetailRow(
+                    context,
+                    'Nomor Pengaduan',
+                    '#${complaint.number.toString()}',
+                    Icons.tag,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildDetailRow(
+                    context,
+                    'Nama Pelanggan',
+                    complaint.name ?? "Anonim",
+                    Icons.subject,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildDetailRow(
+                    context,
+                    'Deskripsi',
+                    complaint.topic,
+                    Icons.topic,
+                  ),
+                  const SizedBox(height: 16),
+                  _buildDetailRow(
+                    context,
+                    'Status',
+                    _getStatusText(complaint.statusEnum),
+                    Icons.info_outline,
+                    color: _getStatusColor(complaint.statusEnum),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildDetailRow(
+                    context,
+                    'Tipe',
+                    _getTypeText(complaint.typeEnum),
+                    _getTypeIcon(complaint.typeEnum),
+                  ),
+                  const SizedBox(height: 16),
+                  _buildDetailRow(
+                    context,
+                    'Tanggal',
+                    DateHelper.formatDate(complaint.date, format: 'full'),
+                    Icons.calendar_month,
+                  ),
+                  const SizedBox(height: 32),
+                  _buildDetailModalActions(context, complaint),
+                  const SizedBox(height: 16),
+                ],
               ),
-              const SizedBox(height: 16),
-              _buildDetailRow(
-                context,
-                'Nama Pelanggan',
-                complaint.name ?? "Anonim",
-                Icons.subject,
-              ),
-              const SizedBox(height: 16),
-              _buildDetailRow(
-                context,
-                'Deskripsi',
-                complaint.topic,
-                Icons.topic,
-              ),
-              const SizedBox(height: 16),
-              _buildDetailRow(
-                context,
-                'Status',
-                _getStatusText(complaint.statusEnum),
-                Icons.info_outline,
-                color: _getStatusColor(complaint.statusEnum),
-              ),
-              const SizedBox(height: 16),
-              _buildDetailRow(
-                context,
-                'Tipe',
-                _getTypeText(complaint.typeEnum),
-                _getTypeIcon(complaint.typeEnum),
-              ),
-              const SizedBox(height: 16),
-              _buildDetailRow(
-                context,
-                'Tanggal',
-                DateHelper.formatDate(complaint.date, format: 'full'),
-                Icons.calendar_month,
-              ),
-              const SizedBox(height: 32),
-              _buildDetailModalActions(context, complaint),
-              const SizedBox(height: 16),
-            ],
-          ),
-        ),
+            ),
+          );
+        },
       ),
     );
   }
@@ -704,7 +726,15 @@ class ComplaintsTab extends StatelessWidget {
                   backgroundColor: AppColors.primary,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  Navigator.pop(context);
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => EditComplaintScreen(),
+                    ),
+                  );
+                },
                 child: const Text(
                   'Tindak Lanjuti',
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
