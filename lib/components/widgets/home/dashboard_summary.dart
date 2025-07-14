@@ -11,7 +11,7 @@ class DashboardSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => DashboardSummaryController(),
+      create: (_) => DashboardSummaryController()..loadDashboardData(),
       child: _DashboardSummaryView(onTransactionTap: onTransactionTap),
     );
   }
@@ -26,105 +26,170 @@ class _DashboardSummaryView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.all(16),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        image: const DecorationImage(
-          image: AssetImage('assets/summary-image.png'),
-          fit: BoxFit.cover,
-        ),
-      ),
-      padding: const EdgeInsets.all(12),
-      child: Column(
-        children: [
-          Row(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Expanded(
-                child: _buildSummaryItem(
-                  context,
-                  label: 'Total Kas Bulan Ini',
-                  icon: PhosphorIcons.cardholder(PhosphorIconsStyle.fill),
-                  value: 'Rp 2.000.000.000.000',
-                  isObscured: (c) => c.obscureTotalCashFlow,
-                  onToggle: (c) => c.toggleCashFlowVisibility(),
-                  size: WidgetSize.large,
+    return Consumer<DashboardSummaryController>(
+      builder: (context, controller, _) {
+        if (controller.isLoading) {
+          return Container(
+            margin: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              image: const DecorationImage(
+                image: AssetImage('assets/summary-image.png'),
+                fit: BoxFit.cover,
+              ),
+            ),
+            padding: const EdgeInsets.all(12),
+            child: const Center(
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+              ),
+            ),
+          );
+        }
+
+        if (controller.error != null) {
+          return Container(
+            margin: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(16),
+              color: Colors.red.shade100,
+            ),
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Icon(
+                  Icons.error_outline,
+                  color: Colors.red.shade700,
+                  size: 48,
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  'Error: ${controller.error}',
+                  style: TextStyle(
+                    color: Colors.red.shade700,
+                    fontWeight: FontWeight.w600,
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 8),
+                ElevatedButton(
+                  onPressed: controller.refresh,
+                  child: const Text('Retry'),
+                ),
+              ],
+            ),
+          );
+        }
+
+        return RefreshIndicator(
+          onRefresh: controller.refresh,
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            child: Container(
+              margin: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                image: const DecorationImage(
+                  image: AssetImage('assets/summary-image.png'),
+                  fit: BoxFit.cover,
                 ),
               ),
-            ],
-          ),
+              padding: const EdgeInsets.all(12),
+              child: Column(
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: _buildSummaryItem(
+                          context,
+                          label: 'Total Kas Bulan Ini',
+                          icon: PhosphorIcons.cardholder(PhosphorIconsStyle.fill),
+                          value: controller.getFormattedTotalCashFlow(),
+                          isObscured: (c) => c.obscureTotalCashFlow,
+                          onToggle: (c) => c.toggleCashFlowVisibility(),
+                          size: WidgetSize.large,
+                        ),
+                      ),
+                    ],
+                  ),
 
-          const SizedBox(height: 8),
+                  const SizedBox(height: 8),
 
-          _buildUnpaidInvoiceItem(context),
+                  _buildUnpaidInvoiceItem(context),
 
-          const SizedBox(height: 8),
+                  const SizedBox(height: 8),
 
-          Row(
-            children: [
-              Expanded(
-                child: _buildSummaryItem(
-                  context,
-                  label: 'Pemasukan',
-                  icon: PhosphorIcons.arrowCircleUp(PhosphorIconsStyle.fill),
-                  value: 'Rp 3.500.000',
-                  isObscured: (c) => c.obscureTotalIncome,
-                  onToggle: (c) => c.toggleIncomeVisibility(),
-                  iconColor: Colors.green,
-                  size: WidgetSize.small,
-                ),
-              ),
-              Container(
-                width: 1,
-                height: 40,
-                color: Colors.white.withValues(alpha: 0.3),
-              ),
-              const SizedBox(width: 8),
-              Expanded(
-                child: _buildSummaryItem(
-                  context,
-                  label: 'Pengeluaran',
-                  icon: PhosphorIcons.arrowCircleDown(PhosphorIconsStyle.fill),
-                  value: 'Rp 500.000',
-                  isObscured: (c) => c.obscureTotalExpense,
-                  onToggle: (c) => c.toggleExpenseVisibility(),
-                  iconColor: Colors.red,
-                  size: WidgetSize.small,
-                ),
-              ),
-            ],
-          ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildSummaryItem(
+                          context,
+                          label: 'Pemasukan',
+                          icon: PhosphorIcons.arrowCircleUp(PhosphorIconsStyle.fill),
+                          value: controller.getFormattedTotalIncome(),
+                          isObscured: (c) => c.obscureTotalIncome,
+                          onToggle: (c) => c.toggleIncomeVisibility(),
+                          iconColor: Colors.green,
+                          size: WidgetSize.small,
+                        ),
+                      ),
+                      Container(
+                        width: 1,
+                        height: 40,
+                        color: Colors.white.withValues(alpha: 0.3),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildSummaryItem(
+                          context,
+                          label: 'Pengeluaran',
+                          icon: PhosphorIcons.arrowCircleDown(PhosphorIconsStyle.fill),
+                          value: controller.getFormattedTotalExpense(),
+                          isObscured: (c) => c.obscureTotalExpense,
+                          onToggle: (c) => c.toggleExpenseVisibility(),
+                          iconColor: Colors.red,
+                          size: WidgetSize.small,
+                        ),
+                      ),
+                    ],
+                  ),
 
-          const SizedBox(height: 8),
+                  const SizedBox(height: 8),
 
-          InkWell(
-            onTap: onTransactionTap,
-            child: SizedBox(
-              width: double.infinity,
-              child: Padding(
-                padding: EdgeInsets.symmetric(horizontal: 4),
-                child: Row(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      "Lihat Semuanya",
-                      style: Theme.of(
-                        context,
-                      ).textTheme.bodySmall?.copyWith(color: Colors.white),
+                  InkWell(
+                    onTap: onTransactionTap,
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Lihat Semuanya",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(color: Colors.white),
+                            ),
+                            const Icon(
+                              Icons.keyboard_arrow_right_rounded,
+                              color: Colors.white,
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
-                    Icon(
-                      Icons.keyboard_arrow_right_rounded,
-                      color: Colors.white,
-                    ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
@@ -165,37 +230,37 @@ class _DashboardSummaryView extends StatelessWidget {
   }
 
   Widget _buildSummaryItem(
-    BuildContext context, {
-    required String label,
-    required IconData icon,
-    required String value,
-    required bool Function(DashboardSummaryController) isObscured,
-    required void Function(DashboardSummaryController) onToggle,
-    Color? iconColor,
-    WidgetSize size = WidgetSize.large,
-  }) {
+      BuildContext context, {
+        required String label,
+        required IconData icon,
+        required String value,
+        required bool Function(DashboardSummaryController) isObscured,
+        required void Function(DashboardSummaryController) onToggle,
+        Color? iconColor,
+        WidgetSize size = WidgetSize.large,
+      }) {
     final theme = Theme.of(context);
 
     final iconSize = size == WidgetSize.small ? 24.0 : 48.0;
     final spacing = size == WidgetSize.small ? 8.0 : 12.0;
     final labelStyle = size == WidgetSize.small
         ? theme.textTheme.bodySmall?.copyWith(
-            color: Colors.white.withValues(alpha: 0.9),
-            fontSize: 10,
-          )
+      color: Colors.white.withValues(alpha: 0.9),
+      fontSize: 10,
+    )
         : theme.textTheme.bodyMedium?.copyWith(
-            color: Colors.white.withValues(alpha: 0.9),
-          );
+      color: Colors.white.withValues(alpha: 0.9),
+    );
     final valueStyle = size == WidgetSize.small
         ? theme.textTheme.bodyMedium?.copyWith(
-            color: Colors.white,
-            fontWeight: FontWeight.w600,
-          )
+      color: Colors.white,
+      fontWeight: FontWeight.w600,
+    )
         : theme.textTheme.bodyLarge?.copyWith(
-            color: Colors.white,
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          );
+      color: Colors.white,
+      fontSize: 20,
+      fontWeight: FontWeight.bold,
+    );
 
     return Consumer<DashboardSummaryController>(
       builder: (context, controller, _) {

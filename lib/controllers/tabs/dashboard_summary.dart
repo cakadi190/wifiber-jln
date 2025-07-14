@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:wifiber/helpers/currency_helper.dart';
+import 'package:wifiber/helpers/currency_helper.dart';
+import 'package:wifiber/helpers/currency_helper.dart';
 import 'package:wifiber/services/dashboard_service.dart';
 
 class DashboardSummaryController extends ChangeNotifier {
@@ -28,15 +31,6 @@ class DashboardSummaryController extends ChangeNotifier {
   bool get isLoading => _isLoading;
 
   String? get error => _error;
-
-  String formatCurrency(num amount) {
-    final formatter = NumberFormat.currency(
-      locale: 'id_ID',
-      symbol: 'Rp ',
-      decimalDigits: 0,
-    );
-    return formatter.format(amount);
-  }
 
   Future<void> loadDashboardData() async {
     _isLoading = true;
@@ -85,15 +79,15 @@ class DashboardSummaryController extends ChangeNotifier {
   }
 
   String getFormattedTotalCashFlow() {
-    return formatCurrency(_totalCashFlow);
+    return CurrencyHelper.formatCurrency(_totalCashFlow);
   }
 
   String getFormattedTotalIncome() {
-    return formatCurrency(_totalIncome);
+    return CurrencyHelper.formatCurrency(_totalIncome);
   }
 
   String getFormattedTotalExpense() {
-    return formatCurrency(_totalExpense);
+    return CurrencyHelper.formatCurrency(_totalExpense);
   }
 
   Future<void> refresh() async {
