@@ -485,52 +485,56 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) => MediaQuery.removePadding(
-        context: context,
-        removeTop: true,
-        removeLeft: true,
-        removeRight: true,
-        child: SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const SizedBox(height: 8),
-
-              _buildComplaintCard(context, complaint),
-
-              const SizedBox(height: 16),
-
-              _buildButton(context, "Lihat Detail", () {
-                Navigator.pop(context);
-                _showComplaintDetailModal(context, complaint);
-              }),
-              _buildButton(
-                context,
-                "Tindak Lanjuti (Perbarui Laporan)",
-                () async {
+      useSafeArea: false,
+      backgroundColor: Colors.transparent,
+      builder: (context) {
+        return MediaQuery.removePadding(
+          context: context,
+          removeTop: true,
+          removeLeft: true,
+          removeRight: true,
+          child: Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                const SizedBox(height: 8),
+                _buildComplaintCard(context, complaint),
+                const SizedBox(height: 16),
+                _buildButton(context, "Lihat Detail", () {
                   Navigator.pop(context);
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          EditComplaintScreen(complaint: complaint),
-                    ),
-                  );
-                  widget.controller.loadComplaints();
-                },
-              ),
-              _buildButton(context, "Hapus Pengaduan", () {
-                Navigator.pop(context);
-                _showComplaintDeleteModal(context, complaint);
-              }, isDangerZone: true),
-              const SizedBox(height: 16),
-            ],
+                  _showComplaintDetailModal(context, complaint);
+                }),
+                _buildButton(
+                  context,
+                  "Tindak Lanjuti (Perbarui Laporan)",
+                      () async {
+                    Navigator.pop(context);
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            EditComplaintScreen(complaint: complaint),
+                      ),
+                    );
+                    widget.controller.loadComplaints();
+                  },
+                ),
+                _buildButton(context, "Hapus Pengaduan", () {
+                  Navigator.pop(context);
+                  _showComplaintDeleteModal(context, complaint);
+                }, isDangerZone: true),
+                const SizedBox(height: 16),
+              ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 
@@ -541,8 +545,9 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
     bool? isDangerZone = false,
   }) {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 0),
       child: ListTile(
+        contentPadding: const EdgeInsets.symmetric(horizontal: 0, vertical: 0),
         visualDensity: VisualDensity.comfortable,
         title: Text(
           label,
