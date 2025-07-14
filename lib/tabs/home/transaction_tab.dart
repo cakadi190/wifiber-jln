@@ -24,6 +24,7 @@ class TransactionTab extends StatelessWidget {
               _buildFilter(context, provider),
               Expanded(
                 child: Container(
+                  clipBehavior: Clip.hardEdge,
                   decoration: BoxDecoration(
                     color: AppColors.background,
                     borderRadius: BorderRadius.only(

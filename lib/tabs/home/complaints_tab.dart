@@ -75,7 +75,7 @@ class ComplaintsTab extends StatelessWidget {
             SizedBox(width: 8),
             _buildFilterChip(
               context,
-              label: "Pending",
+              label: "Menunggu",
               isSelected:
                   provider.selectedComplaintFilter == ComplaintStatus.pending,
               onTap: () => provider.setComplaintFilter(ComplaintStatus.pending),
@@ -311,6 +311,7 @@ class ComplaintsTab extends StatelessWidget {
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(12),
             ),
+            clipBehavior: Clip.hardEdge,
             margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
             child: ListTile(
               leading: Container(
@@ -331,6 +332,7 @@ class ComplaintsTab extends StatelessWidget {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
+              onLongPress: () => _buildOptionsMenu(context, complaint),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -382,6 +384,11 @@ class ComplaintsTab extends StatelessWidget {
         },
       ),
     );
+  }
+
+  void _buildOptionsMenu(BuildContext context, Complaint complaint) {
+    final provider = context.read<ComplaintProvider>();
+    final statusColor = _getStatusColor(complaint.statusEnum);
   }
 
   Widget _buildErrorWidget(BuildContext context, String error) {
