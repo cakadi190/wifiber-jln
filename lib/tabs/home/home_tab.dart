@@ -57,7 +57,6 @@ class _HomeTabState extends State<HomeTab> {
                     onTransactionTap: widget.onTransactionTap,
                   ),
                 ),
-                const SizedBox(height: 16),
 
                 SizedBox(
                   width: double.infinity,
