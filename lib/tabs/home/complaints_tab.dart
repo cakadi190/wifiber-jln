@@ -456,7 +456,7 @@ class ComplaintsTab extends StatelessWidget {
               _buildButton(context, "Hapus Pengaduan", () {
                 Navigator.pop(context);
                 _showComplaintDeleteModal(context, complaint);
-              }),
+              }, isDangerZone: true),
               const SizedBox(height: 16),
             ],
           ),
@@ -468,14 +468,15 @@ class ComplaintsTab extends StatelessWidget {
   Widget _buildButton(
     BuildContext context,
     String label,
-    VoidCallback? onPressed,
-  ) {
+    VoidCallback? onPressed, {
+    bool? isDangerZone = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: ListTile(
         visualDensity: VisualDensity.comfortable,
-        title: Text(label),
-        trailing: const Icon(Icons.chevron_right_rounded),
+        title: Text(label, style: TextStyle(color: isDangerZone != null && isDangerZone ? Colors.red : null)),
+        trailing: Icon(Icons.chevron_right_rounded, color: isDangerZone != null && isDangerZone ? Colors.red : null),
         onTap: onPressed,
       ),
     );
