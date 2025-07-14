@@ -408,7 +408,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
     VoidCallback? onTap,
   }) {
     final statusColor = _getStatusColor(complaint.statusEnum);
-    final typeIcon = _getTypeIcon(complaint.typeEnum);
+    final typeIcon = _getTypeIcon(complaint.statusEnum);
 
     return Card(
       elevation: 0,
@@ -778,7 +778,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
                     context,
                     'Tipe',
                     _getTypeText(complaint.typeEnum),
-                    _getTypeIcon(complaint.typeEnum),
+                    _getTypeIcon(complaint.statusEnum),
                   ),
                   const SizedBox(height: 16),
                   _buildDetailRow(
@@ -941,12 +941,14 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
     }
   }
 
-  IconData _getTypeIcon(ComplaintType type) {
-    switch (type) {
-      case ComplaintType.registration:
-        return Icons.person;
-      case ComplaintType.complaint:
+  IconData _getTypeIcon(ComplaintStatus status) {
+    switch (status) {
+      case ComplaintStatus.pending:
         return Icons.warning;
+      case ComplaintStatus.ongoing:
+        return Icons.info;
+      case ComplaintStatus.completed:
+        return Icons.check;
     }
   }
 
