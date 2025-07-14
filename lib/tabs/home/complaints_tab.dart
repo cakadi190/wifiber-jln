@@ -632,7 +632,7 @@ class ComplaintsTab extends StatelessWidget {
               _buildDetailRow(
                 context,
                 'ID Pengaduan',
-                '#${complaint.id.toString()}',
+                '#${complaint.number.toString()}',
                 Icons.tag,
               ),
               const SizedBox(height: 16),
