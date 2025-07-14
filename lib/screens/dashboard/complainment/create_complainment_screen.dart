@@ -128,232 +128,234 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
           foregroundColor: Colors.white,
           elevation: 0,
         ),
-        body: Column(
-          children: [
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(24),
-                    topRight: Radius.circular(24),
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Expanded(
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(24),
+                      topRight: Radius.circular(24),
+                    ),
                   ),
-                ),
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  children: [
-                    Expanded(
-                      child: Form(
-                        key: formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            const SizedBox(height: 16),
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      Expanded(
+                        child: Form(
+                          key: formKey,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              const SizedBox(height: 16),
 
-                            const Text(
-                              'Pelanggan',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            InkWell(
-                              onTap: _isLoading
-                                  ? null
-                                  : _showCustomerSearchModal,
-                              child: Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 16,
-                                ),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: _isLoading
-                                        ? Colors.grey.shade400
-                                        : Colors.grey.shade300,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: _isLoading
-                                      ? Colors.grey.shade50
-                                      : null,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            selectedCustomer?.name ??
-                                                'Pilih Pelanggan',
-                                            style: TextStyle(
-                                              color: selectedCustomer != null
-                                                  ? Colors.black
-                                                  : Colors.grey.shade600,
-                                              fontSize: 16,
-                                              fontWeight:
-                                                  selectedCustomer != null
-                                                  ? FontWeight.w500
-                                                  : FontWeight.normal,
-                                            ),
-                                          ),
-                                          if (selectedCustomer != null)
-                                            Text(
-                                              selectedCustomer!.phone,
-                                              style: TextStyle(
-                                                color: Colors.grey.shade600,
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                        ],
-                                      ),
-                                    ),
-                                    Icon(
-                                      Icons.arrow_drop_down,
-                                      color: _isLoading
-                                          ? Colors.grey.shade400
-                                          : Colors.grey.shade600,
-                                    ),
-                                  ],
+                              const Text(
+                                'Pelanggan',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
                                 ),
                               ),
-                            ),
-                            const SizedBox(height: 24),
-
-                            TextFormField(
-                              decoration: InputDecoration(
-                                hintText: 'Masukkan topik pengaduan',
-                                border: OutlineInputBorder(),
-                                labelText: 'Topik / Deskripsi Pengaduan',
-                                floatingLabelBehavior:
-                                    FloatingLabelBehavior.always,
-                              ),
-                              maxLines: 8,
-                              minLines: 3,
-                              keyboardType: TextInputType.multiline,
-                              enabled: !_isLoading,
-                              onChanged: (value) {
-                                setState(() {
-                                  complaintDescription = value;
-                                });
-                              },
-                              validator: (value) {
-                                if (value == null || value.trim().isEmpty) {
-                                  return 'Deskripsi pengaduan tidak boleh kosong';
-                                }
-                                return null;
-                              },
-                            ),
-                            const SizedBox(height: 24),
-
-                            const Text(
-                              'Tanggal Pengaduan',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            InkWell(
-                              onTap: _isLoading ? null : _selectDate,
-                              child: Container(
-                                width: double.infinity,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 12,
-                                  vertical: 16,
-                                ),
-                                decoration: BoxDecoration(
-                                  border: Border.all(
-                                    color: _isLoading
-                                        ? Colors.grey.shade400
-                                        : Colors.grey.shade300,
-                                  ),
-                                  borderRadius: BorderRadius.circular(8),
-                                  color: _isLoading
-                                      ? Colors.grey.shade50
-                                      : null,
-                                ),
-                                child: Row(
-                                  mainAxisAlignment:
-                                      MainAxisAlignment.spaceBetween,
-                                  children: [
-                                    Text(
-                                      selectedDate != null
-                                          ? _formatDate(selectedDate!)
-                                          : 'Pilih Tanggal',
-                                      style: TextStyle(
-                                        color: selectedDate != null
-                                            ? Colors.black
-                                            : Colors.grey.shade600,
-                                        fontSize: 16,
-                                      ),
-                                    ),
-                                    Icon(
-                                      Icons.calendar_today,
-                                      color: _isLoading
-                                          ? Colors.grey.shade400
-                                          : Colors.grey.shade600,
-                                      size: 20,
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-
-                            const Spacer(),
-
-                            SizedBox(
-                              width: double.infinity,
-                              child: ElevatedButton(
-                                onPressed: _isLoading ? null : _handleSubmit,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: _isLoading
-                                      ? Colors.grey.shade400
-                                      : AppColors.primary,
-                                  foregroundColor: Colors.white,
+                              const SizedBox(height: 8),
+                              InkWell(
+                                onTap: _isLoading
+                                    ? null
+                                    : _showCustomerSearchModal,
+                                child: Container(
+                                  width: double.infinity,
                                   padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
                                     vertical: 16,
                                   ),
-                                  shape: RoundedRectangleBorder(
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: _isLoading
+                                          ? Colors.grey.shade400
+                                          : Colors.grey.shade300,
+                                    ),
                                     borderRadius: BorderRadius.circular(8),
+                                    color: _isLoading
+                                        ? Colors.grey.shade50
+                                        : null,
                                   ),
-                                ),
-                                child: _isLoading
-                                    ? const SizedBox(
-                                        height: 20,
-                                        width: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                Colors.white,
+                                  child: Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              selectedCustomer?.name ??
+                                                  'Pilih Pelanggan',
+                                              style: TextStyle(
+                                                color: selectedCustomer != null
+                                                    ? Colors.black
+                                                    : Colors.grey.shade600,
+                                                fontSize: 16,
+                                                fontWeight:
+                                                selectedCustomer != null
+                                                    ? FontWeight.w500
+                                                    : FontWeight.normal,
                                               ),
-                                        ),
-                                      )
-                                    : const Text(
-                                        'Buat Pengaduan',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
+                                            ),
+                                            if (selectedCustomer != null)
+                                              Text(
+                                                selectedCustomer!.phone,
+                                                style: TextStyle(
+                                                  color: Colors.grey.shade600,
+                                                  fontSize: 14,
+                                                ),
+                                              ),
+                                          ],
                                         ),
                                       ),
+                                      Icon(
+                                        Icons.arrow_drop_down,
+                                        color: _isLoading
+                                            ? Colors.grey.shade400
+                                            : Colors.grey.shade600,
+                                      ),
+                                    ],
+                                  ),
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 16),
-                          ],
+                              const SizedBox(height: 24),
+
+                              TextFormField(
+                                decoration: InputDecoration(
+                                  hintText: 'Masukkan topik pengaduan',
+                                  border: OutlineInputBorder(),
+                                  labelText: 'Topik / Deskripsi Pengaduan',
+                                  floatingLabelBehavior:
+                                  FloatingLabelBehavior.always,
+                                ),
+                                maxLines: 8,
+                                minLines: 3,
+                                keyboardType: TextInputType.multiline,
+                                enabled: !_isLoading,
+                                onChanged: (value) {
+                                  setState(() {
+                                    complaintDescription = value;
+                                  });
+                                },
+                                validator: (value) {
+                                  if (value == null || value.trim().isEmpty) {
+                                    return 'Deskripsi pengaduan tidak boleh kosong';
+                                  }
+                                  return null;
+                                },
+                              ),
+                              const SizedBox(height: 24),
+
+                              const Text(
+                                'Tanggal Pengaduan',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                              const SizedBox(height: 8),
+                              InkWell(
+                                onTap: _isLoading ? null : _selectDate,
+                                child: Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 16,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: _isLoading
+                                          ? Colors.grey.shade400
+                                          : Colors.grey.shade300,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8),
+                                    color: _isLoading
+                                        ? Colors.grey.shade50
+                                        : null,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        selectedDate != null
+                                            ? _formatDate(selectedDate!)
+                                            : 'Pilih Tanggal',
+                                        style: TextStyle(
+                                          color: selectedDate != null
+                                              ? Colors.black
+                                              : Colors.grey.shade600,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                      Icon(
+                                        Icons.calendar_today,
+                                        color: _isLoading
+                                            ? Colors.grey.shade400
+                                            : Colors.grey.shade600,
+                                        size: 20,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+
+                              const Spacer(),
+
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: _isLoading ? null : _handleSubmit,
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: _isLoading
+                                        ? Colors.grey.shade400
+                                        : AppColors.primary,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 16,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: _isLoading
+                                      ? const SizedBox(
+                                    height: 20,
+                                    width: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2,
+                                      valueColor:
+                                      AlwaysStoppedAnimation<Color>(
+                                        Colors.white,
+                                      ),
+                                    ),
+                                  )
+                                      : const Text(
+                                    'Buat Pengaduan',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                              const SizedBox(height: 16),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
