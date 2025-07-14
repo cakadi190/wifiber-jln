@@ -59,7 +59,9 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
               builder: (context) => const CreateComplaintScreen(),
             ),
           );
-          widget.controller.loadComplaints();
+          if (mounted) {
+            widget.controller.loadComplaints();
+          }
         },
         backgroundColor: AppColors.primary,
         child: const Icon(Icons.add),
@@ -520,7 +522,9 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
                             EditComplaintScreen(complaint: complaint),
                       ),
                     );
-                    widget.controller.loadComplaints();
+                    if (mounted) {
+                      widget.controller.loadComplaints();
+                    }
                   },
                 ),
                 _buildButton(context, "Hapus Pengaduan", () {
@@ -641,7 +645,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => Padding(
+      builder: (modalContext) => Padding(
         padding: const EdgeInsets.only(
           bottom: 16,
           left: 16,
@@ -669,7 +673,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
               children: [
                 Expanded(
                   child: OutlinedButton(
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () => Navigator.pop(modalContext),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       side: const BorderSide(color: AppColors.primary),
@@ -688,13 +692,15 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
                       final success = await widget.controller.removeComplaint(
                         id,
                       );
-                      if (success) {
-                        Navigator.pop(context);
+                      if (success && mounted) {
+                        Navigator.pop(modalContext);
                         onSuccess?.call();
-                        SnackBars.success(
-                          context,
-                          "Pengaduan berhasil dihapus",
-                        );
+                        if (mounted) {
+                          SnackBars.success(
+                            context,
+                            "Pengaduan berhasil dihapus",
+                          );
+                        }
                       }
                     },
                     style: ElevatedButton.styleFrom(
@@ -721,7 +727,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => DraggableScrollableSheet(
+      builder: (modalContext) => DraggableScrollableSheet(
         initialChildSize: 0.9,
         minChildSize: 0.2,
         maxChildSize: 1.0,
@@ -786,7 +792,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
                     Icons.calendar_month,
                   ),
                   const SizedBox(height: 32),
-                  _buildDetailModalActions(context, complaint),
+                  _buildDetailModalActions(modalContext, complaint),
                   const SizedBox(height: 16),
                 ],
               ),
@@ -797,7 +803,10 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
     );
   }
 
-  Widget _buildDetailModalActions(BuildContext context, Complaint complaint) {
+  Widget _buildDetailModalActions(
+    BuildContext modalContext,
+    Complaint complaint,
+  ) {
     return Column(
       children: [
         Row(
@@ -805,8 +814,8 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
             Expanded(
               child: OutlinedButton(
                 onPressed: () =>
-                    _showComplaintDeleteModal(context, complaint, () {
-                      Navigator.pop(context);
+                    _showComplaintDeleteModal(modalContext, complaint, () {
+                      Navigator.pop(modalContext);
                     }),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -824,7 +833,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
                 onPressed: () async {
-                  Navigator.pop(context);
+                  Navigator.pop(modalContext);
                   await Navigator.push(
                     context,
                     MaterialPageRoute(
@@ -832,7 +841,9 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
                           EditComplaintScreen(complaint: complaint),
                     ),
                   );
-                  widget.controller.loadComplaints();
+                  if (mounted) {
+                    widget.controller.loadComplaints();
+                  }
                 },
                 child: const Text(
                   'Tindak Lanjuti',
@@ -846,7 +857,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
         SizedBox(
           width: double.infinity,
           child: OutlinedButton(
-            onPressed: () => Navigator.pop(context),
+            onPressed: () => Navigator.pop(modalContext),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
               side: const BorderSide(color: AppColors.primary),
