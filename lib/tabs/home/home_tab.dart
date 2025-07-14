@@ -9,10 +9,11 @@ import 'package:wifiber/controllers/tabs/home_tab.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 
 class HomeTab extends StatefulWidget {
-  const HomeTab({super.key, this.onTransactionTap, this.onLogoutTap});
+  const HomeTab({super.key, this.onTransactionTap, this.onLogoutTap, this.onTicketTap});
 
   final VoidCallback? onTransactionTap;
   final VoidCallback? onLogoutTap;
+  final VoidCallback? onTicketTap;
 
   @override
   State<HomeTab> createState() => _HomeTabState();
@@ -60,7 +61,9 @@ class _HomeTabState extends State<HomeTab> {
 
                 SizedBox(
                   width: double.infinity,
-                  child: TicketSummary(),
+                  child: TicketSummary(
+                    onTicketTap: widget.onTicketTap
+                  ),
                 ),
               ],
             ),
