@@ -233,7 +233,7 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
                                 floatingLabelBehavior:
                                     FloatingLabelBehavior.always,
                               ),
-                              maxLines: null,
+                              maxLines: 8,
                               minLines: 3,
                               keyboardType: TextInputType.multiline,
                               enabled: !_isLoading,
