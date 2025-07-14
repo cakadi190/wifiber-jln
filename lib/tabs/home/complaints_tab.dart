@@ -515,7 +515,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
                 Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => EditComplaintScreen(),
+                    builder: (context) => EditComplaintScreen(complaint: complaint),
                   ),
                 );
               }),
@@ -815,7 +815,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
                   Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => EditComplaintScreen(),
+                      builder: (context) => EditComplaintScreen(complaint: complaint),
                     ),
                   );
                 },
