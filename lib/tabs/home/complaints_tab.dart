@@ -871,7 +871,6 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
     String value,
     IconData icon, {
     Color? color,
-    Widget? additionalDetails,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -910,10 +909,6 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
                     color: color,
                   ),
                 ),
-                if (additionalDetails != null) ...[
-                  const SizedBox(height: 4),
-                  additionalDetails,
-                ]
               ],
             ),
           ),
