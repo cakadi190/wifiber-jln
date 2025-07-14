@@ -23,7 +23,7 @@ class _TicketSummaryView extends StatelessWidget {
       margin: const EdgeInsets.only(top: 0, left: 16, right: 16, bottom: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(8),
+        borderRadius: BorderRadius.circular(16),
       ),
     );
   }
