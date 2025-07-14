@@ -137,10 +137,8 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
               context,
               label: "Diproses",
               isSelected:
-                  provider.selectedComplaintFilter ==
-                  ComplaintStatus.ongoing,
-              onTap: () =>
-                  provider.setComplaintFilter(ComplaintStatus.ongoing),
+                  provider.selectedComplaintFilter == ComplaintStatus.ongoing,
+              onTap: () => provider.setComplaintFilter(ComplaintStatus.ongoing),
             ),
             const SizedBox(width: 8),
             _buildFilterChip(
@@ -513,7 +511,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
                 _buildButton(
                   context,
                   "Tindak Lanjuti (Perbarui Laporan)",
-                      () async {
+                  () async {
                     Navigator.pop(context);
                     await Navigator.push(
                       context,
@@ -873,6 +871,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
     String value,
     IconData icon, {
     Color? color,
+    Widget? additionalDetails,
   }) {
     return Container(
       padding: const EdgeInsets.all(16),
@@ -911,6 +910,10 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
                     color: color,
                   ),
                 ),
+                if (additionalDetails != null) ...[
+                  const SizedBox(height: 4),
+                  additionalDetails,
+                ]
               ],
             ),
           ),
