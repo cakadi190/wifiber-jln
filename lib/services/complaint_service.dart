@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:wifiber/models/complaint.dart';
 import 'package:wifiber/services/http_service.dart';
 
@@ -82,11 +83,19 @@ class ComplaintService {
     }
   }
 
-  Future<ComplaintResponse> updateComplaint(int id, UpdateComplaint complaint) async {
+  Future<ComplaintResponse> updateComplaint(
+    int id,
+    UpdateComplaint complaint,
+  ) async {
     try {
-      final response = await _http.post(
+      final response = await _http.postForm(
         '/complaint-ticket-update',
-        body: json.encode(complaint.toJson()),
+        fields: {
+          'id': id.toString(),
+          'detail': complaint.detail,
+          'name': complaint.name,
+          'is-ticket-done': complaint.ticketIsDone.toString(),
+        },
         requiresAuth: true,
       );
 

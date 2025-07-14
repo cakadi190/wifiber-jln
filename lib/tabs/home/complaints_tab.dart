@@ -57,16 +57,16 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
       appBar: AppBar(
         title: _isSearching
             ? TextField(
-          controller: _searchController,
-          autofocus: true,
-          style: const TextStyle(color: Colors.white),
-          decoration: const InputDecoration(
-            hintText: 'Cari nomor pengaduan...',
-            hintStyle: TextStyle(color: Colors.white70),
-            border: InputBorder.none,
-          ),
-          onChanged: _onSearchChanged,
-        )
+                controller: _searchController,
+                autofocus: true,
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  hintText: 'Cari nomor pengaduan...',
+                  hintStyle: TextStyle(color: Colors.white70),
+                  border: InputBorder.none,
+                ),
+                onChanged: _onSearchChanged,
+              )
             : const Text('Pengaduan & Keluhan'),
         actions: [
           if (_isSearching)
@@ -75,11 +75,14 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
             IconButton(icon: const Icon(Icons.search), onPressed: _startSearch),
             IconButton(
               icon: const Icon(Icons.add),
-              onPressed: () => Navigator.of(context).push(
-                MaterialPageRoute(
-                  builder: (context) => const CreateComplaintScreen(),
-                ),
-              ),
+              onPressed: () async {
+                await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const CreateComplaintScreen(),
+                  ),
+                );
+                widget.controller.loadComplaints();
+              },
             ),
           ],
         ],
@@ -129,7 +132,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
               context,
               label: "Menunggu",
               isSelected:
-              provider.selectedComplaintFilter == ComplaintStatus.pending,
+                  provider.selectedComplaintFilter == ComplaintStatus.pending,
               onTap: () => provider.setComplaintFilter(ComplaintStatus.pending),
             ),
             const SizedBox(width: 8),
@@ -137,7 +140,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
               context,
               label: "Diproses",
               isSelected:
-              provider.selectedComplaintFilter ==
+                  provider.selectedComplaintFilter ==
                   ComplaintStatus.processing,
               onTap: () =>
                   provider.setComplaintFilter(ComplaintStatus.processing),
@@ -147,7 +150,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
               context,
               label: "Selesai",
               isSelected:
-              provider.selectedComplaintFilter == ComplaintStatus.resolved,
+                  provider.selectedComplaintFilter == ComplaintStatus.resolved,
               onTap: () =>
                   provider.setComplaintFilter(ComplaintStatus.resolved),
             ),
@@ -166,7 +169,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
               context,
               label: "Pendaftaran",
               isSelected:
-              provider.selectedComplaintTypeFilter ==
+                  provider.selectedComplaintTypeFilter ==
                   ComplaintType.registration,
               onTap: () =>
                   provider.setComplaintTypeFilter(ComplaintType.registration),
@@ -176,7 +179,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
               context,
               label: "Keluhan",
               isSelected:
-              provider.selectedComplaintTypeFilter ==
+                  provider.selectedComplaintTypeFilter ==
                   ComplaintType.complaint,
               onTap: () =>
                   provider.setComplaintTypeFilter(ComplaintType.complaint),
@@ -189,11 +192,11 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
   }
 
   Widget _buildFilterChip(
-      BuildContext context, {
-        required String label,
-        required bool isSelected,
-        required VoidCallback onTap,
-      }) {
+    BuildContext context, {
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -246,10 +249,10 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
   }
 
   Widget _buildComplaintList(
-      BuildContext context,
-      List<Complaint> complaints,
-      ComplaintProvider provider,
-      ) {
+    BuildContext context,
+    List<Complaint> complaints,
+    ComplaintProvider provider,
+  ) {
     if (complaints.isEmpty) {
       return _buildEmptyState(context, provider);
     }
@@ -306,9 +309,9 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
   }
 
   Widget _buildEmptyStateActions(
-      BuildContext context,
-      ComplaintProvider provider,
-      ) {
+    BuildContext context,
+    ComplaintProvider provider,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -346,70 +349,70 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
   }
 
   Widget _buildActionButton(
-      BuildContext context, {
-        required String label,
-        required VoidCallback onPressed,
-        required bool isOutlined,
-      }) {
+    BuildContext context, {
+    required String label,
+    required VoidCallback onPressed,
+    required bool isOutlined,
+  }) {
     return SizedBox(
       height: 32,
       child: isOutlined
           ? OutlinedButton(
-        style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 6,
-          ),
-          minimumSize: const Size(0, 32),
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          side: BorderSide(color: Colors.grey.shade300, width: 1),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
-        onPressed: onPressed,
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.black.withValues(alpha: 0.6),
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-      )
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                minimumSize: const Size(0, 32),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                side: BorderSide(color: Colors.grey.shade300, width: 1),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              onPressed: onPressed,
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.black.withValues(alpha: 0.6),
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            )
           : ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(
-            horizontal: 12,
-            vertical: 6,
-          ),
-          minimumSize: const Size(0, 32),
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          elevation: 2,
-        ),
-        onPressed: onPressed,
-        child: Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                minimumSize: const Size(0, 32),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 2,
+              ),
+              onPressed: onPressed,
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
     );
   }
 
   Widget _buildComplaintCard(
-      BuildContext context,
-      Complaint complaint, {
-        VoidCallback? onLongPress,
-        VoidCallback? onTap,
-      }) {
+    BuildContext context,
+    Complaint complaint, {
+    VoidCallback? onLongPress,
+    VoidCallback? onTap,
+  }) {
     final statusColor = _getStatusColor(complaint.statusEnum);
     final typeIcon = _getTypeIcon(complaint.typeEnum);
 
@@ -510,14 +513,16 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
                 Navigator.pop(context);
                 _showComplaintDetailModal(context, complaint);
               }),
-              _buildButton(context, "Tindak Lanjuti (Perbarui Laporan)", () {
+              _buildButton(context, "Tindak Lanjuti (Perbarui Laporan)", () async {
                 Navigator.pop(context);
-                Navigator.push(
+                await Navigator.push(
                   context,
                   MaterialPageRoute(
-                    builder: (context) => EditComplaintScreen(complaint: complaint),
+                    builder: (context) =>
+                        EditComplaintScreen(complaint: complaint),
                   ),
                 );
+                widget.controller.loadComplaints();
               }),
               _buildButton(context, "Hapus Pengaduan", () {
                 Navigator.pop(context);
@@ -532,11 +537,11 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
   }
 
   Widget _buildButton(
-      BuildContext context,
-      String label,
-      VoidCallback? onPressed, {
-        bool? isDangerZone = false,
-      }) {
+    BuildContext context,
+    String label,
+    VoidCallback? onPressed, {
+    bool? isDangerZone = false,
+  }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: ListTile(
@@ -597,15 +602,22 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
               ),
             ),
             Text(
-              error.contains("not found") ? "Data pengaduan yang anda cari tidak ditemukan. Coba cari dengan pendekatan yang lainnya ya!" : error,
+              error.contains("not found")
+                  ? "Data pengaduan yang anda cari tidak ditemukan. Coba cari dengan pendekatan yang lainnya ya!"
+                  : error,
               textAlign: TextAlign.center,
             ),
-            if(error.contains("not found")) Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                _buildButton(context, "Muat Ulang", () => widget.controller.loadComplaints()),
-              ],
-            ),
+            if (error.contains("not found"))
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  _buildButton(
+                    context,
+                    "Muat Ulang",
+                    () => widget.controller.loadComplaints(),
+                  ),
+                ],
+              ),
             if (error.contains("401"))
               TextButton(
                 onPressed: () => widget.controller.logout(context),
@@ -618,10 +630,10 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
   }
 
   Future<void> _showComplaintDeleteModal(
-      BuildContext context,
-      Complaint complaint, [
-        VoidCallback? onSuccess,
-      ]) async {
+    BuildContext context,
+    Complaint complaint, [
+    VoidCallback? onSuccess,
+  ]) async {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -810,14 +822,15 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
                   backgroundColor: AppColors.primary,
                   padding: const EdgeInsets.symmetric(vertical: 16),
                 ),
-                onPressed: () {
+                onPressed: () async {
                   Navigator.pop(context);
-                  Navigator.push(
+                  await Navigator.push(
                     context,
                     MaterialPageRoute(
                       builder: (context) => EditComplaintScreen(complaint: complaint),
                     ),
                   );
+                  widget.controller.loadComplaints();
                 },
                 child: const Text(
                   'Tindak Lanjuti',
@@ -851,12 +864,12 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
   }
 
   Widget _buildDetailRow(
-      BuildContext context,
-      String label,
-      String value,
-      IconData icon, {
-        Color? color,
-      }) {
+    BuildContext context,
+    String label,
+    String value,
+    IconData icon, {
+    Color? color,
+  }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(

@@ -147,13 +147,9 @@ class UpdateComplaint {
 class ComplaintResponse {
   final bool success;
   final String message;
-  final List<Complaint>? data; // Make data nullable
+  final List<Complaint>? data;
 
-  ComplaintResponse({
-    required this.success,
-    required this.message,
-    this.data,
-  });
+  ComplaintResponse({required this.success, required this.message, this.data});
 
   factory ComplaintResponse.fromJson(Map<String, dynamic> json) {
     return ComplaintResponse(
@@ -161,9 +157,9 @@ class ComplaintResponse {
       message: json['message'] ?? '',
       data: json['data'] != null
           ? (json['data'] as List<dynamic>)
-          .map((item) => Complaint.fromJson(item))
-          .toList()
-          : null, // Handle null data
+                .map((item) => Complaint.fromJson(item))
+                .toList()
+          : null,
     );
   }
 
