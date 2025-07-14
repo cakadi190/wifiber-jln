@@ -33,15 +33,6 @@ class ComplaintProvider extends ChangeNotifier {
   Future<void> fetchComplaints() async {
     _setLoading(true);
     _setError(null);
-
-    print(
-      {
-        'status': _selectedStatus,
-        'type': _selectedType,
-        'search': _searchQuery,
-      }.toString(),
-    );
-
     try {
       final response = await _complaintService.getComplaints(
         status: _selectedStatus,
