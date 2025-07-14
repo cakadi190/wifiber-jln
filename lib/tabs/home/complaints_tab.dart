@@ -75,22 +75,28 @@ class ComplaintsTab extends StatelessWidget {
             _buildFilterChip(
               context,
               label: "Menunggu",
-              isSelected: provider.selectedComplaintFilter == ComplaintStatus.pending,
+              isSelected:
+                  provider.selectedComplaintFilter == ComplaintStatus.pending,
               onTap: () => provider.setComplaintFilter(ComplaintStatus.pending),
             ),
             const SizedBox(width: 8),
             _buildFilterChip(
               context,
               label: "Diproses",
-              isSelected: provider.selectedComplaintFilter == ComplaintStatus.processing,
-              onTap: () => provider.setComplaintFilter(ComplaintStatus.processing),
+              isSelected:
+                  provider.selectedComplaintFilter ==
+                  ComplaintStatus.processing,
+              onTap: () =>
+                  provider.setComplaintFilter(ComplaintStatus.processing),
             ),
             const SizedBox(width: 8),
             _buildFilterChip(
               context,
               label: "Selesai",
-              isSelected: provider.selectedComplaintFilter == ComplaintStatus.resolved,
-              onTap: () => provider.setComplaintFilter(ComplaintStatus.resolved),
+              isSelected:
+                  provider.selectedComplaintFilter == ComplaintStatus.resolved,
+              onTap: () =>
+                  provider.setComplaintFilter(ComplaintStatus.resolved),
             ),
 
             // Divider
@@ -106,15 +112,21 @@ class ComplaintsTab extends StatelessWidget {
             _buildFilterChip(
               context,
               label: "Pendaftaran",
-              isSelected: provider.selectedComplaintTypeFilter == ComplaintType.registration,
-              onTap: () => provider.setComplaintTypeFilter(ComplaintType.registration),
+              isSelected:
+                  provider.selectedComplaintTypeFilter ==
+                  ComplaintType.registration,
+              onTap: () =>
+                  provider.setComplaintTypeFilter(ComplaintType.registration),
             ),
             const SizedBox(width: 8),
             _buildFilterChip(
               context,
               label: "Keluhan",
-              isSelected: provider.selectedComplaintTypeFilter == ComplaintType.complaint,
-              onTap: () => provider.setComplaintTypeFilter(ComplaintType.complaint),
+              isSelected:
+                  provider.selectedComplaintTypeFilter ==
+                  ComplaintType.complaint,
+              onTap: () =>
+                  provider.setComplaintTypeFilter(ComplaintType.complaint),
             ),
             const SizedBox(width: 16),
           ],
@@ -124,11 +136,11 @@ class ComplaintsTab extends StatelessWidget {
   }
 
   Widget _buildFilterChip(
-      BuildContext context, {
-        required String label,
-        required bool isSelected,
-        required VoidCallback onTap,
-      }) {
+    BuildContext context, {
+    required String label,
+    required bool isSelected,
+    required VoidCallback onTap,
+  }) {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -176,10 +188,10 @@ class ComplaintsTab extends StatelessWidget {
   }
 
   Widget _buildComplaintList(
-      BuildContext context,
-      List<Complaint> complaints,
-      ComplaintProvider provider,
-      ) {
+    BuildContext context,
+    List<Complaint> complaints,
+    ComplaintProvider provider,
+  ) {
     if (complaints.isEmpty) {
       return _buildEmptyState(context, provider);
     }
@@ -190,7 +202,12 @@ class ComplaintsTab extends StatelessWidget {
         itemCount: complaints.length,
         itemBuilder: (_, i) {
           final complaint = complaints[i];
-          return _buildComplaintCard(context, complaint);
+          return _buildComplaintCard(
+            context,
+            complaint,
+            onTap: () => _showComplaintDetailModal(context, complaint),
+            onLongPress: () => _buildOptionsMenu(context, complaint),
+          );
         },
       ),
     );
@@ -230,7 +247,10 @@ class ComplaintsTab extends StatelessWidget {
     );
   }
 
-  Widget _buildEmptyStateActions(BuildContext context, ComplaintProvider provider) {
+  Widget _buildEmptyStateActions(
+    BuildContext context,
+    ComplaintProvider provider,
+  ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -249,10 +269,7 @@ class ComplaintsTab extends StatelessWidget {
           padding: EdgeInsets.symmetric(horizontal: 8),
           child: Text(
             "atau",
-            style: TextStyle(
-              fontSize: 12,
-              color: Colors.black54,
-            ),
+            style: TextStyle(fontSize: 12, color: Colors.black54),
           ),
         ),
         _buildActionButton(
@@ -266,67 +283,76 @@ class ComplaintsTab extends StatelessWidget {
   }
 
   Widget _buildActionButton(
-      BuildContext context, {
-        required String label,
-        required VoidCallback onPressed,
-        required bool isOutlined,
-      }) {
+    BuildContext context, {
+    required String label,
+    required VoidCallback onPressed,
+    required bool isOutlined,
+  }) {
     return SizedBox(
       height: 32,
       child: isOutlined
           ? OutlinedButton(
-        style: OutlinedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          minimumSize: const Size(0, 32),
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          side: BorderSide(color: Colors.grey.shade300, width: 1),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-        ),
-        onPressed: onPressed,
-        child: Text(
-          label,
-          style: TextStyle(
-            fontSize: 12,
-            color: Colors.black.withValues(alpha: 0.6),
-            fontWeight: FontWeight.w400,
-          ),
-        ),
-      )
+              style: OutlinedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                minimumSize: const Size(0, 32),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                side: BorderSide(color: Colors.grey.shade300, width: 1),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+              ),
+              onPressed: onPressed,
+              child: Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.black.withValues(alpha: 0.6),
+                  fontWeight: FontWeight.w400,
+                ),
+              ),
+            )
           : ElevatedButton(
-        style: ElevatedButton.styleFrom(
-          padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-          minimumSize: const Size(0, 32),
-          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          elevation: 2,
-        ),
-        onPressed: onPressed,
-        child: Text(
-          label,
-          style: const TextStyle(
-            fontSize: 12,
-            fontWeight: FontWeight.w500,
-          ),
-        ),
-      ),
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 12,
+                  vertical: 6,
+                ),
+                minimumSize: const Size(0, 32),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                elevation: 2,
+              ),
+              onPressed: onPressed,
+              child: Text(
+                label,
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
     );
   }
 
-  Widget _buildComplaintCard(BuildContext context, Complaint complaint) {
+  Widget _buildComplaintCard(
+    BuildContext context,
+    Complaint complaint, {
+    VoidCallback? onLongPress,
+    VoidCallback? onTap,
+  }) {
     final statusColor = _getStatusColor(complaint.statusEnum);
     final typeIcon = _getTypeIcon(complaint.typeEnum);
 
     return Card(
       elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       clipBehavior: Clip.hardEdge,
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
       child: ListTile(
@@ -337,13 +363,13 @@ class ComplaintsTab extends StatelessWidget {
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
         ),
-        onLongPress: () => _buildOptionsMenu(context, complaint),
+        onLongPress: onLongPress,
         subtitle: _buildComplaintSubtitle(complaint, statusColor),
         trailing: Text(
           DateHelper.formatDate(complaint.date),
           style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
         ),
-        onTap: () => _showComplaintDetailModal(context, complaint),
+        onTap: onTap,
       ),
     );
   }
@@ -357,9 +383,7 @@ class ComplaintsTab extends StatelessWidget {
       ),
       height: 40,
       width: 40,
-      child: Center(
-        child: Icon(typeIcon, color: statusColor, size: 20),
-      ),
+      child: Center(child: Icon(typeIcon, color: statusColor, size: 20)),
     );
   }
 
@@ -367,11 +391,7 @@ class ComplaintsTab extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          complaint.topic,
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
+        Text(complaint.topic, maxLines: 1, overflow: TextOverflow.ellipsis),
         const SizedBox(height: 4),
         Row(
           children: [
@@ -393,10 +413,7 @@ class ComplaintsTab extends StatelessWidget {
             const SizedBox(width: 8),
             Text(
               _getTypeText(complaint.typeEnum),
-              style: TextStyle(
-                color: Colors.grey.shade600,
-                fontSize: 10,
-              ),
+              style: TextStyle(color: Colors.grey.shade600, fontSize: 10),
             ),
           ],
         ),
@@ -411,29 +428,59 @@ class ComplaintsTab extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => SizedBox(
-        width: double.infinity,
-        child: Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-            left: 16,
-            right: 16,
-            top: 16,
+      builder: (context) => Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          const SizedBox(height: 16),
+          Center(child: SizedBox(width: 40, child: _buildModalHandle())),
+          const SizedBox(height: 8),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: _buildComplaintCard(context, complaint),
           ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              _buildModalHandle(),
-              const SizedBox(height: 8),
-              SizedBox(
-                width: double.infinity,
-                child: _buildComplaintCard(context, complaint),
-              ),
-            ],
+          const SizedBox(height: 16),
+          _buildButton(
+            context,
+            "Lihat Detail",
+                () {
+              Navigator.pop(context);
+              _showComplaintDetailModal(context, complaint);
+            },
           ),
-        ),
+          _buildButton(
+            context,
+            "Perbarui Pengaduan",
+                () {
+              Navigator.pop(context);
+              _showComplaintDetailModal(context, complaint);
+            },
+          ),
+          _buildButton(
+            context,
+            "Hapus Pengaduan",
+                () {
+                  Navigator.pop(context);
+                  _showComplaintDeleteModal(context, complaint);
+                },
+          ),
+          const SizedBox(height: 16),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildButton(
+    BuildContext context,
+    String label,
+    VoidCallback? onPressed,
+  ) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16),
+      child: ListTile(
+        visualDensity: VisualDensity.comfortable,
+        title: Text(label),
+        trailing: const Icon(Icons.chevron_right_rounded),
+        onTap: onPressed,
       ),
     );
   }
@@ -480,10 +527,10 @@ class ComplaintsTab extends StatelessWidget {
   }
 
   Future<void> _showComplaintDeleteModal(
-      BuildContext context,
-      Complaint complaint, [
-        VoidCallback? onSuccess,
-      ]) async {
+    BuildContext context,
+    Complaint complaint, [
+    VoidCallback? onSuccess,
+  ]) async {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -491,7 +538,12 @@ class ComplaintsTab extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => Padding(
-        padding: const EdgeInsets.only(bottom: 16, left: 16, right: 16, top: 16),
+        padding: const EdgeInsets.only(
+          bottom: 16,
+          left: 16,
+          right: 16,
+          top: 16,
+        ),
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.center,
@@ -667,12 +719,12 @@ class ComplaintsTab extends StatelessWidget {
   }
 
   Widget _buildDetailRow(
-      BuildContext context,
-      String label,
-      String value,
-      IconData icon, {
-        Color? color,
-      }) {
+    BuildContext context,
+    String label,
+    String value,
+    IconData icon, {
+    Color? color,
+  }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
