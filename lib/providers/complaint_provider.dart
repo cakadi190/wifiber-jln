@@ -138,6 +138,7 @@ class ComplaintProvider extends ChangeNotifier {
   void setComplaintFilter(ComplaintStatus? status) {
     _selectedComplaintFilter = status;
     _applyFilters();
+    fetchComplaints();
   }
 
   void setComplaintTypeFilter(ComplaintType? type) {

@@ -304,80 +304,90 @@ class ComplaintsTab extends StatelessWidget {
       );
     }
 
-    return ListView.builder(
-      itemCount: complaints.length,
-      itemBuilder: (_, i) {
-        final complaint = complaints[i];
-        final statusColor = _getStatusColor(complaint.statusEnum);
-        final typeIcon = _getTypeIcon(complaint.typeEnum);
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 16),
+      child: ListView.builder(
+        itemCount: complaints.length,
+        itemBuilder: (_, i) {
+          final complaint = complaints[i];
+          final statusColor = _getStatusColor(complaint.statusEnum);
+          final typeIcon = _getTypeIcon(complaint.typeEnum);
 
-        return Card(
-          margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
-          child: ListTile(
-            leading: Container(
-              decoration: BoxDecoration(
-                color: statusColor.withValues(alpha: 0.1),
-                border: Border.all(color: statusColor),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              height: 40,
-              width: 40,
-              child: Center(
-                child: Icon(typeIcon, color: statusColor, size: 20),
-              ),
+          return Card(
+            elevation: 0,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(12),
             ),
-            title: Text(
-              complaint.subject ?? 'No Subject',
-              style: TextStyle(fontWeight: FontWeight.bold),
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-            subtitle: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  complaint.topic,
-                  maxLines: 1,
-                  overflow: TextOverflow.ellipsis,
+            margin: EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: ListTile(
+              leading: Container(
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.1),
+                  border: Border.all(color: statusColor),
+                  borderRadius: BorderRadius.circular(12),
                 ),
-                SizedBox(height: 4),
-                Row(
-                  children: [
-                    Container(
-                      padding: EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: statusColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        _getStatusText(complaint.statusEnum),
-                        style: TextStyle(
-                          color: statusColor,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w500,
+                height: 40,
+                width: 40,
+                child: Center(
+                  child: Icon(typeIcon, color: statusColor, size: 20),
+                ),
+              ),
+              title: Text(
+                complaint.subject ?? 'No Subject',
+                style: TextStyle(fontWeight: FontWeight.bold),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+              ),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    complaint.topic,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Container(
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 8,
+                          vertical: 2,
+                        ),
+                        decoration: BoxDecoration(
+                          color: statusColor.withValues(alpha: 0.1),
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        child: Text(
+                          _getStatusText(complaint.statusEnum),
+                          style: TextStyle(
+                            color: statusColor,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
-                    ),
-                    SizedBox(width: 8),
-                    Text(
-                      _getTypeText(complaint.typeEnum),
-                      style: TextStyle(
-                        color: Colors.grey.shade600,
-                        fontSize: 10,
+                      SizedBox(width: 8),
+                      Text(
+                        _getTypeText(complaint.typeEnum),
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 10,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-              ],
+                    ],
+                  ),
+                ],
+              ),
+              trailing: Text(
+                DateHelper.formatDate(complaint.date),
+                style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
+              ),
+              onTap: () => _showComplaintDetailModal(context, complaint),
             ),
-            trailing: Text(
-              DateHelper.formatDate(complaint.date),
-              style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
-            ),
-            onTap: () => _showComplaintDetailModal(context, complaint),
-          ),
-        );
-      },
+          );
+        },
+      ),
     );
   }
 
