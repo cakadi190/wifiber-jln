@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/widgets/home/dashboard_summary.dart';
+import 'package:wifiber/components/widgets/home/tickets_summary.dart';
 import 'package:wifiber/components/widgets/user_avatar.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/controllers/tabs/home_tab.dart';
@@ -55,6 +56,12 @@ class _HomeTabState extends State<HomeTab> {
                   child: DashboardSummary(
                     onTransactionTap: widget.onTransactionTap,
                   ),
+                ),
+                const SizedBox(height: 16),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: TicketSummary(),
                 ),
               ],
             ),
