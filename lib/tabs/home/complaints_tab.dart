@@ -428,43 +428,39 @@ class ComplaintsTab extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          const SizedBox(height: 16),
-          Center(child: SizedBox(width: 40, child: _buildModalHandle())),
-          const SizedBox(height: 8),
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16),
-            child: _buildComplaintCard(context, complaint),
+      builder: (context) => MediaQuery.removePadding(
+        context: context,
+        removeTop: true,
+        removeLeft: true,
+        removeRight: true,
+        child: SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 16),
+              Center(child: SizedBox(width: 40, child: _buildModalHandle())),
+              const SizedBox(height: 8),
+
+              _buildComplaintCard(context, complaint),
+
+              const SizedBox(height: 16),
+
+              _buildButton(context, "Lihat Detail", () {
+                Navigator.pop(context);
+                _showComplaintDetailModal(context, complaint);
+              }),
+              _buildButton(context, "Tindak Lanjuti (Perbarui Laporan)", () {
+                Navigator.pop(context);
+                _showComplaintDetailModal(context, complaint);
+              }),
+              _buildButton(context, "Hapus Pengaduan", () {
+                Navigator.pop(context);
+                _showComplaintDeleteModal(context, complaint);
+              }),
+              const SizedBox(height: 16),
+            ],
           ),
-          const SizedBox(height: 16),
-          _buildButton(
-            context,
-            "Lihat Detail",
-                () {
-              Navigator.pop(context);
-              _showComplaintDetailModal(context, complaint);
-            },
-          ),
-          _buildButton(
-            context,
-            "Perbarui Pengaduan",
-                () {
-              Navigator.pop(context);
-              _showComplaintDetailModal(context, complaint);
-            },
-          ),
-          _buildButton(
-            context,
-            "Hapus Pengaduan",
-                () {
-                  Navigator.pop(context);
-                  _showComplaintDeleteModal(context, complaint);
-                },
-          ),
-          const SizedBox(height: 16),
-        ],
+        ),
       ),
     );
   }
@@ -682,32 +678,53 @@ class ComplaintsTab extends StatelessWidget {
   }
 
   Widget _buildDetailModalActions(BuildContext context, Complaint complaint) {
-    return Row(
+    return Column(
       children: [
-        Expanded(
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: () =>
+                    _showComplaintDeleteModal(context, complaint, () {
+                      Navigator.pop(context); // Tutup modal detail
+                    }),
+                style: OutlinedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  side: const BorderSide(color: Colors.red),
+                ),
+                child: const Text('Hapus', style: TextStyle(color: Colors.red)),
+              ),
+            ),
+            const SizedBox(width: 16),
+            Expanded(
+              child: TextButton(
+                style: TextButton.styleFrom(
+                  foregroundColor: Colors.white,
+                  backgroundColor: AppColors.primary,
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                ),
+                onPressed: () => Navigator.pop(context),
+                child: const Text(
+                  'Tindak Lanjuti',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
+          ],
+        ),
+        const SizedBox(height: 12),
+        SizedBox(
+          width: double.infinity,
           child: OutlinedButton(
-            onPressed: () => _showComplaintDeleteModal(context, complaint, () {
-              Navigator.pop(context);
-            }),
+            onPressed: () => Navigator.pop(context),
             style: OutlinedButton.styleFrom(
               padding: const EdgeInsets.symmetric(vertical: 16),
-              side: const BorderSide(color: Colors.red),
-            ),
-            child: const Text('Hapus', style: TextStyle(color: Colors.red)),
-          ),
-        ),
-        const SizedBox(width: 16),
-        Expanded(
-          child: ElevatedButton(
-            onPressed: () => Navigator.pop(context),
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              padding: const EdgeInsets.symmetric(vertical: 16),
+              side: const BorderSide(color: AppColors.primary),
             ),
             child: const Text(
               'Tutup',
               style: TextStyle(
-                color: Colors.white,
+                color: AppColors.primary,
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
               ),
