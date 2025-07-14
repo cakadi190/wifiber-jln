@@ -8,7 +8,10 @@ class ComplaintService {
 
   Future<ComplaintResponse> getAllComplaints() async {
     try {
-      final response = await _http.get('/complaint-tickets', requiresAuth: true);
+      final response = await _http.get(
+        '/complaint-tickets',
+        requiresAuth: true,
+      );
 
       if (response.statusCode == 200) {
         return ComplaintResponse.fromJson(json.decode(response.body));
@@ -22,7 +25,10 @@ class ComplaintService {
 
   Future<Complaint> getComplaintById(int id) async {
     try {
-      final response = await _http.get('/complaint-tickets/$id', requiresAuth: true);
+      final response = await _http.get(
+        '/complaint-tickets/$id',
+        requiresAuth: true,
+      );
 
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
@@ -37,16 +43,34 @@ class ComplaintService {
 
   Future<ComplaintResponse> createComplaint(CreateComplaint complaint) async {
     try {
-      final response = await _http.post(
+      final response = await _http.postForm(
         '/complaint-tickets',
-        body: json.encode(complaint.toJson()),
+        fields: {
+          'subject': complaint.subject,
+          'topic': complaint.topic,
+          'date': complaint.date.toIso8601String(),
+        },
         requiresAuth: true,
       );
 
-      if (response.statusCode == 201) {
-        return ComplaintResponse.fromJson(json.decode(response.body));
+      if (response.statusCode == 201 || response.statusCode == 200) {
+        final responseData = json.decode(response.body);
+
+        // Handle different response formats
+        if (responseData is Map<String, dynamic>) {
+          return ComplaintResponse.fromJson(responseData);
+        } else {
+          // If the response is not in the expected format, create a success response
+          return ComplaintResponse(
+            success: true,
+            message: 'Complaint created successfully',
+            data:
+                [], // Empty list since we don't have the created complaint data
+          );
+        }
       } else {
-        throw Exception('Failed to create complaint');
+        final errorData = json.decode(response.body);
+        throw Exception(errorData['message'] ?? 'Failed to create complaint');
       }
     } catch (e) {
       throw Exception('Error: $e');

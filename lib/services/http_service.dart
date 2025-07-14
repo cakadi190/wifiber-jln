@@ -88,6 +88,75 @@ class HttpService {
     }
   }
 
+  Future<http.Response> postForm(
+    String path, {
+    Map<String, String>? headers,
+    Map<String, String>? fields,
+    bool requiresAuth = false,
+    Map<String, dynamic>? parameters,
+  }) async {
+    final uri = HttpHelper.buildUri(path, parameters);
+    final completeHeaders = await _buildFormHeaders(headers, requiresAuth);
+
+    final response = await _client.post(
+      uri,
+      headers: completeHeaders,
+      body: fields != null ? _encodeFormData(fields) : null,
+    );
+
+    _handleResponseErrors(response);
+    return response;
+  }
+
+  Future<http.Response> putForm(
+    String path, {
+    Map<String, String>? headers,
+    Map<String, String>? fields,
+    bool requiresAuth = false,
+    Map<String, dynamic>? parameters,
+  }) async {
+    final uri = HttpHelper.buildUri(path, parameters);
+    final completeHeaders = await _buildFormHeaders(headers, requiresAuth);
+
+    final response = await _client.put(
+      uri,
+      headers: completeHeaders,
+      body: fields != null ? _encodeFormData(fields) : null,
+    );
+
+    _handleResponseErrors(response);
+    return response;
+  }
+
+  Future<http.Response> deleteForm(
+    String path, {
+    Map<String, String>? headers,
+    Map<String, String>? fields,
+    bool requiresAuth = false,
+    Map<String, dynamic>? parameters,
+  }) async {
+    final uri = HttpHelper.buildUri(path, parameters);
+    final completeHeaders = await _buildFormHeaders(headers, requiresAuth);
+
+    final response = await _client.delete(
+      uri,
+      headers: completeHeaders,
+      body: fields != null ? _encodeFormData(fields) : null,
+    );
+
+    _handleResponseErrors(response);
+    return response;
+  }
+
+  String _encodeFormData(Map<String, String> fields) {
+    return fields.entries
+        .map(
+          (entry) =>
+              '${Uri.encodeComponent(entry.key)}=${Uri.encodeComponent(entry.value)}',
+        )
+        .join('&');
+  }
+
   Future<Map<String, String>> _buildHeaders(
     Map<String, String>? headers,
     bool requiresAuth,
@@ -95,6 +164,44 @@ class HttpService {
     try {
       final baseHeaders = <String, String>{
         'Content-Type': 'application/json',
+        'Accept': 'application/json',
+      };
+
+      if (requiresAuth) {
+        final json = await SecureStorageService.storage.read(
+          key: SecureStorageService.userKey,
+        );
+
+        if (json == null) throw SecureStorageNotFoundException();
+
+        final userdata = jsonDecode(json);
+        if (userdata is Map<String, dynamic> &&
+            userdata.containsKey('access')) {
+          final token = userdata['access'];
+          if (token is String) {
+            baseHeaders['Authorization'] = 'Bearer $token';
+          } else {
+            throw Exception('Invalid token format');
+          }
+        } else {
+          throw Exception('Access token not found in user data');
+        }
+      }
+
+      if (headers != null) baseHeaders.addAll(headers);
+      return baseHeaders;
+    } catch (e) {
+      rethrow;
+    }
+  }
+
+  Future<Map<String, String>> _buildFormHeaders(
+    Map<String, String>? headers,
+    bool requiresAuth,
+  ) async {
+    try {
+      final baseHeaders = <String, String>{
+        'Content-Type': 'application/x-www-form-urlencoded',
         'Accept': 'application/json',
       };
 

@@ -150,25 +150,33 @@ class UpdateComplaint {
 class ComplaintResponse {
   final bool success;
   final String message;
-  final List<Complaint> data;
-  final Map<String, dynamic>? error;
+  final List<Complaint>? data; // Make data nullable
 
   ComplaintResponse({
     required this.success,
     required this.message,
-    required this.data,
-    this.error,
+    this.data,
   });
 
-  factory ComplaintResponse.fromJson(Map<String, dynamic> json) =>
-      ComplaintResponse(
-        success: json['success'],
-        message: json['message'],
-        data: List<Complaint>.from(
-          json['data'].map((x) => Complaint.fromJson(x)),
-        ),
-        error: json['error'],
-      );
+  factory ComplaintResponse.fromJson(Map<String, dynamic> json) {
+    return ComplaintResponse(
+      success: json['success'] ?? false,
+      message: json['message'] ?? '',
+      data: json['data'] != null
+          ? (json['data'] as List<dynamic>)
+          .map((item) => Complaint.fromJson(item))
+          .toList()
+          : null, // Handle null data
+    );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      'success': success,
+      'message': message,
+      'data': data?.map((item) => item.toJson()).toList(),
+    };
+  }
 }
 
 enum ComplaintStatus { pending, processing, resolved }

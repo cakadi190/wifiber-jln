@@ -8,22 +8,26 @@ class ComplaintProvider extends ChangeNotifier {
   ComplaintProvider(this._complaintService);
 
   List<Complaint> _complaints = [];
-  List<Complaint> _allComplaints = []; // Keep original data for filtering
+  List<Complaint> _allComplaints = [];
   Complaint? _selectedComplaint;
   bool _isLoading = false;
   String? _error;
 
-  // Filter states
   ComplaintStatus? _selectedComplaintFilter;
   ComplaintType? _selectedComplaintTypeFilter;
 
-  // Getters
   List<Complaint> get complaints => _complaints;
+
   Complaint? get selectedComplaint => _selectedComplaint;
+
   bool get isLoading => _isLoading;
+
   String? get error => _error;
+
   ComplaintStatus? get selectedComplaintFilter => _selectedComplaintFilter;
-  ComplaintType? get selectedComplaintTypeFilter => _selectedComplaintTypeFilter;
+
+  ComplaintType? get selectedComplaintTypeFilter =>
+      _selectedComplaintTypeFilter;
 
   Future<void> fetchComplaints() async {
     _setLoading(true);
@@ -32,8 +36,8 @@ class ComplaintProvider extends ChangeNotifier {
     try {
       final response = await _complaintService.getAllComplaints();
       if (response.success) {
-        _allComplaints = response.data;
-        _applyFilters(); // Apply current filters
+        _allComplaints = response.data ?? [];
+        _applyFilters();
       } else {
         _setError(response.message);
       }
@@ -65,7 +69,9 @@ class ComplaintProvider extends ChangeNotifier {
       final response = await _complaintService.createComplaint(complaint);
 
       if (response.success) {
-        _allComplaints.addAll(response.data);
+        if (response.data != null) {
+          _allComplaints.addAll(response.data!);
+        }
         _applyFilters();
         return true;
       } else {
@@ -87,10 +93,12 @@ class ComplaintProvider extends ChangeNotifier {
     try {
       final response = await _complaintService.updateComplaint(id, complaint);
       if (response.success) {
-        final index = _allComplaints.indexWhere((c) => c.id == id);
-        if (index != -1) {
-          _allComplaints[index] = response.data.first;
-          _applyFilters();
+        if (response.data != null && response.data!.isNotEmpty) {
+          final index = _allComplaints.indexWhere((c) => c.id == id);
+          if (index != -1) {
+            _allComplaints[index] = response.data!.first;
+            _applyFilters();
+          }
         }
         return true;
       } else {
@@ -127,7 +135,6 @@ class ComplaintProvider extends ChangeNotifier {
     }
   }
 
-  // Filter methods
   void setComplaintFilter(ComplaintStatus? status) {
     _selectedComplaintFilter = status;
     _applyFilters();
@@ -141,16 +148,20 @@ class ComplaintProvider extends ChangeNotifier {
   void _applyFilters() {
     List<Complaint> filtered = List.from(_allComplaints);
 
-    // Apply status filter
     if (_selectedComplaintFilter != null) {
-      filtered = filtered.where((complaint) =>
-      complaint.statusEnum == _selectedComplaintFilter).toList();
+      filtered = filtered
+          .where(
+            (complaint) => complaint.statusEnum == _selectedComplaintFilter,
+          )
+          .toList();
     }
 
-    // Apply type filter
     if (_selectedComplaintTypeFilter != null) {
-      filtered = filtered.where((complaint) =>
-      complaint.typeEnum == _selectedComplaintTypeFilter).toList();
+      filtered = filtered
+          .where(
+            (complaint) => complaint.typeEnum == _selectedComplaintTypeFilter,
+          )
+          .toList();
     }
 
     _complaints = filtered;
@@ -164,7 +175,7 @@ class ComplaintProvider extends ChangeNotifier {
     try {
       final response = await _complaintService.getComplaintsByStatus(status);
       if (response.success) {
-        _complaints = response.data;
+        _complaints = response.data ?? [];
       } else {
         _setError(response.message);
       }
@@ -182,7 +193,7 @@ class ComplaintProvider extends ChangeNotifier {
     try {
       final response = await _complaintService.getComplaintsByType(type);
       if (response.success) {
-        _complaints = response.data;
+        _complaints = response.data ?? [];
       } else {
         _setError(response.message);
       }

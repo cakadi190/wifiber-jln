@@ -30,9 +30,6 @@ class HttpHelper {
           } else if (value is List) {
             stringValue = value.map((item) => item.toString()).join(',');
           } else if (value is Map) {
-            print(
-              'Warning: Map value detected for key $stringKey, converting to JSON...',
-            );
             try {
               stringValue = jsonEncode(value);
             } catch (e) {

@@ -76,18 +76,16 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
 
     try {
       final success = await _complaintController.addComplaint(
-        subject: selectedCustomer!.id,
+        subject: selectedCustomer!.customerId,
         topic: complaintDescription!,
         date: selectedDate!,
       );
-
-      print(success);
 
       if (success) {
         _complaintController.showSuccessMessage(
           'Pengaduan untuk ${selectedCustomer!.name} berhasil dibuat!',
         );
-        Navigator.pop(context, true); // Return true untuk menandakan success
+        Navigator.pop(context, true);
       } else {
         _complaintController.showErrorMessage('Gagal membuat pengaduan!');
       }
@@ -152,7 +150,6 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
                           children: [
                             const SizedBox(height: 16),
 
-                            // Customer Selection
                             const Text(
                               'Pelanggan',
                               style: TextStyle(
@@ -228,7 +225,6 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
                             ),
                             const SizedBox(height: 24),
 
-                            // Complaint Description
                             TextFormField(
                               decoration: InputDecoration(
                                 hintText: 'Masukkan topik pengaduan',
@@ -255,7 +251,6 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
                             ),
                             const SizedBox(height: 24),
 
-                            // Date Selection
                             const Text(
                               'Tanggal Pengaduan',
                               style: TextStyle(
@@ -312,7 +307,6 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
 
                             const Spacer(),
 
-                            // Submit Button
                             SizedBox(
                               width: double.infinity,
                               child: ElevatedButton(

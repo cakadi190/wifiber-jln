@@ -75,6 +75,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
       Navigator.of(
         context,
       ).push(MaterialPageRoute(builder: (context) => const BillsScreen()));
+    } else if(index == 3) {
+      _complaintController.loadComplaints();
     } else {
       setState(() {
         _internalStyle = SystemUiHelper.light(
