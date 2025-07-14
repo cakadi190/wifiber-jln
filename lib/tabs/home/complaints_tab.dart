@@ -824,33 +824,35 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
                 child: const Text('Hapus', style: TextStyle(color: Colors.red)),
               ),
             ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: TextButton(
-                style: TextButton.styleFrom(
-                  foregroundColor: Colors.white,
-                  backgroundColor: AppColors.primary,
-                  padding: const EdgeInsets.symmetric(vertical: 16),
+            if(complaint.statusEnum != ComplaintStatus.completed) ...[
+              const SizedBox(width: 16),
+              Expanded(
+                child: TextButton(
+                  style: TextButton.styleFrom(
+                    foregroundColor: Colors.white,
+                    backgroundColor: AppColors.primary,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                  ),
+                  onPressed: () async {
+                    Navigator.pop(modalContext);
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            EditComplaintScreen(complaint: complaint),
+                      ),
+                    );
+                    if (mounted) {
+                      widget.controller.loadComplaints();
+                    }
+                  },
+                  child: const Text(
+                    'Tindak Lanjuti',
+                    style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                  ),
                 ),
-                onPressed: () async {
-                  Navigator.pop(modalContext);
-                  await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) =>
-                          EditComplaintScreen(complaint: complaint),
-                    ),
-                  );
-                  if (mounted) {
-                    widget.controller.loadComplaints();
-                  }
-                },
-                child: const Text(
-                  'Tindak Lanjuti',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-              ),
-            ),
+              )
+            ],
           ],
         ),
         const SizedBox(height: 12),
