@@ -42,6 +42,8 @@ class DashboardSummaryController extends ChangeNotifier {
         _totalExpense = dashboardData.data.currentMonth.finance.expense;
         _unpaidInvoiceCount = dashboardData.data.currentMonth.unpaidBills;
 
+        print(dashboardData.data.currentMonth.unpaidBills.toString());
+
         _totalCashFlow = _totalIncome - _totalExpense;
 
         _error = null;
