@@ -41,12 +41,10 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
       _searchController.clear();
     });
 
-    // Clear search query when stopping search
     widget.controller.search('');
   }
 
   void _onSearchChanged(String query) {
-    // Use the controller's search method
     widget.controller.search(query);
   }
 
@@ -54,6 +52,18 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.primary,
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          await Navigator.of(context).push(
+            MaterialPageRoute(
+              builder: (context) => const CreateComplaintScreen(),
+            ),
+          );
+          widget.controller.loadComplaints();
+        },
+        backgroundColor: AppColors.primary,
+        child: const Icon(Icons.add),
+      ),
       appBar: AppBar(
         title: _isSearching
             ? TextField(
@@ -71,20 +81,8 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
         actions: [
           if (_isSearching)
             IconButton(icon: const Icon(Icons.close), onPressed: _stopSearch)
-          else ...[
+          else
             IconButton(icon: const Icon(Icons.search), onPressed: _startSearch),
-            IconButton(
-              icon: const Icon(Icons.add),
-              onPressed: () async {
-                await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const CreateComplaintScreen(),
-                  ),
-                );
-                widget.controller.loadComplaints();
-              },
-            ),
-          ],
         ],
       ),
       body: Consumer<ComplaintProvider>(
@@ -120,7 +118,6 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
         padding: const EdgeInsets.symmetric(horizontal: 16.0),
         child: Row(
           children: [
-            // Status filters
             _buildFilterChip(
               context,
               label: "Semua",
@@ -155,7 +152,6 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
                   provider.setComplaintFilter(ComplaintStatus.resolved),
             ),
 
-            // Divider
             const SizedBox(width: 12),
             Container(
               width: 1,
@@ -164,7 +160,6 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
             ),
             const SizedBox(width: 12),
 
-            // Type filters
             _buildFilterChip(
               context,
               label: "Pendaftaran",
@@ -239,7 +234,6 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
       return _buildErrorWidget(context, provider.error!);
     }
 
-    // Use filtered complaints from provider instead of controller
     final complaints = provider.complaints;
 
     return RefreshIndicator(
@@ -323,8 +317,8 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
           onPressed: () {
             provider.setComplaintFilter(null);
             provider.setComplaintTypeFilter(null);
-            provider.setSearchQuery(''); // Also clear search query
-            // Clear search UI if active
+            provider.setSearchQuery('');
+
             if (_isSearching) {
               _stopSearch();
             }
@@ -513,17 +507,21 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
                 Navigator.pop(context);
                 _showComplaintDetailModal(context, complaint);
               }),
-              _buildButton(context, "Tindak Lanjuti (Perbarui Laporan)", () async {
-                Navigator.pop(context);
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        EditComplaintScreen(complaint: complaint),
-                  ),
-                );
-                widget.controller.loadComplaints();
-              }),
+              _buildButton(
+                context,
+                "Tindak Lanjuti (Perbarui Laporan)",
+                () async {
+                  Navigator.pop(context);
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) =>
+                          EditComplaintScreen(complaint: complaint),
+                    ),
+                  );
+                  widget.controller.loadComplaints();
+                },
+              ),
               _buildButton(context, "Hapus Pengaduan", () {
                 Navigator.pop(context);
                 _showComplaintDeleteModal(context, complaint);
@@ -805,7 +803,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
               child: OutlinedButton(
                 onPressed: () =>
                     _showComplaintDeleteModal(context, complaint, () {
-                      Navigator.pop(context); // Tutup modal detail
+                      Navigator.pop(context);
                     }),
                 style: OutlinedButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
@@ -827,7 +825,8 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
                   await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (context) => EditComplaintScreen(complaint: complaint),
+                      builder: (context) =>
+                          EditComplaintScreen(complaint: complaint),
                     ),
                   );
                   widget.controller.loadComplaints();
