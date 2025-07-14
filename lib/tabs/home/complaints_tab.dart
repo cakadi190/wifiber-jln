@@ -138,18 +138,18 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
               label: "Diproses",
               isSelected:
                   provider.selectedComplaintFilter ==
-                  ComplaintStatus.processing,
+                  ComplaintStatus.ongoing,
               onTap: () =>
-                  provider.setComplaintFilter(ComplaintStatus.processing),
+                  provider.setComplaintFilter(ComplaintStatus.ongoing),
             ),
             const SizedBox(width: 8),
             _buildFilterChip(
               context,
               label: "Selesai",
               isSelected:
-                  provider.selectedComplaintFilter == ComplaintStatus.resolved,
+                  provider.selectedComplaintFilter == ComplaintStatus.completed,
               onTap: () =>
-                  provider.setComplaintFilter(ComplaintStatus.resolved),
+                  provider.setComplaintFilter(ComplaintStatus.completed),
             ),
 
             const SizedBox(width: 12),
@@ -923,9 +923,9 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
     switch (status) {
       case ComplaintStatus.pending:
         return Colors.orange;
-      case ComplaintStatus.processing:
+      case ComplaintStatus.ongoing:
         return Colors.blue;
-      case ComplaintStatus.resolved:
+      case ComplaintStatus.completed:
         return Colors.green;
     }
   }
@@ -934,9 +934,9 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
     switch (status) {
       case ComplaintStatus.pending:
         return 'Menunggu';
-      case ComplaintStatus.processing:
+      case ComplaintStatus.ongoing:
         return 'Diproses';
-      case ComplaintStatus.resolved:
+      case ComplaintStatus.completed:
         return 'Selesai';
     }
   }

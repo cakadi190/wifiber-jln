@@ -36,11 +36,9 @@ class Complaint {
       case 'pending':
         return ComplaintStatus.pending;
       case 'ongoing':
-      case 'processing':
-        return ComplaintStatus.processing;
+        return ComplaintStatus.ongoing;
       case 'completed':
-      case 'resolved':
-        return ComplaintStatus.resolved;
+        return ComplaintStatus.completed;
       default:
         return ComplaintStatus.pending;
     }
@@ -172,6 +170,6 @@ class ComplaintResponse {
   }
 }
 
-enum ComplaintStatus { pending, processing, resolved }
+enum ComplaintStatus { pending, ongoing, completed }
 
 enum ComplaintType { registration, complaint }
