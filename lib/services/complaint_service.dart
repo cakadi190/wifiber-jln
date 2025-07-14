@@ -53,19 +53,18 @@ class ComplaintService {
         requiresAuth: true,
       );
 
+      print(response.body);
+
       if (response.statusCode == 201 || response.statusCode == 200) {
         final responseData = json.decode(response.body);
 
-        // Handle different response formats
         if (responseData is Map<String, dynamic>) {
           return ComplaintResponse.fromJson(responseData);
         } else {
-          // If the response is not in the expected format, create a success response
           return ComplaintResponse(
             success: true,
             message: 'Complaint created successfully',
-            data:
-                [], // Empty list since we don't have the created complaint data
+            data: [],
           );
         }
       } else {
@@ -73,6 +72,7 @@ class ComplaintService {
         throw Exception(errorData['message'] ?? 'Failed to create complaint');
       }
     } catch (e) {
+      print(e);
       throw Exception('Error: $e');
     }
   }
