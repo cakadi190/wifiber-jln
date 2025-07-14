@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
-import 'package:wifiber/helpers/currency_helper.dart';
-import 'package:wifiber/helpers/currency_helper.dart';
 import 'package:wifiber/helpers/currency_helper.dart';
 import 'package:wifiber/services/dashboard_service.dart';
 
