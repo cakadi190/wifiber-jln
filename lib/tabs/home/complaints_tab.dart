@@ -151,34 +151,6 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
               onTap: () =>
                   provider.setComplaintFilter(ComplaintStatus.completed),
             ),
-
-            const SizedBox(width: 12),
-            Container(
-              width: 1,
-              height: 24,
-              color: Colors.white.withValues(alpha: 0.25),
-            ),
-            const SizedBox(width: 12),
-
-            _buildFilterChip(
-              context,
-              label: "Pendaftaran",
-              isSelected:
-                  provider.selectedComplaintTypeFilter ==
-                  ComplaintType.registration,
-              onTap: () =>
-                  provider.setComplaintTypeFilter(ComplaintType.registration),
-            ),
-            const SizedBox(width: 8),
-            _buildFilterChip(
-              context,
-              label: "Keluhan",
-              isSelected:
-                  provider.selectedComplaintTypeFilter ==
-                  ComplaintType.complaint,
-              onTap: () =>
-                  provider.setComplaintTypeFilter(ComplaintType.complaint),
-            ),
             const SizedBox(width: 16),
           ],
         ),
