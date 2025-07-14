@@ -39,24 +39,15 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
     setState(() {
       _isSearching = false;
       _searchController.clear();
-      _searchController.text = '';
     });
 
-    const duration = Duration(milliseconds: 300);
-    Future.delayed(duration, () {
-      final provider = Provider.of<ComplaintProvider>(context, listen: false);
-
-      provider.fetchComplaints();
-    });
+    // Clear search query when stopping search
+    widget.controller.search('');
   }
 
   void _onSearchChanged(String query) {
-    const duration = Duration(milliseconds: 300);
-    Future.delayed(duration, () {
-      final provider = Provider.of<ComplaintProvider>(context, listen: false);
-
-      provider.fetchComplaints();
-    });
+    // Use the controller's search method
+    widget.controller.search(query);
   }
 
   @override
@@ -66,16 +57,16 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
       appBar: AppBar(
         title: _isSearching
             ? TextField(
-                controller: _searchController,
-                autofocus: true,
-                style: const TextStyle(color: Colors.white),
-                decoration: const InputDecoration(
-                  hintText: 'Cari nomor pengaduan...',
-                  hintStyle: TextStyle(color: Colors.white70),
-                  border: InputBorder.none,
-                ),
-                onChanged: _onSearchChanged,
-              )
+          controller: _searchController,
+          autofocus: true,
+          style: const TextStyle(color: Colors.white),
+          decoration: const InputDecoration(
+            hintText: 'Cari nomor pengaduan...',
+            hintStyle: TextStyle(color: Colors.white70),
+            border: InputBorder.none,
+          ),
+          onChanged: _onSearchChanged,
+        )
             : const Text('Pengaduan & Keluhan'),
         actions: [
           if (_isSearching)
@@ -138,7 +129,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
               context,
               label: "Menunggu",
               isSelected:
-                  provider.selectedComplaintFilter == ComplaintStatus.pending,
+              provider.selectedComplaintFilter == ComplaintStatus.pending,
               onTap: () => provider.setComplaintFilter(ComplaintStatus.pending),
             ),
             const SizedBox(width: 8),
@@ -146,7 +137,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
               context,
               label: "Diproses",
               isSelected:
-                  provider.selectedComplaintFilter ==
+              provider.selectedComplaintFilter ==
                   ComplaintStatus.processing,
               onTap: () =>
                   provider.setComplaintFilter(ComplaintStatus.processing),
@@ -156,7 +147,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
               context,
               label: "Selesai",
               isSelected:
-                  provider.selectedComplaintFilter == ComplaintStatus.resolved,
+              provider.selectedComplaintFilter == ComplaintStatus.resolved,
               onTap: () =>
                   provider.setComplaintFilter(ComplaintStatus.resolved),
             ),
@@ -175,7 +166,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
               context,
               label: "Pendaftaran",
               isSelected:
-                  provider.selectedComplaintTypeFilter ==
+              provider.selectedComplaintTypeFilter ==
                   ComplaintType.registration,
               onTap: () =>
                   provider.setComplaintTypeFilter(ComplaintType.registration),
@@ -185,7 +176,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
               context,
               label: "Keluhan",
               isSelected:
-                  provider.selectedComplaintTypeFilter ==
+              provider.selectedComplaintTypeFilter ==
                   ComplaintType.complaint,
               onTap: () =>
                   provider.setComplaintTypeFilter(ComplaintType.complaint),
@@ -198,11 +189,11 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
   }
 
   Widget _buildFilterChip(
-    BuildContext context, {
-    required String label,
-    required bool isSelected,
-    required VoidCallback onTap,
-  }) {
+      BuildContext context, {
+        required String label,
+        required bool isSelected,
+        required VoidCallback onTap,
+      }) {
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
@@ -245,7 +236,8 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
       return _buildErrorWidget(context, provider.error!);
     }
 
-    final complaints = widget.controller.filteredComplaints;
+    // Use filtered complaints from provider instead of controller
+    final complaints = provider.complaints;
 
     return RefreshIndicator(
       onRefresh: () => widget.controller.loadComplaints(),
@@ -253,12 +245,11 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
     );
   }
 
-
   Widget _buildComplaintList(
-    BuildContext context,
-    List<Complaint> complaints,
-    ComplaintProvider provider,
-  ) {
+      BuildContext context,
+      List<Complaint> complaints,
+      ComplaintProvider provider,
+      ) {
     if (complaints.isEmpty) {
       return _buildEmptyState(context, provider);
     }
@@ -315,9 +306,9 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
   }
 
   Widget _buildEmptyStateActions(
-    BuildContext context,
-    ComplaintProvider provider,
-  ) {
+      BuildContext context,
+      ComplaintProvider provider,
+      ) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.center,
       crossAxisAlignment: CrossAxisAlignment.center,
@@ -329,6 +320,11 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
           onPressed: () {
             provider.setComplaintFilter(null);
             provider.setComplaintTypeFilter(null);
+            provider.setSearchQuery(''); // Also clear search query
+            // Clear search UI if active
+            if (_isSearching) {
+              _stopSearch();
+            }
           },
           isOutlined: true,
         ),
@@ -350,70 +346,70 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
   }
 
   Widget _buildActionButton(
-    BuildContext context, {
-    required String label,
-    required VoidCallback onPressed,
-    required bool isOutlined,
-  }) {
+      BuildContext context, {
+        required String label,
+        required VoidCallback onPressed,
+        required bool isOutlined,
+      }) {
     return SizedBox(
       height: 32,
       child: isOutlined
           ? OutlinedButton(
-              style: OutlinedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                minimumSize: const Size(0, 32),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                side: BorderSide(color: Colors.grey.shade300, width: 1),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-              ),
-              onPressed: onPressed,
-              child: Text(
-                label,
-                style: TextStyle(
-                  fontSize: 12,
-                  color: Colors.black.withValues(alpha: 0.6),
-                  fontWeight: FontWeight.w400,
-                ),
-              ),
-            )
+        style: OutlinedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 6,
+          ),
+          minimumSize: const Size(0, 32),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          side: BorderSide(color: Colors.grey.shade300, width: 1),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+        ),
+        onPressed: onPressed,
+        child: Text(
+          label,
+          style: TextStyle(
+            fontSize: 12,
+            color: Colors.black.withValues(alpha: 0.6),
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+      )
           : ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 12,
-                  vertical: 6,
-                ),
-                minimumSize: const Size(0, 32),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                elevation: 2,
-              ),
-              onPressed: onPressed,
-              child: Text(
-                label,
-                style: const TextStyle(
-                  fontSize: 12,
-                  fontWeight: FontWeight.w500,
-                ),
-              ),
-            ),
+        style: ElevatedButton.styleFrom(
+          padding: const EdgeInsets.symmetric(
+            horizontal: 12,
+            vertical: 6,
+          ),
+          minimumSize: const Size(0, 32),
+          tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+          backgroundColor: AppColors.primary,
+          foregroundColor: Colors.white,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(16),
+          ),
+          elevation: 2,
+        ),
+        onPressed: onPressed,
+        child: Text(
+          label,
+          style: const TextStyle(
+            fontSize: 12,
+            fontWeight: FontWeight.w500,
+          ),
+        ),
+      ),
     );
   }
 
   Widget _buildComplaintCard(
-    BuildContext context,
-    Complaint complaint, {
-    VoidCallback? onLongPress,
-    VoidCallback? onTap,
-  }) {
+      BuildContext context,
+      Complaint complaint, {
+        VoidCallback? onLongPress,
+        VoidCallback? onTap,
+      }) {
     final statusColor = _getStatusColor(complaint.statusEnum);
     final typeIcon = _getTypeIcon(complaint.typeEnum);
 
@@ -536,11 +532,11 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
   }
 
   Widget _buildButton(
-    BuildContext context,
-    String label,
-    VoidCallback? onPressed, {
-    bool? isDangerZone = false,
-  }) {
+      BuildContext context,
+      String label,
+      VoidCallback? onPressed, {
+        bool? isDangerZone = false,
+      }) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 16),
       child: ListTile(
@@ -622,10 +618,10 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
   }
 
   Future<void> _showComplaintDeleteModal(
-    BuildContext context,
-    Complaint complaint, [
-    VoidCallback? onSuccess,
-  ]) async {
+      BuildContext context,
+      Complaint complaint, [
+        VoidCallback? onSuccess,
+      ]) async {
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -855,12 +851,12 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
   }
 
   Widget _buildDetailRow(
-    BuildContext context,
-    String label,
-    String value,
-    IconData icon, {
-    Color? color,
-  }) {
+      BuildContext context,
+      String label,
+      String value,
+      IconData icon, {
+        Color? color,
+      }) {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
