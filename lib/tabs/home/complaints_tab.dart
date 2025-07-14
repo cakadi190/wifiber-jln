@@ -10,26 +10,87 @@ import 'package:wifiber/providers/complaint_provider.dart';
 import 'package:wifiber/screens/dashboard/complainment/create_complainment_screen.dart';
 import 'package:wifiber/screens/dashboard/complainment/edit_complainment_screen.dart';
 
-class ComplaintsTab extends StatelessWidget {
+class ComplaintsTab extends StatefulWidget {
   final ComplaintTabController controller;
 
   const ComplaintsTab({super.key, required this.controller});
+
+  @override
+  State<ComplaintsTab> createState() => _ComplaintsTabState();
+}
+
+class _ComplaintsTabState extends State<ComplaintsTab> {
+  bool _isSearching = false;
+  final TextEditingController _searchController = TextEditingController();
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _startSearch() {
+    setState(() {
+      _isSearching = true;
+    });
+  }
+
+  void _stopSearch() {
+    setState(() {
+      _isSearching = false;
+      _searchController.clear();
+      _searchController.text = '';
+    });
+
+    const duration = Duration(milliseconds: 300);
+    Future.delayed(duration, () {
+      final provider = Provider.of<ComplaintProvider>(context, listen: false);
+
+      provider.fetchComplaints();
+    });
+  }
+
+  void _onSearchChanged(String query) {
+    const duration = Duration(milliseconds: 300);
+    Future.delayed(duration, () {
+      final provider = Provider.of<ComplaintProvider>(context, listen: false);
+
+      provider.fetchComplaints();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.primary,
       appBar: AppBar(
-        title: const Text('Pengaduan & Keluhan'),
+        title: _isSearching
+            ? TextField(
+                controller: _searchController,
+                autofocus: true,
+                style: const TextStyle(color: Colors.white),
+                decoration: const InputDecoration(
+                  hintText: 'Cari nomor pengaduan...',
+                  hintStyle: TextStyle(color: Colors.white70),
+                  border: InputBorder.none,
+                ),
+                onChanged: _onSearchChanged,
+              )
+            : const Text('Pengaduan & Keluhan'),
         actions: [
-          IconButton(
-            icon: const Icon(Icons.add),
-            onPressed: () => Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const CreateComplaintScreen(),
+          if (_isSearching)
+            IconButton(icon: const Icon(Icons.close), onPressed: _stopSearch)
+          else ...[
+            IconButton(icon: const Icon(Icons.search), onPressed: _startSearch),
+            IconButton(
+              icon: const Icon(Icons.add),
+              onPressed: () => Navigator.of(context).push(
+                MaterialPageRoute(
+                  builder: (context) => const CreateComplaintScreen(),
+                ),
               ),
             ),
-          ),
+          ],
         ],
       ),
       body: Consumer<ComplaintProvider>(
@@ -177,16 +238,21 @@ class ComplaintsTab extends StatelessWidget {
     }
 
     if (provider.error != null) {
+      if (provider.error!.toLowerCase().contains("not found")) {
+        return _buildEmptyState(context, provider);
+      }
+
       return _buildErrorWidget(context, provider.error!);
     }
 
-    final complaints = controller.filteredComplaints;
+    final complaints = widget.controller.filteredComplaints;
 
     return RefreshIndicator(
-      onRefresh: () => controller.loadComplaints(),
+      onRefresh: () => widget.controller.loadComplaints(),
       child: _buildComplaintList(context, complaints, provider),
     );
   }
+
 
   Widget _buildComplaintList(
     BuildContext context,
@@ -276,7 +342,7 @@ class ComplaintsTab extends StatelessWidget {
         _buildActionButton(
           context,
           label: "Muat Ulang",
-          onPressed: () => controller.loadComplaints(),
+          onPressed: () => widget.controller.loadComplaints(),
           isOutlined: false,
         ),
       ],
@@ -359,7 +425,7 @@ class ComplaintsTab extends StatelessWidget {
       child: ListTile(
         leading: _buildComplaintIcon(statusColor, typeIcon),
         title: Text(
-          complaint.name ?? "Anonim",
+          '#${complaint.number.toString()}',
           style: const TextStyle(fontWeight: FontWeight.bold),
           maxLines: 1,
           overflow: TextOverflow.ellipsis,
@@ -513,20 +579,40 @@ class ComplaintsTab extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(color: Colors.red, Icons.warning, size: 64),
-            const Text(
-              "Ada Kesalahan!",
+            Icon(
+              color: error.contains('not found')
+                  ? Colors.grey.shade600
+                  : Colors.red,
+              error.contains('not found') ? Icons.info : Icons.warning,
+              size: 64,
+            ),
+            const SizedBox(height: 16),
+            Text(
+              error.contains("not found")
+                  ? "Tidak Ditemukan"
+                  : "Ada Kesalahan!",
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 fontSize: 24,
-                color: Colors.red,
+                color: error.contains("not found")
+                    ? Colors.grey.shade600
+                    : Colors.red,
               ),
             ),
-            Text(error, textAlign: TextAlign.center),
+            Text(
+              error.contains("not found") ? "Data pengaduan yang anda cari tidak ditemukan. Coba cari dengan pendekatan yang lainnya ya!" : error,
+              textAlign: TextAlign.center,
+            ),
+            if(error.contains("not found")) Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                _buildButton(context, "Muat Ulang", () => widget.controller.loadComplaints()),
+              ],
+            ),
             if (error.contains("401"))
               TextButton(
-                onPressed: () => controller.logout(context),
+                onPressed: () => widget.controller.logout(context),
                 child: const Text("Autentikasi ulang"),
               ),
           ],
@@ -590,7 +676,9 @@ class ComplaintsTab extends StatelessWidget {
                   child: ElevatedButton(
                     onPressed: () async {
                       int id = int.parse(complaint.id.toString());
-                      final success = await controller.removeComplaint(id);
+                      final success = await widget.controller.removeComplaint(
+                        id,
+                      );
                       if (success) {
                         Navigator.pop(context);
                         onSuccess?.call();

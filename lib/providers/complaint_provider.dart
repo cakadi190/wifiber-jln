@@ -8,13 +8,13 @@ class ComplaintProvider extends ChangeNotifier {
   ComplaintProvider(this._complaintService);
 
   List<Complaint> _complaints = [];
-  List<Complaint> _allComplaints = [];
   Complaint? _selectedComplaint;
   bool _isLoading = false;
   String? _error;
 
-  ComplaintStatus? _selectedComplaintFilter;
-  ComplaintType? _selectedComplaintTypeFilter;
+  ComplaintStatus? _selectedStatus;
+  ComplaintType? _selectedType;
+  String _searchQuery = '';
 
   List<Complaint> get complaints => _complaints;
 
@@ -24,20 +24,24 @@ class ComplaintProvider extends ChangeNotifier {
 
   String? get error => _error;
 
-  ComplaintStatus? get selectedComplaintFilter => _selectedComplaintFilter;
+  ComplaintStatus? get selectedComplaintFilter => _selectedStatus;
 
-  ComplaintType? get selectedComplaintTypeFilter =>
-      _selectedComplaintTypeFilter;
+  ComplaintType? get selectedComplaintTypeFilter => _selectedType;
+
+  String get searchQuery => _searchQuery;
 
   Future<void> fetchComplaints() async {
     _setLoading(true);
     _setError(null);
-
     try {
-      final response = await _complaintService.getAllComplaints();
+      final response = await _complaintService.getComplaints(
+        status: _selectedStatus,
+        type: _selectedType,
+        search: _searchQuery,
+      );
+
       if (response.success) {
-        _allComplaints = response.data ?? [];
-        _applyFilters();
+        _complaints = response.data ?? [];
       } else {
         _setError(response.message);
       }
@@ -48,29 +52,24 @@ class ComplaintProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> searchComplaints(String query) async {
-    _setLoading(true);
-    _setError(null);
+  void setComplaintFilter(ComplaintStatus? status) {
+    _selectedStatus = status;
+    fetchComplaints();
+  }
 
-    try {
-      final response = await _complaintService.searchComplaints(query);
-      if (response.success) {
-        _allComplaints = response.data ?? [];
-        _applyFilters();
-      } else {
-        _setError(response.message);
-      }
-    } catch (e) {
-      _setError(e.toString());
-    } finally {
-      _setLoading(false);
-    }
+  void setComplaintTypeFilter(ComplaintType? type) {
+    _selectedType = type;
+    fetchComplaints();
+  }
+
+  void setSearchQuery(String query) {
+    _searchQuery = query;
+    fetchComplaints();
   }
 
   Future<void> fetchComplaintById(int id) async {
     _setLoading(true);
     _setError(null);
-
     try {
       _selectedComplaint = await _complaintService.getComplaintById(id);
     } catch (e) {
@@ -83,16 +82,10 @@ class ComplaintProvider extends ChangeNotifier {
   Future<bool> createComplaint(CreateComplaint complaint) async {
     _setLoading(true);
     _setError(null);
-
     try {
       final response = await _complaintService.createComplaint(complaint);
-
       if (response.success) {
-        if (response.data != null) {
-          _allComplaints.addAll(response.data!);
-        }
-        _applyFilters();
-        fetchComplaints();
+        await fetchComplaints();
         return true;
       } else {
         _setError(response.message);
@@ -109,17 +102,10 @@ class ComplaintProvider extends ChangeNotifier {
   Future<bool> updateComplaint(int id, UpdateComplaint complaint) async {
     _setLoading(true);
     _setError(null);
-
     try {
       final response = await _complaintService.updateComplaint(id, complaint);
       if (response.success) {
-        if (response.data != null && response.data!.isNotEmpty) {
-          final index = _allComplaints.indexWhere((c) => c.id == id);
-          if (index != -1) {
-            _allComplaints[index] = response.data!.first;
-            _applyFilters();
-          }
-        }
+        await fetchComplaints();
         return true;
       } else {
         _setError(response.message);
@@ -136,13 +122,10 @@ class ComplaintProvider extends ChangeNotifier {
   Future<bool> deleteComplaint(int id) async {
     _setLoading(true);
     _setError(null);
-
     try {
       final success = await _complaintService.deleteComplaint(id);
       if (success) {
-        _allComplaints.removeWhere((c) => c.id == id);
-        _applyFilters();
-        fetchComplaints();
+        await fetchComplaints();
         return true;
       } else {
         _setError('Failed to delete complaint');
@@ -154,89 +137,6 @@ class ComplaintProvider extends ChangeNotifier {
     } finally {
       _setLoading(false);
     }
-  }
-
-  void setComplaintFilter(ComplaintStatus? status) {
-    _selectedComplaintFilter = status;
-    _applyFilters();
-    fetchComplaints();
-  }
-
-  void setComplaintTypeFilter(ComplaintType? type) {
-    _selectedComplaintTypeFilter = type;
-    _applyFilters();
-    fetchComplaints();
-  }
-
-  void _applyFilters() {
-    List<Complaint> filtered = List.from(_allComplaints);
-
-    if (_selectedComplaintFilter != null) {
-      filtered = filtered
-          .where(
-            (complaint) => complaint.statusEnum == _selectedComplaintFilter,
-          )
-          .toList();
-    }
-
-    if (_selectedComplaintTypeFilter != null) {
-      filtered = filtered
-          .where(
-            (complaint) => complaint.typeEnum == _selectedComplaintTypeFilter,
-          )
-          .toList();
-    }
-
-    _complaints = filtered;
-    notifyListeners();
-  }
-
-  Future<void> fetchComplaintsByStatus(ComplaintStatus status) async {
-    _setLoading(true);
-    _setError(null);
-
-    try {
-      final response = await _complaintService.getComplaintsByStatus(status);
-      if (response.success) {
-        _complaints = response.data ?? [];
-      } else {
-        _setError(response.message);
-      }
-    } catch (e) {
-      _setError(e.toString());
-    } finally {
-      _setLoading(false);
-    }
-  }
-
-  Future<void> fetchComplaintsByType(ComplaintType type) async {
-    _setLoading(true);
-    _setError(null);
-
-    try {
-      final response = await _complaintService.getComplaintsByType(type);
-      if (response.success) {
-        _complaints = response.data ?? [];
-      } else {
-        _setError(response.message);
-      }
-    } catch (e) {
-      _setError(e.toString());
-    } finally {
-      _setLoading(false);
-    }
-  }
-
-  List<Complaint> getComplaintsByStatusLocal(ComplaintStatus status) {
-    return _complaints
-        .where((complaint) => complaint.statusEnum == status)
-        .toList();
-  }
-
-  List<Complaint> getComplaintsByTypeLocal(ComplaintType type) {
-    return _complaints
-        .where((complaint) => complaint.typeEnum == type)
-        .toList();
   }
 
   void clearSelectedComplaint() {

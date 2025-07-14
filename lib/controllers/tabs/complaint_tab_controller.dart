@@ -16,7 +16,6 @@ class ComplaintTabController {
     _authProvider = Provider.of<AuthProvider>(context, listen: false);
   }
 
-  // Get filtered complaints based on current filters
   List<Complaint> get filteredComplaints {
     return _provider.complaints;
   }
@@ -63,20 +62,17 @@ class ComplaintTabController {
     return await _provider.deleteComplaint(id);
   }
 
-  Future<void> filterByStatus(ComplaintStatus status) async {
-    await _provider.fetchComplaintsByStatus(status);
+  // === Ganti filter status/type ===
+  void filterByStatus(ComplaintStatus? status) {
+    _provider.setComplaintFilter(status);
   }
 
-  Future<void> filterByType(ComplaintType type) async {
-    await _provider.fetchComplaintsByType(type);
+  void filterByType(ComplaintType? type) {
+    _provider.setComplaintTypeFilter(type);
   }
 
-  List<Complaint> getComplaintsByStatus(ComplaintStatus status) {
-    return _provider.getComplaintsByStatusLocal(status);
-  }
-
-  List<Complaint> getComplaintsByType(ComplaintType type) {
-    return _provider.getComplaintsByTypeLocal(type);
+  void search(String query) {
+    _provider.setSearchQuery(query);
   }
 
   void clearSelection() {
@@ -97,7 +93,7 @@ class ComplaintTabController {
     Navigator.pushAndRemoveUntil(
       context,
       MaterialPageRoute(builder: (context) => const LoginScreen()),
-      (_) => false,
+          (_) => false,
     );
   }
 }
