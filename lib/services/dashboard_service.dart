@@ -10,8 +10,6 @@ class DashboardService {
     try {
       final response = await _http.get('/dashboard-data', requiresAuth: true);
 
-      print(response.body);
-
       if (response.statusCode == 200) {
         final Map<String, dynamic> jsonData = json.decode(response.body);
         return DashboardData.fromJson(jsonData);
