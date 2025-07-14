@@ -48,6 +48,25 @@ class ComplaintProvider extends ChangeNotifier {
     }
   }
 
+  Future<void> searchComplaints(String query) async {
+    _setLoading(true);
+    _setError(null);
+
+    try {
+      final response = await _complaintService.searchComplaints(query);
+      if (response.success) {
+        _allComplaints = response.data ?? [];
+        _applyFilters();
+      } else {
+        _setError(response.message);
+      }
+    } catch (e) {
+      _setError(e.toString());
+    } finally {
+      _setLoading(false);
+    }
+  }
+
   Future<void> fetchComplaintById(int id) async {
     _setLoading(true);
     _setError(null);

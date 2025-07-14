@@ -23,6 +23,25 @@ class ComplaintService {
     }
   }
 
+  Future<ComplaintResponse> searchComplaints(String query) async {
+    try {
+      final response = await _http.get(
+        '/complaint-tickets/search',
+        requiresAuth: true,
+        parameters: {'search': query},
+      );
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        return ComplaintResponse.fromJson(data['data']);
+      } else {
+        throw Exception('Failed to load complaint');
+      }
+    } catch (e) {
+      throw Exception('Error: $e');
+    }
+  }
+
   Future<Complaint> getComplaintById(int id) async {
     try {
       final response = await _http.get(
