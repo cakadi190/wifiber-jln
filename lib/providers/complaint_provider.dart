@@ -73,6 +73,7 @@ class ComplaintProvider extends ChangeNotifier {
           _allComplaints.addAll(response.data!);
         }
         _applyFilters();
+        fetchComplaints();
         return true;
       } else {
         _setError(response.message);

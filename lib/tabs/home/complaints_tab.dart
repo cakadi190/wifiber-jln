@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/controllers/tabs/complaint_tab_controller.dart';
@@ -106,31 +107,22 @@ class ComplaintsTab extends StatelessWidget {
             SizedBox(width: 12),
             _buildFilterChip(
               context,
-              label: "Internet",
+              label: "Pendaftaran",
               isSelected:
                   provider.selectedComplaintTypeFilter ==
-                  ComplaintType.internet,
+                  ComplaintType.registration,
               onTap: () =>
-                  provider.setComplaintTypeFilter(ComplaintType.internet),
+                  provider.setComplaintTypeFilter(ComplaintType.registration),
             ),
             SizedBox(width: 8),
             _buildFilterChip(
               context,
-              label: "Billing",
-              isSelected:
-                  provider.selectedComplaintTypeFilter == ComplaintType.billing,
-              onTap: () =>
-                  provider.setComplaintTypeFilter(ComplaintType.billing),
-            ),
-            SizedBox(width: 8),
-            _buildFilterChip(
-              context,
-              label: "Teknis",
+              label: "Keluhan",
               isSelected:
                   provider.selectedComplaintTypeFilter ==
-                  ComplaintType.technical,
+                  ComplaintType.complaint,
               onTap: () =>
-                  provider.setComplaintTypeFilter(ComplaintType.technical),
+                  provider.setComplaintTypeFilter(ComplaintType.complaint),
             ),
             SizedBox(width: 16),
           ],
@@ -333,7 +325,7 @@ class ComplaintsTab extends StatelessWidget {
                 ),
               ),
               title: Text(
-                complaint.subject ?? 'No Subject',
+                complaint.name ?? "Anonim",
                 style: TextStyle(fontWeight: FontWeight.bold),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -421,6 +413,74 @@ class ComplaintsTab extends StatelessWidget {
     );
   }
 
+  Future<void> _showComplaintDeleteModal(
+    BuildContext context,
+    Complaint complaint,
+  ) async {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) => Padding(
+        padding: EdgeInsets.only(bottom: 16, left: 16, right: 16, top: 16),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            PhosphorIcon(
+              PhosphorIcons.warning(PhosphorIconsStyle.duotone),
+              color: Colors.red,
+              size: 64,
+            ),
+            SizedBox(height: 8),
+            Text(
+              'Hapus Pengaduan?',
+              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+            ),
+            SizedBox(height: 8),
+            Text('Apakah anda yakin ingin menghapus pengaduan ini?'),
+            SizedBox(height: 16),
+            Row(
+              children: [
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: OutlinedButton.styleFrom(
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                      side: BorderSide(color: AppColors.primary),
+                    ),
+                    child: Text(
+                      'Tidak',
+                      style: TextStyle(color: AppColors.primary, fontSize: 18),
+                    ),
+                  ),
+                ),
+                SizedBox(width: 16),
+                Expanded(
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      int id = int.parse(complaint.id.toString());
+                      final success = await controller.removeComplaint(id);
+                      if (success) Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.red,
+                      foregroundColor: Colors.white,
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: Text('Ya', style: TextStyle(fontSize: 18)),
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _showComplaintDetailModal(BuildContext context, Complaint complaint) {
     showModalBottomSheet(
       context: context,
@@ -436,6 +496,7 @@ class ComplaintsTab extends StatelessWidget {
           top: 16,
         ),
         child: SingleChildScrollView(
+          physics: const BouncingScrollPhysics(),
           child: Column(
             mainAxisSize: MainAxisSize.min,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -459,32 +520,37 @@ class ComplaintsTab extends StatelessWidget {
               ),
               SizedBox(height: 16),
 
-              // _buildDetailRow(
-              //   context,
-              //   'Subjek',
-              //   complaint.subject,
-              //   Icons.subject,
-              // ),
+              _buildDetailRow(
+                context,
+                'Nama Pelanggan',
+                complaint.name ?? "Anonim",
+                Icons.subject,
+              ),
               SizedBox(height: 16),
 
-              _buildDetailRow(context, 'Topik', complaint.topic, Icons.topic),
+              _buildDetailRow(
+                context,
+                'Deskripsi',
+                complaint.topic,
+                Icons.topic,
+              ),
               SizedBox(height: 16),
 
-              // _buildDetailRow(
-              //   context,
-              //   'Status',
-              //   _getStatusText(complaint.status),
-              //   Icons.info_outline,
-              //   color: _getStatusColor(complaint.status),
-              // ),
+              _buildDetailRow(
+                context,
+                'Status',
+                _getStatusText(complaint.statusEnum),
+                Icons.info_outline,
+                color: _getStatusColor(complaint.statusEnum),
+              ),
               SizedBox(height: 16),
 
-              // _buildDetailRow(
-              //   context,
-              //   'Tipe',
-              //   _getTypeText(complaint.type),
-              //   _getTypeIcon(complaint.type),
-              // ),
+              _buildDetailRow(
+                context,
+                'Tipe',
+                _getTypeText(complaint.typeEnum),
+                _getTypeIcon(complaint.typeEnum),
+              ),
               SizedBox(height: 16),
 
               _buildDetailRow(
@@ -495,49 +561,39 @@ class ComplaintsTab extends StatelessWidget {
               ),
               SizedBox(height: 32),
 
-              // Row(
-              //   children: [
-              //     Expanded(
-              //       child: OutlinedButton(
-              //         onPressed: () async {
-              //           final success = await controller.removeComplaint(complaint.id);
-              //           if (success) {
-              //             Navigator.pop(context);
-              //             controller.showSuccessMessage('Pengaduan berhasil dihapus');
-              //           } else {
-              //             controller.showErrorMessage('Gagal menghapus pengaduan');
-              //           }
-              //         },
-              //         style: OutlinedButton.styleFrom(
-              //           padding: EdgeInsets.symmetric(vertical: 16),
-              //           side: BorderSide(color: Colors.red),
-              //         ),
-              //         child: Text(
-              //           'Hapus',
-              //           style: TextStyle(color: Colors.red),
-              //         ),
-              //       ),
-              //     ),
-              //     SizedBox(width: 16),
-              //     Expanded(
-              //       child: ElevatedButton(
-              //         onPressed: () => Navigator.pop(context),
-              //         style: ElevatedButton.styleFrom(
-              //           backgroundColor: AppColors.primary,
-              //           padding: EdgeInsets.symmetric(vertical: 16),
-              //         ),
-              //         child: Text(
-              //           'Tutup',
-              //           style: TextStyle(
-              //             color: Colors.white,
-              //             fontSize: 16,
-              //             fontWeight: FontWeight.bold,
-              //           ),
-              //         ),
-              //       ),
-              //     ),
-              //   ],
-              // ),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () =>
+                          _showComplaintDeleteModal(context, complaint),
+                      style: OutlinedButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                        side: BorderSide(color: Colors.red),
+                      ),
+                      child: Text('Hapus', style: TextStyle(color: Colors.red)),
+                    ),
+                  ),
+                  SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        padding: EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: Text(
+                        'Tutup',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
               SizedBox(height: 16),
             ],
           ),
@@ -612,7 +668,7 @@ class ComplaintsTab extends StatelessWidget {
   String _getStatusText(ComplaintStatus status) {
     switch (status) {
       case ComplaintStatus.pending:
-        return 'Pending';
+        return 'Menunggu';
       case ComplaintStatus.processing:
         return 'Diproses';
       case ComplaintStatus.resolved:
@@ -622,23 +678,19 @@ class ComplaintsTab extends StatelessWidget {
 
   IconData _getTypeIcon(ComplaintType type) {
     switch (type) {
-      case ComplaintType.internet:
-        return Icons.wifi;
-      case ComplaintType.billing:
-        return Icons.payment;
-      case ComplaintType.technical:
-        return Icons.build;
+      case ComplaintType.registration:
+        return Icons.person;
+      case ComplaintType.complaint:
+        return Icons.warning;
     }
   }
 
   String _getTypeText(ComplaintType type) {
     switch (type) {
-      case ComplaintType.internet:
-        return 'Internet';
-      case ComplaintType.billing:
-        return 'Billing';
-      case ComplaintType.technical:
-        return 'Teknis';
+      case ComplaintType.registration:
+        return 'Registrasi';
+      case ComplaintType.complaint:
+        return 'Pengaduan';
     }
   }
 }

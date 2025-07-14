@@ -48,15 +48,12 @@ class Complaint {
 
   ComplaintType get typeEnum {
     switch (type?.toLowerCase()) {
-      case 'internet':
-        return ComplaintType.internet;
-      case 'billing':
-        return ComplaintType.billing;
-      case 'technical':
-      case 'teknis':
-        return ComplaintType.technical;
+      case 'complaint':
+        return ComplaintType.complaint;
+      case 'registration':
+        return ComplaintType.registration;
       default:
-        return ComplaintType.internet;
+        return ComplaintType.complaint;
     }
   }
 
@@ -181,4 +178,4 @@ class ComplaintResponse {
 
 enum ComplaintStatus { pending, processing, resolved }
 
-enum ComplaintType { internet, billing, technical }
+enum ComplaintType { registration, complaint }
