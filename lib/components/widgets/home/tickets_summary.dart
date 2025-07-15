@@ -1,5 +1,8 @@
+import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:wifiber/components/reusables/ticket_component.dart';
+import 'package:wifiber/helpers/datetime_helper.dart';
 import 'package:wifiber/providers/complaint_provider.dart';
 import 'package:wifiber/services/complaint_service.dart';
 
@@ -24,38 +27,61 @@ class _TicketSummaryView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(top: 0, left: 16, right: 16, bottom: 16),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.only(
-              top: 0,
-              left: 16,
-              right: 0,
-              bottom: 0,
+    return Consumer<ComplaintProvider>(
+      builder: (context, provider, _) {
+        return SummaryCard(
+          title: "Pengaduan",
+          onTap: onTicketTap,
+          margin: const EdgeInsets.only(top: 0, left: 16, right: 16, bottom: 16),
+          padding: EdgeInsets.zero,
+          child: StateBuilder<List>(
+            isLoading: provider.isLoading,
+            error: null, // ComplaintProvider doesn't seem to have error handling
+            data: provider.complaints,
+            loadingBuilder: () => DefaultStates.loading(),
+            errorBuilder: (error) => DefaultStates.error(message: error),
+            emptyBuilder: () => DefaultStates.empty(
+              message: "Belum ada pengaduan",
+              icon: Icons.info,
             ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Pengaduan",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
-
-                IconButton(
-                  onPressed: () => onTicketTap?.call(),
-                  icon: Icon(Icons.arrow_forward_ios_rounded, size: 16),
-                ),
-              ],
-            ),
+            dataBuilder: (complaints) => _buildComplaintsList(complaints),
+            isEmpty: (complaints) => complaints?.isEmpty ?? true,
           ),
-        ],
-      ),
+        );
+      },
+    );
+  }
+
+  Widget _buildComplaintsList(List complaints) {
+    return ListView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      itemCount: min(5, complaints.length),
+      itemBuilder: (context, index) {
+        final complaint = complaints[index];
+        return ListTile(
+          title: Text(
+            '#${complaint.number.toString()}',
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+          subtitle: Text(complaint.topic, overflow: TextOverflow.ellipsis, maxLines: 1),
+          leading: Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade200,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(Icons.info, color: Colors.grey),
+          ),
+          trailing: Text(
+            DateHelper.formatDate(
+              complaint.date,
+            ),
+            style: const TextStyle(color: Colors.grey),
+          ),
+        );
+      },
     );
   }
 }

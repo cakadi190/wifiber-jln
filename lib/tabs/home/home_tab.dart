@@ -49,23 +49,25 @@ class _HomeTabState extends State<HomeTab> {
               ),
             ],
           ),
-          body: SafeArea(
-            child: Column(
-              children: [
-                SizedBox(
-                  width: double.infinity,
-                  child: DashboardSummary(
-                    onTransactionTap: widget.onTransactionTap,
+          body: SingleChildScrollView(
+            child: SafeArea(
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    child: DashboardSummary(
+                      onTransactionTap: widget.onTransactionTap,
+                    ),
                   ),
-                ),
 
-                SizedBox(
-                  width: double.infinity,
-                  child: TicketSummary(
-                    onTicketTap: widget.onTicketTap
+                  SizedBox(
+                    width: double.infinity,
+                    child: TicketSummary(
+                        onTicketTap: widget.onTicketTap
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );

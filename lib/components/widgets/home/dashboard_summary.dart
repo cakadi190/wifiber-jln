@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:wifiber/components/reusables/ticket_component.dart';
 import 'package:wifiber/controllers/tabs/dashboard_summary.dart';
 
 class DashboardSummary extends StatelessWidget {
@@ -28,165 +29,120 @@ class _DashboardSummaryView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Consumer<DashboardSummaryController>(
       builder: (context, controller, _) {
-        if (controller.isLoading) {
-          return Container(
-            margin: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              image: const DecorationImage(
-                image: AssetImage('assets/summary-image.png'),
-                fit: BoxFit.cover,
-              ),
+        return SummaryCard(
+          title: '', // Dashboard summary doesn't need a title
+          margin: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(12),
+          backgroundImage: const DecorationImage(
+            image: AssetImage('assets/summary-image.png'),
+            fit: BoxFit.cover,
+          ),
+          child: StateBuilder<DashboardSummaryController>(
+            isLoading: controller.isLoading,
+            error: controller.error,
+            data: controller,
+            loadingBuilder: () => DefaultStates.loading(color: Colors.white),
+            errorBuilder: (error) => DefaultStates.error(
+              message: error,
+              onRetry: controller.refresh,
+              backgroundColor: Colors.red.shade100,
+              textColor: Colors.red.shade700,
             ),
-            padding: const EdgeInsets.all(12),
-            child: const Center(
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-              ),
+            emptyBuilder: () => DefaultStates.empty(
+              message: 'No data available',
+              textColor: Colors.white,
             ),
-          );
-        }
-
-        if (controller.error != null) {
-          return Container(
-            margin: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(16),
-              color: Colors.red.shade100,
-            ),
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.error_outline,
-                  color: Colors.red.shade700,
-                  size: 48,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Error: ${controller.error}',
-                  style: TextStyle(
-                    color: Colors.red.shade700,
-                    fontWeight: FontWeight.w600,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 8),
-                ElevatedButton(
-                  onPressed: controller.refresh,
-                  child: const Text('Retry'),
-                ),
-              ],
-            ),
-          );
-        }
-
-        return RefreshIndicator(
-          onRefresh: controller.refresh,
-          child: SingleChildScrollView(
-            physics: const AlwaysScrollableScrollPhysics(),
-            child: Container(
-              margin: const EdgeInsets.all(16),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(16),
-                image: const DecorationImage(
-                  image: AssetImage('assets/summary-image.png'),
-                  fit: BoxFit.cover,
-                ),
-              ),
-              padding: const EdgeInsets.all(12),
-              child: Column(
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Expanded(
-                        child: _buildSummaryItem(
-                          context,
-                          label: 'Total Kas Bulan Ini',
-                          icon: PhosphorIcons.cardholder(PhosphorIconsStyle.fill),
-                          value: controller.getFormattedTotalCashFlow(),
-                          isObscured: (c) => c.obscureTotalCashFlow,
-                          onToggle: (c) => c.toggleCashFlowVisibility(),
-                          size: WidgetSize.large,
+            dataBuilder: (controller) => RefreshIndicator(
+              onRefresh: controller.refresh,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  children: [
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Expanded(
+                          child: _buildSummaryItem(
+                            context,
+                            label: 'Total Kas Bulan Ini',
+                            icon: PhosphorIcons.cardholder(PhosphorIconsStyle.fill),
+                            value: controller.getFormattedTotalCashFlow(),
+                            isObscured: (c) => c.obscureTotalCashFlow,
+                            onToggle: (c) => c.toggleCashFlowVisibility(),
+                            size: WidgetSize.large,
+                          ),
                         ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  _buildUnpaidInvoiceItem(context),
-
-                  const SizedBox(height: 8),
-
-                  Row(
-                    children: [
-                      Expanded(
-                        child: _buildSummaryItem(
-                          context,
-                          label: 'Pemasukan',
-                          icon: PhosphorIcons.arrowCircleUp(PhosphorIconsStyle.fill),
-                          value: controller.getFormattedTotalIncome(),
-                          isObscured: (c) => c.obscureTotalIncome,
-                          onToggle: (c) => c.toggleIncomeVisibility(),
-                          iconColor: Colors.green,
-                          size: WidgetSize.small,
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    _buildUnpaidInvoiceItem(context),
+                    const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildSummaryItem(
+                            context,
+                            label: 'Pemasukan',
+                            icon: PhosphorIcons.arrowCircleUp(PhosphorIconsStyle.fill),
+                            value: controller.getFormattedTotalIncome(),
+                            isObscured: (c) => c.obscureTotalIncome,
+                            onToggle: (c) => c.toggleIncomeVisibility(),
+                            iconColor: Colors.green,
+                            size: WidgetSize.small,
+                          ),
                         ),
-                      ),
-                      Container(
-                        width: 1,
-                        height: 40,
-                        color: Colors.white.withValues(alpha: 0.3),
-                      ),
-                      const SizedBox(width: 8),
-                      Expanded(
-                        child: _buildSummaryItem(
-                          context,
-                          label: 'Pengeluaran',
-                          icon: PhosphorIcons.arrowCircleDown(PhosphorIconsStyle.fill),
-                          value: controller.getFormattedTotalExpense(),
-                          isObscured: (c) => c.obscureTotalExpense,
-                          onToggle: (c) => c.toggleExpenseVisibility(),
-                          iconColor: Colors.red,
-                          size: WidgetSize.small,
+                        Container(
+                          width: 1,
+                          height: 40,
+                          color: Colors.white.withValues(alpha: 0.3),
                         ),
-                      ),
-                    ],
-                  ),
-
-                  const SizedBox(height: 8),
-
-                  InkWell(
-                    onTap: onTransactionTap,
-                    child: SizedBox(
-                      width: double.infinity,
-                      child: Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 4),
-                        child: Row(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              "Lihat Semuanya",
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(color: Colors.white),
-                            ),
-                            const Icon(
-                              Icons.keyboard_arrow_right_rounded,
-                              color: Colors.white,
-                            ),
-                          ],
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: _buildSummaryItem(
+                            context,
+                            label: 'Pengeluaran',
+                            icon: PhosphorIcons.arrowCircleDown(PhosphorIconsStyle.fill),
+                            value: controller.getFormattedTotalExpense(),
+                            isObscured: (c) => c.obscureTotalExpense,
+                            onToggle: (c) => c.toggleExpenseVisibility(),
+                            iconColor: Colors.red,
+                            size: WidgetSize.small,
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    InkWell(
+                      onTap: onTransactionTap,
+                      child: SizedBox(
+                        width: double.infinity,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(horizontal: 4),
+                          child: Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                "Lihat Semuanya",
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodySmall
+                                    ?.copyWith(color: Colors.white),
+                              ),
+                              const Icon(
+                                Icons.keyboard_arrow_right_rounded,
+                                color: Colors.white,
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
             ),
+            isEmpty: (controller) => controller == null,
           ),
         );
       },
