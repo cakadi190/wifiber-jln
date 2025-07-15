@@ -30,7 +30,7 @@ class _DashboardSummaryView extends StatelessWidget {
     return Consumer<DashboardSummaryController>(
       builder: (context, controller, _) {
         return SummaryCard(
-          title: '', // Dashboard summary doesn't need a title
+          title: '',
           margin: const EdgeInsets.all(16),
           padding: const EdgeInsets.all(12),
           backgroundImage: const DecorationImage(
@@ -52,94 +52,91 @@ class _DashboardSummaryView extends StatelessWidget {
               message: 'No data available',
               textColor: Colors.white,
             ),
-            dataBuilder: (controller) => RefreshIndicator(
-              onRefresh: controller.refresh,
-              child: SingleChildScrollView(
-                physics: const AlwaysScrollableScrollPhysics(),
-                child: Column(
-                  children: [
-                    Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Expanded(
-                          child: _buildSummaryItem(
-                            context,
-                            label: 'Total Kas Bulan Ini',
-                            icon: PhosphorIcons.cardholder(PhosphorIconsStyle.fill),
-                            value: controller.getFormattedTotalCashFlow(),
-                            isObscured: (c) => c.obscureTotalCashFlow,
-                            onToggle: (c) => c.toggleCashFlowVisibility(),
-                            size: WidgetSize.large,
-                          ),
+            dataBuilder: (controller) => SingleChildScrollView(
+              physics: const AlwaysScrollableScrollPhysics(),
+              child: Column(
+                children: [
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Expanded(
+                        child: _buildSummaryItem(
+                          context,
+                          label: 'Total Kas Bulan Ini',
+                          icon: PhosphorIcons.cardholder(PhosphorIconsStyle.fill),
+                          value: controller.getFormattedTotalCashFlow(),
+                          isObscured: (c) => c.obscureTotalCashFlow,
+                          onToggle: (c) => c.toggleCashFlowVisibility(),
+                          size: WidgetSize.large,
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    _buildUnpaidInvoiceItem(context),
-                    const SizedBox(height: 8),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: _buildSummaryItem(
-                            context,
-                            label: 'Pemasukan',
-                            icon: PhosphorIcons.arrowCircleUp(PhosphorIconsStyle.fill),
-                            value: controller.getFormattedTotalIncome(),
-                            isObscured: (c) => c.obscureTotalIncome,
-                            onToggle: (c) => c.toggleIncomeVisibility(),
-                            iconColor: Colors.green,
-                            size: WidgetSize.small,
-                          ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  _buildUnpaidInvoiceItem(context),
+                  const SizedBox(height: 8),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: _buildSummaryItem(
+                          context,
+                          label: 'Pemasukan',
+                          icon: PhosphorIcons.arrowCircleUp(PhosphorIconsStyle.fill),
+                          value: controller.getFormattedTotalIncome(),
+                          isObscured: (c) => c.obscureTotalIncome,
+                          onToggle: (c) => c.toggleIncomeVisibility(),
+                          iconColor: Colors.green,
+                          size: WidgetSize.small,
                         ),
-                        Container(
-                          width: 1,
-                          height: 40,
-                          color: Colors.white.withValues(alpha: 0.3),
+                      ),
+                      Container(
+                        width: 1,
+                        height: 40,
+                        color: Colors.white.withValues(alpha: 0.3),
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: _buildSummaryItem(
+                          context,
+                          label: 'Pengeluaran',
+                          icon: PhosphorIcons.arrowCircleDown(PhosphorIconsStyle.fill),
+                          value: controller.getFormattedTotalExpense(),
+                          isObscured: (c) => c.obscureTotalExpense,
+                          onToggle: (c) => c.toggleExpenseVisibility(),
+                          iconColor: Colors.red,
+                          size: WidgetSize.small,
                         ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: _buildSummaryItem(
-                            context,
-                            label: 'Pengeluaran',
-                            icon: PhosphorIcons.arrowCircleDown(PhosphorIconsStyle.fill),
-                            value: controller.getFormattedTotalExpense(),
-                            isObscured: (c) => c.obscureTotalExpense,
-                            onToggle: (c) => c.toggleExpenseVisibility(),
-                            iconColor: Colors.red,
-                            size: WidgetSize.small,
-                          ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    InkWell(
-                      onTap: onTransactionTap,
-                      child: SizedBox(
-                        width: double.infinity,
-                        child: Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 4),
-                          child: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                "Lihat Semuanya",
-                                style: Theme.of(context)
-                                    .textTheme
-                                    .bodySmall
-                                    ?.copyWith(color: Colors.white),
-                              ),
-                              const Icon(
-                                Icons.keyboard_arrow_right_rounded,
-                                color: Colors.white,
-                              ),
-                            ],
-                          ),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 8),
+                  InkWell(
+                    onTap: onTransactionTap,
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 4),
+                        child: Row(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              "Lihat Semuanya",
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .bodySmall
+                                  ?.copyWith(color: Colors.white),
+                            ),
+                            const Icon(
+                              Icons.keyboard_arrow_right_rounded,
+                              color: Colors.white,
+                            ),
+                          ],
                         ),
                       ),
                     ),
-                  ],
-                ),
+                  ),
+                ],
               ),
             ),
             isEmpty: (controller) => controller == null,
