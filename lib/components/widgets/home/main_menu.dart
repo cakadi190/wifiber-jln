@@ -41,17 +41,6 @@ class _MainMenuState extends State<MainMenu> {
                   'Main Menu',
                   style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
                 ),
-                GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      isExpanded = !isExpanded;
-                    });
-                  },
-                  child: Icon(
-                    isExpanded ? Icons.expand_less : Icons.expand_more,
-                    size: 24,
-                  ),
-                ),
               ],
             ),
 
@@ -60,7 +49,6 @@ class _MainMenuState extends State<MainMenu> {
             AnimatedContainer(
               duration: const Duration(milliseconds: 300),
               curve: Curves.easeInOut,
-
               child: _buildMenuGrid(),
             ),
           ],
@@ -92,30 +80,21 @@ class _MainMenuState extends State<MainMenu> {
       final displayItems = menuItems.take(3).toList();
 
       return Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ...displayItems.asMap().entries.map((entry) {
             MenuItem item = entry.value;
             return Expanded(
               child: Padding(
-                padding: EdgeInsets.only(
-                  right: 16,
-                ),
-                child: AspectRatio(
-                  aspectRatio: 1,
-                  child: _buildMenuItem(item),
-                ),
+                padding: const EdgeInsets.only(right: 16),
+                child: AspectRatio(aspectRatio: 1, child: _buildMenuItem(item)),
               ),
             );
           }),
 
           Expanded(
             child: Padding(
-              padding: EdgeInsets.only(right: 0),
-              child: AspectRatio(
-                aspectRatio: 1,
-                child: _buildCollapseButton(),
-              ),
+              padding: const EdgeInsets.only(right: 16),
+              child: AspectRatio(aspectRatio: 1, child: _buildCollapseButton()),
             ),
           ),
         ],
@@ -161,9 +140,9 @@ class _MainMenuState extends State<MainMenu> {
       },
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.blue.shade50,
+          color: Colors.grey.shade50,
           borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.blue.shade200),
+          border: Border.all(color: Colors.grey.shade200),
         ),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -176,11 +155,7 @@ class _MainMenuState extends State<MainMenu> {
             const SizedBox(height: 8),
             Text(
               isExpanded ? 'Tutup' : 'Lainnya',
-              style: TextStyle(
-                fontSize: 10,
-                fontWeight: FontWeight.w500,
-                color: Colors.blue.shade600,
-              ),
+              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
               textAlign: TextAlign.center,
             ),
           ],
