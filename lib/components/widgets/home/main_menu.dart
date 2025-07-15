@@ -107,7 +107,7 @@ class _MainMenuState extends State<MainMenu> {
                 ),
               ),
             );
-          }).toList(),
+          }),
 
           const SizedBox(width: 12),
 
