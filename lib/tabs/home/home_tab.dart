@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/widgets/home/dashboard_summary.dart';
+import 'package:wifiber/components/widgets/home/main_menu.dart';
 import 'package:wifiber/components/widgets/home/tickets_summary.dart';
 import 'package:wifiber/components/widgets/user_avatar.dart';
 import 'package:wifiber/config/app_colors.dart';
@@ -59,6 +60,8 @@ class _HomeTabState extends State<HomeTab> {
                       onTransactionTap: widget.onTransactionTap,
                     ),
                   ),
+
+                  MainMenu(),
 
                   SizedBox(
                     width: double.infinity,
