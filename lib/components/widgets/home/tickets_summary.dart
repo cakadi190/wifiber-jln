@@ -74,7 +74,7 @@ class _TicketSummaryView extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
           ),
           subtitle: Text(
-            complaint.topic,
+            _getTypeText(complaint.typeEnum),
             overflow: TextOverflow.ellipsis,
             maxLines: 1,
           ),
@@ -103,17 +103,6 @@ class _TicketSummaryView extends StatelessWidget {
         return Colors.blue;
       case ComplaintStatus.completed:
         return Colors.green;
-    }
-  }
-
-  String _getStatusText(ComplaintStatus status) {
-    switch (status) {
-      case ComplaintStatus.pending:
-        return 'Menunggu';
-      case ComplaintStatus.ongoing:
-        return 'Diproses';
-      case ComplaintStatus.completed:
-        return 'Selesai';
     }
   }
 
