@@ -32,27 +32,10 @@ class _MainMenuState extends State<MainMenu> {
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text(
-                  'Main Menu',
-                  style: TextStyle(fontWeight: FontWeight.bold, fontSize: 18),
-                ),
-              ],
-            ),
-
-            const SizedBox(height: 16),
-
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              curve: Curves.easeInOut,
-              child: _buildMenuGrid(),
-            ),
-          ],
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          curve: Curves.easeInOut,
+          child: _buildMenuGrid(),
         ),
       ),
     );
@@ -109,26 +92,19 @@ class _MainMenuState extends State<MainMenu> {
       onTap: () {
         print('Tapped: ${item.title}');
       },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.grey.shade50,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(item.icon, size: 24, color: AppColors.primary),
-            const SizedBox(height: 8),
-            Text(
-              item.title,
-              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
-              textAlign: TextAlign.center,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-            ),
-          ],
-        ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(item.icon, size: 24, color: AppColors.primary),
+          const SizedBox(height: 8),
+          Text(
+            item.title,
+            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
+            textAlign: TextAlign.center,
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
+        ],
       ),
     );
   }
@@ -140,28 +116,21 @@ class _MainMenuState extends State<MainMenu> {
           isExpanded = !isExpanded;
         });
       },
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.grey.shade50,
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(color: Colors.grey.shade200),
-        ),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: [
-            Icon(
-              isExpanded ? Icons.expand_less : Icons.apps,
-              size: 24,
-              color: AppColors.primary,
-            ),
-            const SizedBox(height: 8),
-            Text(
-              isExpanded ? 'Tutup' : 'Lainnya',
-              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
-              textAlign: TextAlign.center,
-            ),
-          ],
-        ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            isExpanded ? Icons.expand_less : Icons.apps,
+            size: 24,
+            color: AppColors.primary,
+          ),
+          const SizedBox(height: 8),
+          Text(
+            isExpanded ? 'Tutup' : 'Lainnya',
+            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
+            textAlign: TextAlign.center,
+          ),
+        ],
       ),
     );
   }
