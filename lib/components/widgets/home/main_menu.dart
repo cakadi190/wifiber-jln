@@ -64,7 +64,8 @@ class _MainMenuState extends State<MainMenu> {
       final displayItems = menuItems.take(3).toList();
 
       return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           ...displayItems.asMap().entries.map((entry) {
             MenuItem item = entry.value;
