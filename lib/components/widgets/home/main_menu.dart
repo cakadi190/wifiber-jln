@@ -91,28 +91,33 @@ class _MainMenuState extends State<MainMenu> {
     } else {
       final displayItems = menuItems.take(3).toList();
 
-      return SizedBox(
-        height: 80,
-        child: Row(
-          children: [
-            ...displayItems.asMap().entries.map((entry) {
-              int index = entry.key;
-              MenuItem item = entry.value;
-              return Expanded(
-                child: Padding(
-                  padding: EdgeInsets.only(
-                    right: index < displayItems.length - 1 ? 12 : 0,
-                  ),
+      return Row(
+        children: [
+          ...displayItems.asMap().entries.map((entry) {
+            int index = entry.key;
+            MenuItem item = entry.value;
+            return Expanded(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  right: index < displayItems.length - 1 ? 12 : 0,
+                ),
+                child: AspectRatio(
+                  aspectRatio: 1,
                   child: _buildMenuItem(item),
                 ),
-              );
-            }).toList(),
+              ),
+            );
+          }).toList(),
 
-            const SizedBox(width: 12),
+          const SizedBox(width: 12),
 
-            Expanded(child: _buildCollapseButton()),
-          ],
-        ),
+          Expanded(
+            child: AspectRatio(
+              aspectRatio: 1,
+              child: _buildCollapseButton(),
+            ),
+          ),
+        ],
       );
     }
   }
@@ -135,7 +140,7 @@ class _MainMenuState extends State<MainMenu> {
             const SizedBox(height: 8),
             Text(
               item.title,
-              style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500),
+              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -171,7 +176,7 @@ class _MainMenuState extends State<MainMenu> {
             Text(
               isExpanded ? 'Tutup' : 'Lainnya',
               style: TextStyle(
-                fontSize: 12,
+                fontSize: 10,
                 fontWeight: FontWeight.w500,
                 color: Colors.blue.shade600,
               ),
