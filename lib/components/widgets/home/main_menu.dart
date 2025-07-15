@@ -95,7 +95,6 @@ class _MainMenuState extends State<MainMenu> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ...displayItems.asMap().entries.map((entry) {
-            int index = entry.key;
             MenuItem item = entry.value;
             return Expanded(
               child: Padding(
@@ -111,9 +110,12 @@ class _MainMenuState extends State<MainMenu> {
           }),
 
           Expanded(
-            child: AspectRatio(
-              aspectRatio: 1,
-              child: _buildCollapseButton(),
+            child: Padding(
+              padding: EdgeInsets.only(right: 0),
+              child: AspectRatio(
+                aspectRatio: 1,
+                child: _buildCollapseButton(),
+              ),
             ),
           ),
         ],
