@@ -74,7 +74,7 @@ class DashboardSummaryController extends ChangeNotifier {
   }
 
   String displayValue(String value, bool isObscured) {
-    return isObscured ? 'Rp ******' : value;
+    return isObscured ? 'Rp******' : value;
   }
 
   String getFormattedTotalCashFlow() {

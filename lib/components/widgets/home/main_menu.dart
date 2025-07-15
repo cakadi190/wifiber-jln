@@ -63,15 +63,18 @@ class _MainMenuState extends State<MainMenu> {
     } else {
       final displayItems = menuItems.take(3).toList();
 
-      return Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        crossAxisAlignment: CrossAxisAlignment.center,
-        children: [
-          ...displayItems.map((item) =>
-              Expanded(child: _buildMenuItem(item))
-          ),
-          Expanded(child: _buildCollapseButton()),
-        ],
+      return Padding(
+        padding: EdgeInsets.symmetric(vertical: 8),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ...displayItems.map(
+              (item) => Expanded(child: _buildMenuItem(item)),
+            ),
+            Expanded(child: _buildCollapseButton()),
+          ],
+        ),
       );
     }
   }

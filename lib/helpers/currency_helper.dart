@@ -15,10 +15,10 @@ class CurrencyHelper {
   /// Contoh:
   /// ```dart
   /// String formatted1 = CurrencyHelper.formatCurrency(100000);
-  /// print(formatted1); // Output: Rp 100.000
+  /// print(formatted1); // Output: Rp100.000
   ///
   /// String formatted2 = CurrencyHelper.formatCurrency(100000.50, includeDecimals: true, decimalPlaces: 2);
-  /// print(formatted2); // Output: Rp 100.000,50
+  /// print(formatted2); // Output: Rp100.000,50
   /// ```
   static String formatCurrency(
       num value, {
@@ -26,11 +26,11 @@ class CurrencyHelper {
         int decimalPlaces = 0,
       }) {
     if (value.isNaN || value.isInfinite) {
-      return 'Rp 0';
+      return 'Rp0';
     }
 
     String formattedValue = _formatNumber(value, includeDecimals, decimalPlaces);
-    return 'Rp $formattedValue';
+    return 'Rp$formattedValue';
   }
 
   /// Format mata uang tanpa prefix "Rp"
@@ -68,18 +68,18 @@ class CurrencyHelper {
   /// Contoh:
   /// ```dart
   /// String compact1 = CurrencyHelper.compactFormatCurrency(1500000);
-  /// print(compact1); // Output: Rp 1,5 Jt
+  /// print(compact1); // Output: Rp1,5 Jt
   ///
   /// String compact2 = CurrencyHelper.compactFormatCurrency(2500000000);
-  /// print(compact2); // Output: Rp 2,5 M
+  /// print(compact2); // Output: Rp2,5 M
   /// ```
   static String compactFormatCurrency(num value, {int decimalPlaces = 1}) {
     if (value.isNaN || value.isInfinite) {
-      return 'Rp 0';
+      return 'Rp0';
     }
 
     String compactValue = _formatCompactNumber(value, decimalPlaces);
-    return 'Rp $compactValue';
+    return 'Rp$compactValue';
   }
 
   /// Format mata uang dalam bentuk kompak tanpa prefix "Rp"
@@ -110,7 +110,7 @@ class CurrencyHelper {
   ///
   /// Contoh:
   /// ```dart
-  /// double value = CurrencyHelper.parseCurrency('Rp 100.000');
+  /// double value = CurrencyHelper.parseCurrency('Rp100.000');
   /// print(value); // Output: 100000.0
   /// ```
   static double parseCurrency(String currencyString) {
@@ -134,7 +134,7 @@ class CurrencyHelper {
   ///
   /// Contoh:
   /// ```dart
-  /// bool isValid = CurrencyHelper.isValidCurrencyFormat('Rp 100.000');
+  /// bool isValid = CurrencyHelper.isValidCurrencyFormat('Rp100.000');
   /// print(isValid); // Output: true
   /// ```
   static bool isValidCurrencyFormat(String currencyString) {
@@ -153,8 +153,8 @@ class CurrencyHelper {
   ///
   /// Contoh:
   /// ```dart
-  /// String converted = CurrencyHelper.convertCurrencyFormat('Rp 1.500.000', 'compact');
-  /// print(converted); // Output: Rp 1,5 Jt
+  /// String converted = CurrencyHelper.convertCurrencyFormat('Rp1.500.000', 'compact');
+  /// print(converted); // Output: Rp1,5 Jt
   /// ```
   static String convertCurrencyFormat(String currencyString, String targetFormat) {
     double value = parseCurrency(currencyString);
