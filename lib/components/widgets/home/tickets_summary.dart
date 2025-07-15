@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/reusables/ticket_component.dart';
 import 'package:wifiber/helpers/datetime_helper.dart';
+import 'package:wifiber/models/complaint.dart';
 import 'package:wifiber/providers/complaint_provider.dart';
 import 'package:wifiber/services/complaint_service.dart';
 
@@ -83,5 +84,47 @@ class _TicketSummaryView extends StatelessWidget {
         );
       },
     );
+  }
+
+  Color _getStatusColor(ComplaintStatus status) {
+    switch (status) {
+      case ComplaintStatus.pending:
+        return Colors.orange;
+      case ComplaintStatus.ongoing:
+        return Colors.blue;
+      case ComplaintStatus.completed:
+        return Colors.green;
+    }
+  }
+
+  String _getStatusText(ComplaintStatus status) {
+    switch (status) {
+      case ComplaintStatus.pending:
+        return 'Menunggu';
+      case ComplaintStatus.ongoing:
+        return 'Diproses';
+      case ComplaintStatus.completed:
+        return 'Selesai';
+    }
+  }
+
+  IconData _getTypeIcon(ComplaintStatus status) {
+    switch (status) {
+      case ComplaintStatus.pending:
+        return Icons.warning;
+      case ComplaintStatus.ongoing:
+        return Icons.info;
+      case ComplaintStatus.completed:
+        return Icons.check;
+    }
+  }
+
+  String _getTypeText(ComplaintType type) {
+    switch (type) {
+      case ComplaintType.registration:
+        return 'Registrasi';
+      case ComplaintType.complaint:
+        return 'Pengaduan';
+    }
   }
 }
