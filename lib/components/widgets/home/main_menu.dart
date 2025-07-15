@@ -92,6 +92,7 @@ class _MainMenuState extends State<MainMenu> {
       final displayItems = menuItems.take(3).toList();
 
       return Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           ...displayItems.asMap().entries.map((entry) {
             int index = entry.key;
@@ -99,7 +100,7 @@ class _MainMenuState extends State<MainMenu> {
             return Expanded(
               child: Padding(
                 padding: EdgeInsets.only(
-                  right: index < displayItems.length - 1 ? 12 : 0,
+                  right: 16,
                 ),
                 child: AspectRatio(
                   aspectRatio: 1,
@@ -108,8 +109,6 @@ class _MainMenuState extends State<MainMenu> {
               ),
             );
           }),
-
-          const SizedBox(width: 12),
 
           Expanded(
             child: AspectRatio(
