@@ -36,7 +36,7 @@ class _TicketSummaryView extends StatelessWidget {
           padding: EdgeInsets.zero,
           child: StateBuilder<List>(
             isLoading: provider.isLoading,
-            error: null, // ComplaintProvider doesn't seem to have error handling
+            error: null,
             data: provider.complaints,
             loadingBuilder: () => DefaultStates.loading(),
             errorBuilder: (error) => DefaultStates.error(message: error),
