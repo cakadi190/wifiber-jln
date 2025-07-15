@@ -1,4 +1,5 @@
 import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/reusables/ticket_component.dart';
@@ -33,7 +34,12 @@ class _TicketSummaryView extends StatelessWidget {
         return SummaryCard(
           title: "Pengaduan",
           onTap: onTicketTap,
-          margin: const EdgeInsets.only(top: 0, left: 16, right: 16, bottom: 16),
+          margin: const EdgeInsets.only(
+            top: 0,
+            left: 16,
+            right: 16,
+            bottom: 16,
+          ),
           padding: EdgeInsets.zero,
           child: StateBuilder<List>(
             isLoading: provider.isLoading,
@@ -64,21 +70,24 @@ class _TicketSummaryView extends StatelessWidget {
           title: Text(
             '#${complaint.number.toString()}',
             maxLines: 1,
+            style: const TextStyle(fontWeight: FontWeight.bold),
             overflow: TextOverflow.ellipsis,
           ),
-          subtitle: Text(complaint.topic, overflow: TextOverflow.ellipsis, maxLines: 1),
+          subtitle: Text(
+            complaint.topic,
+            overflow: TextOverflow.ellipsis,
+            maxLines: 1,
+          ),
           leading: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.grey.shade200,
+              color: _getStatusColor(complaint.statusEnum).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(Icons.info, color: Colors.grey),
+            child: Icon(_getTypeIcon(complaint.statusEnum), color: _getStatusColor(complaint.statusEnum)),
           ),
           trailing: Text(
-            DateHelper.formatDate(
-              complaint.date,
-            ),
+            DateHelper.formatDate(complaint.date),
             style: const TextStyle(color: Colors.grey),
           ),
         );
