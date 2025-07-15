@@ -64,25 +64,13 @@ class _MainMenuState extends State<MainMenu> {
       final displayItems = menuItems.take(3).toList();
 
       return Row(
-        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          ...displayItems.asMap().entries.map((entry) {
-            MenuItem item = entry.value;
-            return Expanded(
-              child: Padding(
-                padding: const EdgeInsets.only(right: 16),
-                child: AspectRatio(aspectRatio: 1, child: _buildMenuItem(item)),
-              ),
-            );
-          }),
-
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.only(right: 16),
-              child: AspectRatio(aspectRatio: 1, child: _buildCollapseButton()),
-            ),
+          ...displayItems.map((item) =>
+              Expanded(child: _buildMenuItem(item))
           ),
+          Expanded(child: _buildCollapseButton()),
         ],
       );
     }
