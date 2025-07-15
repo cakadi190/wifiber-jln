@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wifiber/config/app_colors.dart';
 
 class MainMenu extends StatefulWidget {
   const MainMenu({super.key});
@@ -80,6 +81,7 @@ class _MainMenuState extends State<MainMenu> {
       final displayItems = menuItems.take(3).toList();
 
       return Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           ...displayItems.asMap().entries.map((entry) {
             MenuItem item = entry.value;
@@ -116,7 +118,7 @@ class _MainMenuState extends State<MainMenu> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(item.icon, size: 24, color: Colors.blue.shade600),
+            Icon(item.icon, size: 24, color: AppColors.primary),
             const SizedBox(height: 8),
             Text(
               item.title,
@@ -150,7 +152,7 @@ class _MainMenuState extends State<MainMenu> {
             Icon(
               isExpanded ? Icons.expand_less : Icons.apps,
               size: 24,
-              color: Colors.blue.shade600,
+              color: AppColors.primary,
             ),
             const SizedBox(height: 8),
             Text(
