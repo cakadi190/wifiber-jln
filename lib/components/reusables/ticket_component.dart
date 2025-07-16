@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wifiber/config/app_colors.dart';
 
 class SummaryCard extends StatelessWidget {
   final String title;
@@ -32,10 +33,7 @@ class SummaryCard extends StatelessWidget {
       child: Column(
         children: [
           if (title.isNotEmpty) _buildHeader(context),
-          Padding(
-            padding: padding ?? const EdgeInsets.all(16),
-            child: child,
-          ),
+          Padding(padding: padding ?? const EdgeInsets.all(16), child: child),
         ],
       ),
     );
@@ -49,10 +47,7 @@ class SummaryCard extends StatelessWidget {
         children: [
           Text(
             title,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.bold,
-            ),
+            style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
           if (onTap != null)
             IconButton(
@@ -108,10 +103,13 @@ class StateBuilder<T> extends StatelessWidget {
 
 class DefaultStates {
   static Widget loading({Color? color}) {
-    return Center(
-      child: CircularProgressIndicator(
-        valueColor: AlwaysStoppedAnimation<Color>(color ?? Colors.blue),
-      ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 24, top: 8),
+      child: Center(
+        child: CircularProgressIndicator(
+          valueColor: AlwaysStoppedAnimation<Color>(color ?? AppColors.primary),
+        ),
+      )
     );
   }
 
@@ -166,21 +164,20 @@ class DefaultStates {
     Color? iconColor,
     Color? textColor,
   }) {
-    return Column(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          icon ?? Icons.info,
-          color: iconColor ?? Colors.grey,
-          size: 48,
-        ),
-        const SizedBox(height: 8),
-        Text(
-          message,
-          style: TextStyle(color: textColor ?? Colors.grey),
-          textAlign: TextAlign.center,
-        ),
-      ],
+    return Padding(
+      padding: EdgeInsets.only(bottom: 24, top: 8),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon ?? Icons.info, color: iconColor ?? Colors.grey, size: 48),
+          const SizedBox(height: 8),
+          Text(
+            message,
+            style: TextStyle(color: textColor ?? Colors.grey),
+            textAlign: TextAlign.center,
+          ),
+        ],
+      ),
     );
   }
 }
