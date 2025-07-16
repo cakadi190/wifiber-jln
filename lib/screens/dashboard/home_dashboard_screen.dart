@@ -45,6 +45,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     _widgetOptions = [
       HomeTab(
         onTransactionTap: () => _onItemTapped(1),
+        onBookKeepingTap: () => _onItemTapped(2),
         onLogoutTap: _onLogoutRedirect,
         onTicketTap: () => _onItemTapped(3),
       ),
