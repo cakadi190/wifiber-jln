@@ -77,7 +77,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
       Navigator.of(
         context,
       ).push(MaterialPageRoute(builder: (context) => const BillsScreen()));
-    } else if(index == 3) {
+    } else if (index == 3) {
       _complaintController.loadComplaints();
     } else {
       setState(() {
@@ -100,72 +100,78 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
       child: AuthGuard(
         child: Scaffold(
           body: _widgetOptions.elementAt(_selectedIndex),
-          bottomNavigationBar: BottomNavigationBar(
-            backgroundColor: AppColor.violet50,
-            currentIndex: _selectedIndex,
-            onTap: _onItemTapped,
-            selectedItemColor: AppColors.primary,
-            unselectedItemColor: Colors.grey,
-            showUnselectedLabels: true,
-            type: BottomNavigationBarType.fixed,
-            items: [
-              BottomNavigationBarItem(
-                icon: PhosphorIcon(
-                  PhosphorIcons.house(PhosphorIconsStyle.duotone),
-                ),
-                label: 'Beranda',
-              ),
-              BottomNavigationBarItem(
-                icon: PhosphorIcon(
-                  PhosphorIcons.wallet(PhosphorIconsStyle.duotone),
-                ),
-                label: 'Keuangan',
-              ),
-              BottomNavigationBarItem(
-                icon: Container(
-                  padding: const EdgeInsets.symmetric(
-                    vertical: 6,
-                    horizontal: 12,
+          bottomNavigationBar: Theme(
+            data: ThemeData(
+              splashColor: Colors.transparent,
+              highlightColor: Colors.transparent,
+            ),
+            child: BottomNavigationBar(
+              backgroundColor: AppColor.violet50,
+              currentIndex: _selectedIndex,
+              onTap: _onItemTapped,
+              selectedItemColor: AppColors.primary,
+              unselectedItemColor: Colors.grey,
+              showUnselectedLabels: true,
+              type: BottomNavigationBarType.fixed,
+              items: [
+                BottomNavigationBarItem(
+                  icon: PhosphorIcon(
+                    PhosphorIcons.house(PhosphorIconsStyle.duotone),
                   ),
-                  decoration: BoxDecoration(
-                    color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(12),
+                  label: 'Beranda',
+                ),
+                BottomNavigationBarItem(
+                  icon: PhosphorIcon(
+                    PhosphorIcons.wallet(PhosphorIconsStyle.duotone),
                   ),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      PhosphorIcon(
-                        PhosphorIcons.qrCode(PhosphorIconsStyle.duotone),
-                        size: 20,
-                        color: Colors.white,
-                      ),
-                      const SizedBox(height: 2),
-                      const Text(
-                        'Bayar',
-                        style: TextStyle(
+                  label: 'Keuangan',
+                ),
+                BottomNavigationBarItem(
+                  icon: Container(
+                    padding: const EdgeInsets.symmetric(
+                      vertical: 6,
+                      horizontal: 12,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        PhosphorIcon(
+                          PhosphorIcons.qrCode(PhosphorIconsStyle.duotone),
+                          size: 20,
                           color: Colors.white,
-                          fontSize: 10,
-                          fontWeight: FontWeight.w600,
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 2),
+                        const Text(
+                          'Bayar',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
+                  label: '',
                 ),
-                label: '',
-              ),
-              BottomNavigationBarItem(
-                icon: PhosphorIcon(
-                  PhosphorIcons.chatCenteredDots(PhosphorIconsStyle.duotone),
+                BottomNavigationBarItem(
+                  icon: PhosphorIcon(
+                    PhosphorIcons.chatCenteredDots(PhosphorIconsStyle.duotone),
+                  ),
+                  label: 'Pengaduan',
                 ),
-                label: 'Pengaduan',
-              ),
-              BottomNavigationBarItem(
-                icon: PhosphorIcon(
-                  PhosphorIcons.user(PhosphorIconsStyle.duotone),
+                BottomNavigationBarItem(
+                  icon: PhosphorIcon(
+                    PhosphorIcons.user(PhosphorIconsStyle.duotone),
+                  ),
+                  label: 'Akun',
                 ),
-                label: 'Akun',
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
