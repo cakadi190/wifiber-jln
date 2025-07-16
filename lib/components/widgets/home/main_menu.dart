@@ -21,7 +21,7 @@ class _MainMenuState extends State<MainMenu> {
       MenuItem(icon: Icons.verified_user_sharp, title: 'Calon Pelanggan'),
       MenuItem(icon: Icons.person, title: 'Data Pelanggan'),
       MenuItem(icon: Icons.warning, title: 'Keluhan', onTap: widget.onTicketMenuTapped),
-      MenuItem(icon: Icons.bookmark, title: 'Pembukuan'),
+      MenuItem(icon: Icons.bookmark, title: 'Pembukuan', onTap: widget.onTransactionMenuTapped),
       MenuItem(icon: Icons.wifi, title: 'Mikrotik'),
       MenuItem(icon: Icons.pin_drop, title: 'Peta Infrastruktur'),
       MenuItem(icon: Icons.cell_tower, title: 'Infrastruktur'),
