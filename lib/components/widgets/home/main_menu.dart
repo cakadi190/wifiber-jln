@@ -41,41 +41,29 @@ class _MainMenuState extends State<MainMenu> {
   }
 
   Widget _buildMenuGrid() {
-    if (isExpanded) {
-      return GridView.builder(
+    final displayItems = isExpanded ? menuItems : menuItems.take(3).toList();
+    final totalItems = displayItems.length + 1;
+
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: 4,
-          crossAxisSpacing: 16,
-          mainAxisSpacing: 16,
-          childAspectRatio: 1,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 12,
+          childAspectRatio: 0.9,
         ),
-        itemCount: menuItems.length + 1,
+        itemCount: totalItems,
         itemBuilder: (context, index) {
-          if (index == menuItems.length) {
+          if (index == displayItems.length) {
             return _buildCollapseButton();
           }
-          return _buildMenuItem(menuItems[index]);
+          return _buildMenuItem(displayItems[index]);
         },
-      );
-    } else {
-      final displayItems = menuItems.take(3).toList();
-
-      return Padding(
-        padding: EdgeInsets.symmetric(vertical: 12),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            ...displayItems.map(
-              (item) => Expanded(child: _buildMenuItem(item)),
-            ),
-            Expanded(child: _buildCollapseButton()),
-          ],
-        ),
-      );
-    }
+      ),
+    );
   }
 
   Widget _buildMenuItem(MenuItem item) {
@@ -83,19 +71,27 @@ class _MainMenuState extends State<MainMenu> {
       onTap: () {
         print('Tapped: ${item.title}');
       },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(item.icon, size: 24, color: AppColors.primary),
-          const SizedBox(height: 8),
-          Text(
-            item.title,
-            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
-            textAlign: TextAlign.center,
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-          ),
-        ],
+      child: SizedBox(
+        height: 60,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(item.icon, size: 24, color: AppColors.primary),
+            const SizedBox(height: 6),
+            Flexible(
+              child: Text(
+                item.title,
+                style: const TextStyle(
+                  fontSize: 10,
+                  fontWeight: FontWeight.w500,
+                ),
+                textAlign: TextAlign.center,
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
@@ -107,21 +103,24 @@ class _MainMenuState extends State<MainMenu> {
           isExpanded = !isExpanded;
         });
       },
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(
-            isExpanded ? Icons.expand_less : Icons.apps,
-            size: 24,
-            color: AppColors.primary,
-          ),
-          const SizedBox(height: 8),
-          Text(
-            isExpanded ? 'Tutup' : 'Lainnya',
-            style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
-            textAlign: TextAlign.center,
-          ),
-        ],
+      child: SizedBox(
+        height: 60,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(
+              isExpanded ? Icons.expand_less : Icons.apps,
+              size: 24,
+              color: AppColors.primary,
+            ),
+            const SizedBox(height: 6),
+            Text(
+              isExpanded ? 'Tutup' : 'Lainnya',
+              style: const TextStyle(fontSize: 10, fontWeight: FontWeight.w500),
+              textAlign: TextAlign.center,
+            ),
+          ],
+        ),
       ),
     );
   }
