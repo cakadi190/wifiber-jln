@@ -4,8 +4,8 @@ import 'package:wifiber/config/app_colors.dart';
 class MainMenu extends StatefulWidget {
   const MainMenu({super.key, this.onTicketMenuTapped, this.onTransactionMenuTapped});
 
-  VoidCallback? onTicketMenuTapped;
-  VoidCallback? onTransactionMenuTapped;
+  final VoidCallback? onTicketMenuTapped;
+  final VoidCallback? onTransactionMenuTapped;
 
   @override
   State<MainMenu> createState() => _MainMenuState();
@@ -14,17 +14,21 @@ class MainMenu extends StatefulWidget {
 class _MainMenuState extends State<MainMenu> {
   bool isExpanded = false;
 
-  final List<MenuItem> menuItems = [
-    MenuItem(icon: Icons.verified_user_sharp, title: 'Calon Pelanggan'),
-    MenuItem(icon: Icons.person, title: 'Data Pelanggan'),
-    MenuItem(icon: Icons.warning, title: 'Keluhan', onTap: () {
-      widget.onTicketMenuTapped?.call();
-    }),
-    MenuItem(icon: Icons.bookmark, title: 'Pembukuan'),
-    MenuItem(icon: Icons.wifi, title: 'Mikrotik'),
-    MenuItem(icon: Icons.pin_drop, title: 'Peta Infrastruktur'),
-    MenuItem(icon: Icons.cell_tower, title: 'Infrastruktur'),
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _menuItems = [
+      MenuItem(icon: Icons.verified_user_sharp, title: 'Calon Pelanggan'),
+      MenuItem(icon: Icons.person, title: 'Data Pelanggan'),
+      MenuItem(icon: Icons.warning, title: 'Keluhan', onTap: widget.onTicketMenuTapped),
+      MenuItem(icon: Icons.bookmark, title: 'Pembukuan'),
+      MenuItem(icon: Icons.wifi, title: 'Mikrotik'),
+      MenuItem(icon: Icons.pin_drop, title: 'Peta Infrastruktur'),
+      MenuItem(icon: Icons.cell_tower, title: 'Infrastruktur'),
+    ];
+  }
+
+  late List<MenuItem> _menuItems;
 
   @override
   Widget build(BuildContext context) {
@@ -46,7 +50,7 @@ class _MainMenuState extends State<MainMenu> {
   }
 
   Widget _buildMenuGrid() {
-    final displayItems = isExpanded ? menuItems : menuItems.take(3).toList();
+    final displayItems = isExpanded ? _menuItems : _menuItems.take(3).toList();
     final totalItems = displayItems.length + 1;
 
     return GridView.builder(
@@ -70,9 +74,7 @@ class _MainMenuState extends State<MainMenu> {
 
   Widget _buildMenuItem(MenuItem item) {
     return GestureDetector(
-      onTap: () {
-        print('Tapped: ${item.title}');
-      },
+      onTap: item.onTap,
       child: SizedBox(
         height: 60,
         child: Column(

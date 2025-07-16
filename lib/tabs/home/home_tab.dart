@@ -61,7 +61,10 @@ class _HomeTabState extends State<HomeTab> {
                     ),
                   ),
 
-                  MainMenu(),
+                  MainMenu(
+                    onTicketMenuTapped: widget.onTicketTap,
+                    onTransactionMenuTapped: widget.onTransactionTap,
+                  ),
 
                   SizedBox(
                     width: double.infinity,
