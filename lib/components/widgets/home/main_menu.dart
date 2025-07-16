@@ -12,14 +12,13 @@ class _MainMenuState extends State<MainMenu> {
   bool isExpanded = false;
 
   final List<MenuItem> menuItems = [
-    MenuItem(icon: Icons.home, title: 'Home'),
-    MenuItem(icon: Icons.search, title: 'Search'),
-    MenuItem(icon: Icons.favorite, title: 'Favorite'),
-    MenuItem(icon: Icons.person, title: 'Profile'),
-    MenuItem(icon: Icons.settings, title: 'Settings'),
-    MenuItem(icon: Icons.notifications, title: 'Notifications'),
-    MenuItem(icon: Icons.help, title: 'Help'),
-    MenuItem(icon: Icons.info, title: 'About'),
+    MenuItem(icon: Icons.verified_user_sharp, title: 'Calon Pelanggan'),
+    MenuItem(icon: Icons.person, title: 'Data Pelanggan'),
+    MenuItem(icon: Icons.warning, title: 'Keluhan'),
+    MenuItem(icon: Icons.bookmark, title: 'Pembukuan'),
+    MenuItem(icon: Icons.wifi, title: 'Mikrotik'),
+    MenuItem(icon: Icons.pin_drop, title: 'Peta Infrastruktur'),
+    MenuItem(icon: Icons.cell_tower, title: 'Infrastruktur'),
   ];
 
   @override
@@ -64,7 +63,7 @@ class _MainMenuState extends State<MainMenu> {
       final displayItems = menuItems.take(3).toList();
 
       return Padding(
-        padding: EdgeInsets.symmetric(vertical: 8),
+        padding: EdgeInsets.symmetric(vertical: 12),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           crossAxisAlignment: CrossAxisAlignment.center,
