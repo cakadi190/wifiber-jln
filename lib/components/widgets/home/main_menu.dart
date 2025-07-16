@@ -71,9 +71,9 @@ class _MainMenuState extends State<MainMenu> {
       child: SizedBox(
         height: 60,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Icon(item.icon, size: 24, color: AppColors.primary),
+            _buildIconContainer(Icon(item.icon, size: 24, color: Colors.white)),
             const SizedBox(height: 6),
             Flexible(
               child: Text(
@@ -93,6 +93,18 @@ class _MainMenuState extends State<MainMenu> {
     );
   }
 
+  Widget _buildIconContainer(Icon icon) {
+    return Container(
+      width: 48,
+      height: 48,
+      decoration: BoxDecoration(
+        color: AppColors.primary,
+        shape: BoxShape.circle,
+      ),
+      child: icon,
+    );
+  }
+
   Widget _buildCollapseButton() {
     return GestureDetector(
       onTap: () {
@@ -103,13 +115,13 @@ class _MainMenuState extends State<MainMenu> {
       child: SizedBox(
         height: 60,
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            Icon(
+            _buildIconContainer(Icon(
               isExpanded ? Icons.expand_less : Icons.apps,
               size: 24,
-              color: AppColors.primary,
-            ),
+              color: Colors.white,
+            )),
             const SizedBox(height: 6),
             Text(
               isExpanded ? 'Tutup' : 'Lainnya',

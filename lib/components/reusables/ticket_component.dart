@@ -147,6 +147,10 @@ class DefaultStates {
           if (onRetry != null) ...[
             const SizedBox(height: 8),
             ElevatedButton(
+              style: ElevatedButton.styleFrom(
+                backgroundColor: textColor ?? Colors.red.shade700,
+                foregroundColor: Colors.white,
+              ),
               onPressed: onRetry,
               child: const Text('Retry'),
             ),
