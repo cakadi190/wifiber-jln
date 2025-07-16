@@ -45,8 +45,6 @@ class _MainMenuState extends State<MainMenu> {
           );
         },
       ),
-      MenuItem(icon: Icons.pin_drop, title: 'Peta Infrastruktur'),
-      MenuItem(icon: Icons.cell_tower, title: 'Infrastruktur'),
     ];
   }
 
