@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:wifiber/config/app_colors.dart';
 
 class MainMenu extends StatefulWidget {
-  const MainMenu({super.key});
+  const MainMenu({super.key, this.onTicketMenuTapped, this.onTransactionMenuTapped});
+
+  VoidCallback? onTicketMenuTapped;
+  VoidCallback? onTransactionMenuTapped;
 
   @override
   State<MainMenu> createState() => _MainMenuState();
@@ -14,7 +17,9 @@ class _MainMenuState extends State<MainMenu> {
   final List<MenuItem> menuItems = [
     MenuItem(icon: Icons.verified_user_sharp, title: 'Calon Pelanggan'),
     MenuItem(icon: Icons.person, title: 'Data Pelanggan'),
-    MenuItem(icon: Icons.warning, title: 'Keluhan'),
+    MenuItem(icon: Icons.warning, title: 'Keluhan', onTap: () {
+      widget.onTicketMenuTapped?.call();
+    }),
     MenuItem(icon: Icons.bookmark, title: 'Pembukuan'),
     MenuItem(icon: Icons.wifi, title: 'Mikrotik'),
     MenuItem(icon: Icons.pin_drop, title: 'Peta Infrastruktur'),
