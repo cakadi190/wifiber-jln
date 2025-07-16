@@ -44,25 +44,22 @@ class _MainMenuState extends State<MainMenu> {
     final displayItems = isExpanded ? menuItems : menuItems.take(3).toList();
     final totalItems = displayItems.length + 1;
 
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 8),
-      child: GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: 4,
-          crossAxisSpacing: 8,
-          mainAxisSpacing: 12,
-          childAspectRatio: 0.9,
-        ),
-        itemCount: totalItems,
-        itemBuilder: (context, index) {
-          if (index == displayItems.length) {
-            return _buildCollapseButton();
-          }
-          return _buildMenuItem(displayItems[index]);
-        },
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 4,
+        crossAxisSpacing: 8,
+        mainAxisSpacing: 12,
+        childAspectRatio: 0.9,
       ),
+      itemCount: totalItems,
+      itemBuilder: (context, index) {
+        if (index == displayItems.length) {
+          return _buildCollapseButton();
+        }
+        return _buildMenuItem(displayItems[index]);
+      },
     );
   }
 
