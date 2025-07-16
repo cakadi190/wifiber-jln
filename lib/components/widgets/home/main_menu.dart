@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:wifiber/config/app_colors.dart';
+import 'package:wifiber/screens/dashboard/mikrotik/list_mikrotik.dart';
 
 class MainMenu extends StatefulWidget {
-  const MainMenu({super.key, this.onTicketMenuTapped, this.onTransactionMenuTapped});
+  const MainMenu({
+    super.key,
+    this.onTicketMenuTapped,
+    this.onTransactionMenuTapped,
+  });
 
   final VoidCallback? onTicketMenuTapped;
   final VoidCallback? onTransactionMenuTapped;
@@ -20,9 +25,26 @@ class _MainMenuState extends State<MainMenu> {
     _menuItems = [
       MenuItem(icon: Icons.verified_user_sharp, title: 'Calon Pelanggan'),
       MenuItem(icon: Icons.person, title: 'Data Pelanggan'),
-      MenuItem(icon: Icons.warning, title: 'Keluhan', onTap: widget.onTicketMenuTapped),
-      MenuItem(icon: Icons.bookmark, title: 'Pembukuan', onTap: widget.onTransactionMenuTapped),
-      MenuItem(icon: Icons.wifi, title: 'Mikrotik'),
+      MenuItem(
+        icon: Icons.warning,
+        title: 'Keluhan',
+        onTap: widget.onTicketMenuTapped,
+      ),
+      MenuItem(
+        icon: Icons.bookmark,
+        title: 'Pembukuan',
+        onTap: widget.onTransactionMenuTapped,
+      ),
+      MenuItem(
+        icon: Icons.wifi,
+        title: 'Mikrotik',
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ListMikrotikScreen()),
+          );
+        },
+      ),
       MenuItem(icon: Icons.pin_drop, title: 'Peta Infrastruktur'),
       MenuItem(icon: Icons.cell_tower, title: 'Infrastruktur'),
     ];
@@ -124,11 +146,13 @@ class _MainMenuState extends State<MainMenu> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            _buildIconContainer(Icon(
-              isExpanded ? Icons.expand_less : Icons.apps,
-              size: 24,
-              color: Colors.white,
-            )),
+            _buildIconContainer(
+              Icon(
+                isExpanded ? Icons.expand_less : Icons.apps,
+                size: 24,
+                color: Colors.white,
+              ),
+            ),
             const SizedBox(height: 6),
             Text(
               isExpanded ? 'Tutup' : 'Lainnya',
