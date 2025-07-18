@@ -19,6 +19,13 @@ class _BillsScreenState extends State<BillsScreen> {
         navigationBarColor: Colors.white,
       ),
       child: Scaffold(
+        floatingActionButton: FloatingActionButton(
+          backgroundColor: AppColors.primary,
+          child: const Icon(Icons.add),
+          onPressed: () {
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const BillsCreateScreen()));
+          },
+        ),
         backgroundColor: AppColors.primary,
         appBar: AppBar(title: const Text('Daftar Tagihan')),
         body: SafeArea(child: Container(
