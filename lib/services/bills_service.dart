@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:wifiber/models/bills.dart';
 import 'package:wifiber/services/http_service.dart';
 
@@ -12,11 +13,12 @@ class BillService {
     String? status,
   }) async {
     try {
-      final response = await _http.get(path, parameters: {
-        'customer_id': customerId,
-        'period': period,
-        'status': status,
-      });
+      final parameters = <String, String>{};
+      if (customerId != null) parameters['customer_id'] = customerId;
+      if (period != null) parameters['period'] = period;
+      if (status != null) parameters['status'] = status;
+
+      final response = await _http.get(path, parameters: parameters);
 
       if (response.statusCode == 200) {
         return BillResponse.fromJson(json.decode(response.body));
