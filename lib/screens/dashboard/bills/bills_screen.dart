@@ -18,11 +18,11 @@ class BillsScreen extends StatefulWidget {
 
 class _BillsScreenState extends State<BillsScreen> {
   String _selectedFilter = 'all';
+  String? _selectedCustomerName;
 
   @override
   void initState() {
     super.initState();
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<BillsProvider>().fetchBills();
     });
@@ -35,18 +35,65 @@ class _BillsScreenState extends State<BillsScreen> {
       _selectedFilter = value;
     });
 
-    switch (value) {
-      case 'paid':
-        await provider.filterBillsByPaymentStatus('paid');
-        break;
-      case 'unpaid':
-        await provider.filterBillsByPaymentStatus('unpaid');
-        break;
-      case 'all':
-      default:
-        await provider.filterBillsByPaymentStatus(null);
-        break;
+    // Pastikan tidak ada konflik dengan customer search
+    if (_selectedCustomerName != null) {
+      // Jika ada customer search aktif, filter berdasarkan customer dulu
+      await provider.searchBills(provider.searchQuery ?? '');
+      // Lalu terapkan filter payment status
+      await provider.filterBillsByPaymentStatus(value == 'all' ? null : value);
+    } else {
+      // Jika tidak ada customer search, langsung filter payment status
+      await provider.filterBillsByPaymentStatus(value == 'all' ? null : value);
     }
+  }
+
+  void _resetAllFilters() async {
+    final provider = context.read<BillsProvider>();
+
+    setState(() {
+      _selectedFilter = 'all';
+      _selectedCustomerName = null;
+    });
+
+    // Clear semua filter dan refresh data
+    await provider.clearFilters();
+    await provider.fetchBills(); // Pastikan data di-refresh
+  }
+
+  void _onCustomerSelected(dynamic customer) async {
+    final provider = context.read<BillsProvider>();
+
+    setState(() {
+      _selectedCustomerName = customer.name;
+    });
+
+    // Search berdasarkan customer
+    await provider.searchBills(customer.customerId);
+
+    // Jika ada filter payment status aktif, terapkan juga
+    if (_selectedFilter != 'all') {
+      await provider.filterBillsByPaymentStatus(_selectedFilter);
+    }
+  }
+
+  void _clearCustomerSearch() async {
+    final provider = context.read<BillsProvider>();
+
+    setState(() {
+      _selectedCustomerName = null;
+    });
+
+    // Clear customer search
+    await provider.searchBills('');
+
+    // Jika ada filter payment status aktif, terapkan kembali
+    if (_selectedFilter != 'all') {
+      await provider.filterBillsByPaymentStatus(_selectedFilter);
+    }
+  }
+
+  bool _hasActiveFilters() {
+    return _selectedFilter != 'all' || _selectedCustomerName != null;
   }
 
   @override
@@ -84,10 +131,7 @@ class _BillsScreenState extends State<BillsScreen> {
               onPressed: () {
                 CustomerSearchModal.showModal(
                   context,
-                  onCustomerSelected: (customer) {
-                    final provider = context.read<BillsProvider>();
-                    provider.searchBills(customer.customerId);
-                  },
+                  onCustomerSelected: _onCustomerSelected,
                 );
               },
               icon: Icon(Icons.search),
@@ -107,21 +151,98 @@ class _BillsScreenState extends State<BillsScreen> {
                 ),
                 child: Column(
                   children: [
+                    // Filter Section
                     Container(
                       padding: const EdgeInsets.all(16),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            _buildFilterChip('all', 'Semua'),
-                            _buildFilterChip('paid', 'Lunas'),
-                            _buildFilterChip('unpaid', 'Belum Lunas'),
-                          ],
-                        ),
+                      child: Column(
+                        children: [
+                          SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: Row(
+                              children: [
+                                Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  children: [
+                                    _buildFilterChip('all', 'Semua'),
+                                    _buildFilterChip('paid', 'Lunas'),
+                                    _buildFilterChip('unpaid', 'Belum Lunas'),
+                                  ],
+                                ),
+                                if (_hasActiveFilters())
+                                  Padding(
+                                    padding: const EdgeInsets.only(left: 8),
+                                    child: TextButton.icon(
+                                      onPressed: _resetAllFilters,
+                                      icon: Icon(Icons.close),
+                                      label: Text(
+                                        'Reset semua filter',
+                                        style: TextStyle(
+                                          color: Colors.grey[600],
+                                        ),
+                                      ),
+                                      style: TextButton.styleFrom(
+                                        backgroundColor: Colors.grey[100],
+                                        minimumSize: Size(40, 40),
+                                      ),
+                                    ),
+                                  ),
+                                if (_selectedCustomerName != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8),
+                                    child: Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 12,
+                                        vertical: 8,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: AppColors.primary.withValues(
+                                          alpha: 0.1,
+                                        ),
+                                        borderRadius: BorderRadius.circular(20),
+                                        border: Border.all(
+                                          color: AppColors.primary.withValues(
+                                            alpha: 0.3,
+                                          ),
+                                        ),
+                                      ),
+                                      child: Row(
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Icon(
+                                            Icons.person,
+                                            size: 16,
+                                            color: AppColors.primary,
+                                          ),
+                                          SizedBox(width: 8),
+                                          Text(
+                                            _selectedCustomerName!,
+                                            style: TextStyle(
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              color: AppColors.primary,
+                                            ),
+                                          ),
+                                          SizedBox(width: 8),
+                                          GestureDetector(
+                                            onTap: _clearCustomerSearch,
+                                            child: Icon(
+                                              Icons.close,
+                                              size: 16,
+                                              color: Colors.grey[600],
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     ),
 
+                    // Bills List
                     Expanded(
                       child: Consumer<BillsProvider>(
                         builder: (context, billsProvider, child) {
@@ -169,9 +290,9 @@ class _BillsScreenState extends State<BillsScreen> {
                             );
                           }
 
-                          List<Bills> filteredBills = billsProvider.bills;
+                          List<Bills> displayedBills = billsProvider.bills;
 
-                          if (filteredBills.isEmpty) {
+                          if (displayedBills.isEmpty) {
                             return Center(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -183,7 +304,9 @@ class _BillsScreenState extends State<BillsScreen> {
                                   ),
                                   const SizedBox(height: 16),
                                   Text(
-                                    'Belum ada tagihan',
+                                    _hasActiveFilters()
+                                        ? 'Tidak ada tagihan yang sesuai filter'
+                                        : 'Belum ada tagihan',
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
@@ -192,23 +315,48 @@ class _BillsScreenState extends State<BillsScreen> {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    'Tagihan akan muncul di sini',
+                                    _hasActiveFilters()
+                                        ? 'Coba ubah filter atau buat tagihan baru'
+                                        : 'Tagihan akan muncul di sini',
+                                    textAlign: TextAlign.center,
                                     style: TextStyle(color: Colors.grey[600]),
                                   ),
+                                  if (_hasActiveFilters())
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 16),
+                                      child: ElevatedButton(
+                                        onPressed: _resetAllFilters,
+                                        child: const Text('Reset Filter'),
+                                      ),
+                                    ),
                                 ],
                               ),
                             );
                           }
 
                           return RefreshIndicator(
-                            onRefresh: billsProvider.refresh,
+                            onRefresh: () async {
+                              await billsProvider.refresh();
+                              // Terapkan kembali filter yang aktif
+                              if (_selectedFilter != 'all') {
+                                await billsProvider.filterBillsByPaymentStatus(
+                                  _selectedFilter,
+                                );
+                              }
+                              if (_selectedCustomerName != null &&
+                                  billsProvider.searchQuery != null) {
+                                await billsProvider.searchBills(
+                                  billsProvider.searchQuery!,
+                                );
+                              }
+                            },
                             child: ListView.builder(
                               padding: const EdgeInsets.symmetric(
                                 horizontal: 16,
                               ),
-                              itemCount: filteredBills.length,
+                              itemCount: displayedBills.length,
                               itemBuilder: (context, index) {
-                                final bill = filteredBills[index];
+                                final bill = displayedBills[index];
                                 return _buildBillCard(bill);
                               },
                             ),
@@ -259,7 +407,9 @@ class _BillsScreenState extends State<BillsScreen> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () {},
+        onTap: () {
+          // TODO: Navigate to bill detail
+        },
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(

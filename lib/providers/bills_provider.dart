@@ -22,6 +22,8 @@ class BillsProvider extends ChangeNotifier {
 
   BillsState get state => _state;
 
+  String? get searchQuery => _currentSearchQuery;
+
   String get errorMessage => _errorMessage;
 
   List<Bills> get paidBills => _bills.where((bill) => bill.isPaid).toList();
@@ -47,9 +49,9 @@ class BillsProvider extends ChangeNotifier {
     try {
       _setState(BillsState.loading);
 
-      _currentCustomerId = customerId;
-      _currentPeriod = period;
-      _currentStatusFilter = status;
+      _currentCustomerId = customerId ?? '';
+      _currentPeriod = period ?? '';
+      _currentStatusFilter = status ?? '';
       _currentSearchQuery = searchQuery ?? '';
 
       final billResponse = await _billsService.getBills(
