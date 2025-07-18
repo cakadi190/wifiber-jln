@@ -1,40 +1,28 @@
 import 'package:flutter/material.dart';
 
 class UserAvatar extends StatelessWidget {
-  /// URL gambar avatar
   final String? imageUrl;
 
-  /// Nama untuk generate initials
   final String? name;
 
-  /// Custom initials (override name)
   final String? initials;
 
-  /// Ukuran radius avatar
   final double radius;
 
-  /// Warna background
   final Color? backgroundColor;
 
-  /// Warna text initials
   final Color? textColor;
 
-  /// Headers untuk network request (misal: Authorization)
   final Map<String, String>? headers;
 
-  /// Callback ketika avatar di-tap
   final VoidCallback? onTap;
 
-  /// Border untuk avatar
   final Border? border;
 
-  /// Scale untuk image (default 1.0)
   final double scale;
 
-  /// Cache width untuk optimasi memory
   final int? cacheWidth;
 
-  /// Cache height untuk optimasi memory
   final int? cacheHeight;
 
   const UserAvatar({
@@ -60,10 +48,7 @@ class UserAvatar extends StatelessWidget {
     Widget avatar = Container(
       width: radius * 2,
       height: radius * 2,
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        border: border,
-      ),
+      decoration: BoxDecoration(shape: BoxShape.circle, border: border),
       child: CircleAvatar(
         radius: radius,
         backgroundColor: backgroundColor ?? theme.colorScheme.primary,
@@ -72,7 +57,9 @@ class UserAvatar extends StatelessWidget {
           // Handle error jika gambar gagal load
           debugPrint('Avatar image failed to load: $exception');
         },
-        child: _getBackgroundImage() == null ? _buildInitialsWidget(context) : null,
+        child: _getBackgroundImage() == null
+            ? _buildInitialsWidget(context)
+            : null,
       ),
     );
 
@@ -86,11 +73,7 @@ class UserAvatar extends StatelessWidget {
   ImageProvider? _getBackgroundImage() {
     if (imageUrl != null && imageUrl!.isNotEmpty) {
       return ResizeImage(
-        NetworkImage(
-          imageUrl!,
-          headers: headers,
-          scale: scale,
-        ),
+        NetworkImage(imageUrl!, headers: headers, scale: scale),
         width: cacheWidth ?? (radius * 2 * 2).toInt(), // 2x untuk density
         height: cacheHeight ?? (radius * 2 * 2).toInt(),
         allowUpscaling: false,
