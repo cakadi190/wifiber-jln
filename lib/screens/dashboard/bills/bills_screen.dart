@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/config/app_colors.dart';
+import 'package:wifiber/helpers/currency_helper.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/models/bills.dart';
 import 'package:wifiber/providers/bills_provider.dart';
@@ -403,9 +404,6 @@ class _BillsScreenState extends State<BillsScreen> {
   }
 
   String _formatCurrency(int amount) {
-    return amount.toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]}.',
-    );
+    return CurrencyHelper.formatCurrency(amount);
   }
 }
