@@ -3,7 +3,7 @@ class Bills {
   final String customerId;
   final String invoice;
   final String period;
-  final String status;
+  final BillStatus status;
   final int basePrice;
   final int tax;
   final String packageName;
@@ -52,7 +52,9 @@ class Bills {
     customerId: json['customer_id'].toString(),
     invoice: json['invoice'].toString(),
     period: json['period'].toString(),
-    status: json['status'].toString(),
+    status: BillStatus.values.firstWhere(
+      (status) => status.toString() == 'BillStatus.${json['status'].toString().toUpperCase()}',
+    ),
     basePrice: json['base_price'],
     tax: json['tax'],
     packageName: json['package_name'].toString(),
@@ -77,7 +79,7 @@ class Bills {
     'customerId': customerId,
     'invoice': invoice,
     'period': period,
-    'status': status,
+    'status': status.toString(),
     'basePrice': basePrice,
     'tax': tax,
     'packageName': packageName,
@@ -97,3 +99,5 @@ class Bills {
     'routerId': routerId,
   };
 }
+
+enum BillStatus { PAID, UNPAID }
