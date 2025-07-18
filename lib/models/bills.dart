@@ -101,3 +101,25 @@ class Bills {
 }
 
 enum BillStatus { PAID, UNPAID }
+
+class CreateBill {
+  final String customerId;
+  final String period;
+  final bool? isPaid;
+  final bool? openIsolir;
+  final String? paymentMethod;
+  final String paymentAt;
+  final String? paymentProof;
+  final String? paymentNote;
+
+  CreateBill({
+    required this.customerId,
+    required this.period,
+    this.isPaid,
+    this.openIsolir,
+    this.paymentMethod,
+    required this.paymentAt,
+    this.paymentProof,
+    this.paymentNote,
+  });
+}
