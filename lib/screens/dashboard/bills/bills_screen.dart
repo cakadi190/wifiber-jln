@@ -415,7 +415,7 @@ class _BillsScreenState extends State<BillsScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Invoice: ${bill.invoice}',
+                          bill.invoice,
                           style: TextStyle(
                             fontSize: 12,
                             color: Colors.grey[600],
