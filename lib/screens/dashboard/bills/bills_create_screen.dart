@@ -83,13 +83,7 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
           actions: [
             TextButton(
               onPressed: _saveBill,
-              child: const Text(
-                'Simpan',
-                style: TextStyle(
-                  color: Colors.white,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              child: Icon(Icons.save, color: Colors.white),
             ),
           ],
         ),
