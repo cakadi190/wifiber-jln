@@ -1,21 +1,13 @@
 import 'package:flutter/foundation.dart';
 import 'package:wifiber/models/bills.dart';
+import 'package:wifiber/services/bills_service.dart';
 
 enum BillsState { initial, loading, loaded, error }
-
-abstract class BillsService {
-  Future<List<Bills>> fetchBills();
-
-  Future<Bills?> createBill(CreateBill createBill);
-
-  Future<List<Bills>> fetchBillsByCustomerId(String customerId);
-}
 
 class BillsProvider extends ChangeNotifier {
   final BillsService _billsService;
 
-  BillsProvider({required BillsService billsService})
-    : _billsService = billsService;
+  BillsProvider(this._billsService);
 
   List<Bills> _bills = [];
   BillsState _state = BillsState.initial;
@@ -43,11 +35,21 @@ class BillsProvider extends ChangeNotifier {
   int get totalOverdueAmount =>
       overdueBills.fold(0, (sum, bill) => sum + bill.totalAmount);
 
-  Future<void> fetchBills() async {
+  Future<void> fetchBills({
+    String? customerId,
+    String? period,
+    String? status,
+  }) async {
     try {
       _setState(BillsState.loading);
-      final bills = await _billsService.fetchBills();
-      _bills = bills;
+
+      final billResponse = await _billsService.getBills(
+        customerId: customerId,
+        period: period,
+        status: status,
+      );
+
+      _bills = billResponse.data;
       _setState(BillsState.loaded);
     } catch (e) {
       _setError(e.toString());
@@ -57,13 +59,14 @@ class BillsProvider extends ChangeNotifier {
   Future<bool> createBill(CreateBill createBill) async {
     try {
       _setState(BillsState.loading);
-      final newBill = await _billsService.createBill(createBill);
-      if (newBill != null) {
-        _bills.add(newBill);
-        _setState(BillsState.loaded);
+
+      final billResponse = await _billsService.createBill(createBill);
+
+      if (billResponse.success == true) {
+        await fetchBills();
         return true;
       } else {
-        _setError('Failed to create bill');
+        _setError(billResponse.message);
         return false;
       }
     } catch (e) {
@@ -75,12 +78,29 @@ class BillsProvider extends ChangeNotifier {
   Future<void> fetchBillsByCustomerId(String customerId) async {
     try {
       _setState(BillsState.loading);
-      final bills = await _billsService.fetchBillsByCustomerId(customerId);
-      _bills = bills;
+
+      final billResponse = await _billsService.getBillsByCustomerId(customerId);
+
+      _bills = billResponse.data;
       _setState(BillsState.loaded);
     } catch (e) {
       _setError(e.toString());
     }
+  }
+
+  Future<void> fetchBillsByStatus(String status) async {
+    await fetchBills(status: status);
+  }
+
+  Future<void> fetchBillsByPeriod(String period) async {
+    await fetchBills(period: period);
+  }
+
+  Future<void> fetchBillsByCustomerAndPeriod(
+    String customerId,
+    String period,
+  ) async {
+    await fetchBills(customerId: customerId, period: period);
   }
 
   Future<void> refresh() async {
