@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wifiber/config/app_colors.dart';
-import 'package:wifiber/screens/dashboard/mikrotik/list_mikrotik.dart';
+import 'package:wifiber/screens/dashboard/mikrotik/list_mikrotik_screen.dart';
 
 class MainMenu extends StatefulWidget {
   const MainMenu({
