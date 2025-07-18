@@ -47,6 +47,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
         onTransactionTap: () => _onItemTapped(1),
         onBookKeepingTap: () => _onItemTapped(2),
         onLogoutTap: _onLogoutRedirect,
+        onBillTap: () => _onItemTapped(2),
         onTicketTap: () => _onItemTapped(3),
       ),
       TransactionTab(controller: _transactionTabController),

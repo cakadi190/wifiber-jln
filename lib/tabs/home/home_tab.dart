@@ -16,12 +16,14 @@ class HomeTab extends StatefulWidget {
     this.onLogoutTap,
     this.onTicketTap,
     this.onBookKeepingTap,
+    this.onBillTap,
   });
 
   final VoidCallback? onTransactionTap;
   final VoidCallback? onBookKeepingTap;
   final VoidCallback? onLogoutTap;
   final VoidCallback? onTicketTap;
+  final VoidCallback? onBillTap;
 
   @override
   State<HomeTab> createState() => _HomeTabState();
@@ -71,6 +73,7 @@ class _HomeTabState extends State<HomeTab> {
                   MainMenu(
                     onTicketMenuTapped: widget.onTicketTap,
                     onTransactionMenuTapped: widget.onBookKeepingTap,
+                    onBillMenuTapped: widget.onBillTap,
                   ),
 
                   SizedBox(

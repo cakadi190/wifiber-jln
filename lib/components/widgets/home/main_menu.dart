@@ -7,10 +7,12 @@ class MainMenu extends StatefulWidget {
     super.key,
     this.onTicketMenuTapped,
     this.onTransactionMenuTapped,
+    this.onBillMenuTapped,
   });
 
   final VoidCallback? onTicketMenuTapped;
   final VoidCallback? onTransactionMenuTapped;
+  final VoidCallback? onBillMenuTapped;
 
   @override
   State<MainMenu> createState() => _MainMenuState();
@@ -34,6 +36,11 @@ class _MainMenuState extends State<MainMenu> {
         icon: Icons.bookmark,
         title: 'Pembukuan',
         onTap: widget.onTransactionMenuTapped,
+      ),
+      MenuItem(
+        icon: Icons.wallet,
+        title: 'Tagihan dan Pembayaran',
+        onTap: widget.onBillMenuTapped,
       ),
       MenuItem(
         icon: Icons.wifi,
