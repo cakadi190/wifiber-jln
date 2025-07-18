@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/config/app_colors.dart';
-import 'package:wifiber/controllers/bills_controller.dart';
+import 'package:wifiber/providers/bills_provider.dart'; // Updated import
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/screens/dashboard/bills/bills_create_screen.dart';
 import 'package:wifiber/models/bills.dart';
@@ -23,7 +23,7 @@ class _BillsScreenState extends State<BillsScreen> {
     super.initState();
     // Fetch bills when screen is first loaded
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<BillsController>().fetchBills();
+      context.read<BillsProvider>().fetchBills();
     });
   }
 
@@ -53,7 +53,7 @@ class _BillsScreenState extends State<BillsScreen> {
             );
             // Refresh bills if new bill was created
             if (result == true) {
-              context.read<BillsController>().refresh();
+              context.read<BillsProvider>().refresh();
             }
           },
         ),
@@ -123,15 +123,15 @@ class _BillsScreenState extends State<BillsScreen> {
                     ),
                     // Bills List
                     Expanded(
-                      child: Consumer<BillsController>(
-                        builder: (context, billsController, child) {
-                          if (billsController.state == BillsState.loading) {
+                      child: Consumer<BillsProvider>(
+                        builder: (context, billsProvider, child) {
+                          if (billsProvider.state == BillsState.loading) {
                             return const Center(
                               child: CircularProgressIndicator(),
                             );
                           }
 
-                          if (billsController.state == BillsState.error) {
+                          if (billsProvider.state == BillsState.error) {
                             return Center(
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
@@ -152,7 +152,7 @@ class _BillsScreenState extends State<BillsScreen> {
                                   ),
                                   const SizedBox(height: 8),
                                   Text(
-                                    billsController.errorMessage,
+                                    billsProvider.errorMessage,
                                     textAlign: TextAlign.center,
                                     style: TextStyle(
                                       color: Colors.grey[600],
@@ -161,8 +161,8 @@ class _BillsScreenState extends State<BillsScreen> {
                                   const SizedBox(height: 16),
                                   ElevatedButton(
                                     onPressed: () {
-                                      billsController.clearError();
-                                      billsController.refresh();
+                                      billsProvider.clearError();
+                                      billsProvider.refresh();
                                     },
                                     child: const Text('Coba Lagi'),
                                   ),
@@ -171,7 +171,7 @@ class _BillsScreenState extends State<BillsScreen> {
                             );
                           }
 
-                          List<Bills> filteredBills = _getFilteredBills(billsController);
+                          List<Bills> filteredBills = _getFilteredBills(billsProvider);
 
                           if (filteredBills.isEmpty) {
                             return Center(
@@ -205,7 +205,7 @@ class _BillsScreenState extends State<BillsScreen> {
                           }
 
                           return RefreshIndicator(
-                            onRefresh: billsController.refresh,
+                            onRefresh: billsProvider.refresh,
                             child: ListView.builder(
                               padding: const EdgeInsets.symmetric(horizontal: 16),
                               itemCount: filteredBills.length,
@@ -250,12 +250,12 @@ class _BillsScreenState extends State<BillsScreen> {
     );
   }
 
-  List<Bills> _getFilteredBills(BillsController controller) {
-    List<Bills> bills = controller.bills;
+  List<Bills> _getFilteredBills(BillsProvider provider) {
+    List<Bills> bills = provider.bills;
 
     // Apply search filter
     if (_searchController.text.isNotEmpty) {
-      bills = controller.searchBills(_searchController.text);
+      bills = provider.searchBills(_searchController.text);
     }
 
     // Apply status filter
