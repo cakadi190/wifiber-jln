@@ -121,46 +121,18 @@ class _BillsScreenState extends State<BillsScreen> {
           foregroundColor: Colors.white,
           actions: [
             PopupMenuButton<String>(
-              onSelected: (value) {
-                if (value == 'search') {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    builder: (context) => CustomerSearchModal(
-                      onSelected: _onCustomerSelected,
-                      onClear: _clearCustomerSearch,
-                    ),
-                  );
-                } else if (value == 'reset') {
-                  _resetAllFilters();
-                }
-              },
               itemBuilder: (context) => [
                 PopupMenuItem(
-                  value: 'search',
                   onTap: () {
                     CustomerSearchModal.showModal(
                       context,
                       onCustomerSelected: _onCustomerSelected,
                     );
                   },
-                  child: Row(
-                    children: [
-                      const Icon(Icons.search),
-                      const SizedBox(width: 8),
-                      Text('Cari Pelanggan'),
-                    ],
-                  ),
+                  child: Text('Cari Pelanggan'),
                 ),
                 PopupMenuItem(
-                  value: 'reset',
-                  child: Row(
-                    children: [
-                      const Icon(Icons.refresh),
-                      const SizedBox(width: 8),
-                      Text('Reset Filter'),
-                    ],
-                  ),
+                  child: Text('Buat Tagihan Bulanan'),
                 ),
               ],
             ),
