@@ -16,12 +16,12 @@ class BillsController extends ChangeNotifier {
   BillsState _state = BillsState.initial;
   String _errorMessage = '';
 
-  // Getters
+ 
   List<Bills> get bills => _bills;
   BillsState get state => _state;
   String get errorMessage => _errorMessage;
 
-  // Computed properties
+ 
   List<Bills> get paidBills => _bills.where((bill) => bill.isPaid).toList();
   List<Bills> get unpaidBills => _bills.where((bill) => !bill.isPaid).toList();
   List<Bills> get overdueBills => _bills.where((bill) => bill.isOverdue).toList();
@@ -30,7 +30,7 @@ class BillsController extends ChangeNotifier {
   int get totalUnpaidAmount => unpaidBills.fold(0, (sum, bill) => sum + bill.totalAmount);
   int get totalOverdueAmount => overdueBills.fold(0, (sum, bill) => sum + bill.totalAmount);
 
-  // Get all bills
+ 
   Future<void> fetchBills() async {
     try {
       _setState(BillsState.loading);
@@ -48,7 +48,7 @@ class BillsController extends ChangeNotifier {
     }
   }
 
-  // Create new bill
+ 
   Future<bool> createBill(CreateBill createBill) async {
     try {
       _setState(BillsState.loading);
@@ -56,7 +56,7 @@ class BillsController extends ChangeNotifier {
       final response = await _billsService.createBill(createBill);
 
       if (response.success) {
-        // Add new bill to local list
+       
         if (response.data.isNotEmpty) {
           _bills.add(response.data.first);
         }
@@ -72,7 +72,7 @@ class BillsController extends ChangeNotifier {
     }
   }
 
-  // Get bills by customer ID
+ 
   Future<void> fetchBillsByCustomerId(String customerId) async {
     try {
       _setState(BillsState.loading);
@@ -90,7 +90,7 @@ class BillsController extends ChangeNotifier {
     }
   }
 
-  // Helper methods
+ 
   void _setState(BillsState state) {
     _state = state;
     notifyListeners();
@@ -102,18 +102,18 @@ class BillsController extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Clear error
+ 
   void clearError() {
     _errorMessage = '';
     notifyListeners();
   }
 
-  // Refresh bills
+ 
   Future<void> refresh() async {
     await fetchBills();
   }
 
-  // Search bills by invoice
+ 
   List<Bills> searchBills(String query) {
     if (query.isEmpty) return _bills;
 
@@ -124,17 +124,17 @@ class BillsController extends ChangeNotifier {
     }).toList();
   }
 
-  // Filter bills by status
+ 
   List<Bills> filterBillsByStatus(BillStatus status) {
     return _bills.where((bill) => bill.status == status).toList();
   }
 
-  // Filter bills by period
+ 
   List<Bills> filterBillsByPeriod(String period) {
     return _bills.where((bill) => bill.period == period).toList();
   }
 
-  // Get bill by ID
+ 
   Bills? getBillById(String id) {
     try {
       return _bills.firstWhere((bill) => bill.id == id);
@@ -143,7 +143,7 @@ class BillsController extends ChangeNotifier {
     }
   }
 
-  // Clear all bills
+ 
   void clearBills() {
     _bills.clear();
     _setState(BillsState.initial);
