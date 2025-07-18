@@ -4,6 +4,7 @@ import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/components/widgets/customer_search_modal.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/helpers/currency_helper.dart';
+import 'package:wifiber/helpers/datetime_helper.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/models/bills.dart';
 import 'package:wifiber/providers/bills_provider.dart';
@@ -151,20 +152,15 @@ class _BillsScreenState extends State<BillsScreen> {
                             scrollDirection: Axis.horizontal,
                             child: Row(
                               children: [
-                                Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  children: [
-                                    _buildFilterChip('all', 'Semua'),
-                                    _buildFilterChip('paid', 'Lunas'),
-                                    _buildFilterChip('unpaid', 'Belum Lunas'),
-                                  ],
-                                ),
+                                _buildFilterChip('all', 'Semua'),
+                                _buildFilterChip('paid', 'Lunas'),
+                                _buildFilterChip('unpaid', 'Belum Lunas'),
                                 if (_hasActiveFilters())
                                   Padding(
                                     padding: const EdgeInsets.only(left: 8),
                                     child: TextButton.icon(
                                       onPressed: _resetAllFilters,
-                                      icon: Icon(Icons.close),
+                                      icon: const Icon(Icons.close),
                                       label: Text(
                                         'Reset semua filter',
                                         style: TextStyle(
@@ -173,26 +169,24 @@ class _BillsScreenState extends State<BillsScreen> {
                                       ),
                                       style: TextButton.styleFrom(
                                         backgroundColor: Colors.grey[100],
-                                        minimumSize: Size(40, 40),
+                                        minimumSize: const Size(40, 40),
                                       ),
                                     ),
                                   ),
                                 if (_selectedCustomerName != null)
                                   Padding(
-                                    padding: const EdgeInsets.only(top: 8),
+                                    padding: const EdgeInsets.only(left: 8),
                                     child: Container(
                                       padding: const EdgeInsets.symmetric(
                                         horizontal: 12,
                                         vertical: 8,
                                       ),
                                       decoration: BoxDecoration(
-                                        color: AppColors.primary.withValues(
-                                          alpha: 0.1,
-                                        ),
+                                        color: AppColors.primary.withAlpha(20),
                                         borderRadius: BorderRadius.circular(20),
                                         border: Border.all(
-                                          color: AppColors.primary.withValues(
-                                            alpha: 0.3,
+                                          color: AppColors.primary.withAlpha(
+                                            60,
                                           ),
                                         ),
                                       ),
@@ -204,7 +198,7 @@ class _BillsScreenState extends State<BillsScreen> {
                                             size: 16,
                                             color: AppColors.primary,
                                           ),
-                                          SizedBox(width: 8),
+                                          const SizedBox(width: 8),
                                           Text(
                                             _selectedCustomerName!,
                                             style: TextStyle(
@@ -213,7 +207,7 @@ class _BillsScreenState extends State<BillsScreen> {
                                               color: AppColors.primary,
                                             ),
                                           ),
-                                          SizedBox(width: 8),
+                                          const SizedBox(width: 8),
                                           GestureDetector(
                                             onTap: _clearCustomerSearch,
                                             child: Icon(
@@ -393,7 +387,7 @@ class _BillsScreenState extends State<BillsScreen> {
   Widget _buildBillCard(Bills bill) {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
-      elevation: 2,
+      elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
@@ -441,12 +435,7 @@ class _BillsScreenState extends State<BillsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Periode: ${bill.period}',
-                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                      ),
-                      const SizedBox(height: 4),
-                      Text(
-                        'Customer ID: ${bill.customerId}',
+                        DateHelper.formatDate(DateHelper.parse(bill.period), format: 'long'),
                         style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                       ),
                     ],

@@ -19,7 +19,6 @@ class CustomerSearchModal extends StatefulWidget {
     this.title = 'Pilih Pelanggan',
   });
 
-  /// Static method untuk menampilkan modal sebagai bottom sheet
   static Future<T?> showModal<T>(
       BuildContext context, {
         required Function(Customer) onCustomerSelected,
@@ -38,7 +37,6 @@ class CustomerSearchModal extends StatefulWidget {
     );
   }
 
-  /// Static method untuk menampilkan modal sebagai IconButton
   static Widget iconButton({
     required BuildContext context,
     required Function(Customer) onCustomerSelected,
