@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
-import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/components/widgets/customer_search_modal.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/helpers/currency_helper.dart';
@@ -528,17 +527,102 @@ class _BillsScreenState extends State<BillsScreen> {
     );
   }
 
-  void _createMonthlyBill() async {
+  void _showModalLoading(BuildContext context) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      enableDrag: false,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (modalContext) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+          left: 16,
+          right: 16,
+          top: 16,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Stack(
+              children: const [
+                CircularProgressIndicator(semanticsLabel: 'Loading...'),
+                Center(
+                  child: Text('Loading...', style: TextStyle(fontSize: 16)),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showModalMessage(String message, {bool success = false}) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      enableDrag: false,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (modalContext) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+          left: 16,
+          right: 16,
+          top: 16,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Stack(
+              children: [
+                success
+                    ? const Icon(
+                        Icons.check_circle_outline,
+                        size: 48,
+                        color: Colors.green,
+                      )
+                    : const Icon(
+                        Icons.error_outline,
+                        size: 48,
+                        color: Colors.red,
+                      ),
+                Center(
+                  child: Text(message, style: const TextStyle(fontSize: 16)),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            ElevatedButton(
+              onPressed: () => Navigator.pop(context),
+              child: const Text('OK'),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _createMonthlyBill(BuildContext context) async {
+    Navigator.pop(context); // Tutup modal konfirmasi sebelumnya
+    _showModalLoading(context); // Tampilkan loading pakai context yang benar
+
     try {
-      final response = await _http.post('/monthly-bills', requiresAuth: true);
+      final response = await _http.post('monthly-bills', requiresAuth: true);
+
+      Navigator.pop(context); // Tutup loading
 
       if (response.statusCode == 200) {
-        SnackBars.success(context, 'Tagihan bulanan berhasil dibuat.');
+        _showModalMessage('Tagihan bulanan berhasil dibuat.', success: true);
       } else {
-        SnackBars.error(context, 'Gagal membuat tagihan bulanan.');
+        _showModalMessage('Gagal membuat tagihan bulanan.');
       }
-    } catch (_) {
-      SnackBars.error(context, 'Gagal membuat tagihan bulanan.');
+    } catch (e) {
+      Navigator.pop(context); // Pastikan loading ditutup walau error
+      _showModalMessage('Gagal membuat tagihan bulanan.');
     }
   }
 
@@ -550,81 +634,70 @@ class _BillsScreenState extends State<BillsScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (modalContext) => DraggableScrollableSheet(
-        initialChildSize: 0.4,
-        minChildSize: 0.2,
-        maxChildSize: 0.9,
-        expand: false,
-        builder: (context, scrollController) {
-          return Padding(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom,
-              left: 16,
-              right: 16,
-              top: 16,
+      builder: (modalContext) => Padding(
+        padding: EdgeInsets.only(
+          bottom: MediaQuery.of(context).viewInsets.bottom,
+          left: 16,
+          right: 16,
+          top: 16,
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            _buildModalHandle(),
+            const SizedBox(height: 8),
+            const Text(
+              'Buatkan Tagihan Bulanan?',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
             ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.center,
+            const SizedBox(height: 16),
+            const Text(
+              'Aksi ini akan membuatkan tagihan untuk bulan ini kepada semua pelanggan aktif. Apabila pelanggan sudah memiliki atau melunaskan tagihan pada bulan ini, maka akan dilewatkan. Lanjutkan?',
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                _buildModalHandle(),
-                const SizedBox(height: 8),
-                const Text(
-                  'Buatkan Tagihan Bulanan?',
-                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                Expanded(
+                  child: OutlinedButton(
+                    onPressed: () => Navigator.pop(modalContext),
+                    style: OutlinedButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      side: const BorderSide(color: AppColors.primary),
+                    ),
+                    child: const Text(
+                      'Tidak',
+                      style: TextStyle(color: AppColors.primary, fontSize: 16),
+                    ),
+                  ),
                 ),
-                const SizedBox(height: 16),
-                const Text(
-                  'Apakah anda yakin ingin membuat tagihan bulanan?',
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Expanded(
-                      child: OutlinedButton(
-                        onPressed: () => Navigator.pop(modalContext),
-                        style: OutlinedButton.styleFrom(
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          side: const BorderSide(color: AppColors.primary),
-                        ),
-                        child: const Text(
-                          'Tidak',
-                          style: TextStyle(
-                            color: AppColors.primary,
-                            fontSize: 16,
-                          ),
-                        ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: TextButton(
+                    onPressed: () {
+                      // Navigator.pop(modalContext);
+                      _createMonthlyBill(modalContext);
+                    },
+                    style: TextButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: AppColors.primary,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: const Text(
+                      'Ya, Buatkan',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: TextButton(
-                        onPressed: () {
-                          Navigator.pop(modalContext);
-                          _createMonthlyBill();
-                        },
-                        style: TextButton.styleFrom(
-                          foregroundColor: Colors.white,
-                          backgroundColor: AppColors.primary,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                        ),
-                        child: const Text(
-                          'Ya, Buatkan',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
                 ),
               ],
             ),
-          );
-        },
+          ],
+        ),
       ),
     );
   }
