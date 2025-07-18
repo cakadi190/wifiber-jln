@@ -38,13 +38,10 @@ class BillsService {
 
   Future<BillResponse> createBill(CreateBill createBill) async {
     try {
-      final response = await http.post(
-        Uri.parse('$baseUrl/bills'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
-        body: json.encode(createBill.toJson()),
+      final response = await _http.postForm(
+        _baseUrl,
+        requiresAuth: true,
+        fields: createBill.toJson().cast<String, String>(),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
