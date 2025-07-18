@@ -35,14 +35,11 @@ class _BillsScreenState extends State<BillsScreen> {
       _selectedFilter = value;
     });
 
-    // Pastikan tidak ada konflik dengan customer search
     if (_selectedCustomerName != null) {
-      // Jika ada customer search aktif, filter berdasarkan customer dulu
       await provider.searchBills(provider.searchQuery ?? '');
-      // Lalu terapkan filter payment status
+
       await provider.filterBillsByPaymentStatus(value == 'all' ? null : value);
     } else {
-      // Jika tidak ada customer search, langsung filter payment status
       await provider.filterBillsByPaymentStatus(value == 'all' ? null : value);
     }
   }
@@ -55,9 +52,8 @@ class _BillsScreenState extends State<BillsScreen> {
       _selectedCustomerName = null;
     });
 
-    // Clear semua filter dan refresh data
     await provider.clearFilters();
-    await provider.fetchBills(); // Pastikan data di-refresh
+    await provider.fetchBills();
   }
 
   void _onCustomerSelected(dynamic customer) async {
@@ -67,10 +63,8 @@ class _BillsScreenState extends State<BillsScreen> {
       _selectedCustomerName = customer.name;
     });
 
-    // Search berdasarkan customer
     await provider.searchBills(customer.customerId);
 
-    // Jika ada filter payment status aktif, terapkan juga
     if (_selectedFilter != 'all') {
       await provider.filterBillsByPaymentStatus(_selectedFilter);
     }
@@ -83,10 +77,8 @@ class _BillsScreenState extends State<BillsScreen> {
       _selectedCustomerName = null;
     });
 
-    // Clear customer search
     await provider.searchBills('');
 
-    // Jika ada filter payment status aktif, terapkan kembali
     if (_selectedFilter != 'all') {
       await provider.filterBillsByPaymentStatus(_selectedFilter);
     }
@@ -151,7 +143,6 @@ class _BillsScreenState extends State<BillsScreen> {
                 ),
                 child: Column(
                   children: [
-                    // Filter Section
                     Container(
                       padding: const EdgeInsets.all(16),
                       child: Column(
@@ -242,7 +233,6 @@ class _BillsScreenState extends State<BillsScreen> {
                       ),
                     ),
 
-                    // Bills List
                     Expanded(
                       child: Consumer<BillsProvider>(
                         builder: (context, billsProvider, child) {
@@ -337,7 +327,7 @@ class _BillsScreenState extends State<BillsScreen> {
                           return RefreshIndicator(
                             onRefresh: () async {
                               await billsProvider.refresh();
-                              // Terapkan kembali filter yang aktif
+
                               if (_selectedFilter != 'all') {
                                 await billsProvider.filterBillsByPaymentStatus(
                                   _selectedFilter,
@@ -407,9 +397,7 @@ class _BillsScreenState extends State<BillsScreen> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () {
-          // TODO: Navigate to bill detail
-        },
+        onTap: () {},
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
