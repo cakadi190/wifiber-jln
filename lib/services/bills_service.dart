@@ -57,12 +57,9 @@ class BillsService {
 
   Future<BillResponse> getBillsByCustomerId(String customerId) async {
     try {
-      final response = await http.get(
-        Uri.parse('$baseUrl/bills?customer_id=$customerId'),
-        headers: {
-          'Content-Type': 'application/json',
-          'Accept': 'application/json',
-        },
+      final response = await _http.get(
+        '$_baseUrl/$customerId',
+        requiresAuth: true,
       );
 
       if (response.statusCode == 200) {
