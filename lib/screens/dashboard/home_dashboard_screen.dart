@@ -9,7 +9,7 @@ import 'package:wifiber/controllers/tabs/transaction_tab.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/middlewares/auth_middleware.dart';
 import 'package:wifiber/providers/transaction_provider.dart';
-import 'package:wifiber/screens/dashboard/bills_screen.dart';
+import 'package:wifiber/screens/dashboard/bills/bills_screen.dart';
 import 'package:wifiber/screens/login_screen.dart';
 import 'package:wifiber/tabs/home/account_center_screen.dart';
 import 'package:wifiber/tabs/home/complaints_tab.dart';
