@@ -863,7 +863,7 @@ class _BillsScreenState extends State<BillsScreen> {
                     _buildDetailRow(
                       context,
                       'Diskon',
-                      '- ${_formatCurrency(bill.discount ?? 0)}',
+                      '-${_formatCurrency(bill.discount ?? 0)}',
                       Icons.discount,
                       color: Colors.green,
                     ),
