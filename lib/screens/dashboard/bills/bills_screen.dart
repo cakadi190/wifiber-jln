@@ -532,30 +532,37 @@ class _BillsScreenState extends State<BillsScreen> {
       context: context,
       isScrollControlled: true,
       enableDrag: false,
+      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (modalContext) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-          left: 16,
-          right: 16,
-          top: 16,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Stack(
-              children: const [
-                CircularProgressIndicator(semanticsLabel: 'Loading...'),
-                Center(
-                  child: Text('Loading...', style: TextStyle(fontSize: 16)),
+      builder: (modalContext) {
+        return FractionallySizedBox(
+          widthFactor: 1,
+          child: Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(modalContext).viewInsets.bottom,
+              left: 16,
+              right: 16,
+              top: 16,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                const SizedBox(height: 16),
+                const CircularProgressIndicator(semanticsLabel: 'Loading...'),
+                const SizedBox(height: 16),
+                const Text(
+                  'Loading...',
+                  style: TextStyle(fontSize: 16),
+                  textAlign: TextAlign.center,
                 ),
+                const SizedBox(height: 24),
               ],
             ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
@@ -564,56 +571,81 @@ class _BillsScreenState extends State<BillsScreen> {
       context: context,
       isScrollControlled: true,
       enableDrag: false,
+      backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (modalContext) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-          left: 16,
-          right: 16,
-          top: 16,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Stack(
-              children: [
-                success
-                    ? const Icon(
-                        Icons.check_circle_outline,
-                        size: 48,
-                        color: Colors.green,
-                      )
-                    : const Icon(
-                        Icons.error_outline,
-                        size: 48,
-                        color: Colors.red,
+      builder: (modalContext) {
+        return FractionallySizedBox(
+          widthFactor: 1,
+          child: Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(modalContext).viewInsets.bottom,
+              left: 16,
+              right: 16,
+              top: 16,
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  success
+                      ? const Icon(
+                          Icons.check_circle_outline,
+                          size: 48,
+                          color: Colors.green,
+                        )
+                      : const Icon(
+                          Icons.error_outline,
+                          size: 48,
+                          color: Colors.red,
+                        ),
+                  const SizedBox(height: 16),
+                  Text(
+                    success ? "Berhasil" : "Kesalahan",
+                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    message,
+                    style: const TextStyle(fontSize: 16),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
-                Center(
-                  child: Text(message, style: const TextStyle(fontSize: 16)),
-                ),
-              ],
+                      onPressed: () => Navigator.pop(modalContext),
+                      child: const Text('Tutup'),
+                    ),
+                  )
+                ],
+              ),
             ),
-            const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: () => Navigator.pop(context),
-              child: const Text('OK'),
-            ),
-          ],
-        ),
-      ),
+          ),
+        );
+      },
     );
   }
 
-  void _createMonthlyBill(BuildContext context) async {
-    Navigator.pop(context); // Tutup modal konfirmasi sebelumnya
-    _showModalLoading(context); // Tampilkan loading pakai context yang benar
+  void _createMonthlyBill(BuildContext modalContext) async {
+    Navigator.pop(modalContext);
+
+    _showModalLoading(context);
 
     try {
       final response = await _http.post('monthly-bills', requiresAuth: true);
 
-      Navigator.pop(context); // Tutup loading
+      Navigator.pop(context);
 
       if (response.statusCode == 200) {
         _showModalMessage('Tagihan bulanan berhasil dibuat.', success: true);
@@ -621,7 +653,7 @@ class _BillsScreenState extends State<BillsScreen> {
         _showModalMessage('Gagal membuat tagihan bulanan.');
       }
     } catch (e) {
-      Navigator.pop(context); // Pastikan loading ditutup walau error
+      Navigator.pop(context);
       _showModalMessage('Gagal membuat tagihan bulanan.');
     }
   }
@@ -677,7 +709,6 @@ class _BillsScreenState extends State<BillsScreen> {
                 Expanded(
                   child: TextButton(
                     onPressed: () {
-                      // Navigator.pop(modalContext);
                       _createMonthlyBill(modalContext);
                     },
                     style: TextButton.styleFrom(
