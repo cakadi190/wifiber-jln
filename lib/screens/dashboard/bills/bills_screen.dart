@@ -129,10 +129,22 @@ class _BillsScreenState extends State<BillsScreen> {
                       onCustomerSelected: _onCustomerSelected,
                     );
                   },
-                  child: Text('Cari Pelanggan'),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.search, color: AppColors.primary),
+                      const SizedBox(width: 8),
+                      Text('Cari Pelanggan'),
+                    ],
+                  ),
                 ),
                 PopupMenuItem(
-                  child: Text('Buat Tagihan Bulanan'),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.sync, color: AppColors.primary),
+                      const SizedBox(width: 8),
+                      Text('Buat Tagihan Bulanan'),
+                    ],
+                  ),
                 ),
               ],
             ),
@@ -886,10 +898,10 @@ class _BillsScreenState extends State<BillsScreen> {
           width: double.infinity,
           child: OutlinedButton.icon(
             onPressed: () {
-              _printBill(context, bill);
+              Navigator.pop(context);
             },
-            icon: const Icon(Icons.print),
-            label: const Text('Cetak Tagihan'),
+            icon: const Icon(Icons.close),
+            label: const Text('Tutup'),
             style: OutlinedButton.styleFrom(
               foregroundColor: AppColors.primary,
               side: BorderSide(color: AppColors.primary),
@@ -901,12 +913,6 @@ class _BillsScreenState extends State<BillsScreen> {
           ),
         ),
       ],
-    );
-  }
-
-  void _printBill(BuildContext context, Bills bill) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Fitur cetak tagihan akan segera tersedia')),
     );
   }
 
