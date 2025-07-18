@@ -12,6 +12,11 @@ class BillsProvider extends ChangeNotifier {
   List<Bills> _bills = [];
   BillsState _state = BillsState.initial;
   String _errorMessage = '';
+  String _currentSearchQuery = '';
+  String? _currentStatusFilter;
+
+  String? _currentCustomerId;
+  String? _currentPeriod;
 
   List<Bills> get bills => _bills;
 
@@ -23,9 +28,6 @@ class BillsProvider extends ChangeNotifier {
 
   List<Bills> get unpaidBills => _bills.where((bill) => !bill.isPaid).toList();
 
-  List<Bills> get overdueBills =>
-      _bills.where((bill) => bill.isOverdue).toList();
-
   int get totalPaidAmount => paidBills.fold(
     0,
     (sum, bill) => sum + (int.tryParse(bill.totalAmount.toString()) ?? 0),
@@ -36,23 +38,25 @@ class BillsProvider extends ChangeNotifier {
     (sum, bill) => sum + (int.tryParse(bill.totalAmount.toString()) ?? 0),
   );
 
-  int get totalOverdueAmount => overdueBills.fold(
-    0,
-    (sum, bill) => sum + (int.tryParse(bill.totalAmount.toString()) ?? 0),
-  );
-
   Future<void> fetchBills({
     String? customerId,
     String? period,
     String? status,
+    String? searchQuery,
   }) async {
     try {
       _setState(BillsState.loading);
+
+      _currentCustomerId = customerId;
+      _currentPeriod = period;
+      _currentStatusFilter = status;
+      _currentSearchQuery = searchQuery ?? '';
 
       final billResponse = await _billsService.getBills(
         customerId: customerId,
         period: period,
         status: status,
+        searchQuery: searchQuery,
       );
 
       _bills = billResponse.data;
@@ -69,7 +73,7 @@ class BillsProvider extends ChangeNotifier {
       final billResponse = await _billsService.createBill(createBill);
 
       if (billResponse.success == true) {
-        await fetchBills();
+        await refresh();
         return true;
       } else {
         _setError(billResponse.message);
@@ -82,49 +86,70 @@ class BillsProvider extends ChangeNotifier {
   }
 
   Future<void> fetchBillsByCustomerId(String customerId) async {
-    try {
-      _setState(BillsState.loading);
-
-      final billResponse = await _billsService.getBillsByCustomerId(customerId);
-
-      _bills = billResponse.data;
-      _setState(BillsState.loaded);
-    } catch (e) {
-      _setError(e.toString());
-    }
+    await fetchBills(
+      customerId: customerId,
+      status: _currentStatusFilter,
+      searchQuery: _currentSearchQuery.isNotEmpty ? _currentSearchQuery : null,
+    );
   }
 
   Future<void> fetchBillsByStatus(String status) async {
-    await fetchBills(status: status);
+    await fetchBills(
+      customerId: _currentCustomerId,
+      period: _currentPeriod,
+      status: status,
+      searchQuery: _currentSearchQuery.isNotEmpty ? _currentSearchQuery : null,
+    );
   }
 
   Future<void> fetchBillsByPeriod(String period) async {
-    await fetchBills(period: period);
+    await fetchBills(
+      customerId: _currentCustomerId,
+      period: period,
+      status: _currentStatusFilter,
+      searchQuery: _currentSearchQuery.isNotEmpty ? _currentSearchQuery : null,
+    );
   }
 
   Future<void> fetchBillsByCustomerAndPeriod(
     String customerId,
     String period,
   ) async {
-    await fetchBills(customerId: customerId, period: period);
+    await fetchBills(
+      customerId: customerId,
+      period: period,
+      status: _currentStatusFilter,
+      searchQuery: _currentSearchQuery.isNotEmpty ? _currentSearchQuery : null,
+    );
   }
 
   Future<void> refresh() async {
-    await fetchBills();
+    await fetchBills(
+      customerId: _currentCustomerId,
+      period: _currentPeriod,
+      status: _currentStatusFilter,
+      searchQuery: _currentSearchQuery.isNotEmpty ? _currentSearchQuery : null,
+    );
   }
 
-  List<Bills> searchBills(String query) {
-    if (query.isEmpty) return _bills;
-
-    return _bills.where((bill) {
-      return bill.invoice.toLowerCase().contains(query.toLowerCase()) ||
-          bill.name.toLowerCase().contains(query.toLowerCase()) ||
-          bill.customerId.toLowerCase().contains(query.toLowerCase());
-    }).toList();
+  Future<void> searchBills(String query) async {
+    _currentSearchQuery = query;
+    await fetchBills(
+      customerId: _currentCustomerId,
+      period: _currentPeriod,
+      status: _currentStatusFilter,
+      searchQuery: query.isNotEmpty ? query : null,
+    );
   }
 
-  List<Bills> filterBillsByStatus(BillStatus status) {
-    return _bills.where((bill) => bill.status == status).toList();
+  Future<void> filterBillsByPaymentStatus(String? status) async {
+    _currentStatusFilter = status;
+    await fetchBills(
+      customerId: _currentCustomerId,
+      period: _currentPeriod,
+      status: status,
+      searchQuery: _currentSearchQuery.isNotEmpty ? _currentSearchQuery : null,
+    );
   }
 
   List<Bills> filterBillsByPeriod(String period) {
@@ -141,12 +166,22 @@ class BillsProvider extends ChangeNotifier {
 
   void clearBills() {
     _bills.clear();
+    _currentSearchQuery = '';
+    _currentStatusFilter = null;
+    _currentCustomerId = null;
+    _currentPeriod = null;
     _setState(BillsState.initial);
   }
 
   void clearError() {
     _errorMessage = '';
     notifyListeners();
+  }
+
+  Future<void> clearFilters() async {
+    _currentSearchQuery = '';
+    _currentStatusFilter = null;
+    await fetchBills(customerId: _currentCustomerId, period: _currentPeriod);
   }
 
   void _setState(BillsState state) {

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
@@ -19,6 +21,7 @@ class _BillsScreenState extends State<BillsScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedFilter = 'all';
   bool _isSearching = false;
+  Timer? _searchTimer;
 
   @override
   void initState() {
@@ -32,6 +35,7 @@ class _BillsScreenState extends State<BillsScreen> {
   @override
   void dispose() {
     _searchController.dispose();
+    _searchTimer?.cancel();
     super.dispose();
   }
 
@@ -46,6 +50,37 @@ class _BillsScreenState extends State<BillsScreen> {
       _isSearching = false;
       _searchController.clear();
     });
+
+    context.read<BillsProvider>().searchBills('');
+  }
+
+  void _onSearchChanged(String value) {
+    _searchTimer?.cancel();
+
+    _searchTimer = Timer(const Duration(milliseconds: 500), () {
+      context.read<BillsProvider>().searchBills(value);
+    });
+  }
+
+  void _onFilterChanged(String value) async {
+    final provider = context.read<BillsProvider>();
+
+    setState(() {
+      _selectedFilter = value;
+    });
+
+    switch (value) {
+      case 'paid':
+        await provider.filterBillsByPaymentStatus('paid');
+        break;
+      case 'unpaid':
+        await provider.filterBillsByPaymentStatus('unpaid');
+        break;
+      case 'all':
+      default:
+        await provider.filterBillsByPaymentStatus(null);
+        break;
+    }
   }
 
   @override
@@ -68,7 +103,7 @@ class _BillsScreenState extends State<BillsScreen> {
             );
 
             if (result == true) {
-              context.read<BillsProvider>().refresh();
+              await context.read<BillsProvider>().refresh();
             }
           },
         ),
@@ -76,28 +111,23 @@ class _BillsScreenState extends State<BillsScreen> {
         appBar: AppBar(
           title: _isSearching
               ? TextField(
-            controller: _searchController,
-            autofocus: true,
-            decoration: const InputDecoration(
-              hintText: 'Cari tagihan...',
-              hintStyle: TextStyle(color: Colors.white70),
-              border: InputBorder.none,
-            ),
-            style: const TextStyle(color: Colors.white),
-            onChanged: (value) {
-              setState(() {});
-            },
-          )
+                  controller: _searchController,
+                  autofocus: true,
+                  decoration: const InputDecoration(
+                    hintText: 'Cari tagihan...',
+                    hintStyle: TextStyle(color: Colors.white70),
+                    border: InputBorder.none,
+                  ),
+                  style: const TextStyle(color: Colors.white),
+                  onChanged: _onSearchChanged,
+                )
               : const Text('Daftar Tagihan'),
           elevation: 0,
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
           actions: [
             if (_isSearching)
-              IconButton(
-                icon: const Icon(Icons.close),
-                onPressed: _stopSearch,
-              )
+              IconButton(icon: const Icon(Icons.close), onPressed: _stopSearch)
             else
               IconButton(
                 icon: const Icon(Icons.search),
@@ -127,7 +157,6 @@ class _BillsScreenState extends State<BillsScreen> {
                             _buildFilterChip('all', 'Semua'),
                             _buildFilterChip('paid', 'Lunas'),
                             _buildFilterChip('unpaid', 'Belum Lunas'),
-                            _buildFilterChip('overdue', 'Jatuh Tempo'),
                           ],
                         ),
                       ),
@@ -169,9 +198,9 @@ class _BillsScreenState extends State<BillsScreen> {
                                   ),
                                   const SizedBox(height: 16),
                                   ElevatedButton(
-                                    onPressed: () {
+                                    onPressed: () async {
                                       billsProvider.clearError();
-                                      billsProvider.refresh();
+                                      await billsProvider.refresh();
                                     },
                                     child: const Text('Coba Lagi'),
                                   ),
@@ -180,9 +209,7 @@ class _BillsScreenState extends State<BillsScreen> {
                             );
                           }
 
-                          List<Bills> filteredBills = _getFilteredBills(
-                            billsProvider,
-                          );
+                          List<Bills> filteredBills = billsProvider.bills;
 
                           if (filteredBills.isEmpty) {
                             return Center(
@@ -254,39 +281,15 @@ class _BillsScreenState extends State<BillsScreen> {
         ),
         selected: isSelected,
         onSelected: (selected) {
-          setState(() {
-            _selectedFilter = value;
-          });
+          if (selected) {
+            _onFilterChanged(value);
+          }
         },
         backgroundColor: AppColors.primary.withValues(alpha: 0.1),
         selectedColor: AppColors.primary,
         side: BorderSide.none,
       ),
     );
-  }
-
-  List<Bills> _getFilteredBills(BillsProvider provider) {
-    List<Bills> bills = provider.bills;
-
-    if (_searchController.text.isNotEmpty) {
-      bills = provider.searchBills(_searchController.text);
-    }
-
-    switch (_selectedFilter) {
-      case 'paid':
-        bills = bills.where((bill) => bill.isPaid).toList();
-        break;
-      case 'unpaid':
-        bills = bills.where((bill) => !bill.isPaid).toList();
-        break;
-      case 'overdue':
-        bills = bills.where((bill) => bill.isOverdue).toList();
-        break;
-      default:
-        break;
-    }
-
-    return bills;
   }
 
   Widget _buildBillCard(Bills bill) {
@@ -351,7 +354,7 @@ class _BillsScreenState extends State<BillsScreen> {
                     ],
                   ),
                   Text(
-                    'Rp ${_formatCurrency(bill.totalAmount)}',
+                    _formatCurrency(bill.totalAmount),
                     style: TextStyle(
                       fontSize: 16,
                       fontWeight: FontWeight.bold,
@@ -376,10 +379,6 @@ class _BillsScreenState extends State<BillsScreen> {
       backgroundColor = Colors.green[100]!;
       textColor = Colors.green[800]!;
       text = 'Lunas';
-    } else if (bill.isOverdue) {
-      backgroundColor = Colors.red[100]!;
-      textColor = Colors.red[800]!;
-      text = 'Jatuh Tempo';
     } else {
       backgroundColor = Colors.orange[100]!;
       textColor = Colors.orange[800]!;

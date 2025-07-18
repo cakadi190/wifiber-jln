@@ -11,12 +11,14 @@ class BillsService {
     String? customerId,
     String? period,
     String? status,
+    String? searchQuery,
   }) async {
     try {
       final parameters = <String, String>{};
       if (customerId != null) parameters['customer_id'] = customerId;
       if (period != null) parameters['period'] = period;
       if (status != null) parameters['status'] = status;
+      if (status != null) parameters['customer_id'] = searchQuery ?? '';
 
       final response = await _http.get(
         _baseUrl,
