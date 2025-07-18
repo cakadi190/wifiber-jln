@@ -17,6 +17,7 @@ class BillsScreen extends StatefulWidget {
 class _BillsScreenState extends State<BillsScreen> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedFilter = 'all';
+  bool _isSearching = false;
 
   @override
   void initState() {
@@ -31,6 +32,19 @@ class _BillsScreenState extends State<BillsScreen> {
   void dispose() {
     _searchController.dispose();
     super.dispose();
+  }
+
+  void _startSearch() {
+    setState(() {
+      _isSearching = true;
+    });
+  }
+
+  void _stopSearch() {
+    setState(() {
+      _isSearching = false;
+      _searchController.clear();
+    });
   }
 
   @override
@@ -59,10 +73,36 @@ class _BillsScreenState extends State<BillsScreen> {
         ),
         backgroundColor: AppColors.primary,
         appBar: AppBar(
-          title: const Text('Daftar Tagihan'),
+          title: _isSearching
+              ? TextField(
+            controller: _searchController,
+            autofocus: true,
+            decoration: const InputDecoration(
+              hintText: 'Cari tagihan...',
+              hintStyle: TextStyle(color: Colors.white70),
+              border: InputBorder.none,
+            ),
+            style: const TextStyle(color: Colors.white),
+            onChanged: (value) {
+              setState(() {});
+            },
+          )
+              : const Text('Daftar Tagihan'),
           elevation: 0,
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
+          actions: [
+            if (_isSearching)
+              IconButton(
+                icon: const Icon(Icons.close),
+                onPressed: _stopSearch,
+              )
+            else
+              IconButton(
+                icon: const Icon(Icons.search),
+                onPressed: _startSearch,
+              ),
+          ],
         ),
         body: Column(
           children: [
@@ -79,50 +119,16 @@ class _BillsScreenState extends State<BillsScreen> {
                   children: [
                     Container(
                       padding: const EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          TextField(
-                            controller: _searchController,
-                            decoration: InputDecoration(
-                              hintText: 'Cari tagihan...',
-                              prefixIcon: const Icon(Icons.search),
-                              border: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Colors.grey[300]!,
-                                ),
-                              ),
-                              enabledBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: Colors.grey[300]!,
-                                ),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(
-                                  color: AppColors.primary,
-                                ),
-                              ),
-                            ),
-                            onChanged: (value) {
-                              setState(() {});
-                            },
-                          ),
-                          const SizedBox(height: 12),
-
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: [
-                                _buildFilterChip('all', 'Semua'),
-                                _buildFilterChip('paid', 'Lunas'),
-                                _buildFilterChip('unpaid', 'Belum Lunas'),
-                                _buildFilterChip('overdue', 'Jatuh Tempo'),
-                              ],
-                            ),
-                          ),
-                        ],
+                      child: SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          children: [
+                            _buildFilterChip('all', 'Semua'),
+                            _buildFilterChip('paid', 'Lunas'),
+                            _buildFilterChip('unpaid', 'Belum Lunas'),
+                            _buildFilterChip('overdue', 'Jatuh Tempo'),
+                          ],
+                        ),
                       ),
                     ),
 
@@ -399,7 +405,7 @@ class _BillsScreenState extends State<BillsScreen> {
   String _formatCurrency(int amount) {
     return amount.toString().replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]}.',
+          (Match m) => '${m[1]}.',
     );
   }
 }
