@@ -1,5 +1,6 @@
 import 'package:flutter/foundation.dart';
 import 'package:wifiber/models/bills.dart';
+import 'package:wifiber/services/bills_service.dart';
 
 enum BillsState {
   initial,
