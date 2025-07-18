@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:http/http.dart' as http;
 import 'package:wifiber/models/bills.dart';
 import 'package:wifiber/services/http_service.dart';
 
