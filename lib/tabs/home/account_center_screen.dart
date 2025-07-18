@@ -68,7 +68,6 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
                 headers: authUser?.accessToken != null
                     ? {'Authorization': 'Bearer ${authUser?.accessToken}'}
                     : null,
-                cacheDuration: Duration(days: 2),
               ),
               const SizedBox(height: 8),
               Text(
