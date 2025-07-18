@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
+import 'package:wifiber/components/widgets/customer_search_modal.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/models/bills.dart';
+import 'package:wifiber/models/customer.dart';
 import 'package:wifiber/providers/bills_provider.dart';
 
 class BillsCreateScreen extends StatefulWidget {
@@ -20,6 +22,8 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
   final _paymentMethodController = TextEditingController();
   final _paymentProofController = TextEditingController();
   final _paymentNoteController = TextEditingController();
+
+  Customer? selectedCustomer;
 
   bool _isPaid = false;
   bool _openIsolir = false;
@@ -143,6 +147,29 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
     }
   }
 
+  void _showCustomerSearchModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      enableDrag: true,
+      isDismissible: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (context) {
+        return CustomerSearchModal(
+          title: 'Pilih Pelanggan',
+          selectedCustomer: selectedCustomer,
+          onCustomerSelected: (customer) {
+            setState(() {
+              selectedCustomer = customer;
+            });
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SystemUiWrapper(
@@ -192,41 +219,78 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
                   children: [
                     // Informasi Dasar
                     const Text(
-                      'Customer ID',
+                      'Pelanggan',
                       style: TextStyle(
                         fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+                        fontWeight: FontWeight.bold,
                       ),
                     ),
                     const SizedBox(height: 8),
-                    TextFormField(
-                      controller: _customerIdController,
-                      decoration: InputDecoration(
-                        hintText: 'Masukkan ID customer',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
+                    InkWell(
+                      onTap: _isLoading
+                          ? null
+                          : _showCustomerSearchModal,
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 12,
+                          vertical: 16,
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        decoration: BoxDecoration(
+                          border: Border.all(
+                            color: _isLoading
+                                ? Colors.grey.shade400
+                                : Colors.grey.shade300,
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                          color: _isLoading
+                              ? Colors.grey.shade50
+                              : null,
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: AppColors.primary),
+                        child: Row(
+                          mainAxisAlignment:
+                          MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment:
+                                CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    selectedCustomer?.name ??
+                                        'Pilih Pelanggan',
+                                    style: TextStyle(
+                                      color: selectedCustomer != null
+                                          ? Colors.black
+                                          : Colors.grey.shade600,
+                                      fontSize: 16,
+                                      fontWeight:
+                                      selectedCustomer != null
+                                          ? FontWeight.w500
+                                          : FontWeight.normal,
+                                    ),
+                                  ),
+                                  if (selectedCustomer != null)
+                                    Text(
+                                      selectedCustomer!.phone,
+                                      style: TextStyle(
+                                        color: Colors.grey.shade600,
+                                        fontSize: 14,
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                            Icon(
+                              Icons.arrow_drop_down,
+                              color: _isLoading
+                                  ? Colors.grey.shade400
+                                  : Colors.grey.shade600,
+                            ),
+                          ],
                         ),
-                        filled: true,
-                        fillColor: Colors.grey.shade50,
                       ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Customer ID harus diisi';
-                        }
-                        return null;
-                      },
                     ),
-
                     const SizedBox(height: 24),
 
                     const Text(
