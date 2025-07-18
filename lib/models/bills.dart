@@ -47,33 +47,37 @@ class Bills {
     this.routerId,
   });
 
-  factory Bills.fromJson(Map<String, dynamic> json) => Bills(
-    id: json['id'].toString(),
-    customerId: json['customer_id'].toString(),
-    invoice: json['invoice'].toString(),
-    period: json['period'].toString(),
-    status: BillStatus.values.firstWhere(
-          (status) => status.name.toUpperCase() == json['status'].toString().toUpperCase(),
-      orElse: () => BillStatus.UNPAID,
-    ),
-    basePrice: json['base_price'] ?? 0,
-    tax: json['tax'] ?? 0,
-    packageName: json['package_name']?.toString() ?? '',
-    paymentAt: json['payment_at'] != null ? DateTime.tryParse(json['payment_at'].toString()) : null,
-    paymentReceivedBy: json['payment_received_by']?.toString(),
-    paymentMethod: json['payment_method']?.toString(),
-    additionalInfo: json['additional_info']?.toString(),
-    createdAt: json['created_at'] != null ? DateTime.tryParse(json['created_at'].toString()) : null,
-    discount: json['discount'],
-    name: json['name']?.toString() ?? '',
-    nickname: json['nickname']?.toString(),
-    address: json['address']?.toString(),
-    phone: json['phone']?.toString(),
-    dueDate: DateTime.parse(json['due_date'].toString()),
-    ppoeSecret: json['pppoe_secret']?.toString(),
-    locationPhoto: json['location_photo']?.toString(),
-    routerId: json['router_id'],
-  );
+  factory Bills.fromJson(Map<String, dynamic> json) {
+    print(json);
+
+    return Bills(
+      id: json['id'].toString(),
+      customerId: json['customer_id'].toString(),
+      invoice: json['invoice'].toString(),
+      period: json['period'].toString(),
+      status: BillStatus.values.firstWhere(
+            (status) => status.name.toUpperCase() == json['status'].toString().toUpperCase(),
+        orElse: () => BillStatus.UNPAID,
+      ),
+      basePrice: json['base_price'] ?? 0,
+      tax: json['tax'] ?? 0,
+      packageName: json['package_name']?.toString() ?? '',
+      paymentAt: json['payment_at'] != null ? DateTime.tryParse(json['payment_at'].toString()) : null,
+      paymentReceivedBy: json['payment_received_by']?.toString(),
+      paymentMethod: json['payment_method']?.toString(),
+      additionalInfo: json['additional_info']?.toString(),
+      createdAt: json['created_at'] != null ? DateTime.tryParse(json['created_at'].toString()) : null,
+      discount: json['discount'],
+      name: json['name']?.toString() ?? '',
+      nickname: json['nickname']?.toString(),
+      address: json['address']?.toString(),
+      phone: json['phone']?.toString(),
+      dueDate: DateTime.parse(json['due_date'].toString()),
+      ppoeSecret: json['pppoe_secret']?.toString(),
+      locationPhoto: json['location_photo']?.toString(),
+      routerId: json['router_id'],
+    );
+  }
 
   Map<String, dynamic> toJson() => {
     'id': id,
