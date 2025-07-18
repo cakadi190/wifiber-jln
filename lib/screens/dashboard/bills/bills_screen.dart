@@ -268,23 +268,23 @@ class _BillsScreenState extends State<BillsScreen> {
   List<Bills> _getFilteredBills(BillsProvider provider) {
     List<Bills> bills = provider.bills;
 
-    // if (_searchController.text.isNotEmpty) {
-    //   bills = provider.searchBills(_searchController.text);
-    // }
-    //
-    // switch (_selectedFilter) {
-    //   case 'paid':
-    //     bills = bills.where((bill) => bill.isPaid).toList();
-    //     break;
-    //   case 'unpaid':
-    //     bills = bills.where((bill) => !bill.isPaid).toList();
-    //     break;
-    //   case 'overdue':
-    //     bills = bills.where((bill) => bill.isOverdue).toList();
-    //     break;
-    //   default:
-    //     break;
-    // }
+    if (_searchController.text.isNotEmpty) {
+      bills = provider.searchBills(_searchController.text);
+    }
+
+    switch (_selectedFilter) {
+      case 'paid':
+        bills = bills.where((bill) => bill.isPaid).toList();
+        break;
+      case 'unpaid':
+        bills = bills.where((bill) => !bill.isPaid).toList();
+        break;
+      case 'overdue':
+        bills = bills.where((bill) => bill.isOverdue).toList();
+        break;
+      default:
+        break;
+    }
 
     return bills;
   }
@@ -372,36 +372,35 @@ class _BillsScreenState extends State<BillsScreen> {
     Color textColor;
     String text;
 
-    // if (bill.isPaid) {
-    //   backgroundColor = Colors.green[100]!;
-    //   textColor = Colors.green[800]!;
-    //   text = 'Lunas';
-    // } else if (bill.isOverdue) {
-    //   backgroundColor = Colors.red[100]!;
-    //   textColor = Colors.red[800]!;
-    //   text = 'Jatuh Tempo';
-    // } else {
-    //   backgroundColor = Colors.orange[100]!;
-    //   textColor = Colors.orange[800]!;
-    //   text = 'Belum Lunas';
-    // }
-    //
-    // return Container(
-    //   padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-    //   decoration: BoxDecoration(
-    //     color: backgroundColor,
-    //     borderRadius: BorderRadius.circular(12),
-    //   ),
-    //   child: Text(
-    //     text,
-    //     style: TextStyle(
-    //       fontSize: 12,
-    //       fontWeight: FontWeight.bold,
-    //       color: textColor,
-    //     ),
-    //   ),
-    // );
-    return Container();
+    if (bill.isPaid) {
+      backgroundColor = Colors.green[100]!;
+      textColor = Colors.green[800]!;
+      text = 'Lunas';
+    } else if (bill.isOverdue) {
+      backgroundColor = Colors.red[100]!;
+      textColor = Colors.red[800]!;
+      text = 'Jatuh Tempo';
+    } else {
+      backgroundColor = Colors.orange[100]!;
+      textColor = Colors.orange[800]!;
+      text = 'Belum Lunas';
+    }
+
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+      decoration: BoxDecoration(
+        color: backgroundColor,
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Text(
+        text,
+        style: TextStyle(
+          fontSize: 12,
+          fontWeight: FontWeight.bold,
+          color: textColor,
+        ),
+      ),
+    );
   }
 
   String _formatCurrency(int amount) {

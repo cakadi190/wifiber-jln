@@ -23,8 +23,8 @@ class BillsProvider extends ChangeNotifier {
 
   List<Bills> get unpaidBills => _bills.where((bill) => !bill.isPaid).toList();
 
-  // List<Bills> get overdueBills =>
-  //     _bills.where((bill) => bill.isOverdue).toList();
+  List<Bills> get overdueBills =>
+      _bills.where((bill) => bill.isOverdue).toList();
 
   int get totalPaidAmount => paidBills.fold(
     0,
@@ -36,10 +36,10 @@ class BillsProvider extends ChangeNotifier {
     (sum, bill) => sum + (int.tryParse(bill.totalAmount.toString()) ?? 0),
   );
 
-  // int get totalOverdueAmount => overdueBills.fold(
-  //   0,
-  //   (sum, bill) => sum + (int.tryParse(bill.totalAmount.toString()) ?? 0),
-  // );
+  int get totalOverdueAmount => overdueBills.fold(
+    0,
+    (sum, bill) => sum + (int.tryParse(bill.totalAmount.toString()) ?? 0),
+  );
 
   Future<void> fetchBills({
     String? customerId,
