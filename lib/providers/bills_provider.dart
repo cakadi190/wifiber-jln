@@ -1,12 +1,21 @@
-// lib/providers/bills_provider.dart
 import 'package:flutter/foundation.dart';
-import 'package:wifiber/controllers/bills_controller.dart';
 import 'package:wifiber/models/bills.dart';
 
 enum BillsState { initial, loading, loaded, error }
 
+abstract class BillsService {
+  Future<List<Bills>> fetchBills();
+
+  Future<Bills?> createBill(CreateBill createBill);
+
+  Future<List<Bills>> fetchBillsByCustomerId(String customerId);
+}
+
 class BillsProvider extends ChangeNotifier {
-  final BillsController _billsController = BillsController();
+  final BillsService _billsService;
+
+  BillsProvider({required BillsService billsService})
+    : _billsService = billsService;
 
   List<Bills> _bills = [];
   BillsState _state = BillsState.initial;
@@ -37,8 +46,7 @@ class BillsProvider extends ChangeNotifier {
   Future<void> fetchBills() async {
     try {
       _setState(BillsState.loading);
-
-      final bills = await _billsController.fetchBills();
+      final bills = await _billsService.fetchBills();
       _bills = bills;
       _setState(BillsState.loaded);
     } catch (e) {
@@ -49,8 +57,7 @@ class BillsProvider extends ChangeNotifier {
   Future<bool> createBill(CreateBill createBill) async {
     try {
       _setState(BillsState.loading);
-
-      final newBill = await _billsController.createBill(createBill);
+      final newBill = await _billsService.createBill(createBill);
       if (newBill != null) {
         _bills.add(newBill);
         _setState(BillsState.loaded);
@@ -68,8 +75,7 @@ class BillsProvider extends ChangeNotifier {
   Future<void> fetchBillsByCustomerId(String customerId) async {
     try {
       _setState(BillsState.loading);
-
-      final bills = await _billsController.fetchBillsByCustomerId(customerId);
+      final bills = await _billsService.fetchBillsByCustomerId(customerId);
       _bills = bills;
       _setState(BillsState.loaded);
     } catch (e) {
