@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/config/app_colors.dart';
-import 'package:wifiber/providers/bills_provider.dart'; // Updated import
 import 'package:wifiber/helpers/system_ui_helper.dart';
-import 'package:wifiber/screens/dashboard/bills/bills_create_screen.dart';
 import 'package:wifiber/models/bills.dart';
+import 'package:wifiber/providers/bills_provider.dart';
+import 'package:wifiber/screens/dashboard/bills/bills_create_screen.dart';
 
 class BillsScreen extends StatefulWidget {
   const BillsScreen({super.key});
@@ -21,7 +21,7 @@ class _BillsScreenState extends State<BillsScreen> {
   @override
   void initState() {
     super.initState();
-    // Fetch bills when screen is first loaded
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<BillsProvider>().fetchBills();
     });
@@ -51,7 +51,7 @@ class _BillsScreenState extends State<BillsScreen> {
                 builder: (context) => const BillsCreateScreen(),
               ),
             );
-            // Refresh bills if new bill was created
+
             if (result == true) {
               context.read<BillsProvider>().refresh();
             }
@@ -77,12 +77,10 @@ class _BillsScreenState extends State<BillsScreen> {
                 ),
                 child: Column(
                   children: [
-                    // Search and Filter Section
                     Container(
                       padding: const EdgeInsets.all(16),
                       child: Column(
                         children: [
-                          // Search Bar
                           TextField(
                             controller: _searchController,
                             decoration: InputDecoration(
@@ -90,15 +88,21 @@ class _BillsScreenState extends State<BillsScreen> {
                               prefixIcon: const Icon(Icons.search),
                               border: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(color: Colors.grey[300]!),
+                                borderSide: BorderSide(
+                                  color: Colors.grey[300]!,
+                                ),
                               ),
                               enabledBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(color: Colors.grey[300]!),
+                                borderSide: BorderSide(
+                                  color: Colors.grey[300]!,
+                                ),
                               ),
                               focusedBorder: OutlineInputBorder(
                                 borderRadius: BorderRadius.circular(12),
-                                borderSide: BorderSide(color: AppColors.primary),
+                                borderSide: BorderSide(
+                                  color: AppColors.primary,
+                                ),
                               ),
                             ),
                             onChanged: (value) {
@@ -106,7 +110,7 @@ class _BillsScreenState extends State<BillsScreen> {
                             },
                           ),
                           const SizedBox(height: 12),
-                          // Filter Chips
+
                           SingleChildScrollView(
                             scrollDirection: Axis.horizontal,
                             child: Row(
@@ -121,7 +125,7 @@ class _BillsScreenState extends State<BillsScreen> {
                         ],
                       ),
                     ),
-                    // Bills List
+
                     Expanded(
                       child: Consumer<BillsProvider>(
                         builder: (context, billsProvider, child) {
@@ -154,9 +158,7 @@ class _BillsScreenState extends State<BillsScreen> {
                                   Text(
                                     billsProvider.errorMessage,
                                     textAlign: TextAlign.center,
-                                    style: TextStyle(
-                                      color: Colors.grey[600],
-                                    ),
+                                    style: TextStyle(color: Colors.grey[600]),
                                   ),
                                   const SizedBox(height: 16),
                                   ElevatedButton(
@@ -171,7 +173,9 @@ class _BillsScreenState extends State<BillsScreen> {
                             );
                           }
 
-                          List<Bills> filteredBills = _getFilteredBills(billsProvider);
+                          List<Bills> filteredBills = _getFilteredBills(
+                            billsProvider,
+                          );
 
                           if (filteredBills.isEmpty) {
                             return Center(
@@ -195,9 +199,7 @@ class _BillsScreenState extends State<BillsScreen> {
                                   const SizedBox(height: 8),
                                   Text(
                                     'Tagihan akan muncul di sini',
-                                    style: TextStyle(
-                                      color: Colors.grey[600],
-                                    ),
+                                    style: TextStyle(color: Colors.grey[600]),
                                   ),
                                 ],
                               ),
@@ -207,7 +209,9 @@ class _BillsScreenState extends State<BillsScreen> {
                           return RefreshIndicator(
                             onRefresh: billsProvider.refresh,
                             child: ListView.builder(
-                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 16,
+                              ),
                               itemCount: filteredBills.length,
                               itemBuilder: (context, index) {
                                 final bill = filteredBills[index];
@@ -253,12 +257,10 @@ class _BillsScreenState extends State<BillsScreen> {
   List<Bills> _getFilteredBills(BillsProvider provider) {
     List<Bills> bills = provider.bills;
 
-    // Apply search filter
     if (_searchController.text.isNotEmpty) {
       bills = provider.searchBills(_searchController.text);
     }
 
-    // Apply status filter
     switch (_selectedFilter) {
       case 'paid':
         bills = bills.where((bill) => bill.isPaid).toList();
@@ -270,7 +272,6 @@ class _BillsScreenState extends State<BillsScreen> {
         bills = bills.where((bill) => bill.isOverdue).toList();
         break;
       default:
-      // 'all' - no additional filtering
         break;
     }
 
@@ -281,20 +282,10 @@ class _BillsScreenState extends State<BillsScreen> {
     return Card(
       margin: const EdgeInsets.only(bottom: 12),
       elevation: 2,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-      ),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () {
-          // Navigate to bill detail screen
-          // Navigator.push(
-          //   context,
-          //   MaterialPageRoute(
-          //     builder: (context) => BillDetailScreen(billId: bill.id),
-          //   ),
-          // );
-        },
+        onTap: () {},
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -339,18 +330,12 @@ class _BillsScreenState extends State<BillsScreen> {
                     children: [
                       Text(
                         'Periode: ${bill.period}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                       ),
                       const SizedBox(height: 4),
                       Text(
                         'Customer ID: ${bill.customerId}',
-                        style: TextStyle(
-                          fontSize: 12,
-                          color: Colors.grey[600],
-                        ),
+                        style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                       ),
                     ],
                   ),
@@ -410,7 +395,7 @@ class _BillsScreenState extends State<BillsScreen> {
   String _formatCurrency(int amount) {
     return amount.toString().replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-          (Match m) => '${m[1]}.',
+      (Match m) => '${m[1]}.',
     );
   }
 }
