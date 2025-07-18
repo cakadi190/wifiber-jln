@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
+import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/components/widgets/customer_search_modal.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/helpers/currency_helper.dart';
@@ -9,6 +10,7 @@ import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/models/bills.dart';
 import 'package:wifiber/providers/bills_provider.dart';
 import 'package:wifiber/screens/dashboard/bills/bills_create_screen.dart';
+import 'package:wifiber/services/http_service.dart';
 
 class BillsScreen extends StatefulWidget {
   const BillsScreen({super.key});
@@ -20,6 +22,8 @@ class BillsScreen extends StatefulWidget {
 class _BillsScreenState extends State<BillsScreen> {
   String _selectedFilter = 'all';
   String? _selectedCustomerName;
+
+  final HttpService _http = HttpService();
 
   @override
   void initState() {
@@ -138,6 +142,7 @@ class _BillsScreenState extends State<BillsScreen> {
                   ),
                 ),
                 PopupMenuItem(
+                  onTap: _showModalConfirmationCreateMonthlyBill,
                   child: Row(
                     children: [
                       const Icon(Icons.sync, color: AppColors.primary),
@@ -523,6 +528,107 @@ class _BillsScreenState extends State<BillsScreen> {
     );
   }
 
+  void _createMonthlyBill() async {
+    try {
+      final response = await _http.post('/monthly-bills', requiresAuth: true);
+
+      if (response.statusCode == 200) {
+        SnackBars.success(context, 'Tagihan bulanan berhasil dibuat.');
+      } else {
+        SnackBars.error(context, 'Gagal membuat tagihan bulanan.');
+      }
+    } catch (_) {
+      SnackBars.error(context, 'Gagal membuat tagihan bulanan.');
+    }
+  }
+
+  void _showModalConfirmationCreateMonthlyBill() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      enableDrag: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (modalContext) => DraggableScrollableSheet(
+        initialChildSize: 0.4,
+        minChildSize: 0.2,
+        maxChildSize: 0.9,
+        expand: false,
+        builder: (context, scrollController) {
+          return Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+              left: 16,
+              right: 16,
+              top: 16,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                _buildModalHandle(),
+                const SizedBox(height: 8),
+                const Text(
+                  'Buatkan Tagihan Bulanan?',
+                  style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 16),
+                const Text(
+                  'Apakah anda yakin ingin membuat tagihan bulanan?',
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.pop(modalContext),
+                        style: OutlinedButton.styleFrom(
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          side: const BorderSide(color: AppColors.primary),
+                        ),
+                        child: const Text(
+                          'Tidak',
+                          style: TextStyle(
+                            color: AppColors.primary,
+                            fontSize: 16,
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: TextButton(
+                        onPressed: () {
+                          Navigator.pop(modalContext);
+                          _createMonthlyBill();
+                        },
+                        style: TextButton.styleFrom(
+                          foregroundColor: Colors.white,
+                          backgroundColor: AppColors.primary,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                        ),
+                        child: const Text(
+                          'Ya, Buatkan',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+
   void _showComplaintDetailModal(BuildContext context, Bills bill) {
     showModalBottomSheet(
       context: context,
@@ -872,28 +978,6 @@ class _BillsScreenState extends State<BillsScreen> {
   Widget _buildActionButtons(BuildContext context, Bills bill) {
     return Column(
       children: [
-        if (!bill.isPaid) ...[
-          SizedBox(
-            width: double.infinity,
-            child: ElevatedButton.icon(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              icon: const Icon(Icons.payment),
-              label: const Text('Bayar Tagihan'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.primary,
-                foregroundColor: Colors.white,
-                padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 12),
-        ],
-
         SizedBox(
           width: double.infinity,
           child: OutlinedButton.icon(
