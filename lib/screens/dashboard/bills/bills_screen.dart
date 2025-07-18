@@ -237,19 +237,23 @@ class _BillsScreenState extends State<BillsScreen> {
     return Padding(
       padding: const EdgeInsets.only(right: 8),
       child: FilterChip(
-        label: Text(label),
+        showCheckmark: false,
+        label: Text(
+          label,
+          style: TextStyle(
+            color: isSelected ? Colors.white : AppColors.primary,
+            fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+          ),
+        ),
         selected: isSelected,
         onSelected: (selected) {
           setState(() {
             _selectedFilter = value;
           });
         },
-        backgroundColor: Colors.grey[100],
-        selectedColor: AppColors.primary.withValues(alpha: 0.2),
-        labelStyle: TextStyle(
-          color: isSelected ? AppColors.primary : Colors.grey[700],
-          fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-        ),
+        backgroundColor: AppColors.primary.withValues(alpha: 0.1),
+        selectedColor: AppColors.primary,
+        side: BorderSide.none,
       ),
     );
   }
