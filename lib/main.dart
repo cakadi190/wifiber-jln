@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/config/app_font.dart';
 import 'package:wifiber/providers/auth_provider.dart';
+import 'package:wifiber/providers/bills_provider.dart';
 import 'package:wifiber/providers/complaint_provider.dart';
 import 'package:wifiber/providers/customer_provider.dart';
 import 'package:wifiber/providers/transaction_provider.dart';
@@ -25,6 +26,8 @@ void main() {
         ChangeNotifierProvider(
           create: (_) => ComplaintProvider(ComplaintService()),
         ),
+
+        ChangeNotifierProvider(create: (_) => BillsProvider()),
       ],
       child: const CoreApp(),
     ),

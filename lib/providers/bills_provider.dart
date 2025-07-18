@@ -1,7 +1,7 @@
 // lib/providers/bills_provider.dart
 import 'package:flutter/foundation.dart';
-import 'package:wifiber/models/bills.dart';
 import 'package:wifiber/controllers/bills_controller.dart';
+import 'package:wifiber/models/bills.dart';
 
 enum BillsState { initial, loading, loaded, error }
 
@@ -12,13 +12,18 @@ class BillsProvider extends ChangeNotifier {
   BillsState _state = BillsState.initial;
   String _errorMessage = '';
 
-  // Getters
   List<Bills> get bills => _bills;
+
   BillsState get state => _state;
+
   String get errorMessage => _errorMessage;
+
   List<Bills> get paidBills => _bills.where((bill) => bill.isPaid).toList();
+
   List<Bills> get unpaidBills => _bills.where((bill) => !bill.isPaid).toList();
-  List<Bills> get overdueBills => _bills.where((bill) => bill.isOverdue).toList();
+
+  List<Bills> get overdueBills =>
+      _bills.where((bill) => bill.isOverdue).toList();
 
   int get totalPaidAmount =>
       paidBills.fold(0, (sum, bill) => sum + bill.totalAmount);
@@ -29,7 +34,6 @@ class BillsProvider extends ChangeNotifier {
   int get totalOverdueAmount =>
       overdueBills.fold(0, (sum, bill) => sum + bill.totalAmount);
 
-  // Public methods
   Future<void> fetchBills() async {
     try {
       _setState(BillsState.loading);
@@ -113,7 +117,6 @@ class BillsProvider extends ChangeNotifier {
     notifyListeners();
   }
 
-  // Private methods
   void _setState(BillsState state) {
     _state = state;
     notifyListeners();
