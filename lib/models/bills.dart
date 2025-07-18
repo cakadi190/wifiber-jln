@@ -171,6 +171,30 @@ class Bills {
   int get hashCode => id.hashCode;
 }
 
+class BillResponse {
+  final List<Bills> data;
+  final String message;
+  final bool success;
+
+  BillResponse({
+    required this.data,
+    required this.message,
+    required this.success,
+  });
+
+  factory BillResponse.fromJson(Map<String, dynamic> json) => BillResponse(
+    data: List<Bills>.from(json['data'].map((x) => Bills.fromJson(x))),
+    message: json['message'],
+    success: json['success'],
+  );
+
+  Map<String, dynamic> toJson() => {
+    'data': data.map((x) => x.toJson()).toList(),
+    'message': message,
+    'success': success,
+  };
+}
+
 enum BillStatus {
   PAID,
   UNPAID;
