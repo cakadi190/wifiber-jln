@@ -7,17 +7,17 @@ class Bills {
   final int basePrice;
   final int tax;
   final String packageName;
-  final String? paymentAt;
+  final DateTime? paymentAt;
   final String? paymentReceivedBy;
   final String? paymentMethod;
   final String? additionalInfo;
-  final String? createdAt;
+  final DateTime? createdAt;
   final int? discount;
   final String name;
   final String? nickname;
   final String? address;
   final String? phone;
-  final int dueDate;
+  final DateTime dueDate;
   final String? ppoeSecret;
   final String? locationPhoto;
   final int? routerId;
@@ -53,54 +53,137 @@ class Bills {
     invoice: json['invoice'].toString(),
     period: json['period'].toString(),
     status: BillStatus.values.firstWhere(
-      (status) => status.toString() == 'BillStatus.${json['status'].toString().toUpperCase()}',
+          (status) => status.name.toUpperCase() == json['status'].toString().toUpperCase(),
+      orElse: () => BillStatus.UNPAID,
     ),
-    basePrice: json['base_price'],
-    tax: json['tax'],
-    packageName: json['package_name'].toString(),
-    paymentAt: json['payment_at'].toString(),
-    paymentReceivedBy: json['payment_received_by'].toString(),
-    paymentMethod: json['payment_method'].toString(),
-    additionalInfo: json['additional_info'].toString(),
-    createdAt: json['created_at'].toString(),
+    basePrice: json['base_price'] ?? 0,
+    tax: json['tax'] ?? 0,
+    packageName: json['package_name']?.toString() ?? '',
+    paymentAt: json['payment_at'] != null ? DateTime.tryParse(json['payment_at'].toString()) : null,
+    paymentReceivedBy: json['payment_received_by']?.toString(),
+    paymentMethod: json['payment_method']?.toString(),
+    additionalInfo: json['additional_info']?.toString(),
+    createdAt: json['created_at'] != null ? DateTime.tryParse(json['created_at'].toString()) : null,
     discount: json['discount'],
-    name: json['name'].toString(),
-    nickname: json['nickname'].toString(),
-    address: json['address'].toString(),
-    phone: json['phone'].toString(),
-    dueDate: json['due_date'],
-    ppoeSecret: json['pppoe_secret'].toString(),
-    locationPhoto: json['location_photo'].toString(),
+    name: json['name']?.toString() ?? '',
+    nickname: json['nickname']?.toString(),
+    address: json['address']?.toString(),
+    phone: json['phone']?.toString(),
+    dueDate: DateTime.parse(json['due_date'].toString()),
+    ppoeSecret: json['pppoe_secret']?.toString(),
+    locationPhoto: json['location_photo']?.toString(),
     routerId: json['router_id'],
   );
 
   Map<String, dynamic> toJson() => {
     'id': id,
-    'customerId': customerId,
+    'customer_id': customerId,
     'invoice': invoice,
     'period': period,
-    'status': status.toString(),
-    'basePrice': basePrice,
+    'status': status.name.toLowerCase(),
+    'base_price': basePrice,
     'tax': tax,
-    'packageName': packageName,
-    'paymentAt': paymentAt,
-    'paymentReceivedBy': paymentReceivedBy,
-    'paymentMethod': paymentMethod,
-    'additionalInfo': additionalInfo,
-    'createdAt': createdAt,
+    'package_name': packageName,
+    'payment_at': paymentAt?.toIso8601String(),
+    'payment_received_by': paymentReceivedBy,
+    'payment_method': paymentMethod,
+    'additional_info': additionalInfo,
+    'created_at': createdAt?.toIso8601String(),
     'discount': discount,
     'name': name,
     'nickname': nickname,
     'address': address,
     'phone': phone,
-    'dueDate': dueDate,
-    'pppoeSecret': ppoeSecret,
-    'locationPhoto': locationPhoto,
-    'routerId': routerId,
+    'due_date': dueDate.toIso8601String(),
+    'pppoe_secret': ppoeSecret,
+    'location_photo': locationPhoto,
+    'router_id': routerId,
   };
+
+  int get totalAmount => basePrice + tax - (discount ?? 0);
+
+  bool get isOverdue => DateTime.now().isAfter(dueDate) && status == BillStatus.UNPAID;
+
+  bool get isPaid => status == BillStatus.PAID;
+
+  Bills copyWith({
+    String? id,
+    String? customerId,
+    String? invoice,
+    String? period,
+    BillStatus? status,
+    int? basePrice,
+    int? tax,
+    String? packageName,
+    DateTime? paymentAt,
+    String? paymentReceivedBy,
+    String? paymentMethod,
+    String? additionalInfo,
+    DateTime? createdAt,
+    int? discount,
+    String? name,
+    String? nickname,
+    String? address,
+    String? phone,
+    DateTime? dueDate,
+    String? ppoeSecret,
+    String? locationPhoto,
+    int? routerId,
+  }) {
+    return Bills(
+      id: id ?? this.id,
+      customerId: customerId ?? this.customerId,
+      invoice: invoice ?? this.invoice,
+      period: period ?? this.period,
+      status: status ?? this.status,
+      basePrice: basePrice ?? this.basePrice,
+      tax: tax ?? this.tax,
+      packageName: packageName ?? this.packageName,
+      paymentAt: paymentAt ?? this.paymentAt,
+      paymentReceivedBy: paymentReceivedBy ?? this.paymentReceivedBy,
+      paymentMethod: paymentMethod ?? this.paymentMethod,
+      additionalInfo: additionalInfo ?? this.additionalInfo,
+      createdAt: createdAt ?? this.createdAt,
+      discount: discount ?? this.discount,
+      name: name ?? this.name,
+      nickname: nickname ?? this.nickname,
+      address: address ?? this.address,
+      phone: phone ?? this.phone,
+      dueDate: dueDate ?? this.dueDate,
+      ppoeSecret: ppoeSecret ?? this.ppoeSecret,
+      locationPhoto: locationPhoto ?? this.locationPhoto,
+      routerId: routerId ?? this.routerId,
+    );
+  }
+
+  @override
+  String toString() {
+    return 'Bills(id: $id, customerId: $customerId, invoice: $invoice, status: $status, totalAmount: $totalAmount)';
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is Bills && other.id == id;
+  }
+
+  @override
+  int get hashCode => id.hashCode;
 }
 
-enum BillStatus { PAID, UNPAID }
+enum BillStatus {
+  PAID,
+  UNPAID;
+
+  String get displayName {
+    switch (this) {
+      case BillStatus.PAID:
+        return 'Terbayar';
+      case BillStatus.UNPAID:
+        return 'Belum Terbayar';
+    }
+  }
+}
 
 class CreateBill {
   final String customerId;
@@ -108,7 +191,7 @@ class CreateBill {
   final bool? isPaid;
   final bool? openIsolir;
   final String? paymentMethod;
-  final String paymentAt;
+  final DateTime paymentAt;
   final String? paymentProof;
   final String? paymentNote;
 
@@ -122,4 +205,31 @@ class CreateBill {
     this.paymentProof,
     this.paymentNote,
   });
+
+  factory CreateBill.fromJson(Map<String, dynamic> json) => CreateBill(
+    customerId: json['customer_id'].toString(),
+    period: json['period'].toString(),
+    isPaid: json['is_paid'],
+    openIsolir: json['open_isolir'],
+    paymentMethod: json['payment_method']?.toString(),
+    paymentAt: DateTime.parse(json['payment_at'].toString()),
+    paymentProof: json['payment_proof']?.toString(),
+    paymentNote: json['payment_note']?.toString(),
+  );
+
+  Map<String, dynamic> toJson() => {
+    'customer_id': customerId,
+    'period': period,
+    'is_paid': isPaid,
+    'open_isolir': openIsolir,
+    'payment_method': paymentMethod,
+    'payment_at': paymentAt.toIso8601String(),
+    'payment_proof': paymentProof,
+    'payment_note': paymentNote,
+  };
+
+  @override
+  String toString() {
+    return 'CreateBill(customerId: $customerId, period: $period, isPaid: $isPaid)';
+  }
 }
