@@ -1,8 +1,7 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
+import 'package:wifiber/components/widgets/customer_search_modal.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/helpers/currency_helper.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
@@ -18,10 +17,7 @@ class BillsScreen extends StatefulWidget {
 }
 
 class _BillsScreenState extends State<BillsScreen> {
-  final TextEditingController _searchController = TextEditingController();
   String _selectedFilter = 'all';
-  bool _isSearching = false;
-  Timer? _searchTimer;
 
   @override
   void initState() {
@@ -29,36 +25,6 @@ class _BillsScreenState extends State<BillsScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<BillsProvider>().fetchBills();
-    });
-  }
-
-  @override
-  void dispose() {
-    _searchController.dispose();
-    _searchTimer?.cancel();
-    super.dispose();
-  }
-
-  void _startSearch() {
-    setState(() {
-      _isSearching = true;
-    });
-  }
-
-  void _stopSearch() {
-    setState(() {
-      _isSearching = false;
-      _searchController.clear();
-    });
-
-    context.read<BillsProvider>().searchBills('');
-  }
-
-  void _onSearchChanged(String value) {
-    _searchTimer?.cancel();
-
-    _searchTimer = Timer(const Duration(milliseconds: 500), () {
-      context.read<BillsProvider>().searchBills(value);
     });
   }
 
@@ -109,30 +75,21 @@ class _BillsScreenState extends State<BillsScreen> {
         ),
         backgroundColor: AppColors.primary,
         appBar: AppBar(
-          title: _isSearching
-              ? TextField(
-                  controller: _searchController,
-                  autofocus: true,
-                  decoration: const InputDecoration(
-                    hintText: 'Cari tagihan...',
-                    hintStyle: TextStyle(color: Colors.white70),
-                    border: InputBorder.none,
-                  ),
-                  style: const TextStyle(color: Colors.white),
-                  onChanged: _onSearchChanged,
-                )
-              : const Text('Daftar Tagihan'),
+          title: const Text('Daftar Tagihan'),
           elevation: 0,
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
           actions: [
-            if (_isSearching)
-              IconButton(icon: const Icon(Icons.close), onPressed: _stopSearch)
-            else
-              IconButton(
-                icon: const Icon(Icons.search),
-                onPressed: _startSearch,
-              ),
+            IconButton(
+              icon: const Icon(Icons.search),
+              onPressed: () {
+                CustomerSearchModal(
+                  onCustomerSelected: (customer) {
+                    context.read<BillsProvider>().searchBills(customer.id);
+                  },
+                );
+              },
+            ),
           ],
         ),
         body: Column(
@@ -153,6 +110,7 @@ class _BillsScreenState extends State<BillsScreen> {
                       child: SingleChildScrollView(
                         scrollDirection: Axis.horizontal,
                         child: Row(
+                          mainAxisAlignment: MainAxisAlignment.start,
                           children: [
                             _buildFilterChip('all', 'Semua'),
                             _buildFilterChip('paid', 'Lunas'),
