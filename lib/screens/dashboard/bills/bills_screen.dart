@@ -202,47 +202,56 @@ class _BillsScreenState extends State<BillsScreen> {
                                 if (_selectedCustomerName != null)
                                   Padding(
                                     padding: const EdgeInsets.only(left: 8),
-                                    child: Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 12,
-                                        vertical: 8,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: AppColors.primary.withAlpha(20),
-                                        borderRadius: BorderRadius.circular(20),
-                                        border: Border.all(
-                                          color: AppColors.primary.withAlpha(
-                                            60,
+                                    child: InkWell(
+                                      onTap: () => {
+                                        CustomerSearchModal.showModal(
+                                          context,
+                                          onCustomerSelected:
+                                              _onCustomerSelected,
+                                        ),
+                                      },
+                                      child: Container(
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 12,
+                                          vertical: 8,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.primary.withAlpha(20),
+                                          borderRadius: BorderRadius.circular(20),
+                                          border: Border.all(
+                                            color: AppColors.primary.withAlpha(
+                                              60,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      child: Row(
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Icon(
-                                            Icons.person,
-                                            size: 16,
-                                            color: AppColors.primary,
-                                          ),
-                                          const SizedBox(width: 8),
-                                          Text(
-                                            _selectedCustomerName!,
-                                            style: TextStyle(
-                                              fontSize: 14,
-                                              fontWeight: FontWeight.w500,
+                                        child: Row(
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Icon(
+                                              Icons.person,
+                                              size: 16,
                                               color: AppColors.primary,
                                             ),
-                                          ),
-                                          const SizedBox(width: 8),
-                                          GestureDetector(
-                                            onTap: _clearCustomerSearch,
-                                            child: Icon(
-                                              Icons.close,
-                                              size: 16,
-                                              color: Colors.grey[600],
+                                            const SizedBox(width: 8),
+                                            Text(
+                                              _selectedCustomerName!,
+                                              style: TextStyle(
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.w500,
+                                                color: AppColors.primary,
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                            const SizedBox(width: 8),
+                                            InkWell(
+                                              onTap: _clearCustomerSearch,
+                                              child: Icon(
+                                                Icons.close,
+                                                size: 16,
+                                                color: Colors.grey[600],
+                                              ),
+                                            ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
@@ -361,9 +370,6 @@ class _BillsScreenState extends State<BillsScreen> {
                               }
                             },
                             child: ListView.builder(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                              ),
                               itemCount: displayedBills.length,
                               itemBuilder: (context, index) {
                                 final bill = displayedBills[index];
@@ -412,12 +418,13 @@ class _BillsScreenState extends State<BillsScreen> {
 
   Widget _buildBillCard(Bills bill) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.zero,
       elevation: 0,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(0)),
       child: InkWell(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(0),
         onTap: () => _showComplaintDetailModal(context, bill),
+        onLongPress: () => _showComplaintDetailModal(context, bill),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
