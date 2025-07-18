@@ -20,13 +20,6 @@ class BillsService {
       if (status != null) parameters['status'] = status;
       if (status != null) parameters['customer_id'] = searchQuery ?? '';
 
-      print({
-        'customerId': customerId,
-        'period': period,
-        'status': status,
-        'searchQuery': searchQuery,
-      });
-
       final response = await _http.get(
         _baseUrl,
         requiresAuth: true,
@@ -34,8 +27,6 @@ class BillsService {
       );
 
       if (response.statusCode == 200) {
-        print(json.decode(response.body));
-
         final Map<String, dynamic> data = json.decode(response.body);
         return BillResponse.fromJson(data);
       } else {

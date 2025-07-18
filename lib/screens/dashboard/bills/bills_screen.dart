@@ -75,20 +75,22 @@ class _BillsScreenState extends State<BillsScreen> {
         ),
         backgroundColor: AppColors.primary,
         appBar: AppBar(
-          title: const Text('Daftar Tagihan'),
+          title: Text('Daftar Tagihan'),
           elevation: 0,
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
           actions: [
             IconButton(
-              icon: const Icon(Icons.search),
               onPressed: () {
-                CustomerSearchModal(
+                CustomerSearchModal.showModal(
+                  context,
                   onCustomerSelected: (customer) {
-                    context.read<BillsProvider>().searchBills(customer.id);
+                    final provider = context.read<BillsProvider>();
+                    provider.searchBills(customer.customerId);
                   },
                 );
               },
+              icon: Icon(Icons.search),
             ),
           ],
         ),
