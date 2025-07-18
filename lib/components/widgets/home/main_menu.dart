@@ -28,29 +28,24 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    // Setup animation controller
     _animationController = AnimationController(
       duration: const Duration(milliseconds: 350),
       vsync: this,
     );
 
-    // Slide animation dengan curve yang lebih smooth
-    _slideAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Curves.easeInOutCubic,
-    ));
+    _slideAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Curves.easeInOutCubic,
+      ),
+    );
 
-    // Fade animation untuk efek yang lebih halus
-    _fadeAnimation = Tween<double>(
-      begin: 0.0,
-      end: 1.0,
-    ).animate(CurvedAnimation(
-      parent: _animationController,
-      curve: Interval(0.2, 1.0, curve: Curves.easeInOut),
-    ));
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(
+        parent: _animationController,
+        curve: Interval(0.2, 1.0, curve: Curves.easeInOut),
+      ),
+    );
 
     _menuItems = [
       MenuItem(icon: Icons.verified_user_sharp, title: 'Calon Pelanggan'),
@@ -110,10 +105,8 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Always visible items (first 3 items + collapse button)
         _buildVisibleItems(),
 
-        // Collapsible items with slide animation
         AnimatedBuilder(
           animation: _slideAnimation,
           builder: (context, child) {
@@ -138,7 +131,7 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
 
   Widget _buildVisibleItems() {
     final visibleItems = _menuItems.take(3).toList();
-    final totalItems = visibleItems.length + 1; // +1 untuk collapse button
+    final totalItems = visibleItems.length + 1;
 
     return GridView.builder(
       shrinkWrap: true,
