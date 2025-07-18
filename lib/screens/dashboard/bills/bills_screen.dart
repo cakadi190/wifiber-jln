@@ -577,7 +577,7 @@ class _BillsScreenState extends State<BillsScreen> {
                   const SizedBox(height: 12),
                   _buildDetailRow(
                     context,
-                    'Invoice',
+                    'Tagihan',
                     bill.invoice,
                     Icons.receipt,
                   ),
