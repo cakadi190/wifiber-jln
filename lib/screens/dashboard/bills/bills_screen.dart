@@ -391,7 +391,7 @@ class _BillsScreenState extends State<BillsScreen> {
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
         borderRadius: BorderRadius.circular(12),
-        onTap: () {},
+        onTap: () => _showComplaintDetailModal(context, bill),
         child: Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -435,7 +435,10 @@ class _BillsScreenState extends State<BillsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        DateHelper.formatDate(DateHelper.parse(bill.period), format: 'long'),
+                        DateHelper.formatDate(
+                          DateHelper.parse(bill.period),
+                          format: 'long',
+                        ),
                         style: TextStyle(fontSize: 12, color: Colors.grey[600]),
                       ),
                     ],
@@ -485,6 +488,109 @@ class _BillsScreenState extends State<BillsScreen> {
           fontWeight: FontWeight.bold,
           color: textColor,
         ),
+      ),
+    );
+  }
+
+  Widget _buildModalHandle() {
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 8),
+      height: 4,
+      width: 40,
+      decoration: BoxDecoration(
+        color: Colors.grey.shade300,
+        borderRadius: BorderRadius.circular(2),
+      ),
+    );
+  }
+
+  void _showComplaintDetailModal(BuildContext context, Bills bill) {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      enableDrag: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (modalContext) => DraggableScrollableSheet(
+        initialChildSize: 0.9,
+        minChildSize: 0.2,
+        maxChildSize: 1.0,
+        expand: false,
+        builder: (context, scrollController) {
+          return Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+              left: 16,
+              right: 16,
+              top: 16,
+            ),
+            child: SingleChildScrollView(
+              physics: const BouncingScrollPhysics(),
+              controller: scrollController,
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  _buildModalHandle(),
+                  const SizedBox(height: 8),
+                ],
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildDetailRow(
+    BuildContext context,
+    String label,
+    String value,
+    IconData icon, {
+    Color? color,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey.shade50,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey.shade200),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(8),
+            decoration: BoxDecoration(
+              color: (color ?? AppColors.primary).withValues(alpha: 0.1),
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Icon(icon, color: color ?? AppColors.primary, size: 20),
+          ),
+          const SizedBox(width: 16),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                    color: Colors.grey.shade600,
+                    fontSize: 12,
+                  ),
+                ),
+                const SizedBox(height: 4),
+                Text(
+                  value,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    fontWeight: FontWeight.w600,
+                    color: color,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
