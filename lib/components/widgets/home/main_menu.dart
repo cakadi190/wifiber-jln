@@ -18,12 +18,40 @@ class MainMenu extends StatefulWidget {
   State<MainMenu> createState() => _MainMenuState();
 }
 
-class _MainMenuState extends State<MainMenu> {
+class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
   bool isExpanded = false;
+  late AnimationController _animationController;
+  late Animation<double> _slideAnimation;
+  late Animation<double> _fadeAnimation;
 
   @override
   void initState() {
     super.initState();
+
+    // Setup animation controller
+    _animationController = AnimationController(
+      duration: const Duration(milliseconds: 350),
+      vsync: this,
+    );
+
+    // Slide animation dengan curve yang lebih smooth
+    _slideAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Curves.easeInOutCubic,
+    ));
+
+    // Fade animation untuk efek yang lebih halus
+    _fadeAnimation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(
+      parent: _animationController,
+      curve: Interval(0.2, 1.0, curve: Curves.easeInOut),
+    ));
+
     _menuItems = [
       MenuItem(icon: Icons.verified_user_sharp, title: 'Calon Pelanggan'),
       MenuItem(icon: Icons.person, title: 'Data Pelanggan'),
@@ -55,6 +83,12 @@ class _MainMenuState extends State<MainMenu> {
     ];
   }
 
+  @override
+  void dispose() {
+    _animationController.dispose();
+    super.dispose();
+  }
+
   late List<MenuItem> _menuItems;
 
   @override
@@ -67,23 +101,49 @@ class _MainMenuState extends State<MainMenu> {
       ),
       child: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          child: _buildMenuGrid(),
-        ),
+        child: _buildMenuGrid(),
       ),
     );
   }
 
   Widget _buildMenuGrid() {
-    final displayItems = isExpanded ? _menuItems : _menuItems.take(3).toList();
-    final totalItems = displayItems.length + 1;
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        // Always visible items (first 3 items + collapse button)
+        _buildVisibleItems(),
+
+        // Collapsible items with slide animation
+        AnimatedBuilder(
+          animation: _slideAnimation,
+          builder: (context, child) {
+            return ClipRect(
+              child: Align(
+                alignment: Alignment.topCenter,
+                heightFactor: _slideAnimation.value,
+                child: FadeTransition(
+                  opacity: _fadeAnimation,
+                  child: Transform.translate(
+                    offset: Offset(0, (1 - _slideAnimation.value) * -20),
+                    child: _buildCollapsibleItems(),
+                  ),
+                ),
+              ),
+            );
+          },
+        ),
+      ],
+    );
+  }
+
+  Widget _buildVisibleItems() {
+    final visibleItems = _menuItems.take(3).toList();
+    final totalItems = visibleItems.length + 1; // +1 untuk collapse button
 
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 4,
         crossAxisSpacing: 8,
         mainAxisSpacing: 12,
@@ -91,11 +151,35 @@ class _MainMenuState extends State<MainMenu> {
       ),
       itemCount: totalItems,
       itemBuilder: (context, index) {
-        if (index == displayItems.length) {
+        if (index == visibleItems.length) {
           return _buildCollapseButton();
         }
-        return _buildMenuItem(displayItems[index]);
+        return _buildMenuItem(visibleItems[index]);
       },
+    );
+  }
+
+  Widget _buildCollapsibleItems() {
+    if (_menuItems.length <= 3) return const SizedBox.shrink();
+
+    final collapsibleItems = _menuItems.skip(3).toList();
+
+    return Container(
+      margin: const EdgeInsets.only(top: 12),
+      child: GridView.builder(
+        shrinkWrap: true,
+        physics: const NeverScrollableScrollPhysics(),
+        gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+          crossAxisCount: 4,
+          crossAxisSpacing: 8,
+          mainAxisSpacing: 12,
+          childAspectRatio: 0.9,
+        ),
+        itemCount: collapsibleItems.length,
+        itemBuilder: (context, index) {
+          return _buildMenuItem(collapsibleItems[index]);
+        },
+      ),
     );
   }
 
@@ -144,6 +228,11 @@ class _MainMenuState extends State<MainMenu> {
       onTap: () {
         setState(() {
           isExpanded = !isExpanded;
+          if (isExpanded) {
+            _animationController.forward();
+          } else {
+            _animationController.reverse();
+          }
         });
       },
       child: SizedBox(
@@ -151,11 +240,22 @@ class _MainMenuState extends State<MainMenu> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.start,
           children: [
-            _buildIconContainer(
-              Icon(
-                isExpanded ? Icons.expand_less : Icons.apps,
-                size: 24,
-                color: Colors.white,
+            AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              width: 48,
+              height: 48,
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                shape: BoxShape.circle,
+              ),
+              child: AnimatedRotation(
+                turns: isExpanded ? 0.5 : 0,
+                duration: const Duration(milliseconds: 200),
+                child: Icon(
+                  isExpanded ? Icons.expand_less : Icons.apps,
+                  size: 24,
+                  color: Colors.white,
+                ),
               ),
             ),
             const SizedBox(height: 6),
