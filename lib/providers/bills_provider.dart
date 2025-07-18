@@ -134,6 +134,7 @@ class BillsProvider extends ChangeNotifier {
 
   Future<void> searchBills(String query) async {
     _currentSearchQuery = query;
+    print(_currentSearchQuery);
     await fetchBills(
       customerId: _currentCustomerId,
       period: _currentPeriod,
