@@ -1,8 +1,11 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/components/widgets/customer_search_modal.dart';
 import 'package:wifiber/config/app_colors.dart';
+import 'package:wifiber/exceptions/string_exceptions.dart';
 import 'package:wifiber/helpers/currency_helper.dart';
 import 'package:wifiber/helpers/datetime_helper.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
@@ -566,7 +569,12 @@ class _BillsScreenState extends State<BillsScreen> {
     );
   }
 
-  void _showModalMessage(String message, {bool success = false}) {
+  void _showModalMessage(String message, {String type = 'error'}) {
+    assert(
+      ['success', 'error', 'info'].contains(type),
+      'Type must be one of: success, error, info',
+    );
+
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
@@ -590,21 +598,14 @@ class _BillsScreenState extends State<BillsScreen> {
                 mainAxisSize: MainAxisSize.min,
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  success
-                      ? const Icon(
-                          Icons.check_circle_outline,
-                          size: 48,
-                          color: Colors.green,
-                        )
-                      : const Icon(
-                          Icons.error_outline,
-                          size: 48,
-                          color: Colors.red,
-                        ),
+                  _getIconByType(type),
                   const SizedBox(height: 16),
                   Text(
-                    success ? "Berhasil" : "Kesalahan",
-                    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+                    _getTitleByType(type),
+                    style: const TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                    ),
                     textAlign: TextAlign.center,
                   ),
                   const SizedBox(height: 8),
@@ -627,7 +628,7 @@ class _BillsScreenState extends State<BillsScreen> {
                       onPressed: () => Navigator.pop(modalContext),
                       child: const Text('Tutup'),
                     ),
-                  )
+                  ),
                 ],
               ),
             ),
@@ -637,21 +638,60 @@ class _BillsScreenState extends State<BillsScreen> {
     );
   }
 
+  Widget _getIconByType(String type) {
+    switch (type) {
+      case 'success':
+        return const Icon(
+          Icons.check_circle_outline,
+          size: 48,
+          color: Colors.green,
+        );
+      case 'error':
+        return const Icon(Icons.error_outline, size: 48, color: Colors.red);
+      case 'info':
+        return const Icon(Icons.info_outline, size: 48, color: Colors.blue);
+      default:
+        return const Icon(Icons.error_outline, size: 48, color: Colors.red);
+    }
+  }
+
+  String _getTitleByType(String type) {
+    switch (type) {
+      case 'success':
+        return 'Berhasil';
+      case 'error':
+        return 'Kesalahan';
+      case 'info':
+        return 'Informasi';
+      default:
+        return 'Kesalahan';
+    }
+  }
+
   void _createMonthlyBill(BuildContext modalContext) async {
     Navigator.pop(modalContext);
 
     _showModalLoading(context);
 
     try {
-      final response = await _http.post('monthly-bills', requiresAuth: true);
+      final response = await _http.post(
+        'monthly-bills',
+        requiresAuth: true,
+        body: jsonEncode({}),
+      );
 
       Navigator.pop(context);
 
-      if (response.statusCode == 200) {
-        _showModalMessage('Tagihan bulanan berhasil dibuat.', success: true);
-      } else {
-        _showModalMessage('Gagal membuat tagihan bulanan.');
-      }
+      final json = jsonDecode(response.body);
+      final message = json['message'] ?? 'Tagihan bulanan berhasil dibuat.';
+
+      _showModalMessage(message, type: 'success');
+    } on StringException catch (_) {
+      Navigator.pop(context);
+      _showModalMessage(
+        "Tidak ada tagihan yang dibuat. Semua tagihan pada pelanggan yang aktif sudah ada.",
+        type: 'info',
+      );
     } catch (e) {
       Navigator.pop(context);
       _showModalMessage('Gagal membuat tagihan bulanan.');
