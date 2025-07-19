@@ -235,7 +235,6 @@ class HttpService {
     return streamedResponse;
   }
 
-  // Updated: Now accepts File instance instead of String path
   Future<http.MultipartFile> createMultipartFile(
     String fieldName,
     File file, {
@@ -253,7 +252,6 @@ class HttpService {
     );
   }
 
-  // Alternative method using File.openRead() for better memory efficiency
   http.MultipartFile createMultipartFileFromStream(
     String fieldName,
     File file, {
@@ -279,7 +277,6 @@ class HttpService {
     return http.MultipartFile.fromBytes(fieldName, bytes, filename: filename);
   }
 
-  // Updated: Now accepts File instance instead of String path
   Future<http.StreamedResponse> uploadFile(
     String path,
     String fieldName,
@@ -306,7 +303,6 @@ class HttpService {
     );
   }
 
-  // Updated: Now accepts Map<String, File> instead of Map<String, String>
   Future<http.StreamedResponse> uploadFiles(
     String path,
     Map<String, File> files, {
