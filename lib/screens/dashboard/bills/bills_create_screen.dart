@@ -7,6 +7,7 @@ import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/components/widgets/customer_search_modal.dart';
 import 'package:wifiber/config/app_colors.dart';
+import 'package:wifiber/exceptions/validation_exceptions.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/models/bills.dart';
 import 'package:wifiber/models/customer.dart';
@@ -202,6 +203,22 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
             'Wah, Ada kesalahan waktu membuat tagihan!',
           ).clearSnackBars();
         }
+      }
+    } on SocketException catch(e) {
+      print('Error creating bill: $e');
+      if (mounted) {
+        SnackBars.error(
+          context,
+          'Sepertinya ada masalah koneksi internet atau kamu tidak sedang terhubung ke internet?',
+        ).clearSnackBars();
+      }
+    } on ValidationException catch(e) {
+      print('Error creating bill: $e');
+      if (mounted) {
+        SnackBars.error(
+          context,
+          "Periksa kembali data yang kamu masukkan!",
+        ).clearSnackBars();
       }
     } catch (e) {
       print('Error creating bill: $e');
