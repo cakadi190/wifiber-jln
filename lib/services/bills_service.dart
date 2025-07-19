@@ -38,6 +38,11 @@ class BillsService {
   }
 
   Future<BillResponse> createBill(CreateBill createBill) async {
+    print('=== DEBUG FORMFIELDS ===');
+    createBill.toFormFields().forEach((key, value) {
+      print('$key = $value');
+    });
+
     try {
       if (createBill.paymentProof != null) {
         final response = await _http.uploadFile(
