@@ -181,8 +181,6 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
           : null,
     );
 
-    print(createBill.toJson());
-
     try {
       final success = await billsProvider.createBill(createBill);
 
@@ -196,24 +194,20 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
         }
       } else {
         if (mounted) {
-          print(billsProvider.errorMessage);
-
           SnackBars.error(
             context,
             'Wah, Ada kesalahan waktu membuat tagihan!',
           ).clearSnackBars();
         }
       }
-    } on SocketException catch(e) {
-      print('Error creating bill: $e');
+    } on SocketException catch (e) {
       if (mounted) {
         SnackBars.error(
           context,
           'Sepertinya ada masalah koneksi internet atau kamu tidak sedang terhubung ke internet?',
         ).clearSnackBars();
       }
-    } on ValidationException catch(e) {
-      print('Error creating bill: $e');
+    } on ValidationException catch (e) {
       if (mounted) {
         SnackBars.error(
           context,
@@ -221,7 +215,6 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
         ).clearSnackBars();
       }
     } catch (e) {
-      print('Error creating bill: $e');
       if (mounted) {
         SnackBars.error(
           context,
