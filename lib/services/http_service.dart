@@ -599,7 +599,7 @@ class HttpService {
                 key == 'message' || key == 'error' || key == 'status',
           );
 
-          if (validationErrors?.isEmpty == true) {
+          if (validationErrors.isEmpty == true) {
             validationErrors = null;
           }
           mainMessage = json['message'] ?? mainMessage;
