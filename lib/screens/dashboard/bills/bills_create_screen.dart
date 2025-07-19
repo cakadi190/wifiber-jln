@@ -185,26 +185,14 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
 
       if (success) {
         if (mounted) {
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   const SnackBar(
-          //     content: Text('Bill berhasil dibuat'),
-          //     backgroundColor: Colors.green,
-          //   ),
-          // );
           SnackBars.success(
             context,
-            'Bill berhasil dibuat',
+            'Tagihan berhasil dibuat!',
           ).clearSnackBars();
           Navigator.pop(context);
         }
       } else {
         if (mounted) {
-          // ScaffoldMessenger.of(context).showSnackBar(
-          //   SnackBar(
-          //     content: Text(billsProvider.errorMessage),
-          //     backgroundColor: Colors.red,
-          //   ),
-          // );
           SnackBars.error(
             context,
             billsProvider.errorMessage,
@@ -213,12 +201,10 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        SnackBars.error(
+          context,
+          'Wah, Ada kesalahan waktu membuat tagihan!',
+        ).clearSnackBars();
       }
     } finally {
       if (mounted) {
