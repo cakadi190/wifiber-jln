@@ -257,11 +257,11 @@ class CreateBill {
     customerId: json['customer_id'].toString(),
     period: json['period'].toString(),
     isPaid:
-    json['is_paid'] == true ||
+        json['is_paid'] == true ||
         json['is_paid'] == 'true' ||
         json['is_paid'] == '1',
     openIsolir:
-    json['open_isolir'] == true ||
+        json['open_isolir'] == true ||
         json['open_isolir'] == 'true' ||
         json['open_isolir'] == '1',
     paymentMethod: json['payment_method']?.toString(),
@@ -273,19 +273,25 @@ class CreateBill {
   );
 
   Map<String, String> toFormFields() {
+    String formatPaymentAt(DateTime dateTime) {
+      return "${dateTime.year.toString().padLeft(4, '0')}-"
+          "${dateTime.month.toString().padLeft(2, '0')}-"
+          "${dateTime.day.toString().padLeft(2, '0')} "
+          "${dateTime.hour.toString().padLeft(2, '0')}:"
+          "${dateTime.minute.toString().padLeft(2, '0')}:"
+          "${dateTime.second.toString().padLeft(2, '0')}";
+    }
+
     return {
       'customer_id': customerId,
       'period': period,
       'is_paid': isPaid != null ? (isPaid! ? 'true' : 'false') : 'false',
-      'open_isolir': openIsolir != null ? (openIsolir! ? 'true' : 'false') : 'false',
+      'open_isolir': openIsolir != null
+          ? (openIsolir! ? 'true' : 'false')
+          : 'false',
       if (paymentMethod != null) 'payment_method': paymentMethod!,
       if (paymentNote != null) 'payment_note': paymentNote!,
-      'payment_at': "${paymentAt.year.toString().padLeft(4, '0')}-"
-          "${paymentAt.month.toString().padLeft(2, '0')}-"
-          "${paymentAt.day.toString().padLeft(2, '0')} "
-          "${paymentAt.hour.toString().padLeft(2, '0')}:"
-          "${paymentAt.minute.toString().padLeft(2, '0')}:"
-          "${paymentAt.second.toString().padLeft(2, '0')}",
+      'payment_at': formatPaymentAt(paymentAt),
     };
   }
 
