@@ -15,7 +15,7 @@ class AboutAppScreen extends StatelessWidget {
   }
 
   String buildWithLove() {
-    return "Made with ❤️ & clean code in Indonesia by PT Kodingin Digital Nusantara.";
+    return "Made with ❤️ in Indonesia by PT Kodingin Digital Nusantara.";
   }
 
   @override
@@ -84,7 +84,7 @@ class AboutAppScreen extends StatelessWidget {
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
                 subtitle: Text(
-                  "Jalan Sahara Perum Kraksaan Land Nomor 49, Kebonagung, Kraksaan, Probolinggo, Jawa Timur",
+                  "Jl. Pd. Kopi Raya, RT.1/RW.3, Pd. Kopi, Kec. Duren Sawit, Kota Jakarta Timur, Daerah Khusus Ibukota Jakarta 13460",
                 ),
               ),
               const ListTile(
