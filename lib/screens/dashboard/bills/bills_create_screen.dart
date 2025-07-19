@@ -544,7 +544,7 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
                                       ),
                                       const SizedBox(height: 2),
                                       Text(
-                                        'File berhasil dipilih',
+                                        'Berkas terpilih',
                                         style: TextStyle(
                                           fontSize: 12,
                                           color: Colors.green.shade700,
