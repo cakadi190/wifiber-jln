@@ -53,26 +53,37 @@ class Bills {
     invoice: json['invoice'].toString(),
     period: json['period'].toString(),
     status: BillStatus.values.firstWhere(
-          (status) => status.name.toUpperCase() == json['status'].toString().toUpperCase(),
+      (status) =>
+          status.name.toUpperCase() == json['status'].toString().toUpperCase(),
       orElse: () => BillStatus.UNPAID,
     ),
     basePrice: int.tryParse(json['base_price'].toString()) ?? 0,
     tax: int.tryParse(json['tax'].toString()) ?? 0,
     packageName: json['package_name']?.toString() ?? '',
-    paymentAt: json['payment_at'] != null ? DateTime.tryParse(json['payment_at'].toString()) : null,
+    paymentAt: json['payment_at'] != null
+        ? DateTime.tryParse(json['payment_at'].toString())
+        : null,
     paymentReceivedBy: json['payment_received_by']?.toString(),
     paymentMethod: json['payment_method']?.toString(),
     additionalInfo: json['additional_info']?.toString(),
-    createdAt: json['created_at'] != null ? DateTime.tryParse(json['created_at'].toString()) : null,
-    discount: json['discount'] != null ? int.tryParse(json['discount'].toString()) : null,
+    createdAt: json['created_at'] != null
+        ? DateTime.tryParse(json['created_at'].toString())
+        : null,
+    discount: json['discount'] != null
+        ? int.tryParse(json['discount'].toString())
+        : null,
     name: json['name']?.toString() ?? '',
     nickname: json['nickname']?.toString(),
     address: json['address']?.toString(),
     phone: json['phone']?.toString(),
-    dueDate: (json['due_date'] != null ? _parseDueDay(json['due_date']) : null) ?? DateTime.now(),
+    dueDate:
+        (json['due_date'] != null ? _parseDueDay(json['due_date']) : null) ??
+        DateTime.now(),
     ppoeSecret: json['pppoe_secret']?.toString(),
     locationPhoto: json['location_photo']?.toString(),
-    routerId: json['router_id'] != null ? int.tryParse(json['router_id'].toString()) : null,
+    routerId: json['router_id'] != null
+        ? int.tryParse(json['router_id'].toString())
+        : null,
   );
 
   static DateTime? _parseDueDay(dynamic dueDayRaw) {
@@ -111,7 +122,8 @@ class Bills {
 
   int get totalAmount => basePrice + tax - (discount ?? 0);
 
-  bool get isOverdue => DateTime.now().isAfter(dueDate) && status == BillStatus.UNPAID;
+  bool get isOverdue =>
+      DateTime.now().isAfter(dueDate) && status == BillStatus.UNPAID;
 
   bool get isPaid => status == BillStatus.PAID;
 
@@ -242,8 +254,14 @@ class CreateBill {
   factory CreateBill.fromJson(Map<String, dynamic> json) => CreateBill(
     customerId: json['customer_id'].toString(),
     period: json['period'].toString(),
-    isPaid: json['is_paid'] == true || json['is_paid'] == 'true' || json['is_paid'] == '1',
-    openIsolir: json['open_isolir'] == true || json['open_isolir'] == 'true' || json['open_isolir'] == '1',
+    isPaid:
+        json['is_paid'] == true ||
+        json['is_paid'] == 'true' ||
+        json['is_paid'] == '1',
+    openIsolir:
+        json['open_isolir'] == true ||
+        json['open_isolir'] == 'true' ||
+        json['open_isolir'] == '1',
     paymentMethod: json['payment_method']?.toString(),
     paymentAt: DateTime.parse(json['payment_at'].toString()),
     paymentProof: json['payment_proof']?.toString(),
@@ -251,13 +269,24 @@ class CreateBill {
   );
 
   Map<String, dynamic> toJson() {
+    String formatPaymentAt(DateTime dateTime) {
+      return "${dateTime.year.toString().padLeft(4, '0')}-"
+          "${dateTime.month.toString().padLeft(2, '0')}-"
+          "${dateTime.day.toString().padLeft(2, '0')} "
+          "${dateTime.hour.toString().padLeft(2, '0')}:"
+          "${dateTime.minute.toString().padLeft(2, '0')}:"
+          "${dateTime.second.toString().padLeft(2, '0')}";
+    }
+
     return {
       'customer_id': customerId,
       'period': period,
-      'is_paid': isPaid != null ? (isPaid! ? '1' : '0') : null,
-      'open_isolir': openIsolir != null ? (openIsolir! ? '1' : '0') : null,
+      'is_paid': isPaid != null ? (isPaid! ? 'true' : 'false') : 'false',
+      'open_isolir': openIsolir != null
+          ? (openIsolir! ? 'true' : 'false')
+          : 'false',
       'payment_method': paymentMethod,
-      'payment_at': paymentAt.toIso8601String(),
+      'payment_at': formatPaymentAt(paymentAt),
       'payment_proof': paymentProof,
       'payment_note': paymentNote,
     };

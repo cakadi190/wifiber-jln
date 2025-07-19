@@ -193,7 +193,12 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
         }
       } else {
         if (mounted) {
-          SnackBars.error(context, billsProvider.errorMessage).clearSnackBars();
+          print(billsProvider.errorMessage);
+
+          SnackBars.error(
+            context,
+            'Wah, Ada kesalahan waktu membuat tagihan!',
+          ).clearSnackBars();
         }
       }
     } catch (e) {
