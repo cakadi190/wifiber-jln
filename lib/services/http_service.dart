@@ -174,9 +174,6 @@ class HttpService {
     }
 
     final streamedResponse = await _client.send(request);
-    print(streamedResponse.statusCode);
-    final respBody = await streamedResponse.stream.bytesToString();
-    print('Response Body: $respBody');
     _handleStreamedResponseErrors(streamedResponse);
     return streamedResponse;
   }

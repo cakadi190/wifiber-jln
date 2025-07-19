@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:wifiber/exceptions/string_exceptions.dart';
+import 'package:wifiber/exceptions/validation_exceptions.dart';
 import 'package:wifiber/models/bills.dart';
 import 'package:wifiber/services/http_service.dart';
 
@@ -38,11 +40,6 @@ class BillsService {
   }
 
   Future<BillResponse> createBill(CreateBill createBill) async {
-    print('=== DEBUG FORMFIELDS ===');
-    createBill.toFormFields().forEach((key, value) {
-      print('$key = $value');
-    });
-
     try {
       if (createBill.paymentProof != null) {
         final response = await _http.uploadFile(
@@ -78,28 +75,12 @@ class BillsService {
           throw Exception('Failed to create bill: ${response.statusCode}');
         }
       }
+    } on ValidationException catch (_)  {
+      rethrow;
+    } on StringException catch (_) {
+      rethrow;
     } catch (e) {
       throw Exception('Error creating bill: $e');
-    }
-  }
-
-  Future<BillResponse> getBillsByCustomerId(String customerId) async {
-    try {
-      final response = await _http.get(
-        '$_baseUrl/$customerId',
-        requiresAuth: true,
-      );
-
-      if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        return BillResponse.fromJson(data);
-      } else {
-        throw Exception(
-          'Failed to load bills for customer: ${response.statusCode}',
-        );
-      }
-    } catch (e) {
-      throw Exception('Error fetching bills by customer ID: $e');
     }
   }
 }

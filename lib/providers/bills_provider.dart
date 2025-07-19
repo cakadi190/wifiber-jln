@@ -1,4 +1,6 @@
 import 'package:flutter/foundation.dart';
+import 'package:wifiber/exceptions/string_exceptions.dart';
+import 'package:wifiber/exceptions/validation_exceptions.dart';
 import 'package:wifiber/models/bills.dart';
 import 'package:wifiber/services/bills_service.dart';
 
@@ -81,6 +83,12 @@ class BillsProvider extends ChangeNotifier {
         _setError(billResponse.message);
         return false;
       }
+    } on ValidationException catch (e) {
+      _setError(e.message);
+      rethrow;
+    } on StringException catch (e) {
+      _setError(e.message);
+      return false;
     } catch (e) {
       _setError(e.toString());
       return false;

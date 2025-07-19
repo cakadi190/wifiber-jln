@@ -26,14 +26,4 @@ class BillsController {
       throw Exception(response.message);
     }
   }
-
-  Future<List<Bills>> fetchBillsByCustomerId(String customerId) async {
-    final response = await _billsService.getBillsByCustomerId(customerId);
-
-    if (response.success) {
-      return response.data;
-    } else {
-      throw Exception(response.message);
-    }
-  }
 }

@@ -175,7 +175,6 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
           : null,
       paymentAt: _paymentAt,
       paymentProof: selectedPaymentProof,
-
       paymentNote: _paymentNoteController.text.trim().isNotEmpty
           ? _paymentNoteController.text.trim()
           : null,
@@ -200,7 +199,7 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
           ).clearSnackBars();
         }
       }
-    } on SocketException catch (e) {
+    } on SocketException catch (_) {
       if (mounted) {
         SnackBars.error(
           context,
@@ -208,11 +207,19 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
         ).clearSnackBars();
       }
     } on ValidationException catch (e) {
+      String errorMessage = "Periksa kembali data yang kamu masukkan!";
+
+      if (e.errors.isNotEmpty) {
+        final firstError = e.errors.values.first;
+        if (firstError is List && firstError.isNotEmpty) {
+          errorMessage = firstError.first.toString();
+        } else if (firstError is String) {
+          errorMessage = firstError;
+        }
+      }
+
       if (mounted) {
-        SnackBars.error(
-          context,
-          "Periksa kembali data yang kamu masukkan!",
-        ).clearSnackBars();
+        SnackBars.error(context, errorMessage).clearSnackBars();
       }
     } catch (e) {
       if (mounted) {
