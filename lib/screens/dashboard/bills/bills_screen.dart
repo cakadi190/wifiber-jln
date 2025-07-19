@@ -107,16 +107,14 @@ class _BillsScreenState extends State<BillsScreen> {
           backgroundColor: AppColors.primary,
           child: const Icon(Icons.add),
           onPressed: () async {
-            final result = await Navigator.push(
+            await Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => const BillsCreateScreen(),
               ),
             );
 
-            if (result == true) {
-              await context.read<BillsProvider>().refresh();
-            }
+            await context.read<BillsProvider>().refresh();
           },
         ),
         backgroundColor: AppColors.primary,
@@ -216,8 +214,12 @@ class _BillsScreenState extends State<BillsScreen> {
                                           vertical: 8,
                                         ),
                                         decoration: BoxDecoration(
-                                          color: AppColors.primary.withAlpha(20),
-                                          borderRadius: BorderRadius.circular(20),
+                                          color: AppColors.primary.withAlpha(
+                                            20,
+                                          ),
+                                          borderRadius: BorderRadius.circular(
+                                            20,
+                                          ),
                                           border: Border.all(
                                             color: AppColors.primary.withAlpha(
                                               60,
