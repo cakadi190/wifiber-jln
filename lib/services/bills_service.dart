@@ -4,7 +4,7 @@ import 'package:wifiber/models/bills.dart';
 import 'package:wifiber/services/http_service.dart';
 
 class BillsService {
-  static const String _baseUrl = '/bills';
+  static const String _baseUrl = 'bills';
   static final HttpService _http = HttpService();
 
   Future<BillResponse> getBills({
