@@ -581,26 +581,23 @@ class HttpService {
       try {
         final json = jsonDecode(response.body);
 
-        // Try different possible response structures
         Map<String, dynamic>? validationErrors;
         String mainMessage = 'Validasi gagal.';
 
-        // Structure 1: { "error": { "message": {...} }, "message": "..." }
-        if (json['error']?['message'] != null && json['error']['message'] is Map<String, dynamic>) {
+        if (json['error']?['message'] != null &&
+            json['error']['message'] is Map<String, dynamic>) {
           validationErrors = json['error']['message'];
           mainMessage = json['message'] ?? mainMessage;
-        }
-        // Structure 2: { "errors": {...}, "message": "..." }
-        else if (json['errors'] != null && json['errors'] is Map<String, dynamic>) {
+        } else if (json['errors'] != null &&
+            json['errors'] is Map<String, dynamic>) {
           validationErrors = json['errors'];
           mainMessage = json['message'] ?? mainMessage;
-        }
-        // Structure 3: Direct validation errors in root
-        else if (json is Map<String, dynamic>) {
-          // Remove non-field keys
+        } else if (json is Map<String, dynamic>) {
           validationErrors = Map<String, dynamic>.from(json);
-          validationErrors.removeWhere((key, value) =>
-          key == 'message' || key == 'error' || key == 'status');
+          validationErrors.removeWhere(
+            (key, value) =>
+                key == 'message' || key == 'error' || key == 'status',
+          );
 
           if (validationErrors?.isEmpty == true) {
             validationErrors = null;
