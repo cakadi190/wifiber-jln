@@ -75,6 +75,11 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
           );
         },
       ),
+      MenuItem(
+        icon: Icons.pin_drop,
+        title: 'Peta Infrastruktur',
+        onTap: () {},
+      ),
     ];
   }
 
