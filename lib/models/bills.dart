@@ -257,11 +257,11 @@ class CreateBill {
     customerId: json['customer_id'].toString(),
     period: json['period'].toString(),
     isPaid:
-        json['is_paid'] == true ||
+    json['is_paid'] == true ||
         json['is_paid'] == 'true' ||
         json['is_paid'] == '1',
     openIsolir:
-        json['open_isolir'] == true ||
+    json['open_isolir'] == true ||
         json['open_isolir'] == 'true' ||
         json['open_isolir'] == '1',
     paymentMethod: json['payment_method']?.toString(),
@@ -291,7 +291,7 @@ class CreateBill {
           : 'false',
       'payment_method': paymentMethod,
       'payment_at': formatPaymentAt(paymentAt),
-      'payment_proof': paymentProof,
+      'payment_proof': paymentProof?.path,
       'payment_note': paymentNote,
     };
   }
