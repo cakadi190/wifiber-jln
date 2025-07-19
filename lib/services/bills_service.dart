@@ -37,7 +37,7 @@ class BillsService {
     }
   }
 
-  Future<BillResponse> createBillAlternative1(CreateBill createBill) async {
+  Future<BillResponse> createBill(CreateBill createBill) async {
     try {
       if (createBill.paymentProof != null) {
         final response = await _http.uploadFile(
