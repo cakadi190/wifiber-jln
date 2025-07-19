@@ -673,7 +673,7 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
                                   ),
                                   SizedBox(width: 8),
                                   Text(
-                                    'Membuat Bill...',
+                                    'Memproses...',
                                     style: TextStyle(
                                       fontSize: 16,
                                       fontWeight: FontWeight.w600,
@@ -682,7 +682,7 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
                                 ],
                               )
                             : const Text(
-                                'Buat Bill',
+                                'Buat Tagihan',
                                 style: TextStyle(
                                   fontSize: 16,
                                   fontWeight: FontWeight.w600,
