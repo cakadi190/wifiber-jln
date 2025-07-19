@@ -5,6 +5,7 @@ import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:wifiber/exceptions/secure_storage_exceptions.dart';
 import 'package:wifiber/exceptions/string_exceptions.dart';
+import 'package:wifiber/exceptions/validation_exceptions.dart';
 import 'package:wifiber/helpers/http_helper.dart';
 import 'package:wifiber/services/secure_storage_service.dart';
 
@@ -12,12 +13,12 @@ class HttpService {
   final http.Client _client = http.Client();
 
   Future<http.Response> post(
-      String path, {
-        Map<String, String>? headers,
-        Object? body,
-        bool requiresAuth = false,
-        Map<String, dynamic>? parameters,
-      }) async {
+    String path, {
+    Map<String, String>? headers,
+    Object? body,
+    bool requiresAuth = false,
+    Map<String, dynamic>? parameters,
+  }) async {
     final uri = HttpHelper.buildUri(path, parameters);
     final completeHeaders = await _buildHeaders(headers, requiresAuth);
 
@@ -32,12 +33,12 @@ class HttpService {
   }
 
   Future<http.Response> put(
-      String path, {
-        Map<String, String>? headers,
-        Object? body,
-        bool requiresAuth = false,
-        Map<String, dynamic>? parameters,
-      }) async {
+    String path, {
+    Map<String, String>? headers,
+    Object? body,
+    bool requiresAuth = false,
+    Map<String, dynamic>? parameters,
+  }) async {
     final uri = HttpHelper.buildUri(path, parameters);
     final completeHeaders = await _buildHeaders(headers, requiresAuth);
 
@@ -52,12 +53,12 @@ class HttpService {
   }
 
   Future<http.Response> delete(
-      String path, {
-        Map<String, String>? headers,
-        Object? body,
-        bool requiresAuth = false,
-        Map<String, dynamic>? parameters,
-      }) async {
+    String path, {
+    Map<String, String>? headers,
+    Object? body,
+    bool requiresAuth = false,
+    Map<String, dynamic>? parameters,
+  }) async {
     final uri = HttpHelper.buildUri(path, parameters);
     final completeHeaders = await _buildHeaders(headers, requiresAuth);
 
@@ -72,11 +73,11 @@ class HttpService {
   }
 
   Future<http.Response> get(
-      String path, {
-        Map<String, String>? headers,
-        bool requiresAuth = false,
-        Map<String, dynamic>? parameters,
-      }) async {
+    String path, {
+    Map<String, String>? headers,
+    bool requiresAuth = false,
+    Map<String, dynamic>? parameters,
+  }) async {
     try {
       final uri = HttpHelper.buildUri(path, parameters);
       final completeHeaders = await _buildHeaders(headers, requiresAuth);
@@ -91,12 +92,12 @@ class HttpService {
   }
 
   Future<http.Response> postForm(
-      String path, {
-        Map<String, String>? headers,
-        Map<String, String>? fields,
-        bool requiresAuth = false,
-        Map<String, dynamic>? parameters,
-      }) async {
+    String path, {
+    Map<String, String>? headers,
+    Map<String, String>? fields,
+    bool requiresAuth = false,
+    Map<String, dynamic>? parameters,
+  }) async {
     final uri = HttpHelper.buildUri(path, parameters);
     final completeHeaders = await _buildFormHeaders(headers, requiresAuth);
 
@@ -111,12 +112,12 @@ class HttpService {
   }
 
   Future<http.Response> putForm(
-      String path, {
-        Map<String, String>? headers,
-        Map<String, String>? fields,
-        bool requiresAuth = false,
-        Map<String, dynamic>? parameters,
-      }) async {
+    String path, {
+    Map<String, String>? headers,
+    Map<String, String>? fields,
+    bool requiresAuth = false,
+    Map<String, dynamic>? parameters,
+  }) async {
     final uri = HttpHelper.buildUri(path, parameters);
     final completeHeaders = await _buildFormHeaders(headers, requiresAuth);
 
@@ -131,12 +132,12 @@ class HttpService {
   }
 
   Future<http.Response> deleteForm(
-      String path, {
-        Map<String, String>? headers,
-        Map<String, String>? fields,
-        bool requiresAuth = false,
-        Map<String, dynamic>? parameters,
-      }) async {
+    String path, {
+    Map<String, String>? headers,
+    Map<String, String>? fields,
+    bool requiresAuth = false,
+    Map<String, dynamic>? parameters,
+  }) async {
     final uri = HttpHelper.buildUri(path, parameters);
     final completeHeaders = await _buildFormHeaders(headers, requiresAuth);
 
@@ -151,13 +152,13 @@ class HttpService {
   }
 
   Future<http.StreamedResponse> postUpload(
-      String path, {
-        Map<String, String>? headers,
-        Map<String, String>? fields,
-        List<http.MultipartFile>? files,
-        bool requiresAuth = false,
-        Map<String, dynamic>? parameters,
-      }) async {
+    String path, {
+    Map<String, String>? headers,
+    Map<String, String>? fields,
+    List<http.MultipartFile>? files,
+    bool requiresAuth = false,
+    Map<String, dynamic>? parameters,
+  }) async {
     final uri = HttpHelper.buildUri(path, parameters);
     final request = http.MultipartRequest('POST', uri);
 
@@ -174,18 +175,20 @@ class HttpService {
 
     final streamedResponse = await _client.send(request);
     print(streamedResponse.statusCode);
+    final respBody = await streamedResponse.stream.bytesToString();
+    print('Response Body: $respBody');
     _handleStreamedResponseErrors(streamedResponse);
     return streamedResponse;
   }
 
   Future<http.StreamedResponse> putUpload(
-      String path, {
-        Map<String, String>? headers,
-        Map<String, String>? fields,
-        List<http.MultipartFile>? files,
-        bool requiresAuth = false,
-        Map<String, dynamic>? parameters,
-      }) async {
+    String path, {
+    Map<String, String>? headers,
+    Map<String, String>? fields,
+    List<http.MultipartFile>? files,
+    bool requiresAuth = false,
+    Map<String, dynamic>? parameters,
+  }) async {
     final uri = HttpHelper.buildUri(path, parameters);
     final request = http.MultipartRequest('PUT', uri);
 
@@ -206,13 +209,13 @@ class HttpService {
   }
 
   Future<http.StreamedResponse> patchUpload(
-      String path, {
-        Map<String, String>? headers,
-        Map<String, String>? fields,
-        List<http.MultipartFile>? files,
-        bool requiresAuth = false,
-        Map<String, dynamic>? parameters,
-      }) async {
+    String path, {
+    Map<String, String>? headers,
+    Map<String, String>? fields,
+    List<http.MultipartFile>? files,
+    bool requiresAuth = false,
+    Map<String, dynamic>? parameters,
+  }) async {
     final uri = HttpHelper.buildUri(path, parameters);
     final request = http.MultipartRequest('PATCH', uri);
 
@@ -234,11 +237,11 @@ class HttpService {
 
   // Updated: Now accepts File instance instead of String path
   Future<http.MultipartFile> createMultipartFile(
-      String fieldName,
-      File file, {
-        String? filename,
-        String? contentType,
-      }) async {
+    String fieldName,
+    File file, {
+    String? filename,
+    String? contentType,
+  }) async {
     if (!await file.exists()) {
       throw FileSystemException('File tidak ditemukan', file.path);
     }
@@ -252,43 +255,41 @@ class HttpService {
 
   // Alternative method using File.openRead() for better memory efficiency
   http.MultipartFile createMultipartFileFromStream(
-      String fieldName,
-      File file, {
-        String? filename,
-        String? contentType,
-        int? length,
-      }) {
+    String fieldName,
+    File file, {
+    String? filename,
+    String? contentType,
+    int? length,
+  }) {
     return http.MultipartFile(
       fieldName,
       file.openRead(),
       length ?? file.lengthSync(),
       filename: filename ?? file.path.split('/').last,
-      contentType: contentType != null ?
-      MediaType.parse(contentType) :
-      null,
+      contentType: contentType != null ? MediaType.parse(contentType) : null,
     );
   }
 
   http.MultipartFile createMultipartFileFromBytes(
-      String fieldName,
-      List<int> bytes, {
-        required String filename,
-        String? contentType,
-      }) {
+    String fieldName,
+    List<int> bytes, {
+    required String filename,
+    String? contentType,
+  }) {
     return http.MultipartFile.fromBytes(fieldName, bytes, filename: filename);
   }
 
   // Updated: Now accepts File instance instead of String path
   Future<http.StreamedResponse> uploadFile(
-      String path,
-      String fieldName,
-      File file, {
-        Map<String, String>? headers,
-        Map<String, String>? fields,
-        bool requiresAuth = false,
-        Map<String, dynamic>? parameters,
-        String? filename,
-      }) async {
+    String path,
+    String fieldName,
+    File file, {
+    Map<String, String>? headers,
+    Map<String, String>? fields,
+    bool requiresAuth = false,
+    Map<String, dynamic>? parameters,
+    String? filename,
+  }) async {
     final multipartFile = await createMultipartFile(
       fieldName,
       file,
@@ -307,13 +308,13 @@ class HttpService {
 
   // Updated: Now accepts Map<String, File> instead of Map<String, String>
   Future<http.StreamedResponse> uploadFiles(
-      String path,
-      Map<String, File> files, {
-        Map<String, String>? headers,
-        Map<String, String>? fields,
-        bool requiresAuth = false,
-        Map<String, dynamic>? parameters,
-      }) async {
+    String path,
+    Map<String, File> files, {
+    Map<String, String>? headers,
+    Map<String, String>? fields,
+    bool requiresAuth = false,
+    Map<String, dynamic>? parameters,
+  }) async {
     final multipartFiles = <http.MultipartFile>[];
 
     for (final entry in files.entries) {
@@ -332,8 +333,8 @@ class HttpService {
   }
 
   Future<http.Response> streamedResponseToResponse(
-      http.StreamedResponse streamedResponse,
-      ) async {
+    http.StreamedResponse streamedResponse,
+  ) async {
     final bytes = await streamedResponse.stream.toBytes();
     return http.Response.bytes(
       bytes,
@@ -347,15 +348,15 @@ class HttpService {
     return fields.entries
         .map(
           (entry) =>
-      '${Uri.encodeComponent(entry.key)}=${Uri.encodeComponent(entry.value)}',
-    )
+              '${Uri.encodeComponent(entry.key)}=${Uri.encodeComponent(entry.value)}',
+        )
         .join('&');
   }
 
   Future<Map<String, String>> _buildHeaders(
-      Map<String, String>? headers,
-      bool requiresAuth,
-      ) async {
+    Map<String, String>? headers,
+    bool requiresAuth,
+  ) async {
     try {
       final baseHeaders = <String, String>{
         'Content-Type': 'application/json',
@@ -391,9 +392,9 @@ class HttpService {
   }
 
   Future<Map<String, String>> _buildFormHeaders(
-      Map<String, String>? headers,
-      bool requiresAuth,
-      ) async {
+    Map<String, String>? headers,
+    bool requiresAuth,
+  ) async {
     try {
       final baseHeaders = <String, String>{
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -429,9 +430,9 @@ class HttpService {
   }
 
   Future<Map<String, String>> _buildMultipartHeaders(
-      Map<String, String>? headers,
-      bool requiresAuth,
-      ) async {
+    Map<String, String>? headers,
+    bool requiresAuth,
+  ) async {
     try {
       final baseHeaders = <String, String>{'Accept': 'application/json'};
 
@@ -580,6 +581,21 @@ class HttpService {
       throw StringException(
         'Terjadi kesalahan: metode request Anda tidak diperbolehkan. $errorCode',
       );
+    } else if (response.statusCode == 422) {
+      try {
+        final json = jsonDecode(response.body);
+        final validationErrors = json['error']?['message'];
+        final mainMessage = json['message'] ?? 'Validasi gagal.';
+        if (validationErrors != null &&
+            validationErrors is Map<String, dynamic>) {
+          throw ValidationException(
+            errors: validationErrors,
+            message: mainMessage,
+          );
+        }
+      } catch (_) {
+        throw StringException('Validasi gagal. $errorCode');
+      }
     } else if (response.statusCode >= 500) {
       throw StringException('Terjadi kesalahan server. $errorCode');
     } else if (response.statusCode >= 400) {
