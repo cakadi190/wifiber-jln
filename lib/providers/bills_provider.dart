@@ -37,7 +37,7 @@ class BillsProvider extends ChangeNotifier {
 
   int get totalUnpaidAmount => unpaidBills.fold(
     0,
-    (sum, bill) => sum + (int.tryParse(bill.totalAmount.toString()) ?? 0),
+    (sum, bill) => sum + (bill.totalAmount.toInt() ?? 0),
   );
 
   Future<void> fetchBills({
