@@ -147,40 +147,6 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
             PhosphorIcons.info(PhosphorIconsStyle.duotone),
             color: AppColors.primary,
           ),
-          title: const Text('Bantuan'),
-          trailing: const Icon(
-            Icons.chevron_right_rounded,
-            color: AppColors.primary,
-          ),
-          onTap: () {
-            // _accountCenterController.navigateToScreen(
-            //   screen: const HelpScreen(),
-            //   context: context,
-            // );
-          },
-        ),
-        ListTile(
-          leading: PhosphorIcon(
-            PhosphorIcons.shieldCheck(PhosphorIconsStyle.duotone),
-            color: AppColors.primary,
-          ),
-          title: const Text('Kebijakan Privasi'),
-          trailing: const Icon(
-            Icons.chevron_right_rounded,
-            color: AppColors.primary,
-          ),
-          onTap: () {
-            // _accountCenterController.navigateToScreen(
-            //   screen: const PrivacyPolicyScreen(),
-            //   context: context,
-            // );
-          },
-        ),
-        ListTile(
-          leading: PhosphorIcon(
-            PhosphorIcons.info(PhosphorIconsStyle.duotone),
-            color: AppColors.primary,
-          ),
           title: const Text('Tentang Aplikasi'),
           trailing: const Icon(
             Icons.chevron_right_rounded,
