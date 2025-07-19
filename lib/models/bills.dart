@@ -272,6 +272,23 @@ class CreateBill {
     paymentNote: json['payment_note']?.toString(),
   );
 
+  Map<String, String> toFormFields() {
+    return {
+      'customer_id': customerId,
+      'period': period,
+      'is_paid': isPaid != null ? (isPaid! ? 'true' : 'false') : 'false',
+      'open_isolir': openIsolir != null ? (openIsolir! ? 'true' : 'false') : 'false',
+      if (paymentMethod != null) 'payment_method': paymentMethod!,
+      if (paymentNote != null) 'payment_note': paymentNote!,
+      'payment_at': "${paymentAt.year.toString().padLeft(4, '0')}-"
+          "${paymentAt.month.toString().padLeft(2, '0')}-"
+          "${paymentAt.day.toString().padLeft(2, '0')} "
+          "${paymentAt.hour.toString().padLeft(2, '0')}:"
+          "${paymentAt.minute.toString().padLeft(2, '0')}:"
+          "${paymentAt.second.toString().padLeft(2, '0')}",
+    };
+  }
+
   Map<String, dynamic> toJson() {
     String formatPaymentAt(DateTime dateTime) {
       return "${dateTime.year.toString().padLeft(4, '0')}-"

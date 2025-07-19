@@ -45,7 +45,7 @@ class BillsService {
           'payment_proof',
           createBill.paymentProof!,
           requiresAuth: true,
-          fields: createBill.toJson().cast<String, String>(),
+          fields: createBill.toFormFields(),
         );
 
         final normalResponse = await _http.streamedResponseToResponse(response);
@@ -63,7 +63,7 @@ class BillsService {
         final response = await _http.postForm(
           _baseUrl,
           requiresAuth: true,
-          fields: createBill.toJson().cast<String, String>(),
+          fields: createBill.toFormFields(),
         );
 
         if (response.statusCode == 200 || response.statusCode == 201) {
