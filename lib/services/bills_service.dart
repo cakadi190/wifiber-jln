@@ -37,19 +37,41 @@ class BillsService {
     }
   }
 
-  Future<BillResponse> createBill(CreateBill createBill) async {
+  Future<BillResponse> createBillAlternative1(CreateBill createBill) async {
     try {
-      final response = await _http.postForm(
-        _baseUrl,
-        requiresAuth: true,
-        fields: createBill.toJson().cast<String, String>(),
-      );
+      if (createBill.paymentProof != null) {
+        final response = await _http.uploadFile(
+          _baseUrl,
+          'payment_proof',
+          createBill.paymentProof!,
+          requiresAuth: true,
+          fields: createBill.toJson().cast<String, String>(),
+        );
 
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        return BillResponse.fromJson(data);
+        final normalResponse = await _http.streamedResponseToResponse(response);
+
+        if (normalResponse.statusCode == 200 ||
+            normalResponse.statusCode == 201) {
+          final Map<String, dynamic> data = json.decode(normalResponse.body);
+          return BillResponse.fromJson(data);
+        } else {
+          throw Exception(
+            'Failed to create bill: ${normalResponse.statusCode}',
+          );
+        }
       } else {
-        throw Exception('Failed to create bill: ${response.statusCode}');
+        final response = await _http.postForm(
+          _baseUrl,
+          requiresAuth: true,
+          fields: createBill.toJson().cast<String, String>(),
+        );
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final Map<String, dynamic> data = json.decode(response.body);
+          return BillResponse.fromJson(data);
+        } else {
+          throw Exception('Failed to create bill: ${response.statusCode}');
+        }
       }
     } catch (e) {
       throw Exception('Error creating bill: $e');
