@@ -151,12 +151,10 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
     if (!_formKey.currentState!.validate()) return;
 
     if (selectedCustomer == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Silakan pilih pelanggan terlebih dahulu'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      SnackBars.error(
+        context,
+        "Silakan pilih pelanggan terlebih dahulu",
+      ).clearSnackBars();
       return;
     }
 
@@ -187,22 +185,30 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
 
       if (success) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Bill berhasil dibuat'),
-              backgroundColor: Colors.green,
-            ),
-          );
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   const SnackBar(
+          //     content: Text('Bill berhasil dibuat'),
+          //     backgroundColor: Colors.green,
+          //   ),
+          // );
+          SnackBars.success(
+            context,
+            'Bill berhasil dibuat',
+          ).clearSnackBars();
           Navigator.pop(context);
         }
       } else {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(billsProvider.errorMessage),
-              backgroundColor: Colors.red,
-            ),
-          );
+          // ScaffoldMessenger.of(context).showSnackBar(
+          //   SnackBar(
+          //     content: Text(billsProvider.errorMessage),
+          //     backgroundColor: Colors.red,
+          //   ),
+          // );
+          SnackBars.error(
+            context,
+            billsProvider.errorMessage,
+          ).clearSnackBars();
         }
       }
     } catch (e) {
