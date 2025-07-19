@@ -174,7 +174,7 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
           : null,
       paymentAt: _paymentAt,
       paymentProof: selectedPaymentProof?.path,
-      // Menggunakan path file
+
       paymentNote: _paymentNoteController.text.trim().isNotEmpty
           ? _paymentNoteController.text.trim()
           : null,
@@ -193,10 +193,7 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
         }
       } else {
         if (mounted) {
-          SnackBars.error(
-            context,
-            billsProvider.errorMessage,
-          ).clearSnackBars();
+          SnackBars.error(context, billsProvider.errorMessage).clearSnackBars();
         }
       }
     } catch (e) {
@@ -285,7 +282,6 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Informasi Dasar
                     const Text(
                       'Pelanggan',
                       style: TextStyle(
@@ -511,7 +507,6 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
 
                     const SizedBox(height: 24),
 
-                    // File Picker untuk Bukti Pembayaran
                     const Text(
                       'Bukti Pembayaran (Opsional)',
                       style: TextStyle(
@@ -522,7 +517,6 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
                     ),
                     const SizedBox(height: 8),
 
-                    // Tampilkan file yang sudah dipilih atau tombol pilih file
                     selectedPaymentProof != null
                         ? Container(
                             width: double.infinity,
