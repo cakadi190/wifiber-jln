@@ -580,16 +580,44 @@ class HttpService {
     } else if (response.statusCode == 422) {
       try {
         final json = jsonDecode(response.body);
-        final validationErrors = json['error']?['message'];
-        final mainMessage = json['message'] ?? 'Validasi gagal.';
-        if (validationErrors != null &&
-            validationErrors is Map<String, dynamic>) {
+
+        // Try different possible response structures
+        Map<String, dynamic>? validationErrors;
+        String mainMessage = 'Validasi gagal.';
+
+        // Structure 1: { "error": { "message": {...} }, "message": "..." }
+        if (json['error']?['message'] != null && json['error']['message'] is Map<String, dynamic>) {
+          validationErrors = json['error']['message'];
+          mainMessage = json['message'] ?? mainMessage;
+        }
+        // Structure 2: { "errors": {...}, "message": "..." }
+        else if (json['errors'] != null && json['errors'] is Map<String, dynamic>) {
+          validationErrors = json['errors'];
+          mainMessage = json['message'] ?? mainMessage;
+        }
+        // Structure 3: Direct validation errors in root
+        else if (json is Map<String, dynamic>) {
+          // Remove non-field keys
+          validationErrors = Map<String, dynamic>.from(json);
+          validationErrors.removeWhere((key, value) =>
+          key == 'message' || key == 'error' || key == 'status');
+
+          if (validationErrors?.isEmpty == true) {
+            validationErrors = null;
+          }
+          mainMessage = json['message'] ?? mainMessage;
+        }
+
+        if (validationErrors != null && validationErrors.isNotEmpty) {
           throw ValidationException(
             errors: validationErrors,
             message: mainMessage,
           );
+        } else {
+          throw StringException('$mainMessage $errorCode');
         }
-      } catch (_) {
+      } catch (e) {
+        if (e is ValidationException) rethrow;
         throw StringException('Validasi gagal. $errorCode');
       }
     } else if (response.statusCode >= 500) {
