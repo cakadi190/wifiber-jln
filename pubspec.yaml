@@ -60,6 +60,7 @@ dependencies:
   flutter_map: ^8.1.1
   latlong2: ^0.9.1
   file_picker: ^10.2.0
+  maps_launcher: ^3.0.0+1
 
 dev_dependencies:
   flutter_test:

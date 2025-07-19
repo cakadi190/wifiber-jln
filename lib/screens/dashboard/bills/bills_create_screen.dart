@@ -165,7 +165,7 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
     final billsProvider = context.read<BillsProvider>();
 
     final createBill = CreateBill(
-      customerId: selectedCustomer!.id,
+      customerId: selectedCustomer!.customerId,
       period: _getPeriodString(_selectedPeriod),
       isPaid: _isPaid,
       openIsolir: _openIsolir,
@@ -173,12 +173,14 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
           ? _paymentMethodController.text.trim()
           : null,
       paymentAt: _paymentAt,
-      paymentProof: selectedPaymentProof?.path,
+      paymentProof: selectedPaymentProof,
 
       paymentNote: _paymentNoteController.text.trim().isNotEmpty
           ? _paymentNoteController.text.trim()
           : null,
     );
+
+    print(createBill.toJson());
 
     try {
       final success = await billsProvider.createBill(createBill);
@@ -202,6 +204,7 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
         }
       }
     } catch (e) {
+      print('Error creating bill: $e');
       if (mounted) {
         SnackBars.error(
           context,

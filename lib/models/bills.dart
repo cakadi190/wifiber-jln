@@ -1,3 +1,5 @@
+import 'dart:io';
+
 class Bills {
   final String id;
   final String customerId;
@@ -237,7 +239,7 @@ class CreateBill {
   final bool? openIsolir;
   final String? paymentMethod;
   final DateTime paymentAt;
-  final String? paymentProof;
+  final File? paymentProof;
   final String? paymentNote;
 
   CreateBill({
@@ -264,7 +266,9 @@ class CreateBill {
         json['open_isolir'] == '1',
     paymentMethod: json['payment_method']?.toString(),
     paymentAt: DateTime.parse(json['payment_at'].toString()),
-    paymentProof: json['payment_proof']?.toString(),
+    paymentProof: json['payment_proof'] != null
+        ? File(json['payment_proof'].toString())
+        : null,
     paymentNote: json['payment_note']?.toString(),
   );
 
