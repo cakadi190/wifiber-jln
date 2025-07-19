@@ -18,7 +18,6 @@ class BillsCreateScreen extends StatefulWidget {
 class _BillsCreateScreenState extends State<BillsCreateScreen> {
   final _formKey = GlobalKey<FormState>();
   final _customerIdController = TextEditingController();
-  final _periodController = TextEditingController();
   final _paymentMethodController = TextEditingController();
   final _paymentProofController = TextEditingController();
   final _paymentNoteController = TextEditingController();
@@ -28,12 +27,12 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
   bool _isPaid = false;
   bool _openIsolir = false;
   DateTime _paymentAt = DateTime.now();
+  DateTime _selectedPeriod = DateTime.now();
   bool _isLoading = false;
 
   @override
   void dispose() {
     _customerIdController.dispose();
-    _periodController.dispose();
     _paymentMethodController.dispose();
     _paymentProofController.dispose();
     _paymentNoteController.dispose();
@@ -54,20 +53,19 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
     }
   }
 
-  Future<void> _selectPaymentTime() async {
-    final TimeOfDay? picked = await showTimePicker(
+  Future<void> _selectPeriod() async {
+    final DateTime? picked = await showDatePicker(
       context: context,
-      initialTime: TimeOfDay.fromDateTime(_paymentAt),
+      initialDate: _selectedPeriod,
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+      initialDatePickerMode: DatePickerMode.year,
+      helpText: 'Pilih Periode',
+      fieldLabelText: 'Periode',
     );
-    if (picked != null) {
+    if (picked != null && picked != _selectedPeriod) {
       setState(() {
-        _paymentAt = DateTime(
-          _paymentAt.year,
-          _paymentAt.month,
-          _paymentAt.day,
-          picked.hour,
-          picked.minute,
-        );
+        _selectedPeriod = picked;
       });
     }
   }
@@ -76,12 +74,30 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
     return "${dateTime.day}/${dateTime.month}/${dateTime.year}";
   }
 
-  String _formatTime(DateTime dateTime) {
-    return "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
+  String _formatPeriod(DateTime dateTime) {
+    const months = [
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+    return "${months[dateTime.month - 1]} ${dateTime.year}";
+  }
+
+  String _getPeriodString(DateTime dateTime) {
+    return "${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}";
   }
 
   Future<void> _createBill() async {
     if (!_formKey.currentState!.validate()) return;
+
+    if (selectedCustomer == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Silakan pilih pelanggan terlebih dahulu'),
+          backgroundColor: Colors.red,
+        ),
+      );
+      return;
+    }
 
     setState(() {
       _isLoading = true;
@@ -90,8 +106,8 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
     final billsProvider = context.read<BillsProvider>();
 
     final createBill = CreateBill(
-      customerId: _customerIdController.text.trim(),
-      period: _periodController.text.trim(),
+      customerId: selectedCustomer!.id, // Menggunakan selectedCustomer.id
+      period: _getPeriodString(_selectedPeriod),
       isPaid: _isPaid,
       openIsolir: _openIsolir,
       paymentMethod: _paymentMethodController.text.trim().isNotEmpty
@@ -302,31 +318,33 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    TextFormField(
-                      controller: _periodController,
-                      decoration: InputDecoration(
-                        hintText: 'Contoh: 2024-01',
-                        border: OutlineInputBorder(
+                    InkWell(
+                      onTap: _selectPeriod,
+                      child: Container(
+                        width: double.infinity,
+                        padding: const EdgeInsets.all(16),
+                        decoration: BoxDecoration(
+                          border: Border.all(color: Colors.grey.shade300),
                           borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
+                          color: Colors.grey.shade50,
                         ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              _formatPeriod(_selectedPeriod),
+                              style: const TextStyle(
+                                color: Colors.black87,
+                              ),
+                            ),
+                            Icon(
+                              Icons.calendar_month,
+                              color: AppColors.primary,
+                              size: 20,
+                            ),
+                          ],
                         ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: AppColors.primary),
-                        ),
-                        filled: true,
-                        fillColor: Colors.grey.shade50,
                       ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Periode harus diisi';
-                        }
-                        return null;
-                      },
                     ),
 
                     const SizedBox(height: 24),
@@ -361,46 +379,6 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
                             ),
                             Icon(
                               Icons.calendar_today,
-                              color: AppColors.primary,
-                              size: 20,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    const Text(
-                      'Waktu Pembayaran',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    InkWell(
-                      onTap: _selectPaymentTime,
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(12),
-                          color: Colors.grey.shade50,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              _formatTime(_paymentAt),
-                              style: const TextStyle(
-                                color: Colors.black87,
-                              ),
-                            ),
-                            Icon(
-                              Icons.access_time,
                               color: AppColors.primary,
                               size: 20,
                             ),
