@@ -1,6 +1,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.kodinus.wifiber">
 
+    <!-- Camera permissions -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+    <uses-permission android:name="android.permission.CAMERA" />
+
     <!-- Network permissions -->
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -9,9 +15,11 @@
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
     <!-- Storage permissions for Android 11 and below -->
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+    <uses-permission
+        android:name="android.permission.WRITE_EXTERNAL_STORAGE"
         android:maxSdkVersion="28" />
 
     <!-- Media permissions for Android 13+ (API 33+) -->
@@ -22,25 +30,21 @@
     <!-- Photo picker permission for Android 14+ (API 34+) -->
     <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED" />
 
-    <!-- Optional: Jika app memerlukan akses ke semua file -->
-    <!-- <uses-permission android:name="android.permission.MANAGE_EXTERNAL_STORAGE"
-         tools:ignore="ScopedStorage" /> -->
-
     <application
-        android:label="Wifiber"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher"
         android:enableOnBackInvokedCallback="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="Wifiber"
         android:requestLegacyExternalStorage="true">
 
         <activity
             android:name=".MainActivity"
+            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
             android:exported="true"
+            android:hardwareAccelerated="true"
             android:launchMode="singleTop"
             android:taskAffinity=""
             android:theme="@style/LaunchTheme"
-            android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode"
-            android:hardwareAccelerated="true"
             android:windowSoftInputMode="adjustResize">
 
             <meta-data
@@ -55,10 +59,13 @@
             <!-- Optional: Deep link support -->
             <intent-filter android:autoVerify="true">
                 <action android:name="android.intent.action.VIEW" />
+
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="https"
-                    android:host="wifiber.com" />
+
+                <data
+                    android:host="wifiber.com"
+                    android:scheme="https" />
             </intent-filter>
         </activity>
 
