@@ -242,24 +242,26 @@ class CreateBill {
   factory CreateBill.fromJson(Map<String, dynamic> json) => CreateBill(
     customerId: json['customer_id'].toString(),
     period: json['period'].toString(),
-    isPaid: json['is_paid'],
-    openIsolir: json['open_isolir'],
+    isPaid: json['is_paid'] == true || json['is_paid'] == 'true' || json['is_paid'] == '1',
+    openIsolir: json['open_isolir'] == true || json['open_isolir'] == 'true' || json['open_isolir'] == '1',
     paymentMethod: json['payment_method']?.toString(),
     paymentAt: DateTime.parse(json['payment_at'].toString()),
     paymentProof: json['payment_proof']?.toString(),
     paymentNote: json['payment_note']?.toString(),
   );
 
-  Map<String, dynamic> toJson() => {
-    'customer_id': customerId,
-    'period': period,
-    'is_paid': isPaid,
-    'open_isolir': openIsolir,
-    'payment_method': paymentMethod,
-    'payment_at': paymentAt.toIso8601String(),
-    'payment_proof': paymentProof,
-    'payment_note': paymentNote,
-  };
+  Map<String, dynamic> toJson() {
+    return {
+      'customer_id': customerId,
+      'period': period,
+      'is_paid': isPaid != null ? (isPaid! ? '1' : '0') : null,
+      'open_isolir': openIsolir != null ? (openIsolir! ? '1' : '0') : null,
+      'payment_method': paymentMethod,
+      'payment_at': paymentAt.toIso8601String(),
+      'payment_proof': paymentProof,
+      'payment_note': paymentNote,
+    };
+  }
 
   @override
   String toString() {
