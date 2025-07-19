@@ -1,6 +1,10 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
+import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/components/widgets/customer_search_modal.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
@@ -19,10 +23,11 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
   final _formKey = GlobalKey<FormState>();
   final _customerIdController = TextEditingController();
   final _paymentMethodController = TextEditingController();
-  final _paymentProofController = TextEditingController();
   final _paymentNoteController = TextEditingController();
 
   Customer? selectedCustomer;
+  File? selectedPaymentProof;
+  String? paymentProofFileName;
 
   bool _isPaid = false;
   bool _openIsolir = false;
@@ -34,7 +39,6 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
   void dispose() {
     _customerIdController.dispose();
     _paymentMethodController.dispose();
-    _paymentProofController.dispose();
     _paymentNoteController.dispose();
     super.dispose();
   }
@@ -70,20 +74,77 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
     }
   }
 
+  Future<void> _pickPaymentProofFile() async {
+    try {
+      FilePickerResult? result = await FilePicker.platform.pickFiles(
+        type: FileType.custom,
+        allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
+        allowMultiple: false,
+      );
+
+      if (result != null) {
+        setState(() {
+          selectedPaymentProof = File(result.files.single.path!);
+          paymentProofFileName = result.files.single.name;
+        });
+      }
+    } catch (e) {
+      SnackBars.error(
+        context,
+        "Gagal memilih berkas: ${e.toString()}",
+      ).clearSnackBars();
+    }
+  }
+
+  void _removePaymentProofFile() {
+    setState(() {
+      selectedPaymentProof = null;
+      paymentProofFileName = null;
+    });
+  }
+
   String _formatDate(DateTime dateTime) {
     return "${dateTime.day}/${dateTime.month}/${dateTime.year}";
   }
 
   String _formatPeriod(DateTime dateTime) {
     const months = [
-      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
-      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
     ];
     return "${months[dateTime.month - 1]} ${dateTime.year}";
   }
 
   String _getPeriodString(DateTime dateTime) {
     return "${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}";
+  }
+
+  String? _getFileExtension(String fileName) {
+    return fileName.split('.').last.toLowerCase();
+  }
+
+  Icon _getFileIcon(String fileName) {
+    String? extension = _getFileExtension(fileName);
+    switch (extension) {
+      case 'pdf':
+        return const Icon(Icons.picture_as_pdf, color: Colors.red);
+      case 'jpg':
+      case 'jpeg':
+      case 'png':
+        return const Icon(Icons.image, color: Colors.blue);
+      default:
+        return const Icon(Icons.insert_drive_file, color: Colors.grey);
+    }
   }
 
   Future<void> _createBill() async {
@@ -106,7 +167,7 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
     final billsProvider = context.read<BillsProvider>();
 
     final createBill = CreateBill(
-      customerId: selectedCustomer!.id, // Menggunakan selectedCustomer.id
+      customerId: selectedCustomer!.id,
       period: _getPeriodString(_selectedPeriod),
       isPaid: _isPaid,
       openIsolir: _openIsolir,
@@ -114,9 +175,8 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
           ? _paymentMethodController.text.trim()
           : null,
       paymentAt: _paymentAt,
-      paymentProof: _paymentProofController.text.trim().isNotEmpty
-          ? _paymentProofController.text.trim()
-          : null,
+      paymentProof: selectedPaymentProof?.path,
+      // Menggunakan path file
       paymentNote: _paymentNoteController.text.trim().isNotEmpty
           ? _paymentNoteController.text.trim()
           : null,
@@ -206,13 +266,13 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
               onPressed: _isLoading ? null : _createBill,
               child: _isLoading
                   ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                  color: Colors.white,
-                  strokeWidth: 2,
-                ),
-              )
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    )
                   : const Icon(Icons.save, color: Colors.white),
             ),
           ],
@@ -243,9 +303,7 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
                     ),
                     const SizedBox(height: 8),
                     InkWell(
-                      onTap: _isLoading
-                          ? null
-                          : _showCustomerSearchModal,
+                      onTap: _isLoading ? null : _showCustomerSearchModal,
                       child: Container(
                         width: double.infinity,
                         padding: const EdgeInsets.symmetric(
@@ -259,29 +317,23 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
                                 : Colors.grey.shade300,
                           ),
                           borderRadius: BorderRadius.circular(8),
-                          color: _isLoading
-                              ? Colors.grey.shade50
-                              : null,
+                          color: _isLoading ? Colors.grey.shade50 : null,
                         ),
                         child: Row(
-                          mainAxisAlignment:
-                          MainAxisAlignment.spaceBetween,
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Expanded(
                               child: Column(
-                                crossAxisAlignment:
-                                CrossAxisAlignment.start,
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Text(
-                                    selectedCustomer?.name ??
-                                        'Pilih Pelanggan',
+                                    selectedCustomer?.name ?? 'Pilih Pelanggan',
                                     style: TextStyle(
                                       color: selectedCustomer != null
                                           ? Colors.black
                                           : Colors.grey.shade600,
                                       fontSize: 16,
-                                      fontWeight:
-                                      selectedCustomer != null
+                                      fontWeight: selectedCustomer != null
                                           ? FontWeight.w500
                                           : FontWeight.normal,
                                     ),
@@ -333,9 +385,7 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
                           children: [
                             Text(
                               _formatPeriod(_selectedPeriod),
-                              style: const TextStyle(
-                                color: Colors.black87,
-                              ),
+                              style: const TextStyle(color: Colors.black87),
                             ),
                             Icon(
                               Icons.calendar_month,
@@ -373,9 +423,7 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
                           children: [
                             Text(
                               _formatDate(_paymentAt),
-                              style: const TextStyle(
-                                color: Colors.black87,
-                              ),
+                              style: const TextStyle(color: Colors.black87),
                             ),
                             Icon(
                               Icons.calendar_today,
@@ -471,6 +519,7 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
 
                     const SizedBox(height: 24),
 
+                    // File Picker untuk Bukti Pembayaran
                     const Text(
                       'Bukti Pembayaran (Opsional)',
                       style: TextStyle(
@@ -480,24 +529,94 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
                       ),
                     ),
                     const SizedBox(height: 8),
-                    TextFormField(
-                      controller: _paymentProofController,
-                      decoration: InputDecoration(
-                        hintText: 'URL atau referensi bukti pembayaran',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: AppColors.primary),
-                        ),
-                        filled: true,
-                        fillColor: Colors.grey.shade50,
+
+                    // Tampilkan file yang sudah dipilih atau tombol pilih file
+                    selectedPaymentProof != null
+                        ? Container(
+                            width: double.infinity,
+                            padding: const EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.green.shade300),
+                              borderRadius: BorderRadius.circular(12),
+                              color: Colors.green.shade50,
+                            ),
+                            child: Row(
+                              children: [
+                                _getFileIcon(paymentProofFileName!),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        paymentProofFileName!,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                        overflow: TextOverflow.ellipsis,
+                                      ),
+                                      const SizedBox(height: 2),
+                                      Text(
+                                        'File berhasil dipilih',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.green.shade700,
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                IconButton(
+                                  onPressed: _removePaymentProofFile,
+                                  icon: Icon(
+                                    Icons.close,
+                                    color: Colors.red.shade600,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          )
+                        : InkWell(
+                            onTap: _isLoading ? null : _pickPaymentProofFile,
+                            child: Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Colors.grey.shade300,
+                                  style: BorderStyle.solid,
+                                ),
+                                borderRadius: BorderRadius.circular(12),
+                                color: Colors.grey.shade50,
+                              ),
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.upload_file,
+                                    color: AppColors.primary,
+                                    size: 24,
+                                  ),
+                                  const SizedBox(width: 12),
+                                  Text(
+                                    'Pilih File Bukti Pembayaran',
+                                    style: TextStyle(
+                                      color: AppColors.primary,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+
+                    const SizedBox(height: 8),
+                    Text(
+                      'Format yang didukung: JPG, JPEG, PNG, PDF (Maks. 5MB)',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.grey.shade600,
                       ),
                     ),
 
@@ -550,33 +669,33 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
                         ),
                         child: _isLoading
                             ? const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            ),
-                            SizedBox(width: 8),
-                            Text(
-                              'Membuat Bill...',
-                              style: TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
-                          ],
-                        )
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text(
+                                    'Membuat Bill...',
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ],
+                              )
                             : const Text(
-                          'Buat Bill',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
+                                'Buat Bill',
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
                       ),
                     ),
                   ],
