@@ -38,17 +38,13 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
         floatingActionButton: FloatingActionButton(
           backgroundColor: AppColors.primary,
           onPressed: () async {
-            final result = await Navigator.of(context).push(
+            await Navigator.of(context).push(
               MaterialPageRoute(
                 builder: (context) => const AddMikrotikScreen(),
               ),
             );
 
-            if (result == true) {
-              if (mounted) {
-                context.read<RouterProvider>().refresh();
-              }
-            }
+            await context.read<RouterProvider>().refresh();
           },
           child: const Icon(Icons.add),
         ),
@@ -157,7 +153,10 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
               provider.clearError();
               provider.getAllRouters();
             },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+            ),
             child: const Text('Coba Lagi'),
           ),
         ],
