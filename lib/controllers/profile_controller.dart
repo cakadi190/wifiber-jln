@@ -150,7 +150,7 @@ class ProfileController extends ChangeNotifier {
       final responseBody = await response.stream.transform(utf8.decoder).join();
 
       if (response.statusCode == 200) {
-        await _authProvider.reinitialize();
+        await _authProvider.reinitialize(force: true);
         _selectedImage = null;
         notifyListeners();
       } else if (response.statusCode == 422) {
