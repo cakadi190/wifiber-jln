@@ -145,7 +145,7 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
           ),
           const SizedBox(height: 8),
           Text(
-            provider.errorMessage,
+            "Ada kesalahan pada sistem, coba muat ulang lagi beberapa saat.",
             textAlign: TextAlign.center,
             style: Theme.of(
               context,
@@ -157,7 +157,7 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
               provider.clearError();
               provider.getAllRouters();
             },
-            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary),
+            style: ElevatedButton.styleFrom(backgroundColor: AppColors.primary, foregroundColor: Colors.white),
             child: const Text('Coba Lagi'),
           ),
         ],
@@ -282,76 +282,6 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
   }
 
   void _editRouter(RouterModel router) {}
-
-  Future<void> _toggleAutoIsolate(
-    RouterModel router,
-    RouterProvider provider,
-  ) async {
-    try {
-      final ppoeSecret = await _showPpoeSecretDialog();
-      if (ppoeSecret == null || ppoeSecret.isEmpty) return;
-
-      final newAction = router.action == 'enable' ? 'disable' : 'enable';
-      final toggleModel = ToggleRouterModel(
-        ppoeSecret: ppoeSecret,
-        routerId: router.id.toString(),
-        action: newAction,
-      );
-
-      final success = await provider.toggleAutoIsolate(router.id, toggleModel);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              success
-                  ? 'Auto-isolir ${router.name} ${newAction == 'enable' ? 'diaktifkan' : 'dinonaktifkan'}'
-                  : 'Gagal mengubah pengaturan auto-isolir',
-            ),
-            backgroundColor: success ? Colors.green : Colors.red,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
-
-  Future<String?> _showPpoeSecretDialog() async {
-    final controller = TextEditingController();
-
-    return showDialog<String>(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: const Text('PPPoE Secret'),
-        content: TextField(
-          controller: controller,
-          decoration: const InputDecoration(
-            labelText: 'Masukkan PPPoE Secret',
-            hintText: 'contoh: user123',
-            border: OutlineInputBorder(),
-          ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(),
-            child: const Text('Batal'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(controller.text),
-            child: const Text('OK'),
-          ),
-        ],
-      ),
-    );
-  }
 
   void _showDeleteConfirmation(RouterModel router, RouterProvider provider) {
     showModalBottomSheet(
@@ -845,22 +775,6 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
             ),
 
             _buildActionItem(
-              icon: router.action == 'enable'
-                  ? Icons.power_off
-                  : Icons.power_settings_new,
-              title: router.action == 'enable'
-                  ? 'Deaktivasi Auto-Isolir'
-                  : 'Aktivasi Auto-Isolir',
-              subtitle: router.action == 'enable'
-                  ? 'Matikan mode auto-isolir'
-                  : 'Nyalakan mode auto-isolir',
-              onTap: () {
-                Navigator.pop(context);
-                _toggleAutoIsolate(router, provider);
-              },
-            ),
-
-            _buildActionItem(
               icon: Icons.delete,
               title: 'Hapus Router',
               subtitle: 'Hapus router dari daftar',
@@ -1067,6 +981,7 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
                         ),
                         onPressed: () {
                           provider.toggleAllAutoIsolate(action);
+                          provider.getAllRouters();
                           Navigator.pop(context);
 
                           if (enable) {
