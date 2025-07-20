@@ -18,14 +18,14 @@ class ProfileController extends ChangeNotifier {
   bool _isUploading = false;
 
   ProfileController({required AuthProvider authProvider})
-      : _authProvider = authProvider;
+    : _authProvider = authProvider;
 
-  // Getters
   File? get selectedImage => _selectedImage;
+
   bool get isUploading => _isUploading;
+
   AuthProvider get authProvider => _authProvider;
 
-  // Image picker methods
   Future<void> pickImageFromGallery() async {
     try {
       await Future.delayed(Duration(milliseconds: 300));
@@ -121,7 +121,9 @@ class ProfileController extends ChangeNotifier {
         }
       }
     } catch (e) {
-      throw Exception('Gagal memotong gambar. Coba gunakan galeri atau ambil foto baru.');
+      throw Exception(
+        'Gagal memotong gambar. Coba gunakan galeri atau ambil foto baru.',
+      );
     }
   }
 
