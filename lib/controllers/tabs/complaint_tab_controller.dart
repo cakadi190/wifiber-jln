@@ -62,7 +62,6 @@ class ComplaintTabController {
     return await _provider.deleteComplaint(id);
   }
 
-  // === Ganti filter status/type ===
   void filterByStatus(ComplaintStatus? status) {
     _provider.setComplaintFilter(status);
   }
