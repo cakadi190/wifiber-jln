@@ -7,14 +7,14 @@ import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/models/router.dart';
 import 'package:wifiber/providers/router_provider.dart';
 
-class AddMikrotikScreen extends StatefulWidget {
-  const AddMikrotikScreen({super.key});
+class CreateMikrotikScreen extends StatefulWidget {
+  const CreateMikrotikScreen({super.key});
 
   @override
-  State<AddMikrotikScreen> createState() => _AddMikrotikScreenState();
+  State<CreateMikrotikScreen> createState() => _CreateMikrotikScreenState();
 }
 
-class _AddMikrotikScreenState extends State<AddMikrotikScreen> {
+class _CreateMikrotikScreenState extends State<CreateMikrotikScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _hostnameController = TextEditingController();

@@ -7,7 +7,7 @@ import 'package:wifiber/helpers/datetime_helper.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/models/router.dart';
 import 'package:wifiber/providers/router_provider.dart';
-import 'package:wifiber/screens/dashboard/mikrotik/add_mikrotik_screen.dart';
+import 'package:wifiber/screens/dashboard/mikrotik/create_mikrotik_screen.dart';
 
 class ListMikrotikScreen extends StatefulWidget {
   const ListMikrotikScreen({super.key});
@@ -40,7 +40,7 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
           onPressed: () async {
             await Navigator.of(context).push(
               MaterialPageRoute(
-                builder: (context) => const AddMikrotikScreen(),
+                builder: (context) => const CreateMikrotikScreen(),
               ),
             );
 
