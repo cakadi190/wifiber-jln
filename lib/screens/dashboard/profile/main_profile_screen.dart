@@ -489,12 +489,31 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                                 ListTileItem(
                                   title: 'Nama Pengguna',
                                   subtitle: user.username,
+                                  onTap: () async {
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            EditProfileScreen(
+                                              formLabel: 'Nama Pengguna',
+                                              formName: 'username',
+                                              value: user.username,
+                                            ),
+                                      ),
+                                    );
+                                  },
                                 ),
                               ),
                               _buildProfileItem(
                                 ListTileItem(
-                                  title: 'Email',
+                                  title: 'Surel',
                                   subtitle: user.email,
+                                ),
+                              ),
+                              _buildProfileItem(
+                                ListTileItem(
+                                  title: 'Peran Anda',
+                                  subtitle: user.groupName ?? 'Pengguna Biasa',
                                 ),
                               ),
                             ],

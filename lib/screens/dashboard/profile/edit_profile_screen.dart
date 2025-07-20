@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
+import 'package:wifiber/components/ui/alert.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 
@@ -45,7 +46,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       child: Scaffold(
         backgroundColor: AppColors.primary,
         appBar: AppBar(
-          title: Text(widget.formName),
+          title: Text("Perbarui ${widget.formLabel}"),
           actions: [
             TextButton(
               onPressed: () {
@@ -74,6 +75,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
+                  Alert.opaque(
+                    fullWidth: true,
+                    child: Text(
+                      "Mohon isi formulir di bawah ini dengan lengkap dan benar untuk memperbarui data profil Anda.",
+                    ),
+                  ),
+
+                  const SizedBox(height: 16),
+
                   TextFormField(
                     controller: _controller,
                     decoration: InputDecoration(
