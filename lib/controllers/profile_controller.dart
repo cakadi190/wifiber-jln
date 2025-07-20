@@ -173,9 +173,4 @@ class ProfileController extends ChangeNotifier {
     _selectedImage = null;
     notifyListeners();
   }
-
-  @override
-  void dispose() {
-    super.dispose();
-  }
 }
