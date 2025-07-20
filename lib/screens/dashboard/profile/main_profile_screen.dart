@@ -351,7 +351,7 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                       width: double.infinity,
                       constraints: BoxConstraints(
                         minHeight:
-                        MediaQuery.of(context).size.height -
+                            MediaQuery.of(context).size.height -
                             AppBar().preferredSize.height -
                             MediaQuery.of(context).padding.top,
                       ),
@@ -364,7 +364,6 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                       ),
                       child: Column(
                         children: [
-                          // Profile Header
                           Container(
                             width: double.infinity,
                             padding: EdgeInsets.all(16),
@@ -383,41 +382,41 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                                     children: [
                                       profileController.selectedImage != null
                                           ? Container(
-                                        width: 96,
-                                        height: 96,
-                                        decoration: BoxDecoration(
-                                          shape: BoxShape.circle,
-                                          border: Border.all(
-                                            color: Colors.white,
-                                            width: 2,
-                                          ),
-                                        ),
-                                        child: ClipOval(
-                                          child: Image.file(
-                                            profileController
-                                                .selectedImage!,
-                                            fit: BoxFit.cover,
-                                          ),
-                                        ),
-                                      )
+                                              width: 96,
+                                              height: 96,
+                                              decoration: BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                border: Border.all(
+                                                  color: Colors.white,
+                                                  width: 2,
+                                                ),
+                                              ),
+                                              child: ClipOval(
+                                                child: Image.file(
+                                                  profileController
+                                                      .selectedImage!,
+                                                  fit: BoxFit.cover,
+                                                ),
+                                              ),
+                                            )
                                           : UserAvatar(
-                                        imageUrl:
-                                        user.picture ??
-                                            'https://via.placeholder.com/150',
-                                        name: user.name.isNotEmpty == true
-                                            ? user.name
-                                            .substring(0, 1)
-                                            .toUpperCase()
-                                            : 'A',
-                                        radius: 48,
-                                        backgroundColor: Colors.black,
-                                        headers: token.isNotEmpty
-                                            ? {
-                                          'Authorization':
-                                          'Bearer $token',
-                                        }
-                                            : {},
-                                      ),
+                                              imageUrl:
+                                                  user.picture ??
+                                                  'https://via.placeholder.com/150',
+                                              name: user.name.isNotEmpty == true
+                                                  ? user.name
+                                                        .substring(0, 1)
+                                                        .toUpperCase()
+                                                  : 'A',
+                                              radius: 48,
+                                              backgroundColor: Colors.black,
+                                              headers: token.isNotEmpty
+                                                  ? {
+                                                      'Authorization':
+                                                          'Bearer $token',
+                                                    }
+                                                  : {},
+                                            ),
                                       Positioned(
                                         bottom: 0,
                                         right: 0,
@@ -429,7 +428,7 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                                             decoration: BoxDecoration(
                                               color: Colors.white,
                                               borderRadius:
-                                              BorderRadius.circular(20),
+                                                  BorderRadius.circular(20),
                                               boxShadow: [
                                                 BoxShadow(
                                                   color: Colors.black
@@ -446,7 +445,7 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                                                   : Icons.edit,
                                               size: 16,
                                               color:
-                                              profileController.isUploading
+                                                  profileController.isUploading
                                                   ? Colors.grey[400]
                                                   : AppColors.primary,
                                             ),
@@ -463,7 +462,6 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
 
                           SizedBox(height: 16),
 
-                          // Profile Items - Fixed the ListView issue
                           Column(
                             children: [
                               _buildProfileItem(
@@ -474,16 +472,17 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                                     await Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            EditProfileScreen(
-                                              formLabel: 'Nama',
-                                              formName: 'name',
-                                              value: user.name,
-                                            ),
+                                        builder: (context) => EditProfileScreen(
+                                          formLabel: 'Nama',
+                                          formName: 'name',
+                                          value: user.name,
+                                        ),
                                       ),
                                     );
 
-                                    await authProvider.reinitialize(force: true);
+                                    await authProvider.reinitialize(
+                                      force: true,
+                                    );
                                   },
                                 ),
                               ),
@@ -495,16 +494,17 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                                     await Navigator.push(
                                       context,
                                       MaterialPageRoute(
-                                        builder: (context) =>
-                                            EditProfileScreen(
-                                              formLabel: 'Nama Pengguna',
-                                              formName: 'username',
-                                              value: user.username,
-                                            ),
+                                        builder: (context) => EditProfileScreen(
+                                          formLabel: 'Nama Pengguna',
+                                          formName: 'username',
+                                          value: user.username,
+                                        ),
                                       ),
                                     );
 
-                                    await authProvider.reinitialize(force: true);
+                                    await authProvider.reinitialize(
+                                      force: true,
+                                    );
                                   },
                                 ),
                               ),
