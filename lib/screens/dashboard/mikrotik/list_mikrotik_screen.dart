@@ -202,7 +202,7 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
 
   Widget _buildRouterTile(RouterModel router, RouterProvider provider) {
     return Card(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: EdgeInsets.zero,
       elevation: 0,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: InkWell(
