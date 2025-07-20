@@ -213,19 +213,6 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                 children: [
                   SizedBox(
                     width: double.infinity,
-                    child: TextButton(
-                      onPressed: () {
-                        Navigator.of(context).pop(false);
-                        _profileController.clearSelectedImage();
-                      },
-                      style: TextButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 12),
-                      ),
-                      child: Text('Batal', style: TextStyle(color: Colors.grey[600])),
-                    ),
-                  ),
-                  SizedBox(
-                    width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.of(context).pop(true);
@@ -236,6 +223,19 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                         foregroundColor: Colors.white,
                       ),
                       child: Text('Gunakan'),
+                    ),
+                  ),
+                  SizedBox(
+                    width: double.infinity,
+                    child: TextButton(
+                      onPressed: () {
+                        Navigator.of(context).pop(false);
+                        _profileController.clearSelectedImage();
+                      },
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.symmetric(vertical: 12),
+                      ),
+                      child: Text('Batal', style: TextStyle(color: Colors.grey[600])),
                     ),
                   ),
                 ],
