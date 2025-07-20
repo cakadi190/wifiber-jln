@@ -85,8 +85,6 @@ class _CreateMikrotikScreenState extends State<CreateMikrotikScreen> {
         }
 
         if(mounted && !success) {
-          print(routerProvider.errorMessage);
-
           SnackBars.error(context, 'Gagal menambahkan router');
         }
       } catch (e) {
@@ -485,7 +483,7 @@ class _CreateMikrotikScreenState extends State<CreateMikrotikScreen> {
                   Navigator.pop(context);
                 },
               );
-            }).toList(),
+            }),
             SizedBox(height: 20),
           ],
         ),
