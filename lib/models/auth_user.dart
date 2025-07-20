@@ -29,6 +29,8 @@ class AuthUser {
   });
 
   factory AuthUser.fromToken(String token) {
+    print(token.toString());
+
     if (JwtDecoder.isExpired(token)) {
       throw InvalidUserException();
     }
@@ -75,6 +77,8 @@ class AuthUser {
   }
 
   factory AuthUser.fromJson(Map<String, dynamic> json) {
+    print(json.toString());
+
     return AuthUser(
       userId: json['userId'] ?? json['user_id'] ?? json['id'] ?? 0,
       username: json['username'] ?? '',

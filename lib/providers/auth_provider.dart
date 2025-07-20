@@ -10,9 +10,9 @@ class AuthProvider extends ChangeNotifier {
     _initUser();
   }
 
-  Future<void> _initUser() async {
+  Future<void> _initUser({bool force = false}) async {
     try {
-      user = await AuthService.loadUser();
+      user = await AuthService.loadUser(force: force);
     } catch (_) {
       user = null;
     } finally {
@@ -21,10 +21,10 @@ class AuthProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> reinitialize() async {
+  Future<void> reinitialize({bool force = false}) async {
     isLoading = true;
     notifyListeners();
-    await _initUser();
+    await _initUser(force: force);
   }
 
   Future<void> login(String username, String password) async {

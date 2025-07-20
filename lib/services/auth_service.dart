@@ -13,7 +13,7 @@ class AuthService {
   static const String profilePath = '/profiles';
   static final HttpService _http = HttpService();
 
-  static Future<AuthUser> loadUser() async {
+  static Future<AuthUser> loadUser({bool force = false}) async {
     final json = await SecureStorageService.storage.read(
       key: SecureStorageService.userKey,
     );
@@ -33,6 +33,15 @@ class AuthService {
           debugPrint(
             'Token will expire in ${timeUntilExpiry.inMinutes} minutes',
           );
+        }
+
+        // Jika force = true, fetch ulang profile dari server
+        if (force) {
+          final updatedUser = await _getProfile(user.userId, user);
+          if (updatedUser != null) {
+            await saveUser(updatedUser);
+            return updatedUser;
+          }
         }
 
         return user;
@@ -99,7 +108,7 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final dataParse =
-            jsonDecode(response.body)['data'] as Map<String, dynamic>;
+        jsonDecode(response.body)['data'] as Map<String, dynamic>;
 
         if (userCache != null) {
           final userData = <String, dynamic>{
