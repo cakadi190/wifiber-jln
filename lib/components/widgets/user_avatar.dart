@@ -54,7 +54,7 @@ class UserAvatar extends StatelessWidget {
         backgroundColor: backgroundColor ?? theme.colorScheme.primary,
         backgroundImage: _getBackgroundImage(),
         onBackgroundImageError: (exception, stackTrace) {
-          // Handle error jika gambar gagal load
+
           debugPrint('Avatar image failed to load: $exception');
         },
         child: _getBackgroundImage() == null
@@ -74,7 +74,7 @@ class UserAvatar extends StatelessWidget {
     if (imageUrl != null && imageUrl!.isNotEmpty) {
       return ResizeImage(
         NetworkImage(imageUrl!, headers: headers, scale: scale),
-        width: cacheWidth ?? (radius * 2 * 2).toInt(), // 2x untuk density
+        width: cacheWidth ?? (radius * 2 * 2).toInt(),
         height: cacheHeight ?? (radius * 2 * 2).toInt(),
         allowUpscaling: false,
       );
