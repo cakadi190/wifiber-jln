@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wifiber/config/app_colors.dart';
+import 'package:wifiber/config/app_font.dart';
 
 /// Enum untuk tipe alert yang menentukan warna dan styling
 enum AlertType {
@@ -306,7 +307,7 @@ class _AlertOpaque extends Alert {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
             child: DefaultTextStyle(
-              style: TextStyle(
+              style: AppFont.baseFont(16).copyWith(
                 color: disabled ? color.withAlpha(30) : color,
                 fontWeight: FontWeight.w500,
               ),

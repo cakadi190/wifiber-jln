@@ -325,7 +325,7 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                           if (profileController.isUploading) ...[
                             SizedBox(height: 16),
                             Text(
-                              'Mengupload gambar...',
+                              'Memperbarui gambar, mohon tunggu sebentar...',
                               style: TextStyle(color: Colors.white),
                             ),
                           ],
@@ -482,6 +482,8 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                                             ),
                                       ),
                                     );
+
+                                    await authProvider.reinitialize(force: true);
                                   },
                                 ),
                               ),
@@ -501,6 +503,8 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                                             ),
                                       ),
                                     );
+
+                                    await authProvider.reinitialize(force: true);
                                   },
                                 ),
                               ),
