@@ -23,11 +23,11 @@ class RouterModel {
 
   factory RouterModel.fromJson(Map<String, dynamic> json) {
     return RouterModel(
-      id: json['id'],
+      id: int.parse(json['id']),
       name: json['name'],
       ip: json['ip'],
       host: json['host'],
-      toleranceDays: json['tolerance_days'],
+      toleranceDays: int.parse(json['tolerance_days']),
       status: json['status'],
       action: json['action'],
       isolirProfile: json['isolir_profile'],
