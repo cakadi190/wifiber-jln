@@ -63,9 +63,9 @@ class RouterProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final newRouter = await _routerService.addRouter(router);
-      _routers.add(newRouter);
+      await _routerService.addRouter(router);
       _isAddingRouter = false;
+      await getAllRouters();
       notifyListeners();
       return true;
     } catch (e) {

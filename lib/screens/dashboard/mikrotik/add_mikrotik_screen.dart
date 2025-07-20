@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/models/router.dart';
+import 'package:wifiber/providers/router_provider.dart';
 
 class AddMikrotikScreen extends StatefulWidget {
   const AddMikrotikScreen({super.key});
@@ -55,6 +57,9 @@ class _AddMikrotikScreenState extends State<AddMikrotikScreen> {
         _isLoading = true;
       });
 
+
+      final routerProvider = Provider.of<RouterProvider>(context, listen: false);
+
       final addRouterModel = AddRouterModel(
         name: _nameController.text.trim(),
         hostname: _hostnameController.text.trim(),
@@ -72,16 +77,17 @@ class _AddMikrotikScreenState extends State<AddMikrotikScreen> {
       );
 
       try {
-        await Future.delayed(Duration(seconds: 2));
+        final success = await routerProvider.addRouter(addRouterModel);
 
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Router berhasil ditambahkan'),
-              backgroundColor: Colors.green,
-            ),
-          );
+        if (mounted && success) {
+          SnackBars.success(context, 'Router berhasil ditambahkan');
           Navigator.pop(context, true);
+        }
+
+        if(mounted && !success) {
+          print(routerProvider.errorMessage);
+
+          SnackBars.error(context, 'Gagal menambahkan router');
         }
       } catch (e) {
         if (mounted) {

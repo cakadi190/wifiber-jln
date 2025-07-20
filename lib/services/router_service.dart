@@ -55,16 +55,16 @@ class RouterService {
     }
   }
 
-  Future<RouterModel> addRouter(AddRouterModel router) async {
+  Future<bool> addRouter(AddRouterModel router) async {
     try {
-      final response = await _http.post(
+      final response = await _http.postForm(
         baseUrl,
-        body: json.encode(router.toJson()),
+        fields: router.toFormFields(),
+        requiresAuth: true,
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        return RouterModel.fromJson(data['data'] ?? data);
+        return true;
       } else {
         throw Exception('Failed to add router: ${response.statusCode}');
       }
