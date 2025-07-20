@@ -20,7 +20,7 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
   @override
   void initState() {
     super.initState();
-    // Initialize controller with AuthProvider
+
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     _profileController = ProfileController(authProvider: authProvider);
   }
@@ -153,7 +153,7 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
 
   Future<void> _pickImageFromGallery() async {
     try {
-      Navigator.pop(context); // Close modal
+      Navigator.pop(context);
       await _profileController.pickImageFromGallery();
       await _showCropPreviewDialog();
     } catch (e) {
@@ -163,7 +163,7 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
 
   Future<void> _pickImageFromCamera() async {
     try {
-      Navigator.pop(context); // Close modal
+      Navigator.pop(context);
       await _profileController.pickImageFromCamera();
       await _showCropPreviewDialog();
     } catch (e) {
