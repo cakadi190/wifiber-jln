@@ -21,7 +21,7 @@ class AppFont {
   );
 
   static TextStyle baseFont(double size) {
-    return GoogleFonts.rubik(
+    return GoogleFonts.workSans(
       fontSize: size,
       fontWeight: FontWeight.normal,
       color: AppColors.onSurface,
