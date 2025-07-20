@@ -1,10 +1,17 @@
+import 'dart:convert';
+import 'dart:io';
+
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
+import 'package:http/http.dart' as http;
+import 'package:image_cropper/image_cropper.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/components/widgets/user_avatar.dart';
 import 'package:wifiber/config/app_colors.dart';
+import 'package:wifiber/exceptions/validation_exceptions.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
+import 'package:wifiber/models/auth_user.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 
 class MainProfileScreen extends StatefulWidget {
@@ -16,6 +23,8 @@ class MainProfileScreen extends StatefulWidget {
 
 class _MainProfileScreenState extends State<MainProfileScreen> {
   final ImagePicker _picker = ImagePicker();
+  File? _selectedImage;
+  bool _isUploading = false;
 
   Future<void> _showImagePickerModal() async {
     showModalBottomSheet(
@@ -34,7 +43,6 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                // Handle bar
                 Container(
                   width: 40,
                   height: 4,
@@ -118,14 +126,10 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
             Container(
               padding: EdgeInsets.all(12),
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.1),
+                color: AppColors.primary.withValues(alpha: 0.1),
                 shape: BoxShape.circle,
               ),
-              child: Icon(
-                icon,
-                size: 32,
-                color: AppColors.primary,
-              ),
+              child: Icon(icon, size: 32, color: AppColors.primary),
             ),
             SizedBox(height: 8),
             Text(
@@ -143,9 +147,7 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
   }
 
   Future<void> _pickImageFromGallery() async {
-    Navigator.pop(context); // Close modal
     try {
-      // Add delay to ensure modal is closed properly
       await Future.delayed(Duration(milliseconds: 300));
 
       final XFile? image = await _picker.pickImage(
@@ -156,20 +158,15 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
       );
 
       if (image != null) {
-        // Handle the selected image here
-        // You can call your upload function or update the user avatar
-        _handleImageSelected(image);
+        await _cropImage(image.path);
       }
     } catch (e) {
-      print('Error picking image from gallery: $e');
       _showErrorSnackBar('Gagal memilih gambar dari galeri: ${e.toString()}');
     }
   }
 
   Future<void> _pickImageFromCamera() async {
-    Navigator.pop(context); // Close modal
     try {
-      // Add delay to ensure modal is closed properly
       await Future.delayed(Duration(milliseconds: 300));
 
       final XFile? image = await _picker.pickImage(
@@ -180,39 +177,225 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
       );
 
       if (image != null) {
-        // Handle the captured image here
-        // You can call your upload function or update the user avatar
-        _handleImageSelected(image);
+        await _cropImage(image.path);
       }
     } catch (e) {
-      print('Error picking image from camera: $e');
       _showErrorSnackBar('Gagal mengambil foto dari kamera: ${e.toString()}');
     }
   }
 
-  void _handleImageSelected(XFile image) {
-    // TODO: Implement image upload logic here
-    // Example:
-    // 1. Show loading indicator
-    // 2. Upload image to server
-    // 3. Update user profile
-    // 4. Refresh UI
+  Future<void> _cropImage(String imagePath) async {
+    try {
+      if (!await File(imagePath).exists()) {
+        _showErrorSnackBar('File gambar tidak ditemukan');
+        return;
+      }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Gambar dipilih: ${image.name}'),
-        backgroundColor: Colors.green,
-      ),
+      final croppedFile = await ImageCropper().cropImage(
+        sourcePath: imagePath,
+        maxWidth: 512,
+        maxHeight: 512,
+        compressFormat: ImageCompressFormat.jpg,
+        compressQuality: 85,
+        uiSettings: [
+          AndroidUiSettings(
+            toolbarTitle: 'Crop Gambar Profil',
+            toolbarColor: AppColors.primary,
+            toolbarWidgetColor: Colors.white,
+            initAspectRatio: CropAspectRatioPreset.square,
+            lockAspectRatio: true,
+            aspectRatioPresets: [CropAspectRatioPreset.square],
+            statusBarColor: AppColors.primary,
+            backgroundColor: Colors.white,
+            activeControlsWidgetColor: AppColors.primary,
+            dimmedLayerColor: Colors.black.withValues(alpha: 0.8),
+            cropFrameColor: AppColors.primary,
+            cropGridColor: AppColors.primary.withValues(alpha: 0.5),
+            cropFrameStrokeWidth: 2,
+            cropGridStrokeWidth: 1,
+            showCropGrid: true,
+            hideBottomControls: false,
+          ),
+          IOSUiSettings(
+            title: 'Crop Gambar Profil',
+            doneButtonTitle: 'Selesai',
+            cancelButtonTitle: 'Batal',
+            aspectRatioLockEnabled: true,
+            resetAspectRatioEnabled: false,
+            aspectRatioPickerButtonHidden: true,
+            rotateClockwiseButtonHidden: false,
+            rotateButtonsHidden: false,
+            resetButtonHidden: false,
+            aspectRatioLockDimensionSwapEnabled: false,
+            minimumAspectRatio: 1.0,
+          ),
+          WebUiSettings(
+            context: context,
+            presentStyle: WebPresentStyle.dialog,
+            size: const CropperSize(width: 520, height: 520),
+          ),
+        ],
+      );
+
+      if (croppedFile != null) {
+        final file = File(croppedFile.path);
+        if (await file.exists()) {
+          setState(() {
+            _selectedImage = file;
+          });
+
+          await _showCropPreviewDialog();
+        } else {
+          _showErrorSnackBar('Gagal memproses gambar yang dipotong');
+        }
+      }
+    } catch (e) {
+      _showErrorSnackBar(
+        'Gagal memotong gambar. Coba gunakan galeri atau ambil foto baru.',
+      );
+    }
+  }
+
+  Future<void> _showCropPreviewDialog() async {
+    if (_selectedImage == null) return;
+
+    final result = await showDialog<bool>(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Konfirmasi Gambar Profil'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 120,
+                height: 120,
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: AppColors.primary, width: 2),
+                ),
+                child: ClipOval(
+                  child: Image.file(_selectedImage!, fit: BoxFit.cover),
+                ),
+              ),
+              SizedBox(height: 16),
+              Text(
+                'Apakah Anda ingin menggunakan gambar ini sebagai foto profil?',
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14),
+              ),
+            ],
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(false);
+                setState(() {
+                  _selectedImage = null;
+                });
+              },
+              child: Text('Batal', style: TextStyle(color: Colors.grey[600])),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.of(context).pop(true);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+              ),
+              child: Text('Gunakan'),
+            ),
+          ],
+        );
+      },
     );
 
-    print('Image selected: ${image.path}');
+    if (result == true) {
+      await _handleImageUpload();
+    } else {
+      setState(() {
+        _selectedImage = null;
+      });
+    }
+  }
+
+  Future<void> _handleImageUpload() async {
+    if (_selectedImage == null) return;
+
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    final AuthUser user = auth.user!;
+    final File? imagePath = _selectedImage;
+
+    setState(() {
+      _isUploading = true;
+    });
+
+    try {
+      final request = http.MultipartRequest(
+        'POST',
+        Uri.parse('https://wifiber.web.id/api/v1/profiles/${user.userId}'),
+      );
+      request.headers['Authorization'] = 'Bearer ${user.accessToken}';
+      request.files.add(
+        await http.MultipartFile.fromPath('picture', imagePath!.path),
+      );
+      final response = await request.send();
+      final responseBody = await response.stream.transform(utf8.decoder).join();
+
+      if (response.statusCode == 200) {
+        auth.reinitialize();
+
+        _showSuccessSnackBar('Berhasil mengunggah gambar');
+      } else if (response.statusCode == 422) {
+        _showErrorSnackBar('Gagal mengunggah gambar');
+        throw ValidationException(
+          errors: jsonDecode(responseBody),
+          message: 'Gagal mengunggah gambar',
+        );
+      } else {
+        _showErrorSnackBar('Gagal mengunggah gambar');
+        throw Exception('Gagal mengunggah gambar');
+      }
+    } catch (e) {
+      _showErrorSnackBar('Gagal mengunggah gambar: ${e.toString()}');
+    } finally {
+      setState(() {
+        _selectedImage = null;
+        _isUploading = false;
+      });
+    }
   }
 
   void _showErrorSnackBar(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text(message),
+        content: Row(
+          children: [
+            Icon(Icons.error_outline, color: Colors.white),
+            SizedBox(width: 8),
+            Expanded(child: Text(message)),
+          ],
+        ),
         backgroundColor: Colors.red,
+        duration: Duration(seconds: 4),
+      ),
+    );
+  }
+
+  void _showSuccessSnackBar(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            Icon(Icons.check_circle_outline, color: Colors.white),
+            SizedBox(width: 8),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: Colors.green,
+        duration: Duration(seconds: 3),
       ),
     );
   }
@@ -229,9 +412,21 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
         appBar: AppBar(title: Text('Profil Saya')),
         body: Consumer<AuthProvider>(
           builder: (context, authProvider, child) {
-            if (authProvider.isLoading) {
+            if (authProvider.isLoading || _isUploading) {
               return Center(
-                child: CircularProgressIndicator(color: Colors.white),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(color: Colors.white),
+                    if (_isUploading) ...[
+                      SizedBox(height: 16),
+                      Text(
+                        'Mengupload gambar...',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    ],
+                  ],
+                ),
               );
             }
 
@@ -252,7 +447,7 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                 width: double.infinity,
                 constraints: BoxConstraints(
                   minHeight:
-                  MediaQuery.of(context).size.height -
+                      MediaQuery.of(context).size.height -
                       AppBar().preferredSize.height -
                       MediaQuery.of(context).padding.top,
                 ),
@@ -281,31 +476,55 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                           children: [
                             Stack(
                               children: [
-                                UserAvatar(
-                                  imageUrl:
-                                  user.picture ??
-                                      'https://via.placeholder.com/150',
-                                  name: user.name.isNotEmpty == true
-                                      ? user.name.substring(0, 1).toUpperCase()
-                                      : 'A',
-                                  radius: 48,
-                                  backgroundColor: Colors.black,
-                                  headers: token.isNotEmpty
-                                      ? {'Authorization': 'Bearer $token'}
-                                      : {},
-                                ),
+                                _selectedImage != null
+                                    ? Container(
+                                        width: 96,
+                                        height: 96,
+                                        decoration: BoxDecoration(
+                                          shape: BoxShape.circle,
+                                          border: Border.all(
+                                            color: Colors.white,
+                                            width: 2,
+                                          ),
+                                        ),
+                                        child: ClipOval(
+                                          child: Image.file(
+                                            _selectedImage!,
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      )
+                                    : UserAvatar(
+                                        imageUrl:
+                                            user.picture ??
+                                            'https://via.placeholder.com/150',
+                                        name: user.name.isNotEmpty == true
+                                            ? user.name
+                                                  .substring(0, 1)
+                                                  .toUpperCase()
+                                            : 'A',
+                                        radius: 48,
+                                        backgroundColor: Colors.black,
+                                        headers: token.isNotEmpty
+                                            ? {'Authorization': 'Bearer $token'}
+                                            : {},
+                                      ),
                                 Positioned(
                                   bottom: 0,
                                   right: 0,
                                   child: InkWell(
-                                    onTap: _showImagePickerModal,
+                                    onTap: _isUploading
+                                        ? null
+                                        : _showImagePickerModal,
                                     child: Container(
                                       decoration: BoxDecoration(
                                         color: Colors.white,
                                         borderRadius: BorderRadius.circular(20),
                                         boxShadow: [
                                           BoxShadow(
-                                            color: Colors.black.withValues(alpha:0.1),
+                                            color: Colors.black.withValues(
+                                              alpha: 0.1,
+                                            ),
                                             blurRadius: 4,
                                             offset: Offset(0, 2),
                                           ),
@@ -313,9 +532,13 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                                       ),
                                       padding: EdgeInsets.all(8),
                                       child: Icon(
-                                        Icons.edit,
+                                        _isUploading
+                                            ? Icons.hourglass_empty
+                                            : Icons.edit,
                                         size: 16,
-                                        color: AppColors.primary,
+                                        color: _isUploading
+                                            ? Colors.grey[400]
+                                            : AppColors.primary,
                                       ),
                                     ),
                                   ),
