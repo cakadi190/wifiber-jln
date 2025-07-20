@@ -35,7 +35,6 @@ class AuthService {
           );
         }
 
-        // Jika force = true, fetch ulang profile dari server
         if (force) {
           final updatedUser = await _getProfile(user.userId, user);
           if (updatedUser != null) {
