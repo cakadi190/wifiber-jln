@@ -20,7 +20,49 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
       ),
       child: Scaffold(
         backgroundColor: AppColors.primary,
-        appBar: AppBar(title: const Text('Daftar Mikrotik')),
+        floatingActionButton: FloatingActionButton(
+          onPressed: () {},
+          child: const Icon(Icons.add),
+        ),
+        appBar: AppBar(
+          title: const Text('MikroTik'),
+          actions: [
+            PopupMenuButton<String>(
+              itemBuilder: (context) {
+                return [
+                  PopupMenuItem<String>(
+                    onTap: () {},
+                    child: Row(
+                      children: const [
+                        Icon(
+                          Icons.power_settings_new,
+                          size: 20,
+                          color: AppColors.primary,
+                        ),
+                        SizedBox(width: 8),
+                        Text('Aktivasi Auto-Isolir'),
+                      ],
+                    ),
+                  ),
+                  PopupMenuItem<String>(
+                    onTap: () {},
+                    child: Row(
+                      children: const [
+                        Icon(
+                          Icons.power_off,
+                          size: 20,
+                          color: AppColors.primary,
+                        ),
+                        SizedBox(width: 8),
+                        Text('Deaktivasi Auto-Isolir'),
+                      ],
+                    ),
+                  ),
+                ];
+              },
+            ),
+          ],
+        ),
         body: Container(
           decoration: const BoxDecoration(
             color: Colors.white,

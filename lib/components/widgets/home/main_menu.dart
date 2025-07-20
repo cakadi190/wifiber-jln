@@ -67,7 +67,7 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
       ),
       MenuItem(
         icon: Icons.wifi,
-        title: 'Mikrotik',
+        title: 'Router MikroTik',
         onTap: () {
           Navigator.push(
             context,
