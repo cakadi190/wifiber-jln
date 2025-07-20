@@ -21,10 +21,11 @@ class AppFont {
   );
 
   static TextStyle baseFont(double size) {
-    return GoogleFonts.figtree(
+    return GoogleFonts.rubik(
       fontSize: size,
       fontWeight: FontWeight.normal,
       color: AppColors.onSurface,
+      letterSpacing: 0.0,
     );
   }
 }

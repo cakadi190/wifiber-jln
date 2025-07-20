@@ -51,6 +51,10 @@ class CoreApp extends StatelessWidget {
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
         ),
+        bottomNavigationBarTheme: BottomNavigationBarThemeData(
+          unselectedLabelStyle: AppFont.baseFont(12),
+          selectedLabelStyle: AppFont.baseFont(12),
+        ),
         inputDecorationTheme: InputDecorationTheme(
           border: OutlineInputBorder(
             borderRadius: BorderRadius.circular(8.0),
