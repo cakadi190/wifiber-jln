@@ -8,6 +8,7 @@ import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/models/router.dart';
 import 'package:wifiber/providers/router_provider.dart';
 import 'package:wifiber/screens/dashboard/mikrotik/create_mikrotik_screen.dart';
+import 'package:wifiber/screens/dashboard/mikrotik/edit_mikrotik_screen.dart';
 
 class ListMikrotikScreen extends StatefulWidget {
   const ListMikrotikScreen({super.key});
@@ -280,7 +281,14 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
     }
   }
 
-  void _editRouter(RouterModel router) {}
+  void _editRouter(RouterModel router) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => EditMikrotikScreen(router: router),
+      ),
+    );
+  }
 
   void _showDeleteConfirmation(RouterModel router, RouterProvider provider) {
     showModalBottomSheet(
