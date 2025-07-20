@@ -1,5 +1,3 @@
-import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
@@ -58,17 +56,19 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         'https://wifiber.web.id/api/v1/profiles/${user.userId}',
       );
 
-      final Map<String, dynamic> requestBody = {
+      final Map<String, String> requestHeaders = {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Authorization': 'Bearer $token',
+      };
+
+      final Map<String, String> requestBody = {
         widget.formName: _controller.text,
       };
 
-      final response = await http.put(
+      final response = await http.post(
         url,
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer $token',
-        },
-        body: json.encode(requestBody),
+        headers: requestHeaders,
+        body: _encodeFormData(requestBody),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -109,6 +109,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         });
       }
     }
+  }
+
+  String _encodeFormData(Map<String, String> data) {
+    return data.keys
+        .map((key) => '$key=${Uri.encodeQueryComponent(data[key]!)}')
+        .join('&');
   }
 
   @override
