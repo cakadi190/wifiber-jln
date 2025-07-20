@@ -75,7 +75,7 @@ class BillsService {
           throw Exception('Failed to create bill: ${response.statusCode}');
         }
       }
-    } on ValidationException catch (e)  {
+    } on ValidationException catch (_)  {
       rethrow;
     } on StringException catch (_) {
       rethrow;
