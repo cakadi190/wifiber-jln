@@ -20,7 +20,7 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
   @override
   void initState() {
     super.initState();
-    // Load data saat screen pertama kali dibuka
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<RouterProvider>().getAllRouters();
     });
@@ -44,7 +44,6 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
               ),
             );
 
-            // Refresh list setelah menambah router baru
             if (result == true) {
               if (mounted) {
                 context.read<RouterProvider>().refresh();
@@ -282,21 +281,13 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
     }
   }
 
-  void _editRouter(RouterModel router) {
-    // Navigate to edit screen
-    // Navigator.of(context).push(
-    //   MaterialPageRoute(
-    //     builder: (context) => EditMikrotikScreen(router: router),
-    //   ),
-    // );
-  }
+  void _editRouter(RouterModel router) {}
 
   Future<void> _toggleAutoIsolate(
     RouterModel router,
     RouterProvider provider,
   ) async {
     try {
-      // Show dialog to get ppoeSecret
       final ppoeSecret = await _showPpoeSecretDialog();
       if (ppoeSecret == null || ppoeSecret.isEmpty) return;
 
@@ -377,7 +368,6 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Handle bar
             Container(
               margin: const EdgeInsets.only(top: 12),
               width: 40,
@@ -388,7 +378,6 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
               ),
             ),
 
-            // Header dengan icon warning
             Padding(
               padding: const EdgeInsets.all(24),
               child: Column(
@@ -434,12 +423,10 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
               ),
             ),
 
-            // Action buttons
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
                 children: [
-                  // Delete button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -466,7 +453,7 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-                  // Cancel button
+
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton(
@@ -492,7 +479,6 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
               ),
             ),
 
-            // Bottom safe area
             SizedBox(height: MediaQuery.of(context).padding.bottom + 24),
           ],
         ),
@@ -549,13 +535,12 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
           minChildSize: 0.4,
           maxChildSize: 0.8,
           expand: false,
-          // Tambahkan ini untuk mencegah expand otomatis
+
           snap: true,
-          // Tambahkan snap untuk transisi yang lebih smooth
+
           snapSizes: const [0.4, 0.6, 0.8],
-          // Tentukan ukuran snap points
+
           builder: (context, scrollController) {
-            // Reset scroll position ke top saat pertama kali dibuka
             WidgetsBinding.instance.addPostFrameCallback((_) {
               if (scrollController.hasClients) {
                 scrollController.jumpTo(0);
@@ -565,17 +550,16 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
             return SingleChildScrollView(
               controller: scrollController,
               physics: const ClampingScrollPhysics(),
-              // Ubah physics untuk kontrol yang lebih baik
+
               child: Padding(
                 padding: const EdgeInsets.all(24),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    // Handle bar - buat lebih responsive untuk drag
                     Center(
                       child: GestureDetector(
                         onTap: () {},
-                        // Tambahkan gesture detector kosong untuk handle bar
+
                         child: Container(
                           width: 40,
                           height: 4,
@@ -589,7 +573,6 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
                     ),
                     const SizedBox(height: 16),
 
-                    // Header
                     Row(
                       children: [
                         CircleAvatar(
@@ -621,7 +604,6 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
 
                     const SizedBox(height: 32),
 
-                    // Details Section
                     _buildDetailSection('Informasi Dasar', [
                       _buildDetailItem(
                         Icons.computer,
@@ -680,7 +662,6 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
 
                     const SizedBox(height: 32),
 
-                    // Quick Actions
                     Row(
                       children: [
                         Expanded(
@@ -719,7 +700,6 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
                       ],
                     ),
 
-                    // Bottom padding for safe area
                     SizedBox(
                       height: MediaQuery.of(context).padding.bottom + 16,
                     ),
@@ -817,7 +797,6 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Handle bar
             Container(
               margin: const EdgeInsets.only(top: 12),
               width: 40,
@@ -828,7 +807,6 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
               ),
             ),
 
-            // Header
             Padding(
               padding: const EdgeInsets.all(20),
               child: Row(
@@ -893,7 +871,6 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
               },
             ),
 
-            // Bottom safe area
             SizedBox(height: MediaQuery.of(context).padding.bottom + 20),
           ],
         ),
@@ -981,7 +958,6 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
           child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
-              // Handle bar dengan animasi
               Container(
                 margin: const EdgeInsets.only(top: 16),
                 width: 48,
@@ -994,7 +970,6 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
 
               const SizedBox(height: 24),
 
-              // Icon dengan background colorful
               Container(
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
@@ -1004,13 +979,14 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
                 child: Icon(
                   enable ? Icons.wifi_protected_setup : Icons.wifi_off,
                   size: 32,
-                  color: enable ? Colors.green.shade600 : Colors.orange.shade600,
+                  color: enable
+                      ? Colors.green.shade600
+                      : Colors.orange.shade600,
                 ),
               ),
 
               const SizedBox(height: 20),
 
-              // Title dengan styling yang lebih menarik
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Text(
@@ -1029,7 +1005,6 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
 
               const SizedBox(height: 8),
 
-              // Subtitle/description
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Text(
@@ -1047,12 +1022,10 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
 
               const SizedBox(height: 32),
 
-              // Action buttons dengan styling modern
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 24),
                 child: Row(
                   children: [
-                    // Cancel button
                     Expanded(
                       child: OutlinedButton(
                         style: OutlinedButton.styleFrom(
@@ -1076,11 +1049,12 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
 
                     const SizedBox(width: 12),
 
-                    // Confirm button
                     Expanded(
                       child: ElevatedButton(
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: enable ? Colors.green.shade600 : Colors.orange.shade600,
+                          backgroundColor: enable
+                              ? Colors.green.shade600
+                              : Colors.orange.shade600,
                           foregroundColor: Colors.white,
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
@@ -1095,10 +1069,16 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
                           provider.toggleAllAutoIsolate(action);
                           Navigator.pop(context);
 
-                          if(enable) {
-                            SnackBars.success(context, 'Auto-Isolir berhasil diaktifkan untuk semua router');
+                          if (enable) {
+                            SnackBars.success(
+                              context,
+                              'Auto-Isolir berhasil diaktifkan untuk semua router',
+                            );
                           } else {
-                            SnackBars.success(context, 'Auto-Isolir berhasil dinonaktifkan untuk semua router');
+                            SnackBars.success(
+                              context,
+                              'Auto-Isolir berhasil dinonaktifkan untuk semua router',
+                            );
                           }
                         },
                         child: Text(
@@ -1114,7 +1094,6 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
                 ),
               ),
 
-              // Bottom padding untuk safe area
               SizedBox(height: MediaQuery.of(context).padding.bottom + 24),
             ],
           ),
