@@ -2,27 +2,16 @@ import 'package:flutter/material.dart';
 
 class UserAvatar extends StatelessWidget {
   final String? imageUrl;
-
   final String? name;
-
   final String? initials;
-
   final double radius;
-
   final Color? backgroundColor;
-
   final Color? textColor;
-
   final Map<String, String>? headers;
-
   final VoidCallback? onTap;
-
   final Border? border;
-
   final double scale;
-
   final int? cacheWidth;
-
   final int? cacheHeight;
 
   const UserAvatar({
@@ -44,6 +33,7 @@ class UserAvatar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final backgroundImage = _getBackgroundImage();
 
     Widget avatar = Container(
       width: radius * 2,
@@ -52,14 +42,14 @@ class UserAvatar extends StatelessWidget {
       child: CircleAvatar(
         radius: radius,
         backgroundColor: backgroundColor ?? theme.colorScheme.primary,
-        backgroundImage: _getBackgroundImage(),
-        onBackgroundImageError: (exception, stackTrace) {
+        backgroundImage: backgroundImage,
 
-          debugPrint('Avatar image failed to load: $exception');
-        },
-        child: _getBackgroundImage() == null
-            ? _buildInitialsWidget(context)
+        onBackgroundImageError: backgroundImage != null
+            ? (exception, stackTrace) {
+                debugPrint('Avatar image failed to load: $exception');
+              }
             : null,
+        child: backgroundImage == null ? _buildInitialsWidget(context) : null,
       ),
     );
 
@@ -71,15 +61,21 @@ class UserAvatar extends StatelessWidget {
   }
 
   ImageProvider? _getBackgroundImage() {
-    if (imageUrl != null && imageUrl!.isNotEmpty) {
+    if (imageUrl == null || imageUrl!.isEmpty) {
+      return null;
+    }
+
+    try {
       return ResizeImage(
         NetworkImage(imageUrl!, headers: headers, scale: scale),
         width: cacheWidth ?? (radius * 2 * 2).toInt(),
         height: cacheHeight ?? (radius * 2 * 2).toInt(),
         allowUpscaling: false,
       );
+    } catch (e) {
+      debugPrint('Error creating background image: $e');
+      return null;
     }
-    return null;
   }
 
   Widget _buildInitialsWidget(BuildContext context) {
@@ -94,19 +90,24 @@ class UserAvatar extends StatelessWidget {
   }
 
   String _getInitials() {
-    if (initials != null && initials!.isNotEmpty) {
-      return initials!.toUpperCase();
+    if (initials != null && initials!.trim().isNotEmpty) {
+      return initials!.trim().toUpperCase();
     }
 
-    if (name != null && name!.isNotEmpty) {
-      return _generateInitialsFromName(name!);
+    if (name != null && name!.trim().isNotEmpty) {
+      return _generateInitialsFromName(name!.trim());
     }
 
     return 'U';
   }
 
   String _generateInitialsFromName(String fullName) {
-    List<String> nameParts = fullName.trim().split(' ');
+    if (fullName.isEmpty) return 'U';
+
+    List<String> nameParts = fullName
+        .split(' ')
+        .where((part) => part.isNotEmpty)
+        .toList();
 
     if (nameParts.isEmpty) return 'U';
 

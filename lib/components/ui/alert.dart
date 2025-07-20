@@ -310,6 +310,7 @@ class _AlertOpaque extends Alert {
               style: AppFont.baseFont(16).copyWith(
                 color: disabled ? color.withAlpha(30) : color,
                 fontWeight: FontWeight.w500,
+                letterSpacing: 0.0,
               ),
               child: child,
             ),
