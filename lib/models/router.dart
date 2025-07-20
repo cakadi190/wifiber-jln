@@ -134,6 +134,20 @@ class UpdateRouterModel {
       'is_auto_isolate': isAutoIsolate,
     };
   }
+
+  Map<String, String> toFormFields() {
+    return {
+      'name': name,
+      'hostname': hostname,
+      'username': username,
+      'password': password,
+      'port': port,
+      'tolerance_days': toleranceDays.toString(),
+      'isolate_action': isolateAction,
+      if (isolateProfile != null) 'isolate_profile': isolateProfile!,
+      'is_auto_isolate': isAutoIsolate.toString(),
+    };
+  }
 }
 
 class ToggleRouterModel {

@@ -80,16 +80,9 @@ class RouterProvider with ChangeNotifier {
     notifyListeners();
 
     try {
-      final updatedRouter = await _routerService.updateRouter(id, router);
+      await _routerService.updateRouter(id, router);
 
-      final index = _routers.indexWhere((r) => r.id == id);
-      if (index != -1) {
-        _routers[index] = updatedRouter;
-      }
-
-      if (_selectedRouter?.id == id) {
-        _selectedRouter = updatedRouter;
-      }
+      await getAllRouters();
 
       _isUpdatingRouter = false;
       notifyListeners();

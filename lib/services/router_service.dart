@@ -73,16 +73,16 @@ class RouterService {
     }
   }
 
-  Future<RouterModel> updateRouter(int id, UpdateRouterModel router) async {
+  Future<bool> updateRouter(int id, UpdateRouterModel router) async {
     try {
-      final response = await _http.put(
+      final response = await _http.postForm(
         '$baseUrl/$id',
-        body: json.encode(router.toJson()),
+        requiresAuth: true,
+        fields: router.toFormFields(),
       );
 
       if (response.statusCode == 200) {
-        final Map<String, dynamic> data = json.decode(response.body);
-        return RouterModel.fromJson(data['data'] ?? data);
+        return true;
       } else {
         throw Exception('Failed to update router: ${response.statusCode}');
       }
