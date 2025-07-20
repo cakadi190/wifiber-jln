@@ -1,8 +1,13 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/components/ui/alert.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
+import 'package:wifiber/providers/auth_provider.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({
@@ -23,6 +28,7 @@ class EditProfileScreen extends StatefulWidget {
 class _EditProfileScreenState extends State<EditProfileScreen> {
   final _formKey = GlobalKey<FormState>();
   final _controller = TextEditingController(text: '');
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -34,6 +40,75 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   void dispose() {
     _controller.dispose();
     super.dispose();
+  }
+
+  Future<void> _submitProfile() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    final auth = Provider.of<AuthProvider>(context, listen: false);
+    final user = auth.user!;
+    final token = user.accessToken;
+
+    setState(() {
+      _isLoading = true;
+    });
+
+    try {
+      final url = Uri.parse(
+        'https://wifiber.web.id/api/v1/profiles/${user.userId}',
+      );
+
+      final Map<String, dynamic> requestBody = {
+        widget.formName: _controller.text,
+      };
+
+      final response = await http.put(
+        url,
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
+        },
+        body: json.encode(requestBody),
+      );
+
+      if (response.statusCode == 200 || response.statusCode == 201) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('${widget.formLabel} berhasil diperbarui'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          Navigator.of(context).pop(_controller.text);
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(
+                'Gagal memperbarui ${widget.formLabel.toLowerCase()}',
+              ),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Terjadi kesalahan: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    } finally {
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
   }
 
   @override
@@ -48,15 +123,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         appBar: AppBar(
           title: Text("Perbarui ${widget.formLabel}"),
           actions: [
-            TextButton(
-              onPressed: () {
-                if (_formKey.currentState!.validate()) {
-                  _formKey.currentState!.save();
-                  Navigator.of(context).pop(_controller.text);
-                }
-              },
-              child: const Text('Simpan'),
-            ),
+            _isLoading
+                ? const Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        color: Colors.white,
+                        strokeWidth: 2,
+                      ),
+                    ),
+                  )
+                : TextButton(
+                    onPressed: _isLoading ? null : _submitProfile,
+                    child: const Icon(Icons.save, color: Colors.white),
+                  ),
           ],
         ),
         body: Container(
@@ -77,15 +159,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                 children: <Widget>[
                   Alert.opaque(
                     fullWidth: true,
-                    child: Text(
+                    child: const Text(
                       "Mohon isi formulir di bawah ini dengan lengkap dan benar untuk memperbarui data profil Anda.",
                     ),
                   ),
 
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 32),
 
                   TextFormField(
                     controller: _controller,
+                    enabled: !_isLoading,
                     decoration: InputDecoration(
                       labelText: widget.formLabel,
                       border: const OutlineInputBorder(),
@@ -102,16 +185,29 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     width: double.infinity,
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
+                        backgroundColor: _isLoading
+                            ? Colors.grey
+                            : AppColors.primary,
                         foregroundColor: Colors.white,
                       ),
-                      onPressed: () {
-                        if (_formKey.currentState!.validate()) {
-                          _formKey.currentState!.save();
-                          Navigator.of(context).pop(_controller.text);
-                        }
-                      },
-                      child: const Text('Simpan'),
+                      onPressed: _isLoading ? null : _submitProfile,
+                      child: _isLoading
+                          ? const Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: CircularProgressIndicator(
+                                    color: Colors.white,
+                                    strokeWidth: 2,
+                                  ),
+                                ),
+                                SizedBox(width: 8),
+                                Text('Menyimpan...'),
+                              ],
+                            )
+                          : const Text('Simpan'),
                     ),
                   ),
                 ],
