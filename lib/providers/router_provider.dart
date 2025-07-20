@@ -4,8 +4,10 @@ import 'package:wifiber/services/router_service.dart';
 
 enum RouterState { initial, loading, success, error }
 
-class RouterProvider extends ChangeNotifier {
-  final RouterService _routerService = RouterService();
+class RouterProvider with ChangeNotifier {
+  final RouterService _routerService;
+
+  RouterProvider(this._routerService);
 
   RouterState _state = RouterState.initial;
   String _errorMessage = '';
