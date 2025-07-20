@@ -84,14 +84,12 @@ class BillsProvider extends ChangeNotifier {
         return false;
       }
     } on ValidationException catch (e) {
-      print(e);
       _setError(e.message);
       rethrow;
     } on StringException catch (e) {
       _setError(e.message);
       return false;
     } catch (e) {
-      print(e);
       _setError(e.toString());
       return false;
     }

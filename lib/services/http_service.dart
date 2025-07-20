@@ -32,6 +32,26 @@ class HttpService {
     return response;
   }
 
+  Future<http.Response> patch(
+    String path, {
+    Map<String, String>? headers,
+    Object? body,
+    bool requiresAuth = false,
+    Map<String, dynamic>? parameters,
+  }) async {
+    final uri = HttpHelper.buildUri(path, parameters);
+    final completeHeaders = await _buildHeaders(headers, requiresAuth);
+
+    final response = await _client.patch(
+      uri,
+      headers: completeHeaders,
+      body: body,
+    );
+
+    _handleResponseErrors(response);
+    return response;
+  }
+
   Future<http.Response> put(
     String path, {
     Map<String, String>? headers,
@@ -102,6 +122,26 @@ class HttpService {
     final completeHeaders = await _buildFormHeaders(headers, requiresAuth);
 
     final response = await _client.post(
+      uri,
+      headers: completeHeaders,
+      body: fields != null ? _encodeFormData(fields) : null,
+    );
+
+    _handleResponseErrors(response);
+    return response;
+  }
+
+  Future<http.Response> patchForm(
+    String path, {
+    Map<String, String>? headers,
+    Map<String, String>? fields,
+    bool requiresAuth = false,
+    Map<String, dynamic>? parameters,
+  }) async {
+    final uri = HttpHelper.buildUri(path, parameters);
+    final completeHeaders = await _buildFormHeaders(headers, requiresAuth);
+
+    final response = await _client.patch(
       uri,
       headers: completeHeaders,
       body: fields != null ? _encodeFormData(fields) : null,

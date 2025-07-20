@@ -183,6 +183,14 @@ class RouterProvider with ChangeNotifier {
     return _routers.where((router) => router.action == action).toList();
   }
 
+  void toggleAllAutoIsolate(String action) {
+    try {
+      _routerService.toggleAllAutoIsolate(action);
+    } catch (e) {
+      _setError(e.toString());
+    }
+  }
+
   void clearSelectedRouter() {
     _selectedRouter = null;
     notifyListeners();

@@ -76,7 +76,6 @@ class BillsService {
         }
       }
     } on ValidationException catch (e)  {
-      print(e);
       rethrow;
     } on StringException catch (_) {
       rethrow;

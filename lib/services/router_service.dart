@@ -14,8 +14,6 @@ class RouterService {
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         final List<dynamic> routersJson = data['data'] ?? data['routers'] ?? [];
-        print("Data: $data");
-        print("JSON: $routersJson");
 
         return routersJson.map((json) => RouterModel.fromJson(json)).toList();
       } else {
@@ -23,6 +21,22 @@ class RouterService {
       }
     } catch (e) {
       throw Exception('Error fetching routers: $e');
+    }
+  }
+
+  Future<void> toggleAllAutoIsolate(String action) async {
+    try {
+      final response = await _http.patchForm(
+        '/toggle-routers',
+        requiresAuth: true,
+        fields: {'action': action},
+      );
+
+      if (response.statusCode != 200) {
+        throw Exception('Failed to toggle auto-isolate: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error toggling auto-isolate: $e');
     }
   }
 
