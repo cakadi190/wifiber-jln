@@ -250,13 +250,6 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'IP: ${router.ip}',
-                      style: TextStyle(
-                        color: Colors.grey[600],
-                        fontSize: 14,
-                      ),
-                    ),
-                    Text(
                       'Host: ${router.host}',
                       style: TextStyle(
                         color: Colors.grey[600],
@@ -650,7 +643,6 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
                   // Details Section
                   _buildDetailSection('Informasi Dasar', [
                     _buildDetailItem(Icons.computer, 'Nama Router', router.name),
-                    _buildDetailItem(Icons.language, 'Alamat IP', router.ip),
                     _buildDetailItem(Icons.dns, 'Host', router.host),
                     _buildDetailItem(Icons.access_time, 'Toleransi Hari', '${router.toleranceDays} hari'),
                   ]),
@@ -854,13 +846,6 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
                           style: const TextStyle(
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        Text(
-                          router.ip,
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.grey[600],
                           ),
                         ),
                       ],

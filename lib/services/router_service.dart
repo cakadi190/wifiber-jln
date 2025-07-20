@@ -14,6 +14,8 @@ class RouterService {
       if (response.statusCode == 200) {
         final Map<String, dynamic> data = json.decode(response.body);
         final List<dynamic> routersJson = data['data'] ?? data['routers'] ?? [];
+        print("Data: $data");
+        print("JSON: $routersJson");
 
         return routersJson.map((json) => RouterModel.fromJson(json)).toList();
       } else {

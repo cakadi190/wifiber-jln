@@ -170,7 +170,6 @@ class RouterProvider with ChangeNotifier {
         .where(
           (router) =>
               router.name.toLowerCase().contains(query.toLowerCase()) ||
-              router.ip.contains(query) ||
               router.host.toLowerCase().contains(query.toLowerCase()),
         )
         .toList();

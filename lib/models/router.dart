@@ -1,7 +1,6 @@
 class RouterModel {
   final int id;
   final String name;
-  final String ip;
   final String host;
   final int toleranceDays;
   final String status;
@@ -12,7 +11,6 @@ class RouterModel {
   RouterModel({
     required this.id,
     required this.name,
-    required this.ip,
     required this.host,
     required this.toleranceDays,
     required this.status,
@@ -25,7 +23,6 @@ class RouterModel {
     return RouterModel(
       id: int.parse(json['id']),
       name: json['name'],
-      ip: json['ip'],
       host: json['host'],
       toleranceDays: int.parse(json['tolerance_days']),
       status: json['status'],
@@ -39,7 +36,6 @@ class RouterModel {
     return {
       'id': id,
       'name': name,
-      'ip': ip,
       'host': host,
       'tolerance_days': toleranceDays,
       'status': status,
