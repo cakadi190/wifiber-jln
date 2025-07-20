@@ -6,6 +6,7 @@ import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/controllers/profile_controller.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/providers/auth_provider.dart';
+import 'package:wifiber/screens/dashboard/profile/edit_profile_screen.dart';
 
 class MainProfileScreen extends StatefulWidget {
   const MainProfileScreen({super.key});
@@ -363,6 +364,7 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                       ),
                       child: Column(
                         children: [
+                          // Profile Header
                           Container(
                             width: double.infinity,
                             padding: EdgeInsets.all(16),
@@ -392,7 +394,8 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                                         ),
                                         child: ClipOval(
                                           child: Image.file(
-                                            profileController.selectedImage!,
+                                            profileController
+                                                .selectedImage!,
                                             fit: BoxFit.cover,
                                           ),
                                         ),
@@ -425,14 +428,12 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                                           child: Container(
                                             decoration: BoxDecoration(
                                               color: Colors.white,
-                                              borderRadius: BorderRadius.circular(
-                                                20,
-                                              ),
+                                              borderRadius:
+                                              BorderRadius.circular(20),
                                               boxShadow: [
                                                 BoxShadow(
-                                                  color: Colors.black.withValues(
-                                                    alpha: 0.1,
-                                                  ),
+                                                  color: Colors.black
+                                                      .withValues(alpha: 0.1),
                                                   blurRadius: 4,
                                                   offset: Offset(0, 2),
                                                 ),
@@ -444,7 +445,8 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                                                   ? Icons.hourglass_empty
                                                   : Icons.edit,
                                               size: 16,
-                                              color: profileController.isUploading
+                                              color:
+                                              profileController.isUploading
                                                   ? Colors.grey[400]
                                                   : AppColors.primary,
                                             ),
@@ -458,6 +460,45 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                               ),
                             ),
                           ),
+
+                          SizedBox(height: 16),
+
+                          // Profile Items - Fixed the ListView issue
+                          Column(
+                            children: [
+                              _buildProfileItem(
+                                ListTileItem(
+                                  title: 'Nama',
+                                  subtitle: user.name,
+                                  onTap: () async {
+                                    await Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            EditProfileScreen(
+                                              formLabel: 'Nama',
+                                              formName: 'name',
+                                              value: user.name,
+                                            ),
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
+                              _buildProfileItem(
+                                ListTileItem(
+                                  title: 'Nama Pengguna',
+                                  subtitle: user.username,
+                                ),
+                              ),
+                              _buildProfileItem(
+                                ListTileItem(
+                                  title: 'Email',
+                                  subtitle: user.email,
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ),
@@ -470,4 +511,21 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
       ),
     );
   }
+
+  Widget _buildProfileItem(ListTileItem item) {
+    return ListTile(
+      title: Text(item.title, style: TextStyle(fontWeight: FontWeight.bold)),
+      subtitle: Text(item.subtitle),
+      trailing: item.onTap == null ? null : Icon(Icons.chevron_right),
+      onTap: item.onTap,
+    );
+  }
+}
+
+class ListTileItem {
+  final String title;
+  final String subtitle;
+  final VoidCallback? onTap;
+
+  ListTileItem({required this.title, required this.subtitle, this.onTap});
 }
