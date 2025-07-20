@@ -125,3 +125,25 @@ class UpdateRouterModel {
     };
   }
 }
+
+class ToggleRouterModel {
+  final String ppoeSecret;
+  final String routerId;
+  final String action;
+
+  ToggleRouterModel({
+    required this.ppoeSecret,
+    required this.routerId,
+    required this.action,
+  });
+
+  Map<String, dynamic> toJson() {
+    return {
+      'ppoe_secret': ppoeSecret,
+      'router_id': routerId,
+      'action': action,
+    };
+  }
+}
+
+enum ToggleRouterAction { enable, disable }
