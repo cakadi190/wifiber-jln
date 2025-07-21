@@ -316,45 +316,10 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
               appBar: AppBar(title: Text('Profil Saya')),
               body: Consumer2<AuthProvider, ProfileController>(
                 builder: (context, authProvider, profileController, child) {
-                  if (authProvider.isLoading || profileController.isUploading) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          CircularProgressIndicator(color: Colors.white),
-                          if (profileController.isUploading) ...[
-                            SizedBox(height: 16),
-                            Text(
-                              'Memperbarui gambar, mohon tunggu sebentar...',
-                              style: TextStyle(color: Colors.white),
-                            ),
-                          ],
-                        ],
-                      ),
-                    );
-                  }
-
                   if (authProvider.user == null) {
-                    return Center(
-                      child: Text(
-                        'Silakan login terlebih dahulu',
-                        style: TextStyle(color: Colors.white, fontSize: 16),
-                      ),
-                    );
-                  }
-
-                  final user = authProvider.user!;
-                  final token = authProvider.user!.accessToken;
-
-                  return SingleChildScrollView(
-                    child: Container(
+                    return Container(
                       width: double.infinity,
-                      constraints: BoxConstraints(
-                        minHeight:
-                            MediaQuery.of(context).size.height -
-                            AppBar().preferredSize.height -
-                            MediaQuery.of(context).padding.top,
-                      ),
+                      height: double.infinity,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.only(
@@ -362,168 +327,224 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                           topRight: Radius.circular(24),
                         ),
                       ),
-                      child: Column(
-                        children: [
-                          Container(
-                            width: double.infinity,
-                            padding: EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              color: AppColors.primary,
-                              borderRadius: BorderRadius.only(
-                                bottomLeft: Radius.circular(512),
-                                bottomRight: Radius.circular(512),
+                      child: Center(
+                        child: Text(
+                          'Silakan login terlebih dahulu',
+                          style: TextStyle(color: Colors.grey[700], fontSize: 16),
+                        ),
+                      ),
+                    );
+                  }
+
+                  final user = authProvider.user!;
+                  final token = authProvider.user!.accessToken;
+
+                  return Container(
+                    width: double.infinity,
+                    height: double.infinity,
+                    decoration: BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(24),
+                        topRight: Radius.circular(24),
+                      ),
+                    ),
+                    child: Stack(
+                      children: [
+                        Column(
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              padding: EdgeInsets.all(16),
+                              decoration: BoxDecoration(
+                                color: AppColors.primary,
+                                borderRadius: BorderRadius.only(
+                                  bottomLeft: Radius.circular(512),
+                                  bottomRight: Radius.circular(512),
+                                ),
                               ),
-                            ),
-                            child: Padding(
-                              padding: EdgeInsets.all(24.0),
-                              child: Column(
-                                children: [
-                                  Stack(
-                                    children: [
-                                      profileController.selectedImage != null
-                                          ? Container(
-                                              width: 96,
-                                              height: 96,
-                                              decoration: BoxDecoration(
-                                                shape: BoxShape.circle,
-                                                border: Border.all(
-                                                  color: Colors.white,
-                                                  width: 2,
-                                                ),
-                                              ),
-                                              child: ClipOval(
-                                                child: Image.file(
-                                                  profileController
-                                                      .selectedImage!,
-                                                  fit: BoxFit.cover,
-                                                ),
-                                              ),
-                                            )
-                                          : UserAvatar(
-                                              imageUrl:
-                                                  user.picture ??
-                                                  'https://via.placeholder.com/150',
-                                              name: user.name.isNotEmpty == true
-                                                  ? user.name
-                                                        .substring(0, 1)
-                                                        .toUpperCase()
-                                                  : 'A',
-                                              radius: 48,
-                                              backgroundColor: Colors.black,
-                                              headers: token.isNotEmpty
-                                                  ? {
-                                                      'Authorization':
-                                                          'Bearer $token',
-                                                    }
-                                                  : {},
-                                            ),
-                                      Positioned(
-                                        bottom: 0,
-                                        right: 0,
-                                        child: InkWell(
-                                          onTap: profileController.isUploading
-                                              ? null
-                                              : _showImagePickerModal,
-                                          child: Container(
-                                            decoration: BoxDecoration(
+                              child: Padding(
+                                padding: EdgeInsets.all(24.0),
+                                child: Column(
+                                  children: [
+                                    Stack(
+                                      children: [
+                                        profileController.selectedImage != null
+                                            ? Container(
+                                          width: 96,
+                                          height: 96,
+                                          decoration: BoxDecoration(
+                                            shape: BoxShape.circle,
+                                            border: Border.all(
                                               color: Colors.white,
-                                              borderRadius:
-                                                  BorderRadius.circular(20),
-                                              boxShadow: [
-                                                BoxShadow(
-                                                  color: Colors.black
-                                                      .withValues(alpha: 0.1),
-                                                  blurRadius: 4,
-                                                  offset: Offset(0, 2),
-                                                ),
-                                              ],
+                                              width: 2,
                                             ),
-                                            padding: EdgeInsets.all(8),
-                                            child: Icon(
-                                              profileController.isUploading
-                                                  ? Icons.hourglass_empty
-                                                  : Icons.edit,
-                                              size: 16,
-                                              color:
-                                                  profileController.isUploading
-                                                  ? Colors.grey[400]
-                                                  : AppColors.primary,
+                                          ),
+                                          child: ClipOval(
+                                            child: Image.file(
+                                              profileController
+                                                  .selectedImage!,
+                                              fit: BoxFit.cover,
+                                            ),
+                                          ),
+                                        )
+                                            : UserAvatar(
+                                          imageUrl:
+                                          user.picture ??
+                                              'https://via.placeholder.com/150',
+                                          name: user.name.isNotEmpty == true
+                                              ? user.name
+                                              .substring(0, 1)
+                                              .toUpperCase()
+                                              : 'A',
+                                          radius: 48,
+                                          backgroundColor: Colors.black,
+                                          headers: token.isNotEmpty
+                                              ? {
+                                            'Authorization':
+                                            'Bearer $token',
+                                          }
+                                              : {},
+                                        ),
+                                        Positioned(
+                                          bottom: 0,
+                                          right: 0,
+                                          child: InkWell(
+                                            onTap: profileController.isUploading
+                                                ? null
+                                                : _showImagePickerModal,
+                                            child: Container(
+                                              decoration: BoxDecoration(
+                                                color: Colors.white,
+                                                borderRadius:
+                                                BorderRadius.circular(20),
+                                                boxShadow: [
+                                                  BoxShadow(
+                                                    color: Colors.black
+                                                        .withValues(alpha: 0.1),
+                                                    blurRadius: 4,
+                                                    offset: Offset(0, 2),
+                                                  ),
+                                                ],
+                                              ),
+                                              padding: EdgeInsets.all(8),
+                                              child: Icon(
+                                                profileController.isUploading
+                                                    ? Icons.hourglass_empty
+                                                    : Icons.edit,
+                                                size: 16,
+                                                color:
+                                                profileController.isUploading
+                                                    ? Colors.grey[400]
+                                                    : AppColors.primary,
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                                    ],
+                                      ],
+                                    ),
+                                    SizedBox(height: 16),
+                                  ],
+                                ),
+                              ),
+                            ),
+
+                            SizedBox(height: 16),
+
+                            Expanded(
+                              child: Column(
+                                children: [
+                                  _buildProfileItem(
+                                    ListTileItem(
+                                      title: 'Nama',
+                                      subtitle: user.name,
+                                      onTap: () async {
+                                        await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => EditProfileScreen(
+                                              formLabel: 'Nama',
+                                              formName: 'name',
+                                              value: user.name,
+                                            ),
+                                          ),
+                                        );
+
+                                        await authProvider.reinitialize(
+                                          force: true,
+                                        );
+                                      },
+                                    ),
                                   ),
-                                  SizedBox(height: 16),
+                                  _buildProfileItem(
+                                    ListTileItem(
+                                      title: 'Nama Pengguna',
+                                      subtitle: user.username,
+                                      onTap: () async {
+                                        await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => EditProfileScreen(
+                                              formLabel: 'Nama Pengguna',
+                                              formName: 'username',
+                                              value: user.username,
+                                            ),
+                                          ),
+                                        );
+
+                                        await authProvider.reinitialize(
+                                          force: true,
+                                        );
+                                      },
+                                    ),
+                                  ),
+                                  _buildProfileItem(
+                                    ListTileItem(
+                                      title: 'Surel',
+                                      subtitle: user.email,
+                                    ),
+                                  ),
+                                  _buildProfileItem(
+                                    ListTileItem(
+                                      title: 'Peran Anda',
+                                      subtitle: user.groupName ?? 'Pengguna Biasa',
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        // Loading overlay di dalam container putih
+                        if (authProvider.isLoading || profileController.isUploading)
+                          Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            decoration: BoxDecoration(
+                              color: Colors.white.withValues(alpha: 0.9),
+                              borderRadius: BorderRadius.only(
+                                topLeft: Radius.circular(24),
+                                topRight: Radius.circular(24),
+                              ),
+                            ),
+                            child: Center(
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  CircularProgressIndicator(color: AppColors.primary),
+                                  if (profileController.isUploading) ...[
+                                    SizedBox(height: 16),
+                                    Text(
+                                      'Memperbarui gambar, mohon tunggu sebentar...',
+                                      style: TextStyle(color: Colors.grey[700]),
+                                    ),
+                                  ],
                                 ],
                               ),
                             ),
                           ),
-
-                          SizedBox(height: 16),
-
-                          Column(
-                            children: [
-                              _buildProfileItem(
-                                ListTileItem(
-                                  title: 'Nama',
-                                  subtitle: user.name,
-                                  onTap: () async {
-                                    await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => EditProfileScreen(
-                                          formLabel: 'Nama',
-                                          formName: 'name',
-                                          value: user.name,
-                                        ),
-                                      ),
-                                    );
-
-                                    await authProvider.reinitialize(
-                                      force: true,
-                                    );
-                                  },
-                                ),
-                              ),
-                              _buildProfileItem(
-                                ListTileItem(
-                                  title: 'Nama Pengguna',
-                                  subtitle: user.username,
-                                  onTap: () async {
-                                    await Navigator.push(
-                                      context,
-                                      MaterialPageRoute(
-                                        builder: (context) => EditProfileScreen(
-                                          formLabel: 'Nama Pengguna',
-                                          formName: 'username',
-                                          value: user.username,
-                                        ),
-                                      ),
-                                    );
-
-                                    await authProvider.reinitialize(
-                                      force: true,
-                                    );
-                                  },
-                                ),
-                              ),
-                              _buildProfileItem(
-                                ListTileItem(
-                                  title: 'Surel',
-                                  subtitle: user.email,
-                                ),
-                              ),
-                              _buildProfileItem(
-                                ListTileItem(
-                                  title: 'Peran Anda',
-                                  subtitle: user.groupName ?? 'Pengguna Biasa',
-                                ),
-                              ),
-                            ],
-                          ),
-                        ],
-                      ),
+                      ],
                     ),
                   );
                 },
