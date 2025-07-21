@@ -167,6 +167,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     fullWidth: true,
                     child: const Text(
                       "Mohon isi formulir di bawah ini dengan lengkap dan benar untuk memperbarui data profil Anda.",
+                      style: TextStyle(fontSize: 14),
                     ),
                   ),
 
