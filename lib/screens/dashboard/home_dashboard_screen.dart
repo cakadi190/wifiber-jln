@@ -58,7 +58,10 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
 
   void _onLogoutRedirect() {
     Navigator.of(context).pushAndRemoveUntil(
-      MaterialPageRoute(builder: (context) => const LoginScreen()),
+      MaterialPageRoute(
+        builder: (context) => const LoginScreen(),
+        settings: const RouteSettings(arguments: {'showLogoutMessage': true}),
+      ),
       (route) => false,
     );
   }

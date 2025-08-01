@@ -29,21 +29,10 @@ class HomeController {
   Future<void> _performLogout(VoidCallback? onLogoutSuccess) async {
     try {
       await authProvider.logout();
-      if (!context.mounted) return;
-
-      _showLogoutSuccessMessage();
-      onLogoutSuccess?.call();
     } catch (e) {
       if (!context.mounted) return;
       _showLogoutErrorMessage();
     }
-  }
-
-  void _showLogoutSuccessMessage() {
-    SnackBars.success(
-      context,
-      "Berhasil mengeluarkan anda dari sesi saat ini. Sampai jumpa di lain waktu!",
-    ).clearSnackBars();
   }
 
   void _showLogoutErrorMessage() {

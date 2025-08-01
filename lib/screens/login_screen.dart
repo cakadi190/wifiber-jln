@@ -8,6 +8,7 @@ import 'package:wifiber/controllers/auth_screen_controller.dart';
 import 'package:wifiber/helpers/network_helper.dart';
 import 'package:wifiber/layouts/auth_layout.dart';
 import 'package:wifiber/providers/auth_provider.dart';
+import 'package:flutter/scheduler.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -49,6 +50,25 @@ class _LoginScreenState extends State<LoginScreen> {
       footer: _buildFooter(),
       child: _buildBody(),
     );
+  }
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+
+    if (args?['showLogoutMessage'] == true) {
+      SchedulerBinding.instance.addPostFrameCallback((_) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Berhasil mengeluarkan anda dari sesi sebelumnya!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      });
+    }
   }
 
   Widget _buildBody() {
