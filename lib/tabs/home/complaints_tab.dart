@@ -611,88 +611,104 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
     Complaint complaint, [
     VoidCallback? onSuccess,
   ]) async {
-    late BuildContext modalContext;
-    showModalBottomSheet(
+    await showDialog(
       context: context,
-      isScrollControlled: true,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (ctx) {
-        modalContext = ctx;
-        return Padding(
-          padding: const EdgeInsets.only(
-            bottom: 16,
-            left: 16,
-            right: 16,
-            top: 16,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              PhosphorIcon(
-                PhosphorIcons.warning(PhosphorIconsStyle.duotone),
-                color: Colors.red,
-                size: 64,
-              ),
-              const SizedBox(height: 8),
-              const Text(
-                'Hapus Pengaduan?',
-                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-              ),
-              const SizedBox(height: 8),
-              const Text('Apakah anda yakin ingin menghapus pengaduan ini?'),
-              const SizedBox(height: 16),
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pop(modalContext),
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        side: const BorderSide(color: AppColors.primary),
+      builder: (modalContext) {
+        return PopScope(
+          canPop: false,
+          child: StatefulBuilder(
+            builder: (context, setState) {
+              return AlertDialog(
+                contentPadding: EdgeInsets.zero,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16),
+                ),
+                content: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      PhosphorIcon(
+                        PhosphorIcons.warning(PhosphorIconsStyle.duotone),
+                        color: Colors.red,
+                        size: 64,
                       ),
-                      child: const Text(
-                        'Tidak',
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Hapus Pengaduan?',
                         style: TextStyle(
-                          color: AppColors.primary,
-                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 24,
                         ),
                       ),
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        if (!mounted) return;
-                        int id = int.parse(complaint.id.toString());
-                        final success = await widget.controller.removeComplaint(
-                          id,
-                        );
-                        if (success && mounted) {
-                          Navigator.pop(modalContext);
-                          onSuccess?.call();
-                          if (mounted) {
-                            SnackBars.success(
-                              context,
-                              "Pengaduan berhasil dihapus",
-                            );
-                          }
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      const SizedBox(height: 8),
+                      const Text(
+                        'Apakah anda yakin ingin menghapus pengaduan ini?',
+                        textAlign: TextAlign.center,
                       ),
-                      child: const Text('Ya', style: TextStyle(fontSize: 18)),
-                    ),
+                      const SizedBox(height: 16),
+                      Row(
+                        children: [
+                          Expanded(
+                            child: OutlinedButton(
+                              onPressed: () => Navigator.pop(context),
+                              style: OutlinedButton.styleFrom(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
+                                side: const BorderSide(
+                                  color: AppColors.primary,
+                                ),
+                              ),
+                              child: const Text(
+                                'Tidak',
+                                style: TextStyle(
+                                  color: AppColors.primary,
+                                  fontSize: 18,
+                                ),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                if (!context.mounted) return;
+                                int id = int.parse(complaint.id.toString());
+                                final success = await widget.controller
+                                    .removeComplaint(id);
+                                if (success && context.mounted) {
+                                  Navigator.pop(context);
+                                  onSuccess?.call();
+                                  if (context.mounted) {
+                                    SnackBars.success(
+                                      context,
+                                      "Pengaduan berhasil dihapus",
+                                    );
+                                  }
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: Colors.red,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
+                              ),
+                              child: const Text(
+                                'Ya',
+                                style: TextStyle(fontSize: 18),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ],
                   ),
-                ],
-              ),
-            ],
+                ),
+              );
+            },
           ),
         );
       },
