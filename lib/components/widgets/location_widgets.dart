@@ -144,7 +144,7 @@ class LocationWidgets {
           Icon(Icons.near_me, size: 14, color: Colors.green),
           SizedBox(width: 4),
           Text(
-            'Nearest',
+            'Terdekat',
             style: TextStyle(
               fontSize: 12,
               color: Colors.green,

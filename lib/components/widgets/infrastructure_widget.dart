@@ -159,7 +159,7 @@ class InfrastructureWidgets {
   static Widget buildDetailItem(
     IconData icon,
     String label,
-    String value, {
+    dynamic value, {
     Color? statusColor,
   }) {
     return Container(
@@ -184,14 +184,16 @@ class InfrastructureWidgets {
                   ),
                 ),
                 const SizedBox(height: 2),
-                Text(
-                  value,
-                  style: TextStyle(
-                    fontSize: 14,
-                    fontWeight: FontWeight.w500,
-                    color: statusColor ?? Colors.black87,
+                if (value is Widget) value,
+                if (value is String)
+                  Text(
+                    value,
+                    style: TextStyle(
+                      fontSize: 14,
+                      fontWeight: FontWeight.w500,
+                      color: statusColor ?? Colors.black87,
+                    ),
                   ),
-                ),
               ],
             ),
           ),

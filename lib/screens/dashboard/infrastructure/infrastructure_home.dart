@@ -233,7 +233,6 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
                 ),
               if (provider.hasUserLocation && !provider.isLocationLoading)
                 _buildNearestItemInfo(provider),
-              const SizedBox(height: 16),
               Expanded(
                 child: _buildScrollableContent(scrollController, provider),
               ),
@@ -326,7 +325,7 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Nearest ${provider.activeType.displayName}',
+                  '${provider.activeType.displayName} Terdekat',
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.green,
@@ -407,20 +406,34 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
   ) {
     final item = itemWithDistance.item;
 
-    return Card(
+    return Container(
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey[300]!),
+        borderRadius: BorderRadius.circular(12),
+      ),
       margin: const EdgeInsets.only(bottom: 8),
       child: ListTile(
         leading: Icon(type.icon, color: AppColors.primary),
-        title: Text(item.getCode(type)),
-        subtitle: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
+        title: Text("${type.displayName} ${item.getCode(type)}"),
+        subtitle: Wrap(
           children: [
-            if (item.name != null) Text(item.name!),
-            if (item.status != null)
-              Text(
-                'Status: ${item.status!}',
-                style: const TextStyle(fontSize: 12),
+            Container(
+              margin: const EdgeInsets.only(top: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: (item.status == 'active' ? Colors.green : Colors.red)
+                    .withValues(alpha: 0.1),
+                borderRadius: BorderRadius.circular(12),
               ),
+              child: Text(
+                item.status == 'active' ? "Aktif" : "Tidak Aktif",
+                style: TextStyle(
+                  fontSize: 12,
+                  color: (item.status == 'active' ? Colors.green : Colors.red),
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
           ],
         ),
         trailing: Column(
@@ -495,7 +508,30 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
         InfrastructureWidgets.buildDetailItem(
           Icons.info,
           'Status',
-          item.status ?? 'N/A',
+          item.status != null
+              ? Container(
+                  margin: const EdgeInsets.only(top: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
+                  decoration: BoxDecoration(
+                    color: (item.status == 'active' ? Colors.green : Colors.red)
+                        .withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    item.status == 'active' ? "Aktif" : "Tidak Aktif",
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: (item.status == 'active'
+                          ? Colors.green
+                          : Colors.red),
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                )
+              : 'N/A',
         ),
         InfrastructureWidgets.buildDetailItem(
           Icons.info,
@@ -578,7 +614,6 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
             label: const Text('Buka di Maps'),
           ),
         ),
-        const SizedBox(height: 8),
         SizedBox(
           width: double.infinity,
           child: ElevatedButton.icon(
