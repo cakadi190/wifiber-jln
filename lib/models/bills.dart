@@ -57,7 +57,7 @@ class Bills {
     status: BillStatus.values.firstWhere(
       (status) =>
           status.name.toUpperCase() == json['status'].toString().toUpperCase(),
-      orElse: () => BillStatus.UNPAID,
+      orElse: () => BillStatus.unpaid,
     ),
     basePrice: int.tryParse(json['base_price'].toString()) ?? 0,
     tax: int.tryParse(json['tax'].toString()) ?? 0,
@@ -125,9 +125,9 @@ class Bills {
   int get totalAmount => basePrice + tax - (discount ?? 0);
 
   bool get isOverdue =>
-      DateTime.now().isAfter(dueDate) && status == BillStatus.UNPAID;
+      DateTime.now().isAfter(dueDate) && status == BillStatus.unpaid;
 
-  bool get isPaid => status == BillStatus.PAID;
+  bool get isPaid => status == BillStatus.paid;
 
   Bills copyWith({
     String? id,
@@ -219,14 +219,14 @@ class BillResponse {
 }
 
 enum BillStatus {
-  PAID,
-  UNPAID;
+  paid,
+  unpaid;
 
   String get displayName {
     switch (this) {
-      case BillStatus.PAID:
+      case BillStatus.paid:
         return 'Terbayar';
-      case BillStatus.UNPAID:
+      case BillStatus.unpaid:
         return 'Belum Terbayar';
     }
   }
