@@ -7,6 +7,7 @@ import 'package:latlong2/latlong.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/services/http_service.dart';
+import 'package:maps_launcher/maps_launcher.dart';
 
 class InfrastructureHome extends StatefulWidget {
   const InfrastructureHome({super.key});
@@ -216,6 +217,58 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
     return markers;
   }
 
+  // Added missing _buildMarkers method for modal bottom sheet
+  List<Marker> _buildMarkers(dynamic item) {
+    final lat = double.tryParse(item['latitude'].toString());
+    final lng = double.tryParse(item['longitude'].toString());
+
+    if (lat == null || lng == null) return [];
+
+    Color markerColor;
+    IconData markerIcon;
+
+    switch (_activeFilter) {
+      case 'OLT':
+        markerColor = Colors.purple;
+        markerIcon = Icons.router_outlined;
+        break;
+      case 'ODP':
+        markerColor = Colors.blue;
+        markerIcon = Icons.router;
+        break;
+      case 'ODC':
+        markerColor = Colors.green;
+        markerIcon = Icons.hub;
+        break;
+      default:
+        markerColor = Colors.grey;
+        markerIcon = Icons.location_on;
+    }
+
+    return [
+      Marker(
+        point: LatLng(lat, lng),
+        width: 40,
+        height: 40,
+        child: Container(
+          decoration: BoxDecoration(
+            color: markerColor,
+            shape: BoxShape.circle,
+            border: Border.all(color: Colors.white, width: 2),
+            boxShadow: const [
+              BoxShadow(
+                color: Colors.black26,
+                blurRadius: 4,
+                offset: Offset(0, 2),
+              ),
+            ],
+          ),
+          child: Icon(markerIcon, color: Colors.white, size: 20),
+        ),
+      ),
+    ];
+  }
+
   Widget _buildDetailSection(String title, List<Widget> items) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -342,19 +395,83 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
                       '${item['latitude']}, ${item['longitude']}',
                     ),
                 ]),
-                const SizedBox(height: 16),
-                Align(
-                  alignment: Alignment.center,
-                  child: SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        // Dummy button action for opening maps
-                      },
-                      child: const Text('Buka di Maps'),
+                if (item['latitude'] != null && item['longitude'] != null) ...[
+                  const SizedBox(height: 16),
+                  _buildDetailSection('Peta', [
+                    ClipRRect(
+                      borderRadius: BorderRadius.circular(12),
+                      child: SizedBox(
+                        height: 300,
+                        child: FlutterMap(
+                          options: MapOptions(
+                            initialCenter: LatLng(
+                              double.tryParse(item['latitude'].toString()) ??
+                                  0.0,
+                              double.tryParse(item['longitude'].toString()) ??
+                                  0.0,
+                            ),
+                            initialZoom: 16,
+                          ),
+                          children: [
+                            TileLayer(
+                              urlTemplate:
+                                  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+                              subdomains: ['a', 'b', 'c'],
+                            ),
+                            MarkerLayer(markers: _buildMarkers(item)),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ]),
+                  const SizedBox(height: 16),
+                  Align(
+                    alignment: Alignment.center,
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          final lat = double.tryParse(
+                            item['latitude'].toString(),
+                          );
+                          final lng = double.tryParse(
+                            item['longitude'].toString(),
+                          );
+                          if (lat != null && lng != null) {
+                            MapsLauncher.launchCoordinates(lat, lng);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          foregroundColor: Colors.white,
+                          backgroundColor: AppColors.primary,
+                        ),
+                        icon: const Icon(Icons.map),
+                        label: const Text('Buka di Maps'),
+                      ),
                     ),
                   ),
-                ),
+                  Align(
+                    alignment: Alignment.center,
+                    child: SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          if (context.mounted) {
+                            Navigator.pop(context);
+                          }
+                        },
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          backgroundColor: Colors.white,
+                          foregroundColor: AppColors.primary,
+                        ),
+                        icon: const Icon(Icons.close),
+                        label: const Text('Tutup'),
+                      ),
+                    ),
+                  ),
+                ],
               ],
             ),
           ),
@@ -394,7 +511,6 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
     String description = '';
     String status = '';
     String totalPort = '';
-    String createdAt = '';
     List<Widget> additionalInfo = [];
 
     switch (_activeFilter) {
@@ -404,7 +520,6 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
         description = item['description'] ?? 'N/A';
         status = item['status'] ?? 'N/A';
         totalPort = item['total_port'] ?? 'N/A';
-        createdAt = item['created_at'] ?? 'N/A';
         break;
       case 'ODP':
         kode = item['kode_odp'] ?? 'N/A';
@@ -412,7 +527,6 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
         description = item['description'] ?? 'N/A';
         status = item['status'] ?? 'N/A';
         totalPort = item['total_port'] ?? 'N/A';
-        createdAt = item['created_at'] ?? 'N/A';
         additionalInfo = [
           if (item['latitude'] != null && item['longitude'] != null) ...[
             const SizedBox(height: 4),
@@ -439,7 +553,7 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
                 border: Border.all(color: Colors.green.shade200),
               ),
               child: Text(
-                'ODC: ${item['kode_odc']} - ${item['odc_name'] ?? 'N/A'}',
+                '${item['kode_odc']} - ${item['odc_name'] ?? 'N/A'}',
                 style: TextStyle(
                   color: Colors.green.shade700,
                   fontSize: 10,
@@ -456,7 +570,6 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
         description = item['description'] ?? 'N/A';
         status = item['status'] ?? 'N/A';
         totalPort = item['total_port'] ?? 'N/A';
-        createdAt = item['created_at'] ?? 'N/A';
         additionalInfo = [
           if (item['latitude'] != null && item['longitude'] != null) ...[
             const SizedBox(height: 4),
@@ -483,7 +596,7 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
                 border: Border.all(color: Colors.purple.shade200),
               ),
               child: Text(
-                'OLT: ${item['kode_olt']} - ${item['olt_name'] ?? 'N/A'}',
+                '${item['kode_olt']} - ${item['olt_name'] ?? 'N/A'}',
                 style: TextStyle(
                   color: Colors.purple.shade700,
                   fontSize: 10,
@@ -496,82 +609,83 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
         break;
     }
 
-    return Container(
-      margin: const EdgeInsets.only(bottom: 8),
-      padding: const EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        border: Border.all(color: Colors.grey.shade200),
-        borderRadius: BorderRadius.circular(8),
-        color: Colors.white,
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Text(
-                  '$kode - $name',
-                  style: const TextStyle(
-                    fontWeight: FontWeight.w600,
-                    fontSize: 14,
+    return InkWell(
+      onTap: () {
+        _showMarkerInfo(item, _activeFilter);
+      },
+      child: Container(
+        margin: const EdgeInsets.only(bottom: 8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.grey.shade200),
+          borderRadius: BorderRadius.circular(8),
+          color: Colors.white,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                Expanded(
+                  child: Text(
+                    '$kode - $name',
+                    style: const TextStyle(
+                      fontWeight: FontWeight.w600,
+                      fontSize: 14,
+                    ),
                   ),
                 ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                decoration: BoxDecoration(
-                  color: status == 'active'
-                      ? Colors.green.shade100
-                      : Colors.red.shade100,
-                  borderRadius: BorderRadius.circular(4),
-                ),
-                child: Text(
-                  status.toUpperCase(),
-                  style: TextStyle(
+                Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 6,
+                    vertical: 2,
+                  ),
+                  decoration: BoxDecoration(
                     color: status == 'active'
-                        ? Colors.green.shade800
-                        : Colors.red.shade800,
-                    fontSize: 10,
-                    fontWeight: FontWeight.w600,
+                        ? Colors.green.shade100
+                        : Colors.red.shade100,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                  child: Text(
+                    status.toUpperCase(),
+                    style: TextStyle(
+                      color: status == 'active'
+                          ? Colors.green.shade800
+                          : Colors.red.shade800,
+                      fontSize: 10,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 6),
-          Text(
-            description,
-            style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Icon(
-                Icons.settings_ethernet,
-                size: 12,
-                color: Colors.grey.shade500,
-              ),
-              const SizedBox(width: 4),
-              Text(
-                'Port: $totalPort',
-                style: TextStyle(
-                  color: Colors.grey.shade600,
-                  fontSize: 11,
-                  fontWeight: FontWeight.w500,
+              ],
+            ),
+            const SizedBox(height: 6),
+            Text(
+              description,
+              style: TextStyle(color: Colors.grey.shade700, fontSize: 12),
+            ),
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                Icon(
+                  Icons.settings_ethernet,
+                  size: 12,
+                  color: Colors.grey.shade500,
                 ),
-              ),
-              const Spacer(),
-              Icon(Icons.schedule, size: 12, color: Colors.grey.shade500),
-              const SizedBox(width: 4),
-              Text(
-                createdAt.split(' ')[0],
-                style: TextStyle(color: Colors.grey.shade600, fontSize: 11),
-              ),
-            ],
-          ),
-          ...additionalInfo,
-        ],
+                const SizedBox(width: 4),
+                Text(
+                  'Port: $totalPort',
+                  style: TextStyle(
+                    color: Colors.grey.shade600,
+                    fontSize: 11,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+            ...additionalInfo,
+          ],
+        ),
       ),
     );
   }
