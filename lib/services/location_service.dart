@@ -37,7 +37,6 @@ class LocationService {
   /// Get current position with error handling
   static Future<LatLng?> getCurrentPosition() async {
     try {
-      // Check if location service is enabled
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
       if (!serviceEnabled) {
         throw custom_exceptions.LocationServiceDisabledException(
@@ -45,7 +44,6 @@ class LocationService {
         );
       }
 
-      // Check permissions
       LocationPermission permission = await Geolocator.checkPermission();
       if (permission == LocationPermission.denied) {
         permission = await Geolocator.requestPermission();
@@ -62,7 +60,6 @@ class LocationService {
         );
       }
 
-      // Get current position
       Position position = await Geolocator.getCurrentPosition(
         locationSettings: _locationSettings,
       ).timeout(_timeoutDuration);

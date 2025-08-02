@@ -16,7 +16,6 @@ class InfrastructureProvider with ChangeNotifier {
   bool _isLocationLoading = false;
   String? _locationError;
 
-  // Getters
   List<InfrastructureItem> get items => _items;
   bool get isLoading => _isLoading;
   String? get error => _error;
@@ -49,7 +48,6 @@ class InfrastructureProvider with ChangeNotifier {
             .map((item) => InfrastructureItem.fromJson(item))
             .toList();
 
-        // Sort items by distance from user location if available
         if (_userLocation != null) {
           _sortItemsByDistance();
         }
@@ -72,7 +70,6 @@ class InfrastructureProvider with ChangeNotifier {
       final location = await LocationService.getCurrentPosition();
       _userLocation = location;
 
-      // Re-sort items by distance if we have data
       if (_items.isNotEmpty) {
         _sortItemsByDistance();
       }
@@ -207,7 +204,7 @@ class InfrastructureProvider with ChangeNotifier {
 /// Helper class to combine infrastructure item with distance
 class InfrastructureItemWithDistance {
   final InfrastructureItem item;
-  final double? distance; // in meters
+  final double? distance;
 
   InfrastructureItemWithDistance(this.item, this.distance);
 
