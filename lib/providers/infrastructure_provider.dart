@@ -61,7 +61,6 @@ class InfrastructureProvider with ChangeNotifier {
     }
   }
 
-  /// Get user's current location
   Future<void> getUserLocation() async {
     _setLocationLoading(true);
     _clearLocationError();
@@ -80,7 +79,6 @@ class InfrastructureProvider with ChangeNotifier {
     }
   }
 
-  /// Sort items by distance from user location
   void _sortItemsByDistance() {
     if (_userLocation == null) return;
 
@@ -104,7 +102,6 @@ class InfrastructureProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  /// Get items with distance from user location
   List<InfrastructureItemWithDistance> getItemsWithDistance() {
     if (_userLocation == null) {
       return _items
@@ -124,7 +121,6 @@ class InfrastructureProvider with ChangeNotifier {
     }).toList();
   }
 
-  /// Get nearest infrastructure item
   InfrastructureItem? getNearestItem() {
     if (_userLocation == null || _items.isEmpty) return null;
 
@@ -149,7 +145,6 @@ class InfrastructureProvider with ChangeNotifier {
     return nearestItem;
   }
 
-  /// Clear user location
   void clearUserLocation() {
     _userLocation = null;
     _clearLocationError();

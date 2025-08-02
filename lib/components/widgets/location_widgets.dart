@@ -4,7 +4,6 @@ import 'package:latlong2/latlong.dart';
 import 'package:wifiber/config/app_colors.dart';
 
 class LocationWidgets {
-  /// Build floating action button for getting user location
   static Widget buildLocationFAB({
     required VoidCallback onPressed,
     required bool isLoading,
@@ -29,7 +28,6 @@ class LocationWidgets {
     );
   }
 
-  /// Build user location marker for map
   static Marker buildUserLocationMarker(LatLng location) {
     return Marker(
       point: location,
@@ -48,7 +46,6 @@ class LocationWidgets {
     );
   }
 
-  /// Build location info card
   static Widget buildLocationInfoCard({
     required LatLng location,
     required VoidCallback onTap,
@@ -67,7 +64,6 @@ class LocationWidgets {
     );
   }
 
-  /// Build location error widget
   static Widget buildLocationError({
     required String error,
     required VoidCallback onRetry,
@@ -110,7 +106,6 @@ class LocationWidgets {
     );
   }
 
-  /// Build distance chip
   static Widget buildDistanceChip(String distance) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -136,7 +131,6 @@ class LocationWidgets {
     );
   }
 
-  /// Build nearest item indicator
   static Widget buildNearestItemIndicator() {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -162,7 +156,6 @@ class LocationWidgets {
     );
   }
 
-  /// Build location permission request widget
   static Widget buildLocationPermissionRequest({
     required VoidCallback onRequestPermission,
   }) {

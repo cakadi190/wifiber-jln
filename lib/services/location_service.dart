@@ -11,7 +11,6 @@ class LocationService {
     distanceFilter: 10,
   );
 
-  /// Check if location services are enabled and permissions are granted
   static Future<bool> isLocationAvailable() async {
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
@@ -23,7 +22,6 @@ class LocationService {
         permission == LocationPermission.whileInUse;
   }
 
-  /// Request location permissions
   static Future<LocationPermission> requestLocationPermission() async {
     LocationPermission permission = await Geolocator.checkPermission();
 
@@ -34,7 +32,6 @@ class LocationService {
     return permission;
   }
 
-  /// Get current position with error handling
   static Future<LatLng?> getCurrentPosition() async {
     try {
       bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
@@ -86,7 +83,6 @@ class LocationService {
     }
   }
 
-  /// Calculate distance between two points in meters
   static double calculateDistance(LatLng point1, LatLng point2) {
     return Geolocator.distanceBetween(
       point1.latitude,
@@ -96,14 +92,12 @@ class LocationService {
     );
   }
 
-  /// Get location stream for real-time updates
   static Stream<LatLng> getLocationStream() {
     return Geolocator.getPositionStream(
       locationSettings: _locationSettings,
     ).map((position) => LatLng(position.latitude, position.longitude));
   }
 
-  /// Open location settings
   static Future<bool> openLocationSettings() async {
     return await Geolocator.openLocationSettings();
   }
