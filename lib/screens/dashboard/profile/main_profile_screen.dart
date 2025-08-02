@@ -330,7 +330,10 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                       child: Center(
                         child: Text(
                           'Silakan login terlebih dahulu',
-                          style: TextStyle(color: Colors.grey[700], fontSize: 16),
+                          style: TextStyle(
+                            color: Colors.grey[700],
+                            fontSize: 16,
+                          ),
                         ),
                       ),
                     );
@@ -371,41 +374,42 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                                       children: [
                                         profileController.selectedImage != null
                                             ? Container(
-                                          width: 96,
-                                          height: 96,
-                                          decoration: BoxDecoration(
-                                            shape: BoxShape.circle,
-                                            border: Border.all(
-                                              color: Colors.white,
-                                              width: 2,
-                                            ),
-                                          ),
-                                          child: ClipOval(
-                                            child: Image.file(
-                                              profileController
-                                                  .selectedImage!,
-                                              fit: BoxFit.cover,
-                                            ),
-                                          ),
-                                        )
+                                                width: 96,
+                                                height: 96,
+                                                decoration: BoxDecoration(
+                                                  shape: BoxShape.circle,
+                                                  border: Border.all(
+                                                    color: Colors.white,
+                                                    width: 2,
+                                                  ),
+                                                ),
+                                                child: ClipOval(
+                                                  child: Image.file(
+                                                    profileController
+                                                        .selectedImage!,
+                                                    fit: BoxFit.cover,
+                                                  ),
+                                                ),
+                                              )
                                             : UserAvatar(
-                                          imageUrl:
-                                          user.picture ??
-                                              'https://via.placeholder.com/150',
-                                          name: user.name.isNotEmpty == true
-                                              ? user.name
-                                              .substring(0, 1)
-                                              .toUpperCase()
-                                              : 'A',
-                                          radius: 48,
-                                          backgroundColor: Colors.black,
-                                          headers: token.isNotEmpty
-                                              ? {
-                                            'Authorization':
-                                            'Bearer $token',
-                                          }
-                                              : {},
-                                        ),
+                                                imageUrl:
+                                                    user.picture ??
+                                                    'https://via.placeholder.com/150',
+                                                name:
+                                                    user.name.isNotEmpty == true
+                                                    ? user.name
+                                                          .substring(0, 1)
+                                                          .toUpperCase()
+                                                    : 'A',
+                                                radius: 48,
+                                                backgroundColor: Colors.black,
+                                                headers: token.isNotEmpty
+                                                    ? {
+                                                        'Authorization':
+                                                            'Bearer $token',
+                                                      }
+                                                    : {},
+                                              ),
                                         Positioned(
                                           bottom: 0,
                                           right: 0,
@@ -417,7 +421,7 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                                               decoration: BoxDecoration(
                                                 color: Colors.white,
                                                 borderRadius:
-                                                BorderRadius.circular(20),
+                                                    BorderRadius.circular(20),
                                                 boxShadow: [
                                                   BoxShadow(
                                                     color: Colors.black
@@ -434,7 +438,8 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                                                     : Icons.edit,
                                                 size: 16,
                                                 color:
-                                                profileController.isUploading
+                                                    profileController
+                                                        .isUploading
                                                     ? Colors.grey[400]
                                                     : AppColors.primary,
                                               ),
@@ -462,11 +467,12 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                                         await Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => EditProfileScreen(
-                                              formLabel: 'Nama',
-                                              formName: 'name',
-                                              value: user.name,
-                                            ),
+                                            builder: (context) =>
+                                                EditProfileScreen(
+                                                  formLabel: 'Nama',
+                                                  formName: 'name',
+                                                  value: user.name,
+                                                ),
                                           ),
                                         );
 
@@ -484,11 +490,12 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                                         await Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => EditProfileScreen(
-                                              formLabel: 'Nama Pengguna',
-                                              formName: 'username',
-                                              value: user.username,
-                                            ),
+                                            builder: (context) =>
+                                                EditProfileScreen(
+                                                  formLabel: 'Nama Pengguna',
+                                                  formName: 'username',
+                                                  value: user.username,
+                                                ),
                                           ),
                                         );
 
@@ -507,7 +514,8 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                                   _buildProfileItem(
                                     ListTileItem(
                                       title: 'Peran Anda',
-                                      subtitle: user.groupName ?? 'Pengguna Biasa',
+                                      subtitle:
+                                          user.groupName ?? 'Pengguna Biasa',
                                     ),
                                   ),
                                 ],
@@ -516,8 +524,8 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                           ],
                         ),
 
-                        // Loading overlay di dalam container putih
-                        if (authProvider.isLoading || profileController.isUploading)
+                        if (authProvider.isLoading ||
+                            profileController.isUploading)
                           Container(
                             width: double.infinity,
                             height: double.infinity,
@@ -532,7 +540,9 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  CircularProgressIndicator(color: AppColors.primary),
+                                  CircularProgressIndicator(
+                                    color: AppColors.primary,
+                                  ),
                                   if (profileController.isUploading) ...[
                                     SizedBox(height: 16),
                                     Text(

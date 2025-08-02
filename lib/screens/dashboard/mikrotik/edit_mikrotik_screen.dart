@@ -71,7 +71,10 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
         _isLoading = true;
       });
 
-      final routerProvider = Provider.of<RouterProvider>(context, listen: false);
+      final routerProvider = Provider.of<RouterProvider>(
+        context,
+        listen: false,
+      );
 
       final updateRouterModel = UpdateRouterModel(
         name: _nameController.text.trim(),
@@ -82,22 +85,25 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
         toleranceDays: int.parse(_toleranceDaysController.text.trim()),
         isolateAction: _isolateAction,
         isolateProfile:
-        _isolateAction == 'change-profile' &&
-            _isolateProfileController.text.trim().isNotEmpty
+            _isolateAction == 'change-profile' &&
+                _isolateProfileController.text.trim().isNotEmpty
             ? _isolateProfileController.text.trim()
             : null,
         isAutoIsolate: _isAutoIsolate,
       );
 
       try {
-        final success = await routerProvider.updateRouter(widget.router.id, updateRouterModel);
+        final success = await routerProvider.updateRouter(
+          widget.router.id,
+          updateRouterModel,
+        );
 
         if (mounted && success) {
           SnackBars.success(context, 'Router berhasil diperbarui');
           Navigator.pop(context, true);
         }
 
-        if(mounted && !success) {
+        if (mounted && !success) {
           SnackBars.error(context, 'Gagal memperbarui router');
         }
       } catch (e) {
@@ -133,7 +139,6 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Handle bar
             Container(
               width: 40,
               height: 4,
@@ -144,7 +149,6 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
             ),
             SizedBox(height: 24),
 
-            // Danger icon with warning colors
             Container(
               width: 80,
               height: 80,
@@ -162,7 +166,6 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
 
             SizedBox(height: 20),
 
-            // Title with danger emphasis
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 24),
               child: Text(
@@ -178,7 +181,6 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
 
             SizedBox(height: 12),
 
-            // Router name with emphasis
             Container(
               margin: EdgeInsets.symmetric(horizontal: 24),
               padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -194,10 +196,7 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
                   SizedBox(width: 8),
                   Text(
                     widget.router.name,
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: 16,
-                    ),
+                    style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
                   ),
                 ],
               ),
@@ -205,7 +204,6 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
 
             SizedBox(height: 16),
 
-            // Warning message
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 24),
               child: Text(
@@ -225,29 +223,26 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
               padding: EdgeInsets.symmetric(horizontal: 24),
               child: Text(
                 'Tindakan ini tidak dapat dibatalkan dan semua data terkait akan hilang permanen.',
-                style: TextStyle(
-                  fontSize: 14,
-                  color: Colors.grey.shade600,
-                ),
+                style: TextStyle(fontSize: 14, color: Colors.grey.shade600),
                 textAlign: TextAlign.center,
               ),
             ),
 
             SizedBox(height: 32),
 
-            // Action buttons
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 24),
               child: Column(
                 children: [
-                  // Delete button with danger styling
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _isLoading ? null : () {
-                        Navigator.pop(context);
-                        _deleteRouter();
-                      },
+                      onPressed: _isLoading
+                          ? null
+                          : () {
+                              Navigator.pop(context);
+                              _deleteRouter();
+                            },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red.shade600,
                         foregroundColor: Colors.white,
@@ -259,33 +254,32 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
                       ),
                       child: _isLoading
                           ? SizedBox(
-                        height: 20,
-                        width: 20,
-                        child: CircularProgressIndicator(
-                          color: Colors.white,
-                          strokeWidth: 2,
-                        ),
-                      )
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
                           : Row(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          Icon(Icons.delete_outline, size: 20),
-                          SizedBox(width: 8),
-                          Text(
-                            'Ya, Hapus Router',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(Icons.delete_outline, size: 20),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Ya, Hapus Router',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                              ],
                             ),
-                          ),
-                        ],
-                      ),
                     ),
                   ),
 
                   SizedBox(height: 12),
 
-                  // Cancel button
                   SizedBox(
                     width: double.infinity,
                     child: TextButton(
@@ -333,7 +327,7 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
         Navigator.pop(context, true);
       }
 
-      if(mounted && !success) {
+      if (mounted && !success) {
         SnackBars.error(context, 'Gagal menghapus router');
       }
     } catch (e) {
@@ -631,21 +625,21 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
                     ),
                     child: _isLoading
                         ? SizedBox(
-                      height: 20,
-                      width: 20,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
-                    )
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
                         : Text(
-                      'Perbarui Router',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.white,
-                      ),
-                    ),
+                            'Perbarui Router',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.white,
+                            ),
+                          ),
                   ),
 
                   const SizedBox(height: 16),
@@ -703,15 +697,15 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
                   ),
                   child: _isolateAction == entry.key
                       ? Center(
-                    child: Container(
-                      width: 12,
-                      height: 12,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  )
+                          child: Container(
+                            width: 12,
+                            height: 12,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        )
                       : null,
                 ),
                 title: Text(

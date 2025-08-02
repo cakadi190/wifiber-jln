@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wifiber/config/app_colors.dart';
+import 'package:wifiber/screens/dashboard/infrastructure/infrastructure_home.dart';
 import 'package:wifiber/screens/dashboard/mikrotik/list_mikrotik_screen.dart';
 
 class MainMenu extends StatefulWidget {
@@ -78,7 +79,12 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
       MenuItem(
         icon: Icons.pin_drop,
         title: 'Peta Infrastruktur',
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const InfrastructureHome()),
+          );
+        },
       ),
     ];
   }
