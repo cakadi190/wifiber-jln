@@ -1,5 +1,5 @@
+import 'package:wifiber/config/app_colors.dart';
 import 'dart:convert';
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_map/flutter_map.dart';
@@ -7,17 +7,6 @@ import 'package:latlong2/latlong.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/services/http_service.dart';
-
-class _AlwaysWinPanGestureRecognizer extends PanGestureRecognizer {
-  @override
-  void addAllowedPointer(PointerDownEvent event) {
-    super.addAllowedPointer(event);
-    resolve(GestureDisposition.accepted);
-  }
-
-  @override
-  String get debugDescription => 'alwaysWin';
-}
 
 class InfrastructureHome extends StatefulWidget {
   const InfrastructureHome({super.key});
@@ -32,25 +21,16 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
   final DraggableScrollableController _draggableController =
       DraggableScrollableController();
 
-  List<dynamic> _olts = [];
-  List<dynamic> _odps = [];
-  List<dynamic> _odcs = [];
-
-  bool _isLoadingOlts = false;
-  bool _isLoadingOdps = false;
-  bool _isLoadingOdcs = false;
-
-  String? _errorOlts;
-  String? _errorOdps;
-  String? _errorOdcs;
-
+  List<dynamic> _currentData = [];
+  bool _isLoading = false;
+  String? _error;
   String _activeFilter = 'OLT';
 
   @override
   void initState() {
     super.initState();
     _mapController = MapController();
-    _loadInitialData();
+    _loadDataForFilter(_activeFilter);
 
     SystemChrome.setSystemUIOverlayStyle(
       const SystemUiOverlayStyle(
@@ -62,208 +42,161 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
     );
   }
 
-  void _loadInitialData() {
-    _loadOlts();
-  }
-
-  Future<void> _loadOlts() async {
+  Future<void> _loadDataForFilter(String filter) async {
     setState(() {
-      _isLoadingOlts = true;
-      _errorOlts = null;
+      _isLoading = true;
+      _error = null;
     });
 
     try {
-      final response = await _http.get('olts', requiresAuth: true);
+      String endpoint;
+      switch (filter) {
+        case 'OLT':
+          endpoint = 'olts';
+          break;
+        case 'ODP':
+          endpoint = 'odps';
+          break;
+        case 'ODC':
+          endpoint = 'odcs';
+          break;
+        default:
+          endpoint = 'olts';
+      }
+
+      final response = await _http.get(endpoint, requiresAuth: true);
 
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         setState(() {
-          _olts = data['data'] ?? [];
-          _isLoadingOlts = false;
+          _currentData = data['data'] ?? [];
+          _isLoading = false;
         });
+
+        _animateMapToDataCenter();
       }
     } catch (e) {
       setState(() {
-        _errorOlts = e.toString();
-        _isLoadingOlts = false;
+        _error = e.toString();
+        _isLoading = false;
       });
     }
   }
 
-  Future<void> _loadOdps() async {
-    setState(() {
-      _isLoadingOdps = true;
-      _errorOdps = null;
-    });
+  void _animateMapToDataCenter() {
+    if (_currentData.isEmpty) return;
 
-    try {
-      final response = await _http.get('odps', requiresAuth: true);
+    List<LatLng> coordinates = [];
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        setState(() {
-          _odps = data['data'] ?? [];
-          _isLoadingOdps = false;
-        });
+    for (var item in _currentData) {
+      if (item['latitude'] != null && item['longitude'] != null) {
+        final lat = double.tryParse(item['latitude'].toString());
+        final lng = double.tryParse(item['longitude'].toString());
+        if (lat != null && lng != null) {
+          coordinates.add(LatLng(lat, lng));
+        }
       }
-    } catch (e) {
-      setState(() {
-        _errorOdps = e.toString();
-        _isLoadingOdps = false;
-      });
     }
-  }
 
-  Future<void> _loadOdcs() async {
-    setState(() {
-      _isLoadingOdcs = true;
-      _errorOdcs = null;
+    if (coordinates.isEmpty) return;
+
+    double minLat = coordinates.first.latitude;
+    double maxLat = coordinates.first.latitude;
+    double minLng = coordinates.first.longitude;
+    double maxLng = coordinates.first.longitude;
+
+    for (var coord in coordinates) {
+      minLat = minLat < coord.latitude ? minLat : coord.latitude;
+      maxLat = maxLat > coord.latitude ? maxLat : coord.latitude;
+      minLng = minLng < coord.longitude ? minLng : coord.longitude;
+      maxLng = maxLng > coord.longitude ? maxLng : coord.longitude;
+    }
+
+    double centerLat = (minLat + maxLat) / 2;
+    double centerLng = (minLng + maxLng) / 2;
+
+    double latDiff = maxLat - minLat;
+    double lngDiff = maxLng - minLng;
+    double maxDiff = latDiff > lngDiff ? latDiff : lngDiff;
+
+    maxDiff = maxDiff * 1.2;
+
+    double zoomLevel;
+    if (maxDiff > 0.5) {
+      zoomLevel = 9.0;
+    } else if (maxDiff > 0.2) {
+      zoomLevel = 10.5;
+    } else if (maxDiff > 0.1) {
+      zoomLevel = 11.5;
+    } else if (maxDiff > 0.05) {
+      zoomLevel = 12.5;
+    } else if (maxDiff > 0.02) {
+      zoomLevel = 13.5;
+    } else {
+      zoomLevel = 14.0;
+    }
+
+    Future.delayed(const Duration(milliseconds: 300), () {
+      _mapController.move(LatLng(centerLat, centerLng), zoomLevel);
     });
-
-    try {
-      final response = await _http.get('odcs', requiresAuth: true);
-
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        setState(() {
-          _odcs = data['data'] ?? [];
-          _isLoadingOdcs = false;
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _errorOdcs = e.toString();
-        _isLoadingOdcs = false;
-      });
-    }
   }
 
   void _onFilterTap(String filter) {
+    if (_activeFilter == filter) return;
+
     setState(() {
       _activeFilter = filter;
     });
 
-    switch (filter) {
-      case 'OLT':
-        _loadOlts();
-        break;
-      case 'ODP':
-        _loadOdps();
-        break;
-      case 'ODC':
-        _loadOdcs();
-        break;
-    }
-  }
-
-  List<dynamic> get _currentData {
-    switch (_activeFilter) {
-      case 'OLT':
-        return _olts;
-      case 'ODP':
-        return _odps;
-      case 'ODC':
-        return _odcs;
-      default:
-        return [];
-    }
-  }
-
-  bool get _isCurrentLoading {
-    switch (_activeFilter) {
-      case 'OLT':
-        return _isLoadingOlts;
-      case 'ODP':
-        return _isLoadingOdps;
-      case 'ODC':
-        return _isLoadingOdcs;
-      default:
-        return false;
-    }
-  }
-
-  String? get _currentError {
-    switch (_activeFilter) {
-      case 'OLT':
-        return _errorOlts;
-      case 'ODP':
-        return _errorOdps;
-      case 'ODC':
-        return _errorOdcs;
-      default:
-        return null;
-    }
+    _loadDataForFilter(filter);
   }
 
   void _refreshCurrentData() {
-    switch (_activeFilter) {
-      case 'OLT':
-        _loadOlts();
-        break;
-      case 'ODP':
-        _loadOdps();
-        break;
-      case 'ODC':
-        _loadOdcs();
-        break;
-    }
+    _loadDataForFilter(_activeFilter);
   }
 
   List<Marker> _buildMapMarkers() {
     List<Marker> markers = [];
 
-    for (var odp in _odps) {
-      if (odp['latitude'] != null && odp['longitude'] != null) {
-        final lat = double.tryParse(odp['latitude'].toString());
-        final lng = double.tryParse(odp['longitude'].toString());
+    for (var item in _currentData) {
+      if (item['latitude'] != null && item['longitude'] != null) {
+        final lat = double.tryParse(item['latitude'].toString());
+        final lng = double.tryParse(item['longitude'].toString());
         if (lat != null && lng != null) {
-          markers.add(
-            Marker(
-              point: LatLng(lat, lng),
-              width: 40,
-              height: 40,
-              child: GestureDetector(
-                onTap: () => _showMarkerInfo(odp, 'ODP'),
-                child: Container(
-                  decoration: BoxDecoration(
-                    color: Colors.blue,
-                    shape: BoxShape.circle,
-                    border: Border.all(color: Colors.white, width: 2),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black26,
-                        blurRadius: 4,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: Icon(Icons.router, color: Colors.white, size: 20),
-                ),
-              ),
-            ),
-          );
-        }
-      }
-    }
+          Color markerColor;
+          IconData markerIcon;
 
-    for (var odc in _odcs) {
-      if (odc['latitude'] != null && odc['longitude'] != null) {
-        final lat = double.tryParse(odc['latitude'].toString());
-        final lng = double.tryParse(odc['longitude'].toString());
-        if (lat != null && lng != null) {
+          switch (_activeFilter) {
+            case 'OLT':
+              markerColor = Colors.purple;
+              markerIcon = Icons.router_outlined;
+              break;
+            case 'ODP':
+              markerColor = Colors.blue;
+              markerIcon = Icons.router;
+              break;
+            case 'ODC':
+              markerColor = Colors.green;
+              markerIcon = Icons.hub;
+              break;
+            default:
+              markerColor = Colors.grey;
+              markerIcon = Icons.location_on;
+          }
+
           markers.add(
             Marker(
               point: LatLng(lat, lng),
               width: 40,
               height: 40,
               child: GestureDetector(
-                onTap: () => _showMarkerInfo(odc, 'ODC'),
+                onTap: () => _showMarkerInfo(item, _activeFilter),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.green,
+                    color: markerColor,
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 2),
-                    boxShadow: [
+                    boxShadow: const [
                       BoxShadow(
                         color: Colors.black26,
                         blurRadius: 4,
@@ -271,7 +204,7 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
                       ),
                     ],
                   ),
-                  child: Icon(Icons.hub, color: Colors.white, size: 20),
+                  child: Icon(markerIcon, color: Colors.white, size: 20),
                 ),
               ),
             ),
@@ -283,30 +216,148 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
     return markers;
   }
 
-  void _showMarkerInfo(dynamic item, String type) {
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('$type Info'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text('Kode: ${item['kode_${type.toLowerCase()}'] ?? 'N/A'}'),
-              Text('Nama: ${item['name'] ?? 'N/A'}'),
-              Text('Status: ${item['status'] ?? 'N/A'}'),
-              Text('Total Port: ${item['total_port'] ?? 'N/A'}'),
-              if (item['description'] != null)
-                Text('Deskripsi: ${item['description']}'),
-            ],
+  Widget _buildDetailSection(String title, List<Widget> items) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 16,
+            fontWeight: FontWeight.w600,
+            color: AppColors.primary,
           ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: Text('Tutup'),
+        ),
+        const SizedBox(height: 12),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.grey[50],
+              border: Border.all(color: Colors.grey[200]!),
             ),
-          ],
+            child: Column(children: items),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildDetailItem(
+    IconData icon,
+    String label,
+    String value, {
+    Color? statusColor,
+  }) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      decoration: const BoxDecoration(
+        border: Border(bottom: BorderSide(color: Colors.grey, width: 0.2)),
+      ),
+      child: Row(
+        children: [
+          Icon(icon, size: 20, color: statusColor ?? Colors.grey[600]),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  label,
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  value,
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w500,
+                    color: statusColor ?? Colors.black87,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  void _showMarkerInfo(dynamic item, String type) {
+    String kode = '';
+    switch (type) {
+      case 'OLT':
+        kode = item['kode_olt'] ?? 'N/A';
+        break;
+      case 'ODP':
+        kode = item['kode_odp'] ?? 'N/A';
+        break;
+      case 'ODC':
+        kode = item['kode_odc'] ?? 'N/A';
+        break;
+    }
+
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.white,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (BuildContext context) {
+        return Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildDetailSection('$type Info', [
+                  _buildDetailItem(Icons.info, 'Kode', kode),
+                  _buildDetailItem(Icons.info, 'Nama', item['name'] ?? 'N/A'),
+                  _buildDetailItem(
+                    Icons.info,
+                    'Status',
+                    item['status'] ?? 'N/A',
+                  ),
+                  _buildDetailItem(
+                    Icons.info,
+                    'Total Port',
+                    item['total_port'] ?? 'N/A',
+                  ),
+                  if (item['description'] != null)
+                    _buildDetailItem(
+                      Icons.info,
+                      'Deskripsi',
+                      item['description'] ?? 'N/A',
+                    ),
+                  if (item['latitude'] != null && item['longitude'] != null)
+                    _buildDetailItem(
+                      Icons.info,
+                      'Koordinat',
+                      '${item['latitude']}, ${item['longitude']}',
+                    ),
+                ]),
+                const SizedBox(height: 16),
+                Align(
+                  alignment: Alignment.center,
+                  child: SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        // Dummy button action for opening maps
+                      },
+                      child: const Text('Buka di Maps'),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+          ),
         );
       },
     );
@@ -526,7 +577,7 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
   }
 
   Widget _buildScrollableContent(ScrollController scrollController) {
-    if (_isCurrentLoading) {
+    if (_isLoading) {
       return ListView(
         controller: scrollController,
         children: const [
@@ -538,7 +589,7 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
       );
     }
 
-    if (_currentError != null) {
+    if (_error != null) {
       return ListView(
         controller: scrollController,
         children: [
@@ -563,7 +614,7 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
                   ),
                   const SizedBox(height: 4),
                   Text(
-                    _currentError!,
+                    _error!,
                     textAlign: TextAlign.center,
                     style: TextStyle(color: Colors.grey.shade600, fontSize: 12),
                   ),
@@ -692,7 +743,7 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
                 color: Colors.transparent,
                 child: InkWell(
                   borderRadius: BorderRadius.circular(100),
-                  onTap: () {},
+                  onTap: () => _animateMapToDataCenter(),
                   child: Container(
                     padding: const EdgeInsets.all(8),
                     decoration: BoxDecoration(
@@ -700,7 +751,10 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
                       shape: BoxShape.circle,
                     ),
                     child: const Center(
-                      child: Icon(Icons.filter_list, color: Colors.white),
+                      child: Icon(
+                        Icons.center_focus_strong,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
@@ -712,6 +766,7 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
               initialChildSize: 0.25,
               maxChildSize: 0.9,
               snap: true,
+              controller: _draggableController,
               snapSizes: const [0.25, 0.5, 0.9],
               builder:
                   (BuildContext context, ScrollController scrollController) {
@@ -731,111 +786,81 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
                       ),
                       child: Column(
                         children: [
-                          RawGestureDetector(
-                            gestures: <Type, GestureRecognizerFactory>{
-                              _AlwaysWinPanGestureRecognizer:
-                                  GestureRecognizerFactoryWithHandlers<
-                                    _AlwaysWinPanGestureRecognizer
-                                  >(() => _AlwaysWinPanGestureRecognizer(), (
-                                    _AlwaysWinPanGestureRecognizer instance,
-                                  ) {
-                                    instance
-                                      ..onStart = (details) {
-                                        print(
-                                          'Pan start: ${details.localPosition}',
-                                        );
-                                      }
-                                      ..onUpdate = (details) {
-                                        double currentSize =
-                                            _draggableController.size;
-                                        double delta =
-                                            details.delta.dy /
-                                            MediaQuery.of(context).size.height;
-                                        double newSize = currentSize - delta;
-                                        newSize = newSize.clamp(0.1, 0.9);
-
-                                        _draggableController.animateTo(
-                                          newSize,
-                                          duration: const Duration(
-                                            milliseconds: 50,
-                                          ),
-                                          curve: Curves.linear,
-                                        );
-                                      }
-                                      ..onEnd = (details) {
-                                        double currentSize =
-                                            _draggableController.size;
-                                        double velocity =
-                                            details.velocity.pixelsPerSecond.dy;
-
-                                        double targetSize;
-                                        if (velocity.abs() > 500) {
-                                          if (velocity < 0) {
-                                            targetSize = currentSize < 0.4
-                                                ? 0.5
-                                                : 0.9;
-                                          } else {
-                                            targetSize = currentSize > 0.6
-                                                ? 0.5
-                                                : 0.25;
-                                          }
-                                        } else {
-                                          if (currentSize < 0.35) {
-                                            targetSize = 0.25;
-                                          } else if (currentSize < 0.7) {
-                                            targetSize = 0.5;
-                                          } else {
-                                            targetSize = 0.9;
-                                          }
-                                        }
-
-                                        _draggableController.animateTo(
-                                          targetSize,
-                                          duration: const Duration(
-                                            milliseconds: 300,
-                                          ),
-                                          curve: Curves.easeOut,
-                                        );
-                                      };
-                                  }),
+                          GestureDetector(
+                            onVerticalDragStart: (details) {},
+                            onVerticalDragUpdate: (details) {
+                              double currentSize = _draggableController.size;
+                              double delta =
+                                  details.primaryDelta! /
+                                  MediaQuery.of(context).size.height;
+                              double newSize = currentSize - delta;
+                              newSize = newSize.clamp(0.1, 0.9);
+                              _draggableController.animateTo(
+                                newSize,
+                                duration: const Duration(milliseconds: 50),
+                                curve: Curves.linear,
+                              );
                             },
-                            child: Column(
-                              children: [
-                                Padding(
-                                  padding: EdgeInsets.only(bottom: 16, top: 8),
-                                  child: Container(
-                                    width: double.infinity,
-                                    padding: const EdgeInsets.symmetric(
-                                      vertical: 8,
-                                    ),
-                                    child: Center(
-                                      child: Container(
-                                        width: 40,
-                                        height: 6,
-                                        decoration: BoxDecoration(
-                                          color: Colors.grey[400],
-                                          borderRadius: BorderRadius.circular(
-                                            3,
-                                          ),
+                            onVerticalDragEnd: (details) {
+                              double currentSize = _draggableController.size;
+                              double velocity = details.primaryVelocity ?? 0;
+                              double targetSize;
+
+                              if (velocity.abs() > 500) {
+                                if (velocity < 0) {
+                                  targetSize = currentSize < 0.4 ? 0.5 : 0.9;
+                                } else {
+                                  targetSize = currentSize > 0.6 ? 0.5 : 0.25;
+                                }
+                              } else {
+                                if (currentSize < 0.35) {
+                                  targetSize = 0.25;
+                                } else if (currentSize < 0.7) {
+                                  targetSize = 0.5;
+                                } else {
+                                  targetSize = 0.9;
+                                }
+                              }
+
+                              _draggableController.animateTo(
+                                targetSize,
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeOut,
+                              );
+                            },
+                            child: const Padding(
+                              padding: EdgeInsets.only(bottom: 16, top: 8),
+                              child: SizedBox(
+                                width: double.infinity,
+                                child: Center(
+                                  child: SizedBox(
+                                    width: 40,
+                                    height: 6,
+                                    child: DecoratedBox(
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey,
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(3),
                                         ),
                                       ),
                                     ),
                                   ),
                                 ),
-                                Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 16.0,
-                                  ),
-                                  child: Row(
-                                    children: [
-                                      _buildFilterButton('OLT'),
-                                      const SizedBox(width: 8),
-                                      _buildFilterButton('ODP'),
-                                      const SizedBox(width: 8),
-                                      _buildFilterButton('ODC'),
-                                    ],
-                                  ),
-                                ),
+                              ),
+                            ),
+                          ),
+
+                          Padding(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16.0,
+                            ),
+                            child: Row(
+                              children: [
+                                _buildFilterButton('OLT'),
+                                const SizedBox(width: 8),
+                                _buildFilterButton('ODP'),
+                                const SizedBox(width: 8),
+                                _buildFilterButton('ODC'),
                               ],
                             ),
                           ),

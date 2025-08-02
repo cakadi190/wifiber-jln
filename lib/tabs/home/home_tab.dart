@@ -97,44 +97,47 @@ class _ProfileHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final appTheme = Theme.of(context);
 
-    return Row(
-      children: [
-        UserAvatar(
-          imageUrl: controller.isAuthenticated && controller.hasProfilePicture
-              ? controller.userPictureUrl
-              : null,
-          name: controller.userDisplayName,
-          radius: 24,
-          backgroundColor: Colors.black,
-          headers: controller.userAccessToken != null
-              ? {'Authorization': 'Bearer ${controller.userAccessToken}'}
-              : null,
-        ),
-        const SizedBox(width: 8),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Text(
-                "Selamat Datang",
-                style: appTheme.textTheme.bodySmall?.copyWith(
-                  color: Colors.black,
-                ),
-              ),
-              Text(
-                controller.userDisplayName,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-                style: appTheme.textTheme.bodyLarge?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
-              ),
-            ],
+    return InkWell(
+      onTap: () => controller.navigateToProfile(),
+      child: Row(
+        children: [
+          UserAvatar(
+            imageUrl: controller.isAuthenticated && controller.hasProfilePicture
+                ? controller.userPictureUrl
+                : null,
+            name: controller.userDisplayName,
+            radius: 24,
+            backgroundColor: Colors.black,
+            headers: controller.userAccessToken != null
+                ? {'Authorization': 'Bearer ${controller.userAccessToken}'}
+                : null,
           ),
-        ),
-      ],
+          const SizedBox(width: 8),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.start,
+              children: [
+                Text(
+                  "Selamat Datang",
+                  style: appTheme.textTheme.bodySmall?.copyWith(
+                    color: Colors.black,
+                  ),
+                ),
+                Text(
+                  controller.userDisplayName,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: appTheme.textTheme.bodyLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
     );
   }
 }

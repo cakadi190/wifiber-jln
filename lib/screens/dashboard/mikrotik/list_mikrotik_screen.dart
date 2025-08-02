@@ -663,13 +663,15 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
           ),
         ),
         const SizedBox(height: 12),
-        Container(
-          decoration: BoxDecoration(
-            color: Colors.grey[50],
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: Colors.grey[200]!),
+        ClipRRect(
+          borderRadius: BorderRadius.circular(12),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.grey[50],
+              border: Border.all(color: Colors.grey[200]!),
+            ),
+            child: Column(children: items),
           ),
-          child: Column(children: items),
         ),
       ],
     );

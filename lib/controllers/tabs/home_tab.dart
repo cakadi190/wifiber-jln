@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/providers/auth_provider.dart';
+import 'package:wifiber/screens/dashboard/profile/main_profile_screen.dart';
 
 class HomeController {
   final BuildContext context;
@@ -24,6 +25,12 @@ class HomeController {
         onCancel: () => Navigator.of(context).pop(false),
       ),
     );
+  }
+
+  Future<void> navigateToProfile() async {
+    Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (context) => const MainProfileScreen()));
   }
 
   Future<void> _performLogout(VoidCallback? onLogoutSuccess) async {
