@@ -191,7 +191,7 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
 
   Widget _buildLocationFAB(InfrastructureProvider provider) {
     return Positioned(
-      top: MediaQuery.of(context).padding.top + 80,
+      top: MediaQuery.of(context).padding.top + 16,
       right: 16,
       child: LocationWidgets.buildLocationFAB(
         onPressed: _onLocationButtonPressed,
