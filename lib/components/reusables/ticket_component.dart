@@ -92,12 +92,12 @@ class StateBuilder<T> extends StatelessWidget {
       return errorBuilder(error!);
     }
 
-    final isDataEmpty = isEmpty?.call(data) ?? (data == null);
+    final isDataEmpty = isEmpty?.call(data ?? (T as dynamic)) ?? (data == null);
     if (isDataEmpty) {
       return emptyBuilder();
     }
 
-    return dataBuilder(data!);
+    return dataBuilder(data ?? (T as dynamic));
   }
 }
 
@@ -109,7 +109,7 @@ class DefaultStates {
         child: CircularProgressIndicator(
           valueColor: AlwaysStoppedAnimation<Color>(color ?? AppColors.primary),
         ),
-      )
+      ),
     );
   }
 

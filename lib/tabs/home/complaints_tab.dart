@@ -611,83 +611,91 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
     Complaint complaint, [
     VoidCallback? onSuccess,
   ]) async {
+    late BuildContext modalContext;
     showModalBottomSheet(
       context: context,
       isScrollControlled: true,
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (modalContext) => Padding(
-        padding: const EdgeInsets.only(
-          bottom: 16,
-          left: 16,
-          right: 16,
-          top: 16,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            PhosphorIcon(
-              PhosphorIcons.warning(PhosphorIconsStyle.duotone),
-              color: Colors.red,
-              size: 64,
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Hapus Pengaduan?',
-              style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
-            ),
-            const SizedBox(height: 8),
-            const Text('Apakah anda yakin ingin menghapus pengaduan ini?'),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.pop(modalContext),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: const BorderSide(color: AppColors.primary),
-                    ),
-                    child: const Text(
-                      'Tidak',
-                      style: TextStyle(color: AppColors.primary, fontSize: 18),
+      builder: (ctx) {
+        modalContext = ctx;
+        return Padding(
+          padding: const EdgeInsets.only(
+            bottom: 16,
+            left: 16,
+            right: 16,
+            top: 16,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              PhosphorIcon(
+                PhosphorIcons.warning(PhosphorIconsStyle.duotone),
+                color: Colors.red,
+                size: 64,
+              ),
+              const SizedBox(height: 8),
+              const Text(
+                'Hapus Pengaduan?',
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 24),
+              ),
+              const SizedBox(height: 8),
+              const Text('Apakah anda yakin ingin menghapus pengaduan ini?'),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(modalContext),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        side: const BorderSide(color: AppColors.primary),
+                      ),
+                      child: const Text(
+                        'Tidak',
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontSize: 18,
+                        ),
+                      ),
                     ),
                   ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      int id = int.parse(complaint.id.toString());
-                      final success = await widget.controller.removeComplaint(
-                        id,
-                      );
-                      if (success && mounted) {
-                        Navigator.pop(modalContext);
-                        onSuccess?.call();
-                        if (mounted) {
-                          SnackBars.success(
-                            context,
-                            "Pengaduan berhasil dihapus",
-                          );
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (!mounted) return;
+                        int id = int.parse(complaint.id.toString());
+                        final success = await widget.controller.removeComplaint(
+                          id,
+                        );
+                        if (success && mounted) {
+                          Navigator.pop(modalContext);
+                          onSuccess?.call();
+                          if (mounted) {
+                            SnackBars.success(
+                              context,
+                              "Pengaduan berhasil dihapus",
+                            );
+                          }
                         }
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.red,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: const Text('Ya', style: TextStyle(fontSize: 18)),
                     ),
-                    child: const Text('Ya', style: TextStyle(fontSize: 18)),
                   ),
-                ),
-              ],
-            ),
-          ],
-        ),
-      ),
+                ],
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 
@@ -796,7 +804,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
                 child: const Text('Hapus', style: TextStyle(color: Colors.red)),
               ),
             ),
-            if(complaint.statusEnum != ComplaintStatus.completed) ...[
+            if (complaint.statusEnum != ComplaintStatus.completed) ...[
               const SizedBox(width: 16),
               Expanded(
                 child: TextButton(
@@ -823,7 +831,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
                     style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                   ),
                 ),
-              )
+              ),
             ],
           ],
         ),

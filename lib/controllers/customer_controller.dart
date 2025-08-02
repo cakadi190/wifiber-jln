@@ -27,7 +27,7 @@ class CustomerController {
       areaId: areaId,
     );
 
-    if (showLoading) {
+    if (showLoading && context.mounted) {
       Navigator.of(context).pop();
     }
 
@@ -41,7 +41,9 @@ class CustomerController {
 
     await _provider.loadCustomerById(id);
 
-    Navigator.of(context).pop();
+    if (context.mounted) {
+      Navigator.of(context).pop();
+    }
 
     if (_provider.error != null) {
       _showErrorDialog(_provider.error!);
@@ -53,7 +55,9 @@ class CustomerController {
 
     final success = await _provider.createCustomer(customerData);
 
-    Navigator.of(context).pop();
+    if (context.mounted) {
+      Navigator.of(context).pop();
+    }
 
     if (success) {
       _showSuccessDialog('Customer berhasil dibuat');
@@ -72,7 +76,9 @@ class CustomerController {
 
     final success = await _provider.updateCustomer(id, customerData);
 
-    Navigator.of(context).pop();
+    if (context.mounted) {
+      Navigator.of(context).pop();
+    }
 
     if (success) {
       _showSuccessDialog('Customer berhasil diupdate');
@@ -95,7 +101,9 @@ class CustomerController {
 
     final success = await _provider.deleteCustomer(id);
 
-    Navigator.of(context).pop();
+    if (context.mounted) {
+      Navigator.of(context).pop();
+    }
 
     if (success) {
       _showSuccessDialog('Customer berhasil dihapus');
@@ -124,7 +132,9 @@ class CustomerController {
 
     await _provider.getCustomersByStatus(status);
 
-    Navigator.of(context).pop();
+    if (context.mounted) {
+      Navigator.of(context).pop();
+    }
 
     if (_provider.error != null) {
       _showErrorDialog(_provider.error!);

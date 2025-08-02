@@ -83,6 +83,8 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
         allowMultiple: false,
       );
 
+      if (!mounted) return;
+
       if (result != null) {
         setState(() {
           selectedPaymentProof = File(result.files.single.path!);
@@ -90,10 +92,12 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
         });
       }
     } catch (e) {
-      SnackBars.error(
-        context,
-        "Gagal memilih berkas: ${e.toString()}",
-      ).clearSnackBars();
+      if (mounted) {
+        SnackBars.error(
+          context,
+          "Gagal memilih berkas: ${e.toString()}",
+        ).clearSnackBars();
+      }
     }
   }
 

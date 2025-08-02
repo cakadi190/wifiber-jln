@@ -43,11 +43,11 @@ class ComplaintTabController {
   }
 
   Future<bool> updateComplaintStatus(
-      int id,
-      String detail,
-      String name,
-      bool ticketIsDone,
-      ) async {
+    int id,
+    String detail,
+    String name,
+    bool ticketIsDone,
+  ) async {
     final updatedComplaint = UpdateComplaint(
       id: id,
       detail: detail,
@@ -89,10 +89,12 @@ class ComplaintTabController {
   Future<void> logout(BuildContext context) async {
     await _authProvider.logout();
 
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => const LoginScreen()),
-          (_) => false,
-    );
+    if (context.mounted) {
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+        (_) => false,
+      );
+    }
   }
 }
