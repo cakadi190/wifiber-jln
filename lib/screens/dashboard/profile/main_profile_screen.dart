@@ -32,140 +32,9 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
     super.dispose();
   }
 
-  Future<void> _showImagePickerModal() async {
-    showModalBottomSheet(
-      context: context,
-      backgroundColor: Colors.transparent,
-      builder: (BuildContext context) {
-        return Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-          ),
-          child: SafeArea(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 40,
-                  height: 4,
-                  margin: EdgeInsets.only(top: 12),
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(2),
-                  ),
-                ),
-                Padding(
-                  padding: EdgeInsets.all(16),
-                  child: Column(
-                    children: [
-                      Text(
-                        'Pilih Gambar Profil',
-                        style: TextStyle(
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: [
-                          _buildImagePickerOption(
-                            icon: Icons.photo_library,
-                            label: 'Galeri',
-                            onTap: () => _pickImageFromGallery(),
-                          ),
-                          _buildImagePickerOption(
-                            icon: Icons.camera_alt,
-                            label: 'Kamera',
-                            onTap: () => _pickImageFromCamera(),
-                          ),
-                        ],
-                      ),
-                      SizedBox(height: 20),
-                      SizedBox(
-                        width: double.infinity,
-                        child: TextButton(
-                          onPressed: () => Navigator.pop(context),
-                          style: TextButton.styleFrom(
-                            padding: EdgeInsets.symmetric(vertical: 12),
-                          ),
-                          child: Text(
-                            'Batal',
-                            style: TextStyle(
-                              color: Colors.grey[600],
-                              fontSize: 16,
-                            ),
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        );
-      },
-    );
-  }
-
-  Widget _buildImagePickerOption({
-    required IconData icon,
-    required String label,
-    required VoidCallback onTap,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(12),
-      child: Container(
-        padding: EdgeInsets.symmetric(vertical: 20, horizontal: 32),
-        decoration: BoxDecoration(
-          border: Border.all(color: Colors.grey[300]!),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          children: [
-            Container(
-              padding: EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: AppColors.primary.withValues(alpha: 0.1),
-                shape: BoxShape.circle,
-              ),
-              child: Icon(icon, size: 32, color: AppColors.primary),
-            ),
-            SizedBox(height: 8),
-            Text(
-              label,
-              style: TextStyle(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: Colors.grey[700],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Future<void> _pickImageFromGallery() async {
+  Future<void> _pickImage() async {
     try {
-      Navigator.pop(context);
-      await _profileController.pickImageFromGallery();
-      await _showCropPreviewDialog();
-    } catch (e) {
-      _showErrorSnackBar(e.toString());
-    }
-  }
-
-  Future<void> _pickImageFromCamera() async {
-    try {
-      Navigator.pop(context);
-      await _profileController.pickImageFromCamera();
+      await _profileController.pickImage();
       await _showCropPreviewDialog();
     } catch (e) {
       _showErrorSnackBar(e.toString());
@@ -416,7 +285,7 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                                           child: InkWell(
                                             onTap: profileController.isUploading
                                                 ? null
-                                                : _showImagePickerModal,
+                                                : _pickImage,
                                             child: Container(
                                               decoration: BoxDecoration(
                                                 color: Colors.white,

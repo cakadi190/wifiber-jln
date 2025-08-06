@@ -26,7 +26,7 @@ class ProfileController extends ChangeNotifier {
 
   AuthProvider get authProvider => _authProvider;
 
-  Future<void> pickImageFromGallery() async {
+  Future<void> pickImage() async {
     try {
       await Future.delayed(Duration(milliseconds: 300));
 
@@ -41,26 +41,7 @@ class ProfileController extends ChangeNotifier {
         await _cropImage(image.path);
       }
     } catch (e) {
-      throw Exception('Gagal memilih gambar dari galeri: ${e.toString()}');
-    }
-  }
-
-  Future<void> pickImageFromCamera() async {
-    try {
-      await Future.delayed(Duration(milliseconds: 300));
-
-      final XFile? image = await _picker.pickImage(
-        source: ImageSource.camera,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        imageQuality: 85,
-      );
-
-      if (image != null) {
-        await _cropImage(image.path);
-      }
-    } catch (e) {
-      throw Exception('Gagal mengambil foto dari kamera: ${e.toString()}');
+      throw Exception('Gagal memilih gambar: ${e.toString()}');
     }
   }
 
@@ -121,9 +102,7 @@ class ProfileController extends ChangeNotifier {
         }
       }
     } catch (e) {
-      throw Exception(
-        'Gagal memotong gambar. Coba gunakan galeri atau ambil foto baru.',
-      );
+      throw Exception('Gagal memotong gambar. Coba gunakan gambar lain.');
     }
   }
 
