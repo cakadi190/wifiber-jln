@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wifiber/config/app_colors.dart';
+import 'package:wifiber/screens/dashboard/customers/customer_list_screen.dart';
 import 'package:wifiber/screens/dashboard/infrastructure/infrastructure_home.dart';
 import 'package:wifiber/screens/dashboard/mikrotik/list_mikrotik_screen.dart';
 
@@ -50,7 +51,16 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
 
     _menuItems = [
       MenuItem(icon: Icons.verified_user_sharp, title: 'Calon Pelanggan'),
-      MenuItem(icon: Icons.person, title: 'Data Pelanggan'),
+      MenuItem(
+        icon: Icons.person,
+        title: 'Data Pelanggan',
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const CustomerListScreen()),
+          );
+        },
+      ),
       MenuItem(
         icon: Icons.warning,
         title: 'Keluhan',

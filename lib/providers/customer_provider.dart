@@ -89,6 +89,13 @@ class CustomerProvider extends ChangeNotifier {
     _setLoading(true);
 
     try {
+      // Validate required fields before sending
+      final validationErrors = _validateCustomerData(customerData);
+      if (validationErrors.isNotEmpty) {
+        _setError('Validation failed: ${validationErrors.join(', ')}');
+        return false;
+      }
+
       final newCustomer = await _customerService.createCustomer(customerData);
       _customers.add(newCustomer);
       _error = null;
@@ -109,6 +116,13 @@ class CustomerProvider extends ChangeNotifier {
     _setLoading(true);
 
     try {
+      // Validate required fields before sending
+      final validationErrors = _validateCustomerData(customerData);
+      if (validationErrors.isNotEmpty) {
+        _setError('Validation failed: ${validationErrors.join(', ')}');
+        return false;
+      }
+
       final updatedCustomer = await _customerService.updateCustomer(
         id,
         customerData,
@@ -132,6 +146,67 @@ class CustomerProvider extends ChangeNotifier {
     } finally {
       _setLoading(false);
     }
+  }
+
+  // Add validation method to check required fields
+  List<String> _validateCustomerData(Map<String, dynamic> customerData) {
+    List<String> errors = [];
+
+    // Check required fields based on server validation
+    if (customerData['name'] == null ||
+        customerData['name'].toString().trim().isEmpty) {
+      errors.add('Nama wajib diisi');
+    }
+
+    if (customerData['phone'] == null ||
+        customerData['phone'].toString().trim().isEmpty) {
+      errors.add('Nomor telepon wajib diisi');
+    }
+
+    if (customerData['ktp'] == null ||
+        customerData['ktp'].toString().trim().isEmpty) {
+      errors.add('Nomor KTP wajib diisi (atau isi dengan "-")');
+    }
+
+    if (customerData['address'] == null ||
+        customerData['address'].toString().trim().isEmpty) {
+      errors.add('Alamat wajib diisi');
+    }
+
+    if (customerData['package'] == null) {
+      errors.add('Paket internet wajib dipilih');
+    }
+
+    if (customerData['area'] == null ||
+        customerData['area'].toString().trim().isEmpty) {
+      errors.add('ID Area wajib diisi');
+    }
+
+    if (customerData['router'] == null) {
+      errors.add('Router wajib dipilih');
+    }
+
+    if (customerData['pppoe_secret'] == null ||
+        customerData['pppoe_secret'].toString().trim().isEmpty) {
+      errors.add('PPPoE Secret wajib diisi');
+    }
+
+    if (customerData['due-date'] == null ||
+        customerData['due-date'].toString().trim().isEmpty) {
+      errors.add('Tanggal jatuh tempo wajib diisi');
+    }
+
+    if (customerData['odp'] == null) {
+      errors.add('ODP wajib dipilih');
+    }
+
+    // Check coordinate validation - both must be provided or both must be null
+    final hasCoordinate = customerData.containsKey('coordinate');
+    if (!hasCoordinate) {
+      errors.add('Koordinat lokasi wajib diisi');
+    }
+
+    return errors;
   }
 
   Future<bool> deleteCustomer(String id) async {
