@@ -89,7 +89,6 @@ class CustomerProvider extends ChangeNotifier {
     _setLoading(true);
 
     try {
-      // Validate required fields before sending
       final validationErrors = _validateCustomerData(customerData);
       if (validationErrors.isNotEmpty) {
         _setError('Validation failed: ${validationErrors.join(', ')}');
@@ -116,7 +115,6 @@ class CustomerProvider extends ChangeNotifier {
     _setLoading(true);
 
     try {
-      // Validate required fields before sending
       final validationErrors = _validateCustomerData(customerData);
       if (validationErrors.isNotEmpty) {
         _setError('Validation failed: ${validationErrors.join(', ')}');
@@ -148,11 +146,9 @@ class CustomerProvider extends ChangeNotifier {
     }
   }
 
-  // Add validation method to check required fields
   List<String> _validateCustomerData(Map<String, dynamic> customerData) {
     List<String> errors = [];
 
-    // Check required fields based on server validation
     if (customerData['name'] == null ||
         customerData['name'].toString().trim().isEmpty) {
       errors.add('Nama wajib diisi');
@@ -200,7 +196,6 @@ class CustomerProvider extends ChangeNotifier {
       errors.add('ODP wajib dipilih');
     }
 
-    // Check coordinate validation - both must be provided or both must be null
     final hasCoordinate = customerData.containsKey('coordinate');
     if (!hasCoordinate) {
       errors.add('Koordinat lokasi wajib diisi');
