@@ -103,8 +103,9 @@ class CustomerFormController extends ChangeNotifier {
   Future<void> initializeEditData() async {
     if (selectedPackageId == null &&
         selectedRouterId == null &&
-        selectedOdpId == null)
+        selectedOdpId == null) {
       return;
+    }
 
     isInitializing = true;
     notifyListeners();
