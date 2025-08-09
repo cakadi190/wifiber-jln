@@ -29,6 +29,9 @@ class CustomerFormController extends ChangeNotifier {
   late TextEditingController longitudeController;
   late TextEditingController discountController;
 
+  String? ktpPhotoUrl;
+  String? locationPhotoUrl;
+
   String? selectedPackageId;
   String? selectedPackageName;
   String? selectedRouterId;
@@ -81,6 +84,13 @@ class CustomerFormController extends ChangeNotifier {
     latitudeController.text = customer.latitude ?? '';
     longitudeController.text = customer.longitude ?? '';
     discountController.text = customer.discount;
+
+    ktpPhotoUrl = customer.ktpPhoto?.isNotEmpty == true
+        ? customer.ktpPhoto
+        : null;
+    locationPhotoUrl = customer.locationPhoto?.isNotEmpty == true
+        ? customer.locationPhoto
+        : null;
 
     selectedStatus = _getStatusFromString(customer.status);
     selectedPackageId = customer.packageId;

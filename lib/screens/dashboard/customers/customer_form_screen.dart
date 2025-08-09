@@ -9,6 +9,7 @@ import 'package:wifiber/models/customer.dart';
 import 'package:wifiber/components/reusables/package_modal_action.dart';
 import 'package:wifiber/components/reusables/router_modal_selector.dart';
 import 'package:wifiber/components/reusables/odp_modal_selector.dart';
+import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/services/customer_service.dart';
 
 class CustomerFormScreen extends StatefulWidget {
@@ -47,7 +48,20 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
     required String subtitle,
     required XFile? selectedFile,
     required VoidCallback onTap,
+    required BuildContext context,
+    String? urlPreview = '',
   }) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    // Debug print untuk melihat nilai
+    debugPrint('urlPreview: $urlPreview');
+    debugPrint('selectedFile: ${selectedFile?.path}');
+
+    // Perbaikan kondisi untuk menampilkan preview
+    final hasUrlPreview = urlPreview != null && urlPreview.isNotEmpty;
+    final hasSelectedFile = selectedFile != null;
+    final hasAnyImage = hasUrlPreview || hasSelectedFile;
+
     return Card(
       elevation: 0,
       shape: RoundedRectangleBorder(
@@ -92,22 +106,108 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                       ],
                     ),
                   ),
-                  if (selectedFile != null)
+                  if (hasAnyImage)
                     const Icon(Icons.check_circle, color: Colors.green)
                   else
                     const Icon(Icons.add_a_photo, color: Colors.grey),
                 ],
               ),
-              if (selectedFile != null) ...[
-                const SizedBox(height: 12),
+              const SizedBox(height: 12),
+
+              // Perbaikan untuk menampilkan gambar
+              if (hasAnyImage) ...[
                 ClipRRect(
                   borderRadius: BorderRadius.circular(8),
-                  child: Image.file(
-                    File(selectedFile.path),
-                    height: 120,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
+                  child: hasUrlPreview
+                      ? Image.network(
+                          urlPreview,
+                          height: 120,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          headers: {
+                            'Authorization':
+                                'Bearer ${authProvider.user?.accessToken}',
+                          },
+                          loadingBuilder: (context, child, loadingProgress) {
+                            if (loadingProgress == null) return child;
+                            return Container(
+                              height: 120,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: const Center(
+                                child: CircularProgressIndicator(),
+                              ),
+                            );
+                          },
+                          errorBuilder: (context, error, stackTrace) {
+                            debugPrint('Error loading image: $error');
+                            return Container(
+                              height: 120,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.red.shade50,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.red.shade200),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.error_outline,
+                                    color: Colors.red.shade400,
+                                    size: 32,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Gagal memuat gambar',
+                                    style: TextStyle(
+                                      color: Colors.red.shade600,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        )
+                      : Image.file(
+                          File(selectedFile!.path),
+                          height: 120,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              height: 120,
+                              width: double.infinity,
+                              decoration: BoxDecoration(
+                                color: Colors.red.shade50,
+                                borderRadius: BorderRadius.circular(8),
+                                border: Border.all(color: Colors.red.shade200),
+                              ),
+                              child: Column(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons.error_outline,
+                                    color: Colors.red.shade400,
+                                    size: 32,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'File tidak ditemukan',
+                                    style: TextStyle(
+                                      color: Colors.red.shade600,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            );
+                          },
+                        ),
                 ),
                 const SizedBox(height: 8),
                 Row(
@@ -116,7 +216,9 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                     const SizedBox(width: 4),
                     Expanded(
                       child: Text(
-                        basename(selectedFile.path),
+                        hasUrlPreview
+                            ? basename(urlPreview)
+                            : basename(selectedFile!.path),
                         overflow: TextOverflow.ellipsis,
                         maxLines: 1,
                         style: const TextStyle(
@@ -129,7 +231,6 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                   ],
                 ),
               ] else ...[
-                const SizedBox(height: 12),
                 Container(
                   height: 120,
                   width: double.infinity,
@@ -605,10 +706,12 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                               const SizedBox(height: 16),
 
                               _buildPhotoSelector(
+                                context: context,
                                 title: 'Foto KTP',
                                 subtitle:
                                     'Upload foto KTP pelanggan (opsional)',
                                 selectedFile: controller.ktpPhotoFile,
+                                urlPreview: controller.ktpPhotoUrl,
                                 onTap: () => controller.showImagePickerModal(
                                   context,
                                   forKtp: true,
@@ -617,7 +720,9 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                               const SizedBox(height: 16),
 
                               _buildPhotoSelector(
+                                context: context,
                                 title: 'Foto Lokasi',
+                                urlPreview: controller.locationPhotoUrl,
                                 subtitle:
                                     'Upload foto lokasi pemasangan (opsional)',
                                 selectedFile: controller.locationPhotoFile,
