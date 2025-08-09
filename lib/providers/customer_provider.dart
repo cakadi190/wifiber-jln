@@ -95,8 +95,7 @@ class CustomerProvider extends ChangeNotifier {
         return false;
       }
 
-      final newCustomer = await _customerService.createCustomer(customerData);
-      _customers.add(newCustomer);
+      await _customerService.createCustomer(customerData);
       _error = null;
       notifyListeners();
       return true;

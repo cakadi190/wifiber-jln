@@ -53,11 +53,6 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
   }) {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
-    // Debug print untuk melihat nilai
-    debugPrint('urlPreview: $urlPreview');
-    debugPrint('selectedFile: ${selectedFile?.path}');
-
-    // Perbaikan kondisi untuk menampilkan preview
     final hasUrlPreview = urlPreview != null && urlPreview.isNotEmpty;
     final hasSelectedFile = selectedFile != null;
     final hasAnyImage = hasUrlPreview || hasSelectedFile;

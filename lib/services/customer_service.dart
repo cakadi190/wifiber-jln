@@ -66,19 +66,8 @@ class CustomerService {
     }
   }
 
-  Future<Customer> createCustomer(Map<String, dynamic> customerData) async {
+  Future<bool> createCustomer(Map<String, dynamic> customerData) async {
     try {
-      print(
-        Map.fromEntries(
-          customerData.entries
-              .where(
-                (entry) =>
-                    entry.key != 'ktp-photo' && entry.key != 'location-photo',
-              )
-              .map((entry) => MapEntry(entry.key, entry.value.toString())),
-        ),
-      );
-
       List<http.MultipartFile> files = [];
 
       if (customerData['ktp-photo'] != null) {
@@ -138,16 +127,10 @@ class CustomerService {
 
       if (statusCode == 201) {
         final jsonData = json.decode(responseBody);
-        print('Response JSON: $jsonData');
 
         if (jsonData is Map<String, dynamic>) {
           if (jsonData['success'] == true) {
-            final customerData = jsonData['data'];
-            if (customerData != null && customerData is Map<String, dynamic>) {
-              return Customer.fromJson(customerData);
-            } else {
-              throw Exception('Customer data is null or invalid format');
-            }
+            return true;
           } else {
             throw Exception(
               'Failed to create customer: ${jsonData['message'] ?? 'Unknown error'}',
@@ -169,16 +152,69 @@ class CustomerService {
     Map<String, dynamic> customerData,
   ) async {
     try {
-      final response = await _http.putForm(
+      List<http.MultipartFile> files = [];
+
+      if (customerData['ktp-photo'] != null) {
+        files.add(
+          await http.MultipartFile.fromPath(
+            'ktp-photo',
+            (customerData['ktp-photo'] as XFile).path,
+          ),
+        );
+      }
+
+      if (customerData['location-photo'] != null) {
+        files.add(
+          await http.MultipartFile.fromPath(
+            'location-photo',
+            (customerData['location-photo'] as XFile).path,
+          ),
+        );
+      }
+
+      // Buat fields tanpa file
+      final fields = Map.fromEntries(
+        customerData.entries
+            .where(
+              (entry) =>
+                  entry.key != 'ktp-photo' && entry.key != 'location-photo',
+            )
+            .map((entry) => MapEntry(entry.key, entry.value.toString())),
+      );
+
+      // Kalau _http punya method PUT multipart
+      final streamedResponse = await _http.putUpload(
         '$path/$id',
-        fields: customerData.map(
-          (key, value) => MapEntry(key, value.toString()),
-        ),
+        fields: fields,
+        files: files,
         requiresAuth: true,
       );
 
-      if (response.statusCode == 200) {
-        final jsonData = json.decode(response.body);
+      final statusCode = streamedResponse.statusCode;
+
+      if (statusCode >= 400) {
+        if (statusCode == 401) {
+          throw Exception('Session expired. Please login again.');
+        } else if (statusCode == 403) {
+          throw Exception('You do not have permission.');
+        } else if (statusCode == 422) {
+          throw Exception('Validation failed.');
+        } else if (statusCode >= 500) {
+          throw Exception('Server error occurred.');
+        } else {
+          throw Exception('Failed to update customer: $statusCode');
+        }
+      }
+
+      String responseBody = '';
+      await for (String chunk in streamedResponse.stream.transform(
+        utf8.decoder,
+      )) {
+        responseBody += chunk;
+      }
+
+      if (statusCode == 200) {
+        final jsonData = json.decode(responseBody);
         if (jsonData['success'] == true) {
           return Customer.fromJson(jsonData['data']);
         } else {
@@ -187,7 +223,7 @@ class CustomerService {
           );
         }
       } else {
-        throw Exception('Failed to update customer: ${response.statusCode}');
+        throw Exception('Failed to update customer: $statusCode');
       }
     } catch (e) {
       throw Exception('Error updating customer: $e');
