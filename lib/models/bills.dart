@@ -79,7 +79,7 @@ class Bills {
     address: json['address']?.toString(),
     phone: json['phone']?.toString(),
     dueDate:
-        (json['due_date'] != null ? _parseDueDay(json['due_date']) : null) ??
+        (json['due-date'] != null ? _parseDueDay(json['due-date']) : null) ??
         DateTime.now(),
     ppoeSecret: json['pppoe_secret']?.toString(),
     locationPhoto: json['location_photo']?.toString(),
@@ -116,7 +116,7 @@ class Bills {
     'nickname': nickname,
     'address': address,
     'phone': phone,
-    'due_date': dueDate.toIso8601String(),
+    'due-date': dueDate.toIso8601String(),
     'pppoe_secret': ppoeSecret,
     'location_photo': locationPhoto,
     'router_id': routerId,

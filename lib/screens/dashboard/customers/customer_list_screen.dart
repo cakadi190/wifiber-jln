@@ -178,12 +178,21 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
             ),
             ElevatedButton(
               onPressed: () async {
+                // Close dialog first
                 Navigator.of(context).pop();
+
+                // Check if widget is still mounted before proceeding
+                if (!mounted) return;
+
                 final provider = Provider.of<CustomerProvider>(
                   context,
                   listen: false,
                 );
+
                 final success = await provider.deleteCustomer(customer.id);
+
+                // Double-check if widget is still mounted after async operation
+                if (!mounted) return;
 
                 if (success) {
                   ScaffoldMessenger.of(context).showSnackBar(
@@ -217,17 +226,15 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
   }
 
   void _navigateToForm({Customer? customer}) async {
-    final result = await Navigator.of(context).push(
+    await Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) =>
             CustomerFormScreen(customer: customer, isEdit: customer != null),
       ),
     );
 
-    if (result == true) {
-      final provider = Provider.of<CustomerProvider>(context, listen: false);
-      provider.refresh();
-    }
+    final provider = Provider.of<CustomerProvider>(context, listen: false);
+    provider.refresh();
   }
 
   void _showOptionsMenu(Customer customer) {

@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:http/http.dart' as http;
+import 'package:image_picker/image_picker.dart';
 import 'package:wifiber/models/customer.dart';
 import 'package:wifiber/services/http_service.dart';
 
@@ -66,23 +68,99 @@ class CustomerService {
 
   Future<Customer> createCustomer(Map<String, dynamic> customerData) async {
     try {
-      final response = await _http.post(
+      print(
+        Map.fromEntries(
+          customerData.entries
+              .where(
+                (entry) =>
+                    entry.key != 'ktp-photo' && entry.key != 'location-photo',
+              )
+              .map((entry) => MapEntry(entry.key, entry.value.toString())),
+        ),
+      );
+
+      List<http.MultipartFile> files = [];
+
+      if (customerData['ktp-photo'] != null) {
+        files.add(
+          await http.MultipartFile.fromPath(
+            'ktp-photo',
+            (customerData['ktp-photo'] as XFile).path,
+          ),
+        );
+      }
+
+      if (customerData['location-photo'] != null) {
+        files.add(
+          await http.MultipartFile.fromPath(
+            'location-photo',
+            (customerData['location-photo'] as XFile).path,
+          ),
+        );
+      }
+
+      final streamedResponse = await _http.postUpload(
         path,
-        body: json.encode(customerData),
+        fields: Map.fromEntries(
+          customerData.entries
+              .where(
+                (entry) =>
+                    entry.key != 'ktp-photo' && entry.key != 'location-photo',
+              )
+              .map((entry) => MapEntry(entry.key, entry.value.toString())),
+        ),
+        files: files,
         requiresAuth: true,
       );
 
-      if (response.statusCode == 201) {
-        final jsonData = json.decode(response.body);
-        if (jsonData['success'] == true) {
-          return Customer.fromJson(jsonData['data']);
+      // Check status code before reading stream
+      int statusCode = streamedResponse.statusCode;
+
+      // Handle errors based on status code before reading stream
+      if (statusCode >= 400) {
+        if (statusCode == 401) {
+          throw Exception('Session expired. Please login again.');
+        } else if (statusCode == 403) {
+          throw Exception('You do not have permission.');
+        } else if (statusCode == 422) {
+          throw Exception('Validation failed.');
+        } else if (statusCode >= 500) {
+          throw Exception('Server error occurred.');
         } else {
-          throw Exception(
-            'Failed to create customer: ${jsonData['message'] ?? 'Unknown error'}',
-          );
+          throw Exception('Failed to create customer: $statusCode');
+        }
+      }
+
+      // Only read stream if status is successful
+      String responseBody = '';
+      await for (String chunk in streamedResponse.stream.transform(
+        utf8.decoder,
+      )) {
+        responseBody += chunk;
+      }
+
+      if (statusCode == 201) {
+        final jsonData = json.decode(responseBody);
+        print('Response JSON: $jsonData'); // Debug print
+
+        if (jsonData is Map<String, dynamic>) {
+          if (jsonData['success'] == true) {
+            final customerData = jsonData['data'];
+            if (customerData != null && customerData is Map<String, dynamic>) {
+              return Customer.fromJson(customerData);
+            } else {
+              throw Exception('Customer data is null or invalid format');
+            }
+          } else {
+            throw Exception(
+              'Failed to create customer: ${jsonData['message'] ?? 'Unknown error'}',
+            );
+          }
+        } else {
+          throw Exception('Invalid JSON response format');
         }
       } else {
-        throw Exception('Failed to create customer: ${response.statusCode}');
+        throw Exception('Failed to create customer: $statusCode');
       }
     } catch (e) {
       throw Exception('Error creating customer: $e');
@@ -94,9 +172,11 @@ class CustomerService {
     Map<String, dynamic> customerData,
   ) async {
     try {
-      final response = await _http.put(
+      final response = await _http.putForm(
         '$path/$id',
-        body: json.encode(customerData),
+        fields: customerData.map(
+          (key, value) => MapEntry(key, value.toString()),
+        ),
         requiresAuth: true,
       );
 
