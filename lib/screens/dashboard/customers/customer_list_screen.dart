@@ -5,6 +5,7 @@ import 'package:wifiber/providers/customer_provider.dart';
 import 'package:wifiber/models/customer.dart';
 import 'package:wifiber/screens/dashboard/customers/customer_form_screen.dart';
 import 'package:wifiber/screens/dashboard/customers/customer_detail_modal.dart';
+import 'package:wifiber/screens/dashboard/customers/customer_delete_modal.dart'; // Add this import
 import 'package:wifiber/services/customer_service.dart';
 
 class CustomerListScreen extends StatefulWidget {
@@ -175,63 +176,6 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
     }
   }
 
-  void _showDeleteConfirmation(Customer customer) {
-    showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Hapus Pelanggan'),
-          content: Text(
-            'Apakah Anda yakin ingin menghapus pelanggan "${customer.name}"?',
-          ),
-          actions: [
-            TextButton(
-              onPressed: () => Navigator.of(context).pop(),
-              child: const Text('Batal'),
-            ),
-            ElevatedButton(
-              onPressed: () async {
-                Navigator.of(context).pop();
-
-                if (!mounted || _customerProvider == null) return;
-
-                final success = await _customerProvider!.deleteCustomer(
-                  customer.id,
-                );
-
-                if (!mounted) return;
-
-                if (success) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Pelanggan berhasil dihapus'),
-                      backgroundColor: Colors.green,
-                    ),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: Text(
-                        _customerProvider?.error ?? 'Gagal menghapus pelanggan',
-                      ),
-                      backgroundColor: Colors.red,
-                    ),
-                  );
-                }
-              },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.red,
-                foregroundColor: Colors.white,
-                elevation: 0,
-              ),
-              child: const Text('Hapus'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
   void _navigateToForm({Customer? customer}) async {
     await Navigator.of(context).push(
       MaterialPageRoute(
@@ -294,7 +238,8 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
               title: const Text('Hapus', style: TextStyle(color: Colors.red)),
               onTap: () {
                 Navigator.of(context).pop();
-                _showDeleteConfirmation(customer);
+                // Use the new delete modal instead of the old dialog
+                CustomerDeleteModal.show(context, customer);
               },
             ),
           ],
