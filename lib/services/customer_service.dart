@@ -113,10 +113,8 @@ class CustomerService {
         requiresAuth: true,
       );
 
-      // Check status code before reading stream
       int statusCode = streamedResponse.statusCode;
 
-      // Handle errors based on status code before reading stream
       if (statusCode >= 400) {
         if (statusCode == 401) {
           throw Exception('Session expired. Please login again.');
@@ -131,7 +129,6 @@ class CustomerService {
         }
       }
 
-      // Only read stream if status is successful
       String responseBody = '';
       await for (String chunk in streamedResponse.stream.transform(
         utf8.decoder,
@@ -141,7 +138,7 @@ class CustomerService {
 
       if (statusCode == 201) {
         final jsonData = json.decode(responseBody);
-        print('Response JSON: $jsonData'); // Debug print
+        print('Response JSON: $jsonData');
 
         if (jsonData is Map<String, dynamic>) {
           if (jsonData['success'] == true) {

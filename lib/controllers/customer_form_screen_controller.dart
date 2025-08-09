@@ -42,8 +42,6 @@ class CustomerFormController extends ChangeNotifier {
 
   XFile? ktpPhotoFile;
   XFile? locationPhotoFile;
-  // Removed: Uint8List? ktpPreviewBytes;
-  // Removed: Uint8List? locationPreviewBytes;
 
   CustomerFormController() {
     _initControllers();
@@ -231,8 +229,6 @@ class CustomerFormController extends ChangeNotifier {
     return status.isGranted;
   }
 
-  // Removed: _compressImageInMemory method
-
   Future<void> pickImage(
     ImageSource source,
     BuildContext context, {
@@ -262,10 +258,8 @@ class CustomerFormController extends ChangeNotifier {
       if (image != null) {
         if (forKtp) {
           ktpPhotoFile = image;
-          // Removed: ktpPreviewBytes = compressedBytes;
         } else {
           locationPhotoFile = image;
-          // Removed: locationPreviewBytes = compressedBytes;
         }
 
         notifyListeners();

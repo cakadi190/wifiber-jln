@@ -251,7 +251,6 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                     child: ListView(
                       padding: const EdgeInsets.all(16),
                       children: [
-                        // Informasi Umum
                         Card(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(0),
@@ -376,7 +375,6 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                         ),
                         const SizedBox(height: 16),
 
-                        // Informasi Teknis
                         Card(
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(0),
@@ -518,7 +516,6 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                         ),
                         const SizedBox(height: 16),
 
-                        // Koordinat Lokasi
                         Card(
                           elevation: 0,
                           shape: RoundedRectangleBorder(
@@ -581,7 +578,6 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                         ),
                         const SizedBox(height: 16),
 
-                        // Photo Upload Section
                         Card(
                           elevation: 0,
                           shape: RoundedRectangleBorder(
@@ -608,7 +604,6 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                               ),
                               const SizedBox(height: 16),
 
-                              // KTP Photo Selector
                               _buildPhotoSelector(
                                 title: 'Foto KTP',
                                 subtitle:
@@ -621,7 +616,6 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                               ),
                               const SizedBox(height: 16),
 
-                              // Location Photo Selector
                               _buildPhotoSelector(
                                 title: 'Foto Lokasi',
                                 subtitle:
@@ -637,7 +631,6 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                         ),
                         const SizedBox(height: 32),
 
-                        // Action Buttons
                         Row(
                           children: [
                             Expanded(
