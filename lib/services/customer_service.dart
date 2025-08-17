@@ -254,7 +254,7 @@ class CustomerService {
         String message = jsonData['error'] != null
             ? (jsonData['error']['message'] ?? jsonData['message'])
             : jsonData['message'];
-        throw Exception(message ?? 'Failed to import customers: $statusCode');
+        throw Exception(message);
       }
     } catch (e) {
       throw Exception('Error importing customers: $e');

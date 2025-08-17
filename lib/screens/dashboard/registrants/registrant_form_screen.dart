@@ -13,7 +13,6 @@ import 'package:wifiber/components/reusables/odp_modal_selector.dart';
 import 'package:wifiber/components/reusables/image_preview.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/services/registrant_service.dart';
-import 'package:wifiber/middlewares/auth_middleware.dart';
 
 class RegistrantFormScreen extends StatefulWidget {
   final Registrant? registrant;
@@ -144,8 +143,7 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
                               'Authorization':
                                   'Bearer ${authProvider.user?.accessToken}',
                             },
-                            loadingBuilder:
-                                (context, child, loadingProgress) {
+                            loadingBuilder: (context, child, loadingProgress) {
                               if (loadingProgress == null) return child;
                               return Container(
                                 height: 120,
@@ -159,8 +157,7 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
                                 ),
                               );
                             },
-                            errorBuilder:
-                                (context, error, stackTrace) {
+                            errorBuilder: (context, error, stackTrace) {
                               debugPrint('Error loading image: $error');
                               return Container(
                                 height: 120,
@@ -168,8 +165,9 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
                                 decoration: BoxDecoration(
                                   color: Colors.red.shade50,
                                   borderRadius: BorderRadius.circular(8),
-                                  border:
-                                      Border.all(color: Colors.red.shade200),
+                                  border: Border.all(
+                                    color: Colors.red.shade200,
+                                  ),
                                 ),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -204,8 +202,9 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
                                 decoration: BoxDecoration(
                                   color: Colors.red.shade50,
                                   borderRadius: BorderRadius.circular(8),
-                                  border:
-                                      Border.all(color: Colors.red.shade200),
+                                  border: Border.all(
+                                    color: Colors.red.shade200,
+                                  ),
                                 ),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -230,9 +229,9 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
                           ),
                   ),
                 ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
+                const SizedBox(height: 8),
+                Row(
+                  children: [
                     const Icon(Icons.info, size: 16, color: Colors.green),
                     const SizedBox(width: 4),
                     Expanded(
@@ -322,7 +321,9 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
             backgroundColor: AppColors.primary,
             appBar: AppBar(
               title: Text(
-                widget.isEdit ? 'Edit Calon Pelanggan' : 'Tambah Calon Pelanggan',
+                widget.isEdit
+                    ? 'Edit Calon Pelanggan'
+                    : 'Tambah Calon Pelanggan',
               ),
               actions: [
                 if (controller.isLoading)
@@ -827,7 +828,6 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
             ),
           );
         },
-        ),
       ),
     );
   }

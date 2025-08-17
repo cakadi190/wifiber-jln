@@ -161,16 +161,6 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
     }
   }
 
-  void _clearFilter() {
-    setState(() {
-      _selectedStatus = null;
-      _searchController.clear();
-    });
-    if (_customerProvider != null) {
-      _customerProvider!.loadCustomers();
-    }
-  }
-
   void _onSearchChanged(String query) {
     if (_customerProvider != null) {
       if (query.isEmpty) {
@@ -344,7 +334,9 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                   ),
                   const SizedBox(height: 16),
                   ElevatedButton(
-                    onPressed: selectedFile != null && !isLoading ? upload : null,
+                    onPressed: selectedFile != null && !isLoading
+                        ? upload
+                        : null,
                     child: isLoading
                         ? const SizedBox(
                             width: 20,
@@ -378,235 +370,241 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
             PopupMenuButton<String>(
               itemBuilder: (context) => [
                 PopupMenuItem(
-                onTap: _showFilterDialog,
-                child: Row(
-                  children: const [
-                    Icon(Icons.filter_list, color: AppColors.primary),
-                    SizedBox(width: 8),
-                    Text('Filter'),
-                  ],
+                  onTap: _showFilterDialog,
+                  child: Row(
+                    children: const [
+                      Icon(Icons.filter_list, color: AppColors.primary),
+                      SizedBox(width: 8),
+                      Text('Filter'),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  onTap: _showImportModal,
+                  child: Row(
+                    children: const [
+                      Icon(Icons.file_upload, color: AppColors.primary),
+                      SizedBox(width: 8),
+                      Text('Impor Data Excel'),
+                    ],
+                  ),
+                ),
+                PopupMenuItem(
+                  onTap: () {
+                    if (_customerProvider != null) {
+                      _customerProvider!.refresh();
+                    }
+                  },
+                  child: Row(
+                    children: const [
+                      Icon(Icons.refresh, color: AppColors.primary),
+                      SizedBox(width: 8),
+                      Text('Refresh'),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+        body: Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          child: Column(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(16),
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Cari pelanggan...',
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: _searchController.text.isNotEmpty
+                        ? IconButton(
+                            onPressed: () {
+                              _searchController.clear();
+                              _onSearchChanged('');
+                            },
+                            icon: const Icon(Icons.clear),
+                          )
+                        : null,
+                    border: const OutlineInputBorder(),
+                  ),
+                  onChanged: _onSearchChanged,
                 ),
               ),
-              PopupMenuItem(
-                onTap: _showImportModal,
-                child: Row(
-                  children: const [
-                    Icon(Icons.file_upload, color: AppColors.primary),
-                    SizedBox(width: 8),
-                    Text('Impor Data Excel'),
-                  ],
+              if (_selectedStatus != null)
+                Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.all(8),
+                  decoration: BoxDecoration(
+                    color: Colors.blue.shade50,
+                    borderRadius: BorderRadius.circular(8),
+                    border: Border.all(color: Colors.blue.shade200),
+                  ),
+                  child: Row(
+                    children: [
+                      Icon(
+                        Icons.filter_list,
+                        color: Colors.blue.shade700,
+                        size: 16,
+                      ),
+                      const SizedBox(width: 8),
+                      Text(
+                        'Filter: ${_getStatusDisplayName(_selectedStatus.toString().split('.').last)}',
+                        style: TextStyle(
+                          color: Colors.blue.shade700,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              PopupMenuItem(
-                onTap: () {
-                  if (_customerProvider != null) {
-                    _customerProvider!.refresh();
-                  }
-                },
-                child: Row(
-                  children: const [
-                    Icon(Icons.refresh, color: AppColors.primary),
-                    SizedBox(width: 8),
-                    Text('Refresh'),
-                  ],
+              Expanded(
+                child: Consumer<CustomerProvider>(
+                  builder: (context, provider, child) {
+                    if (provider.isLoading) {
+                      return const Center(child: CircularProgressIndicator());
+                    }
+
+                    if (provider.error != null) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.error,
+                              size: 64,
+                              color: Colors.red,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Terjadi Kesalahan',
+                              style: Theme.of(context).textTheme.headlineSmall,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(
+                              provider.error!,
+                              textAlign: TextAlign.center,
+                              style: const TextStyle(color: Colors.grey),
+                            ),
+                            const SizedBox(height: 16),
+                            ElevatedButton(
+                              onPressed: provider.refresh,
+                              child: const Text('Coba Lagi'),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    if (provider.customers.isEmpty) {
+                      return Center(
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            const Icon(
+                              Icons.people,
+                              size: 64,
+                              color: Colors.grey,
+                            ),
+                            const SizedBox(height: 16),
+                            Text(
+                              'Tidak Ada Data Pelanggan',
+                              style: Theme.of(context).textTheme.headlineSmall,
+                            ),
+                            const SizedBox(height: 8),
+                            const Text(
+                              'Belum ada data pelanggan yang tersedia',
+                              style: TextStyle(color: Colors.grey),
+                            ),
+                          ],
+                        ),
+                      );
+                    }
+
+                    return RefreshIndicator(
+                      onRefresh: provider.refresh,
+                      child: ListView.builder(
+                        itemCount: provider.customers.length,
+                        itemBuilder: (context, index) {
+                          final customer = provider.customers[index];
+                          return Card(
+                            elevation: 0,
+                            margin: const EdgeInsets.all(0),
+                            child: ListTile(
+                              contentPadding: const EdgeInsets.symmetric(
+                                vertical: 8,
+                                horizontal: 16,
+                              ),
+                              leading: CircleAvatar(
+                                backgroundColor: _getStatusColor(
+                                  customer.status,
+                                ),
+                                child: Text(
+                                  customer.name.isNotEmpty
+                                      ? customer.name[0].toUpperCase()
+                                      : 'N',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              title: Text(
+                                customer.name,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              subtitle: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text(customer.phone),
+                                  const SizedBox(width: 8),
+                                  Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 4,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: _getStatusColor(customer.status),
+                                      borderRadius: BorderRadius.circular(12),
+                                    ),
+                                    child: Text(
+                                      _getStatusDisplayName(customer.status),
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              trailing: IconButton(
+                                icon: const Icon(Icons.more_vert),
+                                onPressed: () => _showOptionsMenu(customer),
+                              ),
+                              onLongPress: () => _showOptionsMenu(customer),
+                              onTap: () => _showCustomerDetail(customer),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
                 ),
               ),
             ],
           ),
-        ],
-      ),
-      body: Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
         ),
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16),
-              child: TextField(
-                controller: _searchController,
-                decoration: InputDecoration(
-                  hintText: 'Cari pelanggan...',
-                  prefixIcon: const Icon(Icons.search),
-                  suffixIcon: _searchController.text.isNotEmpty
-                      ? IconButton(
-                          onPressed: () {
-                            _searchController.clear();
-                            _onSearchChanged('');
-                          },
-                          icon: const Icon(Icons.clear),
-                        )
-                      : null,
-                  border: const OutlineInputBorder(),
-                ),
-                onChanged: _onSearchChanged,
-              ),
-            ),
-            if (_selectedStatus != null)
-              Container(
-                width: double.infinity,
-                margin: const EdgeInsets.symmetric(horizontal: 16),
-                padding: const EdgeInsets.all(8),
-                decoration: BoxDecoration(
-                  color: Colors.blue.shade50,
-                  borderRadius: BorderRadius.circular(8),
-                  border: Border.all(color: Colors.blue.shade200),
-                ),
-                child: Row(
-                  children: [
-                    Icon(
-                      Icons.filter_list,
-                      color: Colors.blue.shade700,
-                      size: 16,
-                    ),
-                    const SizedBox(width: 8),
-                    Text(
-                      'Filter: ${_getStatusDisplayName(_selectedStatus.toString().split('.').last)}',
-                      style: TextStyle(
-                        color: Colors.blue.shade700,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            Expanded(
-              child: Consumer<CustomerProvider>(
-                builder: (context, provider, child) {
-                  if (provider.isLoading) {
-                    return const Center(child: CircularProgressIndicator());
-                  }
-
-                  if (provider.error != null) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(Icons.error, size: 64, color: Colors.red),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Terjadi Kesalahan',
-                            style: Theme.of(context).textTheme.headlineSmall,
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            provider.error!,
-                            textAlign: TextAlign.center,
-                            style: const TextStyle(color: Colors.grey),
-                          ),
-                          const SizedBox(height: 16),
-                          ElevatedButton(
-                            onPressed: provider.refresh,
-                            child: const Text('Coba Lagi'),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  if (provider.customers.isEmpty) {
-                    return Center(
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.center,
-                        children: [
-                          const Icon(
-                            Icons.people,
-                            size: 64,
-                            color: Colors.grey,
-                          ),
-                          const SizedBox(height: 16),
-                          Text(
-                            'Tidak Ada Data Pelanggan',
-                            style: Theme.of(context).textTheme.headlineSmall,
-                          ),
-                          const SizedBox(height: 8),
-                          const Text(
-                            'Belum ada data pelanggan yang tersedia',
-                            style: TextStyle(color: Colors.grey),
-                          ),
-                        ],
-                      ),
-                    );
-                  }
-
-                  return RefreshIndicator(
-                    onRefresh: provider.refresh,
-                    child: ListView.builder(
-                      itemCount: provider.customers.length,
-                      itemBuilder: (context, index) {
-                        final customer = provider.customers[index];
-                        return Card(
-                          elevation: 0,
-                          margin: const EdgeInsets.all(0),
-                          child: ListTile(
-                            contentPadding: const EdgeInsets.symmetric(
-                              vertical: 8,
-                              horizontal: 16,
-                            ),
-                            leading: CircleAvatar(
-                              backgroundColor: _getStatusColor(customer.status),
-                              child: Text(
-                                customer.name.isNotEmpty
-                                    ? customer.name[0].toUpperCase()
-                                    : 'N',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            title: Text(
-                              customer.name,
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            subtitle: Row(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Text(customer.phone),
-                                const SizedBox(width: 8),
-                                Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 8,
-                                    vertical: 4,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: _getStatusColor(customer.status),
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  child: Text(
-                                    _getStatusDisplayName(customer.status),
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 12,
-                                      fontWeight: FontWeight.w500,
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.more_vert),
-                              onPressed: () => _showOptionsMenu(customer),
-                            ),
-                            onLongPress: () => _showOptionsMenu(customer),
-                            onTap: () => _showCustomerDetail(customer),
-                          ),
-                        );
-                      },
-                    ),
-                  );
-                },
-              ),
-            ),
-          ],
-        ),
-      ),
         floatingActionButton: PermissionWidget(
           permissions: const ['customer'],
           child: FloatingActionButton(

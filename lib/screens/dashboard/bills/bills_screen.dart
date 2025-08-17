@@ -127,274 +127,275 @@ class _BillsScreenState extends State<BillsScreen> {
           ),
           backgroundColor: AppColors.primary,
           appBar: AppBar(
-          title: Text('Daftar Tagihan'),
-          elevation: 0,
-          backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-          actions: [
-            PopupMenuButton<String>(
-              itemBuilder: (context) => [
-                PopupMenuItem(
-                  onTap: () {
-                    CustomerSearchModal.showModal(
-                      context,
-                      onCustomerSelected: _onCustomerSelected,
-                    );
-                  },
-                  child: Row(
-                    children: [
-                      const Icon(Icons.search, color: AppColors.primary),
-                      const SizedBox(width: 8),
-                      Text('Cari Pelanggan'),
-                    ],
-                  ),
-                ),
-                PopupMenuItem(
-                  onTap: _showModalConfirmationCreateMonthlyBill,
-                  child: Row(
-                    children: [
-                      const Icon(Icons.sync, color: AppColors.primary),
-                      const SizedBox(width: 8),
-                      Text('Buat Tagihan Bulanan'),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ],
-        ),
-        body: Column(
-          children: [
-            Expanded(
-              child: Container(
-                decoration: const BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.only(
-                    topLeft: Radius.circular(24),
-                    topRight: Radius.circular(24),
-                  ),
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.all(16),
-                      child: Column(
-                        children: [
-                          SingleChildScrollView(
-                            scrollDirection: Axis.horizontal,
-                            child: Row(
-                              children: [
-                                _buildFilterChip('all', 'Semua'),
-                                _buildFilterChip('paid', 'Lunas'),
-                                _buildFilterChip('unpaid', 'Belum Lunas'),
-                                if (_hasActiveFilters())
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 8),
-                                    child: TextButton.icon(
-                                      onPressed: _resetAllFilters,
-                                      icon: const Icon(Icons.close),
-                                      label: Text(
-                                        'Reset semua filter',
-                                        style: TextStyle(
-                                          color: Colors.grey[600],
-                                        ),
-                                      ),
-                                      style: TextButton.styleFrom(
-                                        backgroundColor: Colors.grey[100],
-                                        minimumSize: const Size(40, 40),
-                                      ),
-                                    ),
-                                  ),
-                                if (_selectedCustomerName != null)
-                                  Padding(
-                                    padding: const EdgeInsets.only(left: 8),
-                                    child: InkWell(
-                                      onTap: () => {
-                                        CustomerSearchModal.showModal(
-                                          context,
-                                          onCustomerSelected:
-                                              _onCustomerSelected,
-                                        ),
-                                      },
-                                      child: Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 12,
-                                          vertical: 8,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: AppColors.primary.withAlpha(
-                                            20,
-                                          ),
-                                          borderRadius: BorderRadius.circular(
-                                            20,
-                                          ),
-                                          border: Border.all(
-                                            color: AppColors.primary.withAlpha(
-                                              60,
-                                            ),
-                                          ),
-                                        ),
-                                        child: Row(
-                                          mainAxisSize: MainAxisSize.min,
-                                          children: [
-                                            Icon(
-                                              Icons.person,
-                                              size: 16,
-                                              color: AppColors.primary,
-                                            ),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              _selectedCustomerName!,
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
-                                                color: AppColors.primary,
-                                              ),
-                                            ),
-                                            const SizedBox(width: 8),
-                                            InkWell(
-                                              onTap: _clearCustomerSearch,
-                                              child: Icon(
-                                                Icons.close,
-                                                size: 16,
-                                                color: Colors.grey[600],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ),
-                                    ),
-                                  ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      ),
+            title: Text('Daftar Tagihan'),
+            elevation: 0,
+            backgroundColor: AppColors.primary,
+            foregroundColor: Colors.white,
+            actions: [
+              PopupMenuButton<String>(
+                itemBuilder: (context) => [
+                  PopupMenuItem(
+                    onTap: () {
+                      CustomerSearchModal.showModal(
+                        context,
+                        onCustomerSelected: _onCustomerSelected,
+                      );
+                    },
+                    child: Row(
+                      children: [
+                        const Icon(Icons.search, color: AppColors.primary),
+                        const SizedBox(width: 8),
+                        Text('Cari Pelanggan'),
+                      ],
                     ),
-
-                    Expanded(
-                      child: Consumer<BillsProvider>(
-                        builder: (context, billsProvider, child) {
-                          if (billsProvider.state == BillsState.loading) {
-                            return const Center(
-                              child: CircularProgressIndicator(),
-                            );
-                          }
-
-                          if (billsProvider.state == BillsState.error) {
-                            return Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
+                  ),
+                  PopupMenuItem(
+                    onTap: _showModalConfirmationCreateMonthlyBill,
+                    child: Row(
+                      children: [
+                        const Icon(Icons.sync, color: AppColors.primary),
+                        const SizedBox(width: 8),
+                        Text('Buat Tagihan Bulanan'),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+          body: Column(
+            children: [
+              Expanded(
+                child: Container(
+                  decoration: const BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.only(
+                      topLeft: Radius.circular(24),
+                      topRight: Radius.circular(24),
+                    ),
+                  ),
+                  child: Column(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          children: [
+                            SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: Row(
                                 children: [
-                                  Icon(
-                                    Icons.error_outline,
-                                    size: 64,
-                                    color: Colors.grey[400],
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    'Terjadi kesalahan',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    billsProvider.errorMessage,
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(color: Colors.grey[600]),
-                                  ),
-                                  const SizedBox(height: 16),
-                                  ElevatedButton(
-                                    onPressed: () async {
-                                      billsProvider.clearError();
-                                      await billsProvider.refresh();
-                                    },
-                                    child: const Text('Coba Lagi'),
-                                  ),
-                                ],
-                              ),
-                            );
-                          }
-
-                          List<Bills> displayedBills = billsProvider.bills;
-
-                          if (displayedBills.isEmpty) {
-                            return Center(
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.receipt_long_outlined,
-                                    size: 64,
-                                    color: Colors.grey[400],
-                                  ),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    _hasActiveFilters()
-                                        ? 'Tidak ada tagihan yang sesuai filter'
-                                        : 'Belum ada tagihan',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.grey[600],
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    _hasActiveFilters()
-                                        ? 'Coba ubah filter atau buat tagihan baru'
-                                        : 'Tagihan akan muncul di sini',
-                                    textAlign: TextAlign.center,
-                                    style: TextStyle(color: Colors.grey[600]),
-                                  ),
+                                  _buildFilterChip('all', 'Semua'),
+                                  _buildFilterChip('paid', 'Lunas'),
+                                  _buildFilterChip('unpaid', 'Belum Lunas'),
                                   if (_hasActiveFilters())
                                     Padding(
-                                      padding: const EdgeInsets.only(top: 16),
-                                      child: ElevatedButton(
+                                      padding: const EdgeInsets.only(left: 8),
+                                      child: TextButton.icon(
                                         onPressed: _resetAllFilters,
-                                        child: const Text('Reset Filter'),
+                                        icon: const Icon(Icons.close),
+                                        label: Text(
+                                          'Reset semua filter',
+                                          style: TextStyle(
+                                            color: Colors.grey[600],
+                                          ),
+                                        ),
+                                        style: TextButton.styleFrom(
+                                          backgroundColor: Colors.grey[100],
+                                          minimumSize: const Size(40, 40),
+                                        ),
+                                      ),
+                                    ),
+                                  if (_selectedCustomerName != null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(left: 8),
+                                      child: InkWell(
+                                        onTap: () => {
+                                          CustomerSearchModal.showModal(
+                                            context,
+                                            onCustomerSelected:
+                                                _onCustomerSelected,
+                                          ),
+                                        },
+                                        child: Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 12,
+                                            vertical: 8,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: AppColors.primary.withAlpha(
+                                              20,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              20,
+                                            ),
+                                            border: Border.all(
+                                              color: AppColors.primary
+                                                  .withAlpha(60),
+                                            ),
+                                          ),
+                                          child: Row(
+                                            mainAxisSize: MainAxisSize.min,
+                                            children: [
+                                              Icon(
+                                                Icons.person,
+                                                size: 16,
+                                                color: AppColors.primary,
+                                              ),
+                                              const SizedBox(width: 8),
+                                              Text(
+                                                _selectedCustomerName!,
+                                                style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w500,
+                                                  color: AppColors.primary,
+                                                ),
+                                              ),
+                                              const SizedBox(width: 8),
+                                              InkWell(
+                                                onTap: _clearCustomerSearch,
+                                                child: Icon(
+                                                  Icons.close,
+                                                  size: 16,
+                                                  color: Colors.grey[600],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
                                       ),
                                     ),
                                 ],
                               ),
-                            );
-                          }
-
-                          return RefreshIndicator(
-                            onRefresh: () async {
-                              await billsProvider.refresh();
-
-                              if (_selectedFilter != 'all') {
-                                await billsProvider.filterBillsByPaymentStatus(
-                                  _selectedFilter,
-                                );
-                              }
-                              if (_selectedCustomerName != null &&
-                                  billsProvider.searchQuery != null) {
-                                await billsProvider.searchBills(
-                                  billsProvider.searchQuery!,
-                                );
-                              }
-                            },
-                            child: ListView.builder(
-                              itemCount: displayedBills.length,
-                              itemBuilder: (context, index) {
-                                final bill = displayedBills[index];
-                                return _buildBillCard(bill);
-                              },
                             ),
-                          );
-                        },
+                          ],
+                        ),
                       ),
-                    ),
-                  ],
+
+                      Expanded(
+                        child: Consumer<BillsProvider>(
+                          builder: (context, billsProvider, child) {
+                            if (billsProvider.state == BillsState.loading) {
+                              return const Center(
+                                child: CircularProgressIndicator(),
+                              );
+                            }
+
+                            if (billsProvider.state == BillsState.error) {
+                              return Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.error_outline,
+                                      size: 64,
+                                      color: Colors.grey[400],
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      'Terjadi kesalahan',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      billsProvider.errorMessage,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(color: Colors.grey[600]),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    ElevatedButton(
+                                      onPressed: () async {
+                                        billsProvider.clearError();
+                                        await billsProvider.refresh();
+                                      },
+                                      child: const Text('Coba Lagi'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+
+                            List<Bills> displayedBills = billsProvider.bills;
+
+                            if (displayedBills.isEmpty) {
+                              return Center(
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.receipt_long_outlined,
+                                      size: 64,
+                                      color: Colors.grey[400],
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      _hasActiveFilters()
+                                          ? 'Tidak ada tagihan yang sesuai filter'
+                                          : 'Belum ada tagihan',
+                                      style: TextStyle(
+                                        fontSize: 18,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.grey[600],
+                                      ),
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      _hasActiveFilters()
+                                          ? 'Coba ubah filter atau buat tagihan baru'
+                                          : 'Tagihan akan muncul di sini',
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(color: Colors.grey[600]),
+                                    ),
+                                    if (_hasActiveFilters())
+                                      Padding(
+                                        padding: const EdgeInsets.only(top: 16),
+                                        child: ElevatedButton(
+                                          onPressed: _resetAllFilters,
+                                          child: const Text('Reset Filter'),
+                                        ),
+                                      ),
+                                  ],
+                                ),
+                              );
+                            }
+
+                            return RefreshIndicator(
+                              onRefresh: () async {
+                                await billsProvider.refresh();
+
+                                if (_selectedFilter != 'all') {
+                                  await billsProvider
+                                      .filterBillsByPaymentStatus(
+                                        _selectedFilter,
+                                      );
+                                }
+                                if (_selectedCustomerName != null &&
+                                    billsProvider.searchQuery != null) {
+                                  await billsProvider.searchBills(
+                                    billsProvider.searchQuery!,
+                                  );
+                                }
+                              },
+                              child: ListView.builder(
+                                itemCount: displayedBills.length,
+                                itemBuilder: (context, index) {
+                                  final bill = displayedBills[index];
+                                  return _buildBillCard(bill);
+                                },
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
@@ -1094,9 +1095,7 @@ class _BillsScreenState extends State<BillsScreen> {
           onTap: () => showImagePreview(
             context,
             imageUrl: photoUrl,
-            headers: {
-              'Authorization': 'Bearer $token',
-            },
+            headers: {'Authorization': 'Bearer $token'},
           ),
           child: Container(
             width: double.infinity,
@@ -1110,9 +1109,7 @@ class _BillsScreenState extends State<BillsScreen> {
               child: Image.network(
                 photoUrl,
                 fit: BoxFit.cover,
-                headers: {
-                  'Authorization': 'Bearer $token',
-                },
+                headers: {'Authorization': 'Bearer $token'},
                 errorBuilder: (context, error, stackTrace) => Container(
                   color: Colors.grey.shade100,
                   child: Column(
@@ -1139,7 +1136,7 @@ class _BillsScreenState extends State<BillsScreen> {
                       child: CircularProgressIndicator(
                         value: loadingProgress.expectedTotalBytes != null
                             ? loadingProgress.cumulativeBytesLoaded /
-                                loadingProgress.expectedTotalBytes!
+                                  loadingProgress.expectedTotalBytes!
                             : null,
                       ),
                     ),

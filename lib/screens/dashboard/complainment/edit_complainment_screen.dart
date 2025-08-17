@@ -101,117 +101,120 @@ class _EditComplaintScreenState extends State<EditComplaintScreen> {
         child: Scaffold(
           backgroundColor: AppColors.primary,
           appBar: AppBar(
-          title: const Text('Tindak Lanjut Pengaduan'),
-          actions: [
-            IconButton(icon: const Icon(Icons.save), onPressed: _onSubmit),
-          ],
-        ),
-        body: Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(24),
-              topRight: Radius.circular(24),
-            ),
+            title: const Text('Tindak Lanjut Pengaduan'),
+            actions: [
+              IconButton(icon: const Icon(Icons.save), onPressed: _onSubmit),
+            ],
           ),
-          child: Column(
-            children: [
-              Expanded(
-                child: Form(
-                  key: formKey,
-                  child: SingleChildScrollView(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 20,
-                      horizontal: 16,
-                    ),
-                    child: Column(
-                      children: [
-                        TextFormField(
-                          controller: detailController,
-                          decoration: const InputDecoration(
-                            hintText: 'Masukkan detail pembaruan tindak lanjut',
-                            border: OutlineInputBorder(),
-                            labelText: 'Detail tindak lanjut',
-                            floatingLabelBehavior: FloatingLabelBehavior.always,
-                          ),
-                          maxLines: 8,
-                          minLines: 3,
-                          keyboardType: TextInputType.multiline,
-                          enabled: !_isLoading,
-                          validator: (value) {
-                            if (value == null || value.trim().isEmpty) {
-                              return 'Deskripsi pengaduan tidak boleh kosong';
-                            }
-                            return null;
-                          },
-                        ),
-
-                        const SizedBox(height: 16),
-
-                        Row(
-                          children: [
-                            Checkbox(
-                              value: _isDone,
-                              onChanged: _isLoading ? null : _onChanged,
-                            ),
-                            const Expanded(
-                              child: Text(
-                                'Tandai penanganannya sudah selesai',
-                                style: TextStyle(fontSize: 16),
-                              ),
-                            ),
-                          ],
-                        ),
-
-                        const SizedBox(height: 100),
-                      ],
-                    ),
-                  ),
-                ),
+          body: Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
               ),
+            ),
+            child: Column(
+              children: [
+                Expanded(
+                  child: Form(
+                    key: formKey,
+                    child: SingleChildScrollView(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 20,
+                        horizontal: 16,
+                      ),
+                      child: Column(
+                        children: [
+                          TextFormField(
+                            controller: detailController,
+                            decoration: const InputDecoration(
+                              hintText:
+                                  'Masukkan detail pembaruan tindak lanjut',
+                              border: OutlineInputBorder(),
+                              labelText: 'Detail tindak lanjut',
+                              floatingLabelBehavior:
+                                  FloatingLabelBehavior.always,
+                            ),
+                            maxLines: 8,
+                            minLines: 3,
+                            keyboardType: TextInputType.multiline,
+                            enabled: !_isLoading,
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Deskripsi pengaduan tidak boleh kosong';
+                              }
+                              return null;
+                            },
+                          ),
 
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.all(16),
-                decoration: const BoxDecoration(color: Colors.white),
-                child: ElevatedButton(
-                  onPressed: _isLoading ? null : _onSubmit,
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                  ),
-                  child: _isLoading
-                      ? const Row(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation<Color>(
-                                  Colors.white,
+                          const SizedBox(height: 16),
+
+                          Row(
+                            children: [
+                              Checkbox(
+                                value: _isDone,
+                                onChanged: _isLoading ? null : _onChanged,
+                              ),
+                              const Expanded(
+                                child: Text(
+                                  'Tandai penanganannya sudah selesai',
+                                  style: TextStyle(fontSize: 16),
                                 ),
                               ),
-                            ),
-                            SizedBox(width: 8),
-                            Text('Menyimpan...'),
-                          ],
-                        )
-                      : const Text(
-                          'Simpan Tindak Lanjut',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.bold,
+                            ],
                           ),
-                        ),
+
+                          const SizedBox(height: 100),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ],
+
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(16),
+                  decoration: const BoxDecoration(color: Colors.white),
+                  child: ElevatedButton(
+                    onPressed: _isLoading ? null : _onSubmit,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                    ),
+                    child: _isLoading
+                        ? const Row(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                    Colors.white,
+                                  ),
+                                ),
+                              ),
+                              SizedBox(width: 8),
+                              Text('Menyimpan...'),
+                            ],
+                          )
+                        : const Text(
+                            'Simpan Tindak Lanjut',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

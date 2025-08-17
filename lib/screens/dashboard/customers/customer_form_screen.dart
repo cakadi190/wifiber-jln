@@ -143,8 +143,7 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                               'Authorization':
                                   'Bearer ${authProvider.user?.accessToken}',
                             },
-                            loadingBuilder:
-                                (context, child, loadingProgress) {
+                            loadingBuilder: (context, child, loadingProgress) {
                               if (loadingProgress == null) return child;
                               return Container(
                                 height: 120,
@@ -158,8 +157,7 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                                 ),
                               );
                             },
-                            errorBuilder:
-                                (context, error, stackTrace) {
+                            errorBuilder: (context, error, stackTrace) {
                               debugPrint('Error loading image: $error');
                               return Container(
                                 height: 120,
@@ -167,8 +165,9 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                                 decoration: BoxDecoration(
                                   color: Colors.red.shade50,
                                   borderRadius: BorderRadius.circular(8),
-                                  border:
-                                      Border.all(color: Colors.red.shade200),
+                                  border: Border.all(
+                                    color: Colors.red.shade200,
+                                  ),
                                 ),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -203,8 +202,9 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                                 decoration: BoxDecoration(
                                   color: Colors.red.shade50,
                                   borderRadius: BorderRadius.circular(8),
-                                  border:
-                                      Border.all(color: Colors.red.shade200),
+                                  border: Border.all(
+                                    color: Colors.red.shade200,
+                                  ),
                                 ),
                                 child: Column(
                                   mainAxisAlignment: MainAxisAlignment.center,
@@ -229,9 +229,9 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                           ),
                   ),
                 ),
-              const SizedBox(height: 8),
-              Row(
-                children: [
+                const SizedBox(height: 8),
+                Row(
+                  children: [
                     const Icon(Icons.info, size: 16, color: Colors.green),
                     const SizedBox(width: 4),
                     Expanded(
@@ -325,333 +325,405 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                 title: Text(
                   widget.isEdit ? 'Edit Pelanggan' : 'Tambah Pelanggan',
                 ),
-              actions: [
-                if (controller.isLoading)
-                  const Center(
-                    child: Padding(
-                      padding: EdgeInsets.symmetric(horizontal: 16),
-                      child: SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          valueColor: AlwaysStoppedAnimation<Color>(
-                            Colors.white,
+                actions: [
+                  if (controller.isLoading)
+                    const Center(
+                      child: Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 16),
+                        child: SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                              Colors.white,
+                            ),
                           ),
                         ),
                       ),
+                    )
+                  else
+                    IconButton(
+                      onPressed: () async {
+                        if (_formKey.currentState!.validate()) {
+                          await controller.submitForm(
+                            context,
+                            isEdit: widget.isEdit,
+                            customer: widget.customer,
+                          );
+                        }
+                      },
+                      icon: const Icon(Icons.save),
+                      tooltip: 'Simpan',
                     ),
-                  )
-                else
-                  IconButton(
-                    onPressed: () async {
-                      if (_formKey.currentState!.validate()) {
-                        await controller.submitForm(
-                          context,
-                          isEdit: widget.isEdit,
-                          customer: widget.customer,
-                        );
-                      }
-                    },
-                    icon: const Icon(Icons.save),
-                    tooltip: 'Simpan',
-                  ),
-              ],
-            ),
-            body: Container(
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.only(
-                  topLeft: Radius.circular(24),
-                  topRight: Radius.circular(24),
-                ),
+                ],
               ),
-              child: Stack(
-                children: [
-                  Form(
-                    key: _formKey,
-                    child: ListView(
-                      padding: const EdgeInsets.all(16),
-                      children: [
-                        Card(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(0),
-                            side: BorderSide.none,
-                          ),
-                          elevation: 0,
-                          child: Padding(
-                            padding: const EdgeInsets.all(0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Informasi Umum',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
+              body: Container(
+                width: double.infinity,
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.only(
+                    topLeft: Radius.circular(24),
+                    topRight: Radius.circular(24),
+                  ),
+                ),
+                child: Stack(
+                  children: [
+                    Form(
+                      key: _formKey,
+                      child: ListView(
+                        padding: const EdgeInsets.all(16),
+                        children: [
+                          Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(0),
+                              side: BorderSide.none,
+                            ),
+                            elevation: 0,
+                            child: Padding(
+                              padding: const EdgeInsets.all(0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Informasi Umum',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 16),
-                                TextFormField(
-                                  controller: controller.nameController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Nama Lengkap',
-                                    border: OutlineInputBorder(),
-                                    prefixIcon: Icon(Icons.person),
+                                  const SizedBox(height: 16),
+                                  TextFormField(
+                                    controller: controller.nameController,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Nama Lengkap',
+                                      border: OutlineInputBorder(),
+                                      prefixIcon: Icon(Icons.person),
+                                    ),
+                                    validator: (value) =>
+                                        controller.validateRequired(
+                                          value,
+                                          'Nama lengkap',
+                                        ),
                                   ),
-                                  validator: (value) => controller
-                                      .validateRequired(value, 'Nama lengkap'),
-                                ),
-                                const SizedBox(height: 16),
-                                TextFormField(
-                                  controller: controller.nicknameController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Nama Panggilan',
-                                    border: OutlineInputBorder(),
-                                    prefixIcon: Icon(Icons.person_outline),
+                                  const SizedBox(height: 16),
+                                  TextFormField(
+                                    controller: controller.nicknameController,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Nama Panggilan',
+                                      border: OutlineInputBorder(),
+                                      prefixIcon: Icon(Icons.person_outline),
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 16),
-                                TextFormField(
-                                  controller: controller.phoneController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Nomor Telepon',
-                                    border: OutlineInputBorder(),
-                                    prefixIcon: Icon(Icons.phone),
+                                  const SizedBox(height: 16),
+                                  TextFormField(
+                                    controller: controller.phoneController,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Nomor Telepon',
+                                      border: OutlineInputBorder(),
+                                      prefixIcon: Icon(Icons.phone),
+                                    ),
+                                    keyboardType: TextInputType.phone,
+                                    validator: (value) =>
+                                        controller.validateRequired(
+                                          value,
+                                          'Nomor telepon',
+                                        ),
                                   ),
-                                  keyboardType: TextInputType.phone,
-                                  validator: (value) => controller
-                                      .validateRequired(value, 'Nomor telepon'),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  "Awali nomor telpon dengan 62 (contoh: 628123456789)",
-                                  style: TextStyle(
-                                    color: Colors.grey.shade500,
-                                    fontSize: 12,
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    "Awali nomor telpon dengan 62 (contoh: 628123456789)",
+                                    style: TextStyle(
+                                      color: Colors.grey.shade500,
+                                      fontSize: 12,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(height: 20),
-                                TextFormField(
-                                  controller:
-                                      controller.identityNumberController,
-                                  decoration: const InputDecoration(
-                                    labelText:
-                                        'Nomor KTP (atau isi dengan "-" jika belum ada)',
-                                    border: OutlineInputBorder(),
-                                    prefixIcon: Icon(Icons.credit_card),
+                                  const SizedBox(height: 20),
+                                  TextFormField(
+                                    controller:
+                                        controller.identityNumberController,
+                                    decoration: const InputDecoration(
+                                      labelText:
+                                          'Nomor KTP (atau isi dengan "-" jika belum ada)',
+                                      border: OutlineInputBorder(),
+                                      prefixIcon: Icon(Icons.credit_card),
+                                    ),
+                                    validator: (value) =>
+                                        controller.validateRequired(
+                                          value,
+                                          'Nomor KTP (atau isi dengan "-")',
+                                        ),
                                   ),
-                                  validator: (value) =>
-                                      controller.validateRequired(
-                                        value,
-                                        'Nomor KTP (atau isi dengan "-")',
-                                      ),
-                                ),
-                                const SizedBox(height: 16),
-                                TextFormField(
-                                  controller: controller.addressController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Alamat',
-                                    border: OutlineInputBorder(),
-                                    prefixIcon: Icon(Icons.location_on),
+                                  const SizedBox(height: 16),
+                                  TextFormField(
+                                    controller: controller.addressController,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Alamat',
+                                      border: OutlineInputBorder(),
+                                      prefixIcon: Icon(Icons.location_on),
+                                    ),
+                                    maxLines: 3,
+                                    validator: (value) => controller
+                                        .validateRequired(value, 'Alamat'),
                                   ),
-                                  maxLines: 3,
-                                  validator: (value) => controller
-                                      .validateRequired(value, 'Alamat'),
-                                ),
-                                const SizedBox(height: 16),
-                                DropdownButtonFormField<CustomerStatus>(
-                                  value: controller.selectedStatus,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Status',
-                                    border: OutlineInputBorder(),
-                                    prefixIcon: Icon(Icons.info),
+                                  const SizedBox(height: 16),
+                                  DropdownButtonFormField<CustomerStatus>(
+                                    value: controller.selectedStatus,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Status',
+                                      border: OutlineInputBorder(),
+                                      prefixIcon: Icon(Icons.info),
+                                    ),
+                                    items: CustomerStatus.values.map((status) {
+                                      String displayName;
+                                      switch (status) {
+                                        case CustomerStatus.customer:
+                                          displayName = 'Pelanggan';
+                                          break;
+                                        case CustomerStatus.inactive:
+                                          displayName = 'Tidak Aktif';
+                                          break;
+                                        case CustomerStatus.free:
+                                          displayName = 'Gratis';
+                                          break;
+                                        case CustomerStatus.isolir:
+                                          displayName = 'Isolir';
+                                          break;
+                                      }
+                                      return DropdownMenuItem(
+                                        value: status,
+                                        child: Text(displayName),
+                                      );
+                                    }).toList(),
+                                    onChanged: (value) =>
+                                        controller.onStatusChanged(value!),
                                   ),
-                                  items: CustomerStatus.values.map((status) {
-                                    String displayName;
-                                    switch (status) {
-                                      case CustomerStatus.customer:
-                                        displayName = 'Pelanggan';
-                                        break;
-                                      case CustomerStatus.inactive:
-                                        displayName = 'Tidak Aktif';
-                                        break;
-                                      case CustomerStatus.free:
-                                        displayName = 'Gratis';
-                                        break;
-                                      case CustomerStatus.isolir:
-                                        displayName = 'Isolir';
-                                        break;
-                                    }
-                                    return DropdownMenuItem(
-                                      value: status,
-                                      child: Text(displayName),
-                                    );
-                                  }).toList(),
-                                  onChanged: (value) =>
-                                      controller.onStatusChanged(value!),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 16),
+                          const SizedBox(height: 16),
 
-                        Card(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(0),
-                            side: BorderSide.none,
-                          ),
-                          elevation: 0,
-                          child: Padding(
-                            padding: const EdgeInsets.all(0),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                const Text(
-                                  'Informasi Teknis',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: 16),
-                                PackageButtonSelector(
-                                  selectedPackageId:
-                                      controller.selectedPackageId,
-                                  selectedPackageName:
-                                      controller.selectedPackageName,
-                                  onPackageSelected:
-                                      controller.onPackageSelected,
-                                ),
-                                if (controller.validatePackageSelection() !=
-                                    null)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 8),
-                                    child: Text(
-                                      controller.validatePackageSelection()!,
-                                      style: TextStyle(
-                                        color: Colors.red.shade600,
-                                        fontSize: 12,
-                                      ),
+                          Card(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(0),
+                              side: BorderSide.none,
+                            ),
+                            elevation: 0,
+                            child: Padding(
+                              padding: const EdgeInsets.all(0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Informasi Teknis',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
                                     ),
                                   ),
-                                const SizedBox(height: 16),
-                                TextFormField(
-                                  controller: controller.areaIdController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'ID Area',
-                                    border: OutlineInputBorder(),
-                                    prefixIcon: Icon(Icons.map),
+                                  const SizedBox(height: 16),
+                                  PackageButtonSelector(
+                                    selectedPackageId:
+                                        controller.selectedPackageId,
+                                    selectedPackageName:
+                                        controller.selectedPackageName,
+                                    onPackageSelected:
+                                        controller.onPackageSelected,
                                   ),
-                                  keyboardType: TextInputType.number,
-                                  validator: (value) => controller
-                                      .validateRequired(value, 'ID Area'),
-                                ),
-                                const SizedBox(height: 16),
-                                RouterButtonSelector(
-                                  selectedRouterId: controller.selectedRouterId,
-                                  selectedRouterName:
-                                      controller.selectedRouterName,
-                                  onRouterSelected: controller.onRouterSelected,
-                                ),
-                                if (controller.validateRouterSelection() !=
-                                    null)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 8),
-                                    child: Text(
-                                      controller.validateRouterSelection()!,
-                                      style: TextStyle(
-                                        color: Colors.red.shade600,
-                                        fontSize: 12,
+                                  if (controller.validatePackageSelection() !=
+                                      null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8),
+                                      child: Text(
+                                        controller.validatePackageSelection()!,
+                                        style: TextStyle(
+                                          color: Colors.red.shade600,
+                                          fontSize: 12,
+                                        ),
                                       ),
                                     ),
+                                  const SizedBox(height: 16),
+                                  TextFormField(
+                                    controller: controller.areaIdController,
+                                    decoration: const InputDecoration(
+                                      labelText: 'ID Area',
+                                      border: OutlineInputBorder(),
+                                      prefixIcon: Icon(Icons.map),
+                                    ),
+                                    keyboardType: TextInputType.number,
+                                    validator: (value) => controller
+                                        .validateRequired(value, 'ID Area'),
                                   ),
-                                const SizedBox(height: 16),
-                                TextFormField(
-                                  controller: controller.pppoeSecretController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'PPPoE Secret',
-                                    border: OutlineInputBorder(),
-                                    prefixIcon: Icon(Icons.vpn_key),
+                                  const SizedBox(height: 16),
+                                  RouterButtonSelector(
+                                    selectedRouterId:
+                                        controller.selectedRouterId,
+                                    selectedRouterName:
+                                        controller.selectedRouterName,
+                                    onRouterSelected:
+                                        controller.onRouterSelected,
                                   ),
-                                  validator: (value) => controller
-                                      .validateRequired(value, 'PPPoE Secret'),
-                                ),
-                                const SizedBox(height: 16),
-                                TextFormField(
-                                  controller: controller.dueDateController,
-                                  keyboardType: TextInputType.number,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Tanggal Jatuh Tempo',
-                                    prefixIcon: Icon(Icons.calendar_month),
-                                    border: OutlineInputBorder(),
-                                  ),
-                                  validator: (value) =>
-                                      controller.validateRequired(
-                                        value,
-                                        'Tanggal jatuh tempo',
+                                  if (controller.validateRouterSelection() !=
+                                      null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8),
+                                      child: Text(
+                                        controller.validateRouterSelection()!,
+                                        style: TextStyle(
+                                          color: Colors.red.shade600,
+                                          fontSize: 12,
+                                        ),
                                       ),
-                                ),
-                                const SizedBox(height: 2),
-                                Text(
-                                  'Masukkan tanggal jatuh tempo dalam angka antara 1-28 saja.',
-                                  style: TextStyle(
-                                    color: Colors.grey.shade500,
-                                    fontSize: 12,
+                                    ),
+                                  const SizedBox(height: 16),
+                                  TextFormField(
+                                    controller:
+                                        controller.pppoeSecretController,
+                                    decoration: const InputDecoration(
+                                      labelText: 'PPPoE Secret',
+                                      border: OutlineInputBorder(),
+                                      prefixIcon: Icon(Icons.vpn_key),
+                                    ),
+                                    validator: (value) =>
+                                        controller.validateRequired(
+                                          value,
+                                          'PPPoE Secret',
+                                        ),
                                   ),
-                                ),
+                                  const SizedBox(height: 16),
+                                  TextFormField(
+                                    controller: controller.dueDateController,
+                                    keyboardType: TextInputType.number,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Tanggal Jatuh Tempo',
+                                      prefixIcon: Icon(Icons.calendar_month),
+                                      border: OutlineInputBorder(),
+                                    ),
+                                    validator: (value) =>
+                                        controller.validateRequired(
+                                          value,
+                                          'Tanggal jatuh tempo',
+                                        ),
+                                  ),
+                                  const SizedBox(height: 2),
+                                  Text(
+                                    'Masukkan tanggal jatuh tempo dalam angka antara 1-28 saja.',
+                                    style: TextStyle(
+                                      color: Colors.grey.shade500,
+                                      fontSize: 12,
+                                    ),
+                                  ),
 
-                                const SizedBox(height: 20),
-                                OdpButtonSelector(
-                                  selectedOdpId: controller.selectedOdpId,
-                                  selectedOdpName: controller.selectedOdpName,
-                                  onOdpSelected: controller.onOdpSelected,
-                                ),
-                                if (controller.validateOdpSelection() != null)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 8),
-                                    child: Text(
-                                      controller.validateOdpSelection()!,
-                                      style: TextStyle(
-                                        color: Colors.red.shade600,
-                                        fontSize: 12,
+                                  const SizedBox(height: 20),
+                                  OdpButtonSelector(
+                                    selectedOdpId: controller.selectedOdpId,
+                                    selectedOdpName: controller.selectedOdpName,
+                                    onOdpSelected: controller.onOdpSelected,
+                                  ),
+                                  if (controller.validateOdpSelection() != null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8),
+                                      child: Text(
+                                        controller.validateOdpSelection()!,
+                                        style: TextStyle(
+                                          color: Colors.red.shade600,
+                                          fontSize: 12,
+                                        ),
                                       ),
                                     ),
+                                  const SizedBox(height: 16),
+                                  TextFormField(
+                                    controller: controller.discountController,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Diskon',
+                                      border: OutlineInputBorder(),
+                                      prefixIcon: Icon(Icons.discount),
+                                      suffixText: '%',
+                                    ),
+                                    keyboardType: TextInputType.number,
+                                    validator: (value) => controller
+                                        .validateRequired(value, 'Diskon'),
                                   ),
-                                const SizedBox(height: 16),
-                                TextFormField(
-                                  controller: controller.discountController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Diskon',
-                                    border: OutlineInputBorder(),
-                                    prefixIcon: Icon(Icons.discount),
-                                    suffixText: '%',
-                                  ),
-                                  keyboardType: TextInputType.number,
-                                  validator: (value) => controller
-                                      .validateRequired(value, 'Diskon'),
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 16),
+                          const SizedBox(height: 16),
 
-                        Card(
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(0),
-                            side: BorderSide.none,
+                          Card(
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(0),
+                              side: BorderSide.none,
+                            ),
+                            child: Padding(
+                              padding: const EdgeInsets.all(0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  const Text(
+                                    'Koordinat Lokasi (Wajib Diisi)',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    'Kedua koordinat harus diisi atau biarkan keduanya kosong',
+                                    style: TextStyle(
+                                      color: Colors.grey.shade600,
+                                      fontSize: 12,
+                                    ),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  TextFormField(
+                                    controller: controller.latitudeController,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Latitude',
+                                      border: OutlineInputBorder(),
+                                      prefixIcon: Icon(Icons.my_location),
+                                    ),
+                                    keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                          decimal: true,
+                                        ),
+                                    validator: (value) => controller
+                                        .validateCoordinates(value, true),
+                                  ),
+                                  const SizedBox(height: 16),
+                                  TextFormField(
+                                    controller: controller.longitudeController,
+                                    decoration: const InputDecoration(
+                                      labelText: 'Longitude',
+                                      border: OutlineInputBorder(),
+                                      prefixIcon: Icon(Icons.my_location),
+                                    ),
+                                    keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                          decimal: true,
+                                        ),
+                                    validator: (value) => controller
+                                        .validateCoordinates(value, false),
+                                  ),
+                                ],
+                              ),
+                            ),
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.all(0),
+                          const SizedBox(height: 16),
+
+                          Card(
+                            elevation: 0,
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(0),
+                              side: BorderSide.none,
+                            ),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const Text(
-                                  'Koordinat Lokasi (Wajib Diisi)',
+                                  'Foto Dokumen dan Lokasi',
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
@@ -659,172 +731,113 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                                 ),
                                 const SizedBox(height: 8),
                                 Text(
-                                  'Kedua koordinat harus diisi atau biarkan keduanya kosong',
+                                  'Silakan tambahkan foto KTP dan foto lokasi pemasangan',
                                   style: TextStyle(
                                     color: Colors.grey.shade600,
                                     fontSize: 12,
                                   ),
                                 ),
                                 const SizedBox(height: 16),
-                                TextFormField(
-                                  controller: controller.latitudeController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Latitude',
-                                    border: OutlineInputBorder(),
-                                    prefixIcon: Icon(Icons.my_location),
+
+                                _buildPhotoSelector(
+                                  context: context,
+                                  title: 'Foto KTP',
+                                  subtitle:
+                                      'Upload foto KTP pelanggan (opsional)',
+                                  selectedFile: controller.ktpPhotoFile,
+                                  urlPreview: controller.ktpPhotoUrl,
+                                  onTap: () => controller.showImagePickerModal(
+                                    context,
+                                    forKtp: true,
                                   ),
-                                  keyboardType:
-                                      const TextInputType.numberWithOptions(
-                                        decimal: true,
-                                      ),
-                                  validator: (value) => controller
-                                      .validateCoordinates(value, true),
                                 ),
                                 const SizedBox(height: 16),
-                                TextFormField(
-                                  controller: controller.longitudeController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Longitude',
-                                    border: OutlineInputBorder(),
-                                    prefixIcon: Icon(Icons.my_location),
+
+                                _buildPhotoSelector(
+                                  context: context,
+                                  title: 'Foto Lokasi',
+                                  urlPreview: controller.locationPhotoUrl,
+                                  subtitle:
+                                      'Upload foto lokasi pemasangan (opsional)',
+                                  selectedFile: controller.locationPhotoFile,
+                                  onTap: () => controller.showImagePickerModal(
+                                    context,
+                                    forKtp: false,
                                   ),
-                                  keyboardType:
-                                      const TextInputType.numberWithOptions(
-                                        decimal: true,
-                                      ),
-                                  validator: (value) => controller
-                                      .validateCoordinates(value, false),
                                 ),
                               ],
                             ),
                           ),
-                        ),
-                        const SizedBox(height: 16),
+                          const SizedBox(height: 32),
 
-                        Card(
-                          elevation: 0,
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(0),
-                            side: BorderSide.none,
-                          ),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                          Row(
                             children: [
-                              const Text(
-                                'Foto Dokumen dan Lokasi',
-                                style: TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: () => Navigator.of(context).pop(),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.grey,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                    ),
+                                  ),
+                                  child: const Text('Batal'),
                                 ),
                               ),
-                              const SizedBox(height: 8),
-                              Text(
-                                'Silakan tambahkan foto KTP dan foto lokasi pemasangan',
-                                style: TextStyle(
-                                  color: Colors.grey.shade600,
-                                  fontSize: 12,
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-
-                              _buildPhotoSelector(
-                                context: context,
-                                title: 'Foto KTP',
-                                subtitle:
-                                    'Upload foto KTP pelanggan (opsional)',
-                                selectedFile: controller.ktpPhotoFile,
-                                urlPreview: controller.ktpPhotoUrl,
-                                onTap: () => controller.showImagePickerModal(
-                                  context,
-                                  forKtp: true,
-                                ),
-                              ),
-                              const SizedBox(height: 16),
-
-                              _buildPhotoSelector(
-                                context: context,
-                                title: 'Foto Lokasi',
-                                urlPreview: controller.locationPhotoUrl,
-                                subtitle:
-                                    'Upload foto lokasi pemasangan (opsional)',
-                                selectedFile: controller.locationPhotoFile,
-                                onTap: () => controller.showImagePickerModal(
-                                  context,
-                                  forKtp: false,
+                              const SizedBox(width: 16),
+                              Expanded(
+                                child: ElevatedButton(
+                                  onPressed: controller.isLoading
+                                      ? null
+                                      : () async {
+                                          if (_formKey.currentState!
+                                              .validate()) {
+                                            await controller.submitForm(
+                                              context,
+                                              isEdit: widget.isEdit,
+                                              customer: widget.customer,
+                                            );
+                                          }
+                                        },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: AppColors.primary,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 12,
+                                    ),
+                                  ),
+                                  child: controller.isLoading
+                                      ? const SizedBox(
+                                          width: 20,
+                                          height: 20,
+                                          child: CircularProgressIndicator(
+                                            strokeWidth: 2,
+                                            valueColor:
+                                                AlwaysStoppedAnimation<Color>(
+                                                  Colors.white,
+                                                ),
+                                          ),
+                                        )
+                                      : Text(
+                                          widget.isEdit ? 'Perbarui' : 'Simpan',
+                                        ),
                                 ),
                               ),
                             ],
                           ),
-                        ),
-                        const SizedBox(height: 32),
-
-                        Row(
-                          children: [
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: () => Navigator.of(context).pop(),
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: Colors.grey,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 12,
-                                  ),
-                                ),
-                                child: const Text('Batal'),
-                              ),
-                            ),
-                            const SizedBox(width: 16),
-                            Expanded(
-                              child: ElevatedButton(
-                                onPressed: controller.isLoading
-                                    ? null
-                                    : () async {
-                                        if (_formKey.currentState!.validate()) {
-                                          await controller.submitForm(
-                                            context,
-                                            isEdit: widget.isEdit,
-                                            customer: widget.customer,
-                                          );
-                                        }
-                                      },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primary,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 12,
-                                  ),
-                                ),
-                                child: controller.isLoading
-                                    ? const SizedBox(
-                                        width: 20,
-                                        height: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                Colors.white,
-                                              ),
-                                        ),
-                                      )
-                                    : Text(
-                                        widget.isEdit ? 'Perbarui' : 'Simpan',
-                                      ),
-                              ),
-                            ),
-                          ],
-                        ),
-                        const SizedBox(height: 16),
-                      ],
+                          const SizedBox(height: 16),
+                        ],
+                      ),
                     ),
-                  ),
-                  _buildLoadingOverlay(),
-                ],
+                    _buildLoadingOverlay(),
+                  ],
+                ),
               ),
-            ),
-          );
-        },
+            );
+          },
+        ),
       ),
-      );
     );
   }
 }
