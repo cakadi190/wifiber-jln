@@ -58,21 +58,15 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
       floatingActionButton: RoleGuardWidget(
         permissions: 'ticket',
         child: FloatingActionButton(
-          onPressed: () {
-            RoleGuard.check(
-              context: context,
-              permissions: 'ticket',
-              action: () async {
-                await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const CreateComplaintScreen(),
-                  ),
-                );
-                if (mounted) {
-                  widget.controller.loadComplaints();
-                }
-              },
+          onPressed: () async {
+            await Navigator.of(context).push(
+              MaterialPageRoute(
+                builder: (context) => const CreateComplaintScreen(),
+              ),
             );
+            if (mounted) {
+              widget.controller.loadComplaints();
+            }
           },
           backgroundColor: AppColors.primary,
           child: const Icon(Icons.add),

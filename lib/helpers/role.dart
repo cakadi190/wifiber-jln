@@ -18,8 +18,6 @@ class RoleGuard {
 
     final allowed = _hasPermission(userPermissions, permissions, mode);
 
-    print(allowed);
-
     if (!allowed) {
       SnackBars.error(
         context,
@@ -66,7 +64,7 @@ class RoleGuardWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final authProvider = Provider.of<AuthProvider>(context);
     final userPermissions = authProvider.user?.permissions ?? [];
 
     final allowed = RoleGuard._hasPermission(

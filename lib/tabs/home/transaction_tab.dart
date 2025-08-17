@@ -18,38 +18,33 @@ class TransactionTab extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.primary,
       appBar: AppBar(title: const Text('Keuangan')),
-      body: Consumer<TransactionProvider>(
-        builder: (context, provider, child) {
-          return Column(
-            children: [
-              RoleGuardWidget(
-                permissions: 'finance',
-                child: _buildFilter(context, provider),
-              ),
-
-              Expanded(
-                child: Container(
-                  clipBehavior: Clip.hardEdge,
-                  decoration: BoxDecoration(
-                    color: AppColors.background,
-                    borderRadius: const BorderRadius.only(
-                      topLeft: Radius.circular(24),
-                      topRight: Radius.circular(24),
-                    ),
-                  ),
-
-                  child: RoleGuardWidget(
-                    permissions: 'finance',
-                    fallback: Center(
-                      child: Text("Anda tidak memiliki akses ke bagian ini"),
+      body: RoleGuardWidget(
+        permissions: 'finance',
+        fallback: const Center(
+          child: Text("Anda tidak memiliki akses ke bagian ini"),
+        ),
+        child: Consumer<TransactionProvider>(
+          builder: (context, provider, child) {
+            return Column(
+              children: [
+                _buildFilter(context, provider),
+                Expanded(
+                  child: Container(
+                    clipBehavior: Clip.hardEdge,
+                    decoration: BoxDecoration(
+                      color: AppColors.background,
+                      borderRadius: const BorderRadius.only(
+                        topLeft: Radius.circular(24),
+                        topRight: Radius.circular(24),
+                      ),
                     ),
                     child: _buildContent(context, provider),
                   ),
                 ),
-              ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }
