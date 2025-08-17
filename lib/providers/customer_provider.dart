@@ -1,3 +1,5 @@
+import 'dart:io';
+
 import 'package:flutter/foundation.dart';
 import 'package:wifiber/models/customer.dart';
 import 'package:wifiber/services/customer_service.dart';
@@ -140,6 +142,21 @@ class CustomerProvider extends ChangeNotifier {
     } catch (e) {
       _setError(e.toString());
       return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<String?> importCustomers(File file) async {
+    _setLoading(true);
+
+    try {
+      final message = await _customerService.importCustomers(file);
+      _error = null;
+      return message;
+    } catch (e) {
+      _setError(e.toString());
+      return null;
     } finally {
       _setLoading(false);
     }

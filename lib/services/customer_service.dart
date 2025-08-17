@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
@@ -227,6 +228,36 @@ class CustomerService {
       }
     } catch (e) {
       throw Exception('Error updating customer: $e');
+    }
+  }
+
+  Future<String> importCustomers(File file) async {
+    try {
+      final uploadFile = await http.MultipartFile.fromPath(
+        'import-customer-file',
+        file.path,
+      );
+
+      final streamedResponse = await _http.postUpload(
+        'import-customer',
+        files: [uploadFile],
+        requiresAuth: true,
+      );
+
+      final statusCode = streamedResponse.statusCode;
+      String responseBody = await streamedResponse.stream.bytesToString();
+      final jsonData = json.decode(responseBody);
+
+      if (statusCode == 200 && jsonData['success'] == true) {
+        return jsonData['message'] ?? 'Import berhasil';
+      } else {
+        String message = jsonData['error'] != null
+            ? (jsonData['error']['message'] ?? jsonData['message'])
+            : jsonData['message'];
+        throw Exception(message ?? 'Failed to import customers: $statusCode');
+      }
+    } catch (e) {
+      throw Exception('Error importing customers: $e');
     }
   }
 

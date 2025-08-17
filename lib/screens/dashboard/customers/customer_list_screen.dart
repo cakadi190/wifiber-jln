@@ -1,11 +1,15 @@
+import 'dart:io';
+
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/config/app_colors.dart';
-import 'package:wifiber/providers/customer_provider.dart';
 import 'package:wifiber/models/customer.dart';
-import 'package:wifiber/screens/dashboard/customers/customer_form_screen.dart';
+import 'package:wifiber/providers/customer_provider.dart';
+import 'package:wifiber/screens/dashboard/customers/customer_delete_modal.dart';
 import 'package:wifiber/screens/dashboard/customers/customer_detail_modal.dart';
-import 'package:wifiber/screens/dashboard/customers/customer_delete_modal.dart'; // Add this import
+import 'package:wifiber/screens/dashboard/customers/customer_form_screen.dart';
 import 'package:wifiber/services/customer_service.dart';
 
 class CustomerListScreen extends StatefulWidget {
@@ -252,6 +256,114 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
     CustomerDetailModal.show(context, customer);
   }
 
+  void _showImportModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      builder: (context) {
+        File? selectedFile;
+        String? fileName;
+        bool isLoading = false;
+
+        return StatefulBuilder(
+          builder: (context, setState) {
+            Future<void> pickFile() async {
+              try {
+                final result = await FilePicker.platform.pickFiles(
+                  type: FileType.custom,
+                  allowedExtensions: ['xls', 'xlsx'],
+                  allowMultiple: false,
+                );
+
+                if (result != null) {
+                  setState(() {
+                    selectedFile = File(result.files.single.path!);
+                    fileName = result.files.single.name;
+                  });
+                }
+              } catch (e) {
+                SnackBars.error(
+                  context,
+                  'Gagal memilih berkas: ${e.toString()}',
+                ).clearSnackBars();
+              }
+            }
+
+            Future<void> upload() async {
+              if (selectedFile == null) return;
+              setState(() {
+                isLoading = true;
+              });
+
+              final provider = _customerProvider;
+              try {
+                final message = await provider?.importCustomers(selectedFile!);
+                if (!mounted) return;
+                Navigator.of(context).pop();
+                if (message != null) {
+                  SnackBars.success(context, message).clearSnackBars();
+                  provider?.refresh();
+                } else if (provider?.error != null) {
+                  SnackBars.error(context, provider!.error!).clearSnackBars();
+                }
+              } catch (e) {
+                if (mounted) {
+                  SnackBars.error(context, e.toString()).clearSnackBars();
+                }
+              } finally {
+                if (mounted) {
+                  setState(() {
+                    isLoading = false;
+                  });
+                }
+              }
+            }
+
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+                left: 16,
+                right: 16,
+                top: 16,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Text(
+                    'Impor Data Pelanggan',
+                    style: Theme.of(context).textTheme.titleMedium,
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  OutlinedButton.icon(
+                    onPressed: pickFile,
+                    icon: const Icon(Icons.insert_drive_file),
+                    label: Text(fileName ?? 'Pilih File Excel'),
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: selectedFile != null && !isLoading ? upload : null,
+                    child: isLoading
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              strokeWidth: 2,
+                              color: Colors.white,
+                            ),
+                          )
+                        : const Text('Unggah'),
+                  ),
+                ],
+              ),
+            );
+          },
+        );
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -260,25 +372,43 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
         title: const Text('Data Pelanggan'),
         backgroundColor: Theme.of(context).primaryColor,
         actions: [
-          IconButton(
-            onPressed: _showFilterDialog,
-            icon: const Icon(Icons.filter_list),
-            tooltip: 'Filter',
-          ),
-          if (_selectedStatus != null || _searchController.text.isNotEmpty)
-            IconButton(
-              onPressed: _clearFilter,
-              icon: const Icon(Icons.clear),
-              tooltip: 'Bersihkan Filter',
-            ),
-          IconButton(
-            onPressed: () {
-              if (_customerProvider != null) {
-                _customerProvider!.refresh();
-              }
-            },
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh',
+          PopupMenuButton<String>(
+            itemBuilder: (context) => [
+              PopupMenuItem(
+                onTap: _showFilterDialog,
+                child: Row(
+                  children: const [
+                    Icon(Icons.filter_list, color: AppColors.primary),
+                    SizedBox(width: 8),
+                    Text('Filter'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                onTap: _showImportModal,
+                child: Row(
+                  children: const [
+                    Icon(Icons.file_upload, color: AppColors.primary),
+                    SizedBox(width: 8),
+                    Text('Impor Data Excel'),
+                  ],
+                ),
+              ),
+              PopupMenuItem(
+                onTap: () {
+                  if (_customerProvider != null) {
+                    _customerProvider!.refresh();
+                  }
+                },
+                child: Row(
+                  children: const [
+                    Icon(Icons.refresh, color: AppColors.primary),
+                    SizedBox(width: 8),
+                    Text('Refresh'),
+                  ],
+                ),
+              ),
+            ],
           ),
         ],
       ),
