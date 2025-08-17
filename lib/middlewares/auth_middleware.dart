@@ -7,8 +7,15 @@ import 'package:wifiber/screens/login_screen.dart';
 
 class AuthGuard extends StatelessWidget {
   final Widget child;
+  final List<String>? requiredPermissions;
+  final Widget? fallback;
 
-  const AuthGuard({super.key, required this.child});
+  const AuthGuard({
+    super.key,
+    required this.child,
+    this.requiredPermissions,
+    this.fallback,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -39,6 +46,39 @@ class AuthGuard extends StatelessWidget {
       return const Scaffold(body: SizedBox());
     }
 
+    if (requiredPermissions != null &&
+        !authProvider.hasAllPermissions(requiredPermissions!)) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (ModalRoute.of(context)?.isCurrent ?? false) {
+          SnackBars.error(context, "Anda tidak memiliki hak akses.");
+          Navigator.of(context).maybePop();
+        }
+      });
+      return fallback ?? const Scaffold(body: SizedBox());
+    }
+
     return child;
+  }
+}
+
+class PermissionWidget extends StatelessWidget {
+  final List<String> permissions;
+  final Widget child;
+  final Widget? fallback;
+
+  const PermissionWidget({
+    super.key,
+    required this.permissions,
+    required this.child,
+    this.fallback,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final authProvider = context.watch<AuthProvider>();
+    if (authProvider.hasAnyPermission(permissions)) {
+      return child;
+    }
+    return fallback ?? const SizedBox.shrink();
   }
 }

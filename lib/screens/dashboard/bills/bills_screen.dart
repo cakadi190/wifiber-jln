@@ -15,6 +15,7 @@ import 'package:wifiber/providers/bills_provider.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/screens/dashboard/bills/bills_create_screen.dart';
 import 'package:wifiber/services/http_service.dart';
+import 'package:wifiber/middlewares/auth_middleware.dart';
 
 class BillsScreen extends StatefulWidget {
   const BillsScreen({super.key});
@@ -104,23 +105,28 @@ class _BillsScreenState extends State<BillsScreen> {
         statusBarColor: AppColors.primary,
         navigationBarColor: Colors.white,
       ),
-      child: Scaffold(
-        floatingActionButton: FloatingActionButton(
-          backgroundColor: AppColors.primary,
-          child: const Icon(Icons.add),
-          onPressed: () async {
-            await Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => const BillsCreateScreen(),
-              ),
-            );
+      child: AuthGuard(
+        requiredPermissions: const ['bill'],
+        child: Scaffold(
+          floatingActionButton: PermissionWidget(
+            permissions: const ['bill'],
+            child: FloatingActionButton(
+              backgroundColor: AppColors.primary,
+              child: const Icon(Icons.add),
+              onPressed: () async {
+                await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const BillsCreateScreen(),
+                  ),
+                );
 
-            await context.read<BillsProvider>().refresh();
-          },
-        ),
-        backgroundColor: AppColors.primary,
-        appBar: AppBar(
+                await context.read<BillsProvider>().refresh();
+              },
+            ),
+          ),
+          backgroundColor: AppColors.primary,
+          appBar: AppBar(
           title: Text('Daftar Tagihan'),
           elevation: 0,
           backgroundColor: AppColors.primary,

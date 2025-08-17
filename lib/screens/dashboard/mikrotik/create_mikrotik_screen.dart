@@ -6,6 +6,7 @@ import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/models/router.dart';
 import 'package:wifiber/providers/router_provider.dart';
+import 'package:wifiber/middlewares/auth_middleware.dart';
 
 class CreateMikrotikScreen extends StatefulWidget {
   const CreateMikrotikScreen({super.key});
@@ -113,9 +114,11 @@ class _CreateMikrotikScreenState extends State<CreateMikrotikScreen> {
         statusBarColor: AppColors.primary,
         navigationBarColor: Colors.white,
       ),
-      child: Scaffold(
-        backgroundColor: AppColors.primary,
-        appBar: AppBar(
+      child: AuthGuard(
+        requiredPermissions: const ['integration'],
+        child: Scaffold(
+          backgroundColor: AppColors.primary,
+          appBar: AppBar(
           title: const Text('Tambah Mikrotik'),
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
@@ -398,6 +401,7 @@ class _CreateMikrotikScreenState extends State<CreateMikrotikScreen> {
                 ],
               ),
             ),
+          ),
           ),
         ),
       ),

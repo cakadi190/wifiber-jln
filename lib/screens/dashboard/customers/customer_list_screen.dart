@@ -11,6 +11,7 @@ import 'package:wifiber/screens/dashboard/customers/customer_delete_modal.dart';
 import 'package:wifiber/screens/dashboard/customers/customer_detail_modal.dart';
 import 'package:wifiber/screens/dashboard/customers/customer_form_screen.dart';
 import 'package:wifiber/services/customer_service.dart';
+import 'package:wifiber/middlewares/auth_middleware.dart';
 
 class CustomerListScreen extends StatefulWidget {
   const CustomerListScreen({super.key});
@@ -366,15 +367,17 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor,
-      appBar: AppBar(
-        title: const Text('Data Pelanggan'),
+    return AuthGuard(
+      requiredPermissions: const ['customer'],
+      child: Scaffold(
         backgroundColor: Theme.of(context).primaryColor,
-        actions: [
-          PopupMenuButton<String>(
-            itemBuilder: (context) => [
-              PopupMenuItem(
+        appBar: AppBar(
+          title: const Text('Data Pelanggan'),
+          backgroundColor: Theme.of(context).primaryColor,
+          actions: [
+            PopupMenuButton<String>(
+              itemBuilder: (context) => [
+                PopupMenuItem(
                 onTap: _showFilterDialog,
                 child: Row(
                   children: const [
@@ -604,12 +607,16 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _navigateToForm(),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        tooltip: 'Tambah Pelanggan',
-        child: const Icon(Icons.add),
+        floatingActionButton: PermissionWidget(
+          permissions: const ['customer'],
+          child: FloatingActionButton(
+            onPressed: () => _navigateToForm(),
+            backgroundColor: AppColors.primary,
+            foregroundColor: Colors.white,
+            tooltip: 'Tambah Pelanggan',
+            child: const Icon(Icons.add),
+          ),
+        ),
       ),
     );
   }

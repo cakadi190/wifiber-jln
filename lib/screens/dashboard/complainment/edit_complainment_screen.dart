@@ -6,6 +6,7 @@ import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/models/complaint.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/providers/complaint_provider.dart';
+import 'package:wifiber/middlewares/auth_middleware.dart';
 
 class EditComplaintScreen extends StatefulWidget {
   const EditComplaintScreen({super.key, required this.complaint});
@@ -95,9 +96,11 @@ class _EditComplaintScreenState extends State<EditComplaintScreen> {
   @override
   Widget build(BuildContext context) {
     return SystemUiWrapper(
-      child: Scaffold(
-        backgroundColor: AppColors.primary,
-        appBar: AppBar(
+      child: AuthGuard(
+        requiredPermissions: const ['ticket'],
+        child: Scaffold(
+          backgroundColor: AppColors.primary,
+          appBar: AppBar(
           title: const Text('Tindak Lanjut Pengaduan'),
           actions: [
             IconButton(icon: const Icon(Icons.save), onPressed: _onSubmit),

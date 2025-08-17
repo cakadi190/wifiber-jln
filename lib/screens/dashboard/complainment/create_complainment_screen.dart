@@ -5,6 +5,7 @@ import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/controllers/tabs/complaint_tab_controller.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/models/customer.dart';
+import 'package:wifiber/middlewares/auth_middleware.dart';
 
 class CreateComplaintScreen extends StatefulWidget {
   const CreateComplaintScreen({super.key});
@@ -120,20 +121,22 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
         statusBarColor: AppColors.background,
         navigationBarColor: Colors.white,
       ),
-      child: Scaffold(
-        backgroundColor: AppColors.primary,
-        appBar: AppBar(
-          title: const Text('Tambah Data Pengaduan'),
+      child: AuthGuard(
+        requiredPermissions: const ['ticket'],
+        child: Scaffold(
           backgroundColor: AppColors.primary,
-          foregroundColor: Colors.white,
-          elevation: 0,
-        ),
-        body: Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(24),
-              topRight: Radius.circular(24),
+          appBar: AppBar(
+            title: const Text('Tambah Data Pengaduan'),
+            backgroundColor: AppColors.primary,
+            foregroundColor: Colors.white,
+            elevation: 0,
+          ),
+          body: Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
             ),
           ),
           child: Column(
@@ -352,6 +355,7 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
               ),
             ],
           ),
+        ),
         ),
       ),
     );

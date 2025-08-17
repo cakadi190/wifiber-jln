@@ -6,6 +6,7 @@ import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/models/router.dart';
 import 'package:wifiber/providers/router_provider.dart';
+import 'package:wifiber/middlewares/auth_middleware.dart';
 
 class EditMikrotikScreen extends StatefulWidget {
   final RouterModel router;
@@ -355,9 +356,11 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
         statusBarColor: AppColors.primary,
         navigationBarColor: Colors.white,
       ),
-      child: Scaffold(
-        backgroundColor: AppColors.primary,
-        appBar: AppBar(
+      child: AuthGuard(
+        requiredPermissions: const ['integration'],
+        child: Scaffold(
+          backgroundColor: AppColors.primary,
+          appBar: AppBar(
           title: const Text('Edit Mikrotik'),
           backgroundColor: AppColors.primary,
           foregroundColor: Colors.white,
@@ -649,6 +652,7 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 

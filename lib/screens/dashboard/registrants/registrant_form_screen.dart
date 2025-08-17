@@ -13,6 +13,7 @@ import 'package:wifiber/components/reusables/odp_modal_selector.dart';
 import 'package:wifiber/components/reusables/image_preview.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/services/registrant_service.dart';
+import 'package:wifiber/middlewares/auth_middleware.dart';
 
 class RegistrantFormScreen extends StatefulWidget {
   final Registrant? registrant;
@@ -826,6 +827,7 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
             ),
           );
         },
+        ),
       ),
     );
   }

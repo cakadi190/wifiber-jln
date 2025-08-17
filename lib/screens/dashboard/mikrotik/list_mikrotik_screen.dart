@@ -9,6 +9,7 @@ import 'package:wifiber/models/router.dart';
 import 'package:wifiber/providers/router_provider.dart';
 import 'package:wifiber/screens/dashboard/mikrotik/create_mikrotik_screen.dart';
 import 'package:wifiber/screens/dashboard/mikrotik/edit_mikrotik_screen.dart';
+import 'package:wifiber/middlewares/auth_middleware.dart';
 
 class ListMikrotikScreen extends StatefulWidget {
   const ListMikrotikScreen({super.key});
@@ -34,23 +35,28 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
         statusBarColor: AppColors.primary,
         navigationBarColor: Colors.white,
       ),
-      child: Scaffold(
-        backgroundColor: AppColors.primary,
-        floatingActionButton: FloatingActionButton(
+      child: AuthGuard(
+        requiredPermissions: const ['integration'],
+        child: Scaffold(
           backgroundColor: AppColors.primary,
-          onPressed: () async {
-            await Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const CreateMikrotikScreen(),
-              ),
-            );
+          floatingActionButton: PermissionWidget(
+            permissions: const ['integration'],
+            child: FloatingActionButton(
+              backgroundColor: AppColors.primary,
+              onPressed: () async {
+                await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const CreateMikrotikScreen(),
+                  ),
+                );
 
-            await context.read<RouterProvider>().refresh();
-          },
-          child: const Icon(Icons.add),
-        ),
-        appBar: AppBar(
-          title: const Text('MikroTik'),
+                await context.read<RouterProvider>().refresh();
+              },
+              child: const Icon(Icons.add),
+            ),
+          ),
+          appBar: AppBar(
+            title: const Text('MikroTik'),
           actions: [
             Consumer<RouterProvider>(
               builder: (context, provider, child) {
@@ -110,6 +116,7 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 

@@ -12,6 +12,7 @@ import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/models/bills.dart';
 import 'package:wifiber/models/customer.dart';
 import 'package:wifiber/providers/bills_provider.dart';
+import 'package:wifiber/middlewares/auth_middleware.dart';
 
 class BillsCreateScreen extends StatefulWidget {
   const BillsCreateScreen({super.key});
@@ -271,9 +272,11 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
         statusBarColor: AppColors.primary,
         navigationBarColor: Colors.white,
       ),
-      child: Scaffold(
-        backgroundColor: AppColors.primary,
-        appBar: AppBar(
+      child: AuthGuard(
+        requiredPermissions: const ['bill'],
+        child: Scaffold(
+          backgroundColor: AppColors.primary,
+          appBar: AppBar(
           title: const Text('Buat Bill Baru'),
           leading: IconButton(
             icon: const Icon(Icons.arrow_back),
@@ -718,6 +721,7 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
               ),
             ),
           ),
+        ),
         ),
       ),
     );

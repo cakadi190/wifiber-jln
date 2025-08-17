@@ -6,6 +6,7 @@ import 'package:wifiber/components/ui/alert.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/providers/auth_provider.dart';
+import 'package:wifiber/middlewares/auth_middleware.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({
@@ -124,9 +125,11 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         statusBarColor: AppColors.primary,
         navigationBarColor: Colors.white,
       ),
-      child: Scaffold(
-        backgroundColor: AppColors.primary,
-        appBar: AppBar(
+      child: AuthGuard(
+        requiredPermissions: const ['company-profile'],
+        child: Scaffold(
+          backgroundColor: AppColors.primary,
+          appBar: AppBar(
           title: Text("Perbarui ${widget.formLabel}"),
           actions: [
             _isLoading
@@ -223,6 +226,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           ),
         ),
       ),
+    ),
     );
   }
 }

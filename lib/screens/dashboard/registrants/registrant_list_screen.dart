@@ -7,6 +7,7 @@ import 'package:wifiber/screens/dashboard/registrants/registrant_form_screen.dar
 import 'package:wifiber/screens/dashboard/registrants/registrant_detail_modal.dart';
 import 'package:wifiber/screens/dashboard/registrants/registrant_delete_modal.dart'; // Add this import
 import 'package:wifiber/services/registrant_service.dart';
+import 'package:wifiber/middlewares/auth_middleware.dart';
 
 class RegistrantListScreen extends StatefulWidget {
   const RegistrantListScreen({super.key});
@@ -180,23 +181,25 @@ class _RegistrantListScreenState extends State<RegistrantListScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Theme.of(context).primaryColor,
-      appBar: AppBar(
-        title: const Text('Data Calon Pelanggan'),
+    return AuthGuard(
+      requiredPermissions: const ['registrant'],
+      child: Scaffold(
         backgroundColor: Theme.of(context).primaryColor,
-        actions: [
-          IconButton(
-            onPressed: () {
-              if (_registrantProvider != null) {
-                _registrantProvider!.refresh();
-              }
-            },
-            icon: const Icon(Icons.refresh),
-            tooltip: 'Refresh',
-          ),
-        ],
-      ),
+        appBar: AppBar(
+          title: const Text('Data Calon Pelanggan'),
+          backgroundColor: Theme.of(context).primaryColor,
+          actions: [
+            IconButton(
+              onPressed: () {
+                if (_registrantProvider != null) {
+                  _registrantProvider!.refresh();
+                }
+              },
+              icon: const Icon(Icons.refresh),
+              tooltip: 'Refresh',
+            ),
+          ],
+        ),
       body: Container(
         decoration: const BoxDecoration(
           color: Colors.white,
@@ -392,12 +395,16 @@ class _RegistrantListScreenState extends State<RegistrantListScreen> {
           ],
         ),
       ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _navigateToForm(),
-        backgroundColor: AppColors.primary,
-        foregroundColor: Colors.white,
-        tooltip: 'Tambah Calon Pelanggan',
-        child: const Icon(Icons.add),
+        floatingActionButton: PermissionWidget(
+          permissions: const ['registrant'],
+          child: FloatingActionButton(
+            onPressed: () => _navigateToForm(),
+            backgroundColor: AppColors.primary,
+            foregroundColor: Colors.white,
+            tooltip: 'Tambah Calon Pelanggan',
+            child: const Icon(Icons.add),
+          ),
+        ),
       ),
     );
   }

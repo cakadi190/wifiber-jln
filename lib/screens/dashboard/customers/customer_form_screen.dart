@@ -12,6 +12,7 @@ import 'package:wifiber/components/reusables/odp_modal_selector.dart';
 import 'package:wifiber/components/reusables/image_preview.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/services/customer_service.dart';
+import 'package:wifiber/middlewares/auth_middleware.dart';
 
 class CustomerFormScreen extends StatefulWidget {
   final Customer? customer;
@@ -312,16 +313,18 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider.value(
-      value: _controller,
-      child: Consumer<CustomerFormController>(
-        builder: (context, controller, child) {
-          return Scaffold(
-            backgroundColor: AppColors.primary,
-            appBar: AppBar(
-              title: Text(
-                widget.isEdit ? 'Edit Pelanggan' : 'Tambah Pelanggan',
-              ),
+    return AuthGuard(
+      requiredPermissions: const ['customer'],
+      child: ChangeNotifierProvider.value(
+        value: _controller,
+        child: Consumer<CustomerFormController>(
+          builder: (context, controller, child) {
+            return Scaffold(
+              backgroundColor: AppColors.primary,
+              appBar: AppBar(
+                title: Text(
+                  widget.isEdit ? 'Edit Pelanggan' : 'Tambah Pelanggan',
+                ),
               actions: [
                 if (controller.isLoading)
                   const Center(
@@ -821,6 +824,7 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
           );
         },
       ),
+      );
     );
   }
 }
