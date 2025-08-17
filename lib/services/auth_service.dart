@@ -43,6 +43,8 @@ class AuthService {
           }
         }
 
+        print(user.toJson());
+
         return user;
       } catch (e) {
         await logout();
@@ -107,7 +109,7 @@ class AuthService {
 
       if (response.statusCode == 200) {
         final dataParse =
-        jsonDecode(response.body)['data'] as Map<String, dynamic>;
+            jsonDecode(response.body)['data'] as Map<String, dynamic>;
 
         if (userCache != null) {
           final userData = <String, dynamic>{
