@@ -92,10 +92,10 @@ class RegistrantService {
         path,
         fields: Map.fromEntries(
           registrantData.entries
-              .where(
-                (entry) =>
-                    entry.key != 'ktp-photo' && entry.key != 'location-photo',
-              )
+              .where((entry) =>
+                  entry.key != 'ktp-photo' &&
+                  entry.key != 'location-photo' &&
+                  entry.value != null)
               .map((entry) => MapEntry(entry.key, entry.value.toString())),
         ),
         files: files,
@@ -125,7 +125,7 @@ class RegistrantService {
         responseBody += chunk;
       }
 
-      if (statusCode == 201) {
+      if (statusCode == 200) {
         final jsonData = json.decode(responseBody);
 
         if (jsonData is Map<String, dynamic>) {
@@ -140,7 +140,11 @@ class RegistrantService {
           throw Exception('Invalid JSON response format');
         }
       } else {
-        throw Exception('Failed to create registrant: $statusCode');
+        final jsonData = json.decode(responseBody);
+        final message = jsonData is Map<String, dynamic>
+            ? (jsonData['message'] ?? 'Unknown error')
+            : 'Failed to create registrant: $statusCode';
+        throw Exception(message);
       }
     } catch (e) {
       throw Exception('Error creating registrant: $e');
@@ -175,10 +179,10 @@ class RegistrantService {
       // Buat fields tanpa file
       final fields = Map.fromEntries(
         registrantData.entries
-            .where(
-              (entry) =>
-                  entry.key != 'ktp-photo' && entry.key != 'location-photo',
-            )
+            .where((entry) =>
+                entry.key != 'ktp-photo' &&
+                entry.key != 'location-photo' &&
+                entry.value != null)
             .map((entry) => MapEntry(entry.key, entry.value.toString())),
       );
 

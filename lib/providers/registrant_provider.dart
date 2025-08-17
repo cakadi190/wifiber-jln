@@ -158,8 +158,8 @@ class RegistrantProvider extends ChangeNotifier {
       errors.add('Nomor telepon wajib diisi');
     }
 
-    if (registrantData['ktp'] == null ||
-        registrantData['ktp'].toString().trim().isEmpty) {
+    if (registrantData['identity-number'] == null ||
+        registrantData['identity-number'].toString().trim().isEmpty) {
       errors.add('Nomor KTP wajib diisi (atau isi dengan "-")');
     }
 
@@ -174,7 +174,7 @@ class RegistrantProvider extends ChangeNotifier {
 
     if (registrantData['area'] == null ||
         registrantData['area'].toString().trim().isEmpty) {
-      errors.add('ID Area wajib diisi');
+      errors.add('Area wajib dipilih');
     }
 
     if (registrantData['router'] == null) {

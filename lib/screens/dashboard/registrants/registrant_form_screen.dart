@@ -8,6 +8,7 @@ import 'package:wifiber/controllers/registrant_form_screen_controller.dart';
 import 'package:wifiber/models/registrant.dart';
 import 'package:wifiber/components/reusables/package_modal_action.dart';
 import 'package:wifiber/components/reusables/router_modal_selector.dart';
+import 'package:wifiber/components/reusables/area_modal_selector.dart';
 import 'package:wifiber/components/reusables/odp_modal_selector.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/services/registrant_service.dart';
@@ -511,17 +512,22 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
                                     ),
                                   ),
                                 const SizedBox(height: 16),
-                                TextFormField(
-                                  controller: controller.areaIdController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'ID Area',
-                                    border: OutlineInputBorder(),
-                                    prefixIcon: Icon(Icons.map),
-                                  ),
-                                  keyboardType: TextInputType.number,
-                                  validator: (value) => controller
-                                      .validateRequired(value, 'ID Area'),
+                                AreaButtonSelector(
+                                  selectedAreaId: controller.selectedAreaId,
+                                  selectedAreaName: controller.selectedAreaName,
+                                  onAreaSelected: controller.onAreaSelected,
                                 ),
+                                if (controller.validateAreaSelection() != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8),
+                                    child: Text(
+                                      controller.validateAreaSelection()!,
+                                      style: TextStyle(
+                                        color: Colors.red.shade600,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
                                 const SizedBox(height: 16),
                                 RouterButtonSelector(
                                   selectedRouterId: controller.selectedRouterId,

@@ -20,7 +20,6 @@ class RegistrantFormController extends ChangeNotifier {
   late TextEditingController identityNumberController;
   late TextEditingController addressController;
   late TextEditingController packageIdController;
-  late TextEditingController areaIdController;
   late TextEditingController routerIdController;
   late TextEditingController pppoeSecretController;
   late TextEditingController dueDateController;
@@ -34,6 +33,8 @@ class RegistrantFormController extends ChangeNotifier {
 
   String? selectedPackageId;
   String? selectedPackageName;
+  String? selectedAreaId;
+  String? selectedAreaName;
   String? selectedRouterId;
   String? selectedRouterName;
   String? selectedOdpId;
@@ -57,7 +58,6 @@ class RegistrantFormController extends ChangeNotifier {
     identityNumberController = TextEditingController();
     addressController = TextEditingController();
     packageIdController = TextEditingController();
-    areaIdController = TextEditingController();
     routerIdController = TextEditingController();
     pppoeSecretController = TextEditingController();
     dueDateController = TextEditingController();
@@ -76,7 +76,6 @@ class RegistrantFormController extends ChangeNotifier {
     identityNumberController.text = registrant.identityNumber;
     addressController.text = registrant.address;
     packageIdController.text = registrant.packageId;
-    areaIdController.text = registrant.areaId;
     routerIdController.text = registrant.routerId ?? '';
     pppoeSecretController.text = registrant.pppoeSecret;
     dueDateController.text = registrant.dueDate;
@@ -94,6 +93,7 @@ class RegistrantFormController extends ChangeNotifier {
 
     selectedStatus = _getStatusFromString(registrant.status);
     selectedPackageId = registrant.packageId;
+    selectedAreaId = registrant.areaId;
     selectedRouterId = registrant.routerId;
     selectedOdpId = registrant.odpId;
 
@@ -102,6 +102,7 @@ class RegistrantFormController extends ChangeNotifier {
 
   Future<void> initializeEditData() async {
     if (selectedPackageId == null &&
+        selectedAreaId == null &&
         selectedRouterId == null &&
         selectedOdpId == null) {
       return;
@@ -114,6 +115,8 @@ class RegistrantFormController extends ChangeNotifier {
       await Future.wait([
         if (selectedPackageId != null && selectedPackageId!.isNotEmpty)
           _fetchPackageName(selectedPackageId!),
+        if (selectedAreaId != null && selectedAreaId!.isNotEmpty)
+          _fetchAreaName(selectedAreaId!),
         if (selectedRouterId != null && selectedRouterId!.isNotEmpty)
           _fetchRouterName(selectedRouterId!),
         if (selectedOdpId != null && selectedOdpId!.isNotEmpty)
@@ -146,6 +149,28 @@ class RegistrantFormController extends ChangeNotifier {
       }
     } catch (e) {
       debugPrint('Error fetching package name: $e');
+    }
+  }
+
+  Future<void> _fetchAreaName(String areaId) async {
+    try {
+      final response = await _http.get('/areas', requiresAuth: true);
+      final jsonResponse = jsonDecode(response.body);
+
+      if (jsonResponse['success'] == true && jsonResponse['data'] is List) {
+        final List areas = jsonResponse['data'];
+        final area = areas.firstWhere(
+          (a) => a['id'] == areaId,
+          orElse: () => null,
+        );
+
+        if (area != null) {
+          selectedAreaName = area['name'];
+          notifyListeners();
+        }
+      }
+    } catch (e) {
+      debugPrint('Error fetching area name: $e');
     }
   }
 
@@ -197,6 +222,12 @@ class RegistrantFormController extends ChangeNotifier {
     selectedPackageId = package.id;
     selectedPackageName = package.name;
     packageIdController.text = package.id;
+    notifyListeners();
+  }
+
+  void onAreaSelected(dynamic area) {
+    selectedAreaId = area.id;
+    selectedAreaName = area.name;
     notifyListeners();
   }
 
@@ -342,7 +373,7 @@ class RegistrantFormController extends ChangeNotifier {
       'name': nameController.text.trim(),
       'nickname': nicknameController.text.trim(),
       'phone': phoneController.text.trim(),
-      'ktp': identityNumberController.text.trim().isEmpty
+      'identity-number': identityNumberController.text.trim().isEmpty
           ? '-'
           : identityNumberController.text.trim(),
       'address': addressController.text.trim(),
@@ -350,9 +381,7 @@ class RegistrantFormController extends ChangeNotifier {
       'package': (selectedPackageId?.isEmpty ?? true)
           ? null
           : selectedPackageId,
-      'area': areaIdController.text.trim().isEmpty
-          ? null
-          : areaIdController.text.trim(),
+      'area': (selectedAreaId?.isEmpty ?? true) ? null : selectedAreaId,
       'router': (selectedRouterId?.isEmpty ?? true) ? null : selectedRouterId,
       'pppoe_secret': pppoeSecretController.text.trim(),
       'due-date': dueDateController.text.trim(),
@@ -436,6 +465,13 @@ class RegistrantFormController extends ChangeNotifier {
     return null;
   }
 
+  String? validateAreaSelection() {
+    if (selectedAreaId == null || selectedAreaId!.isEmpty) {
+      return 'Area wajib dipilih';
+    }
+    return null;
+  }
+
   String? validateRouterSelection() {
     if (selectedRouterId == null || selectedRouterId!.isEmpty) {
       return 'Router wajib dipilih';
@@ -477,7 +513,6 @@ class RegistrantFormController extends ChangeNotifier {
     identityNumberController.dispose();
     addressController.dispose();
     packageIdController.dispose();
-    areaIdController.dispose();
     routerIdController.dispose();
     pppoeSecretController.dispose();
     dueDateController.dispose();
