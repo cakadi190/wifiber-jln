@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:maps_launcher/maps_launcher.dart';
+import 'package:provider/provider.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/helpers/currency_helper.dart';
 import 'package:wifiber/helpers/datetime_helper.dart';
 import 'package:wifiber/models/customer.dart';
+import 'package:wifiber/providers/auth_provider.dart';
 
 class CustomerDetailModal extends StatelessWidget {
   final Customer customer;
@@ -98,43 +100,52 @@ class CustomerDetailModal extends StatelessWidget {
   }
 
   Widget _buildPhotoSection(String label, String imageUrl) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          label,
-          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
-        ),
-        const SizedBox(height: 8),
-        ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: Image.network(
-            imageUrl,
-            height: 150,
-            width: double.infinity,
-            fit: BoxFit.cover,
-            errorBuilder: (context, error, stackTrace) => Container(
-              height: 150,
-              color: Colors.grey[300],
-              child: const Center(child: Icon(Icons.broken_image, size: 40)),
+    return Consumer<AuthProvider>(
+      builder: (context, authProvider, child) {
+        return Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label,
+              style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
-            loadingBuilder: (context, child, progress) {
-              if (progress == null) return child;
-              return Container(
+            const SizedBox(height: 8),
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8),
+              child: Image.network(
+                imageUrl,
                 height: 150,
-                alignment: Alignment.center,
-                child: CircularProgressIndicator(
-                  value: progress.expectedTotalBytes != null
-                      ? progress.cumulativeBytesLoaded /
-                            progress.expectedTotalBytes!
-                      : null,
+                width: double.infinity,
+                fit: BoxFit.cover,
+                headers: {
+                  'Authorization': 'Bearer ${authProvider.user?.accessToken}',
+                },
+                errorBuilder: (context, error, stackTrace) => Container(
+                  height: 150,
+                  color: Colors.grey[300],
+                  child: const Center(
+                    child: Icon(Icons.broken_image, size: 40),
+                  ),
                 ),
-              );
-            },
-          ),
-        ),
-        const SizedBox(height: 16),
-      ],
+                loadingBuilder: (context, child, progress) {
+                  if (progress == null) return child;
+                  return Container(
+                    height: 150,
+                    alignment: Alignment.center,
+                    child: CircularProgressIndicator(
+                      value: progress.expectedTotalBytes != null
+                          ? progress.cumulativeBytesLoaded /
+                                progress.expectedTotalBytes!
+                          : null,
+                    ),
+                  );
+                },
+              ),
+            ),
+            const SizedBox(height: 16),
+          ],
+        );
+      },
     );
   }
 
