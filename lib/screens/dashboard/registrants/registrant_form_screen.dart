@@ -10,6 +10,7 @@ import 'package:wifiber/components/reusables/package_modal_action.dart';
 import 'package:wifiber/components/reusables/router_modal_selector.dart';
 import 'package:wifiber/components/reusables/area_modal_selector.dart';
 import 'package:wifiber/components/reusables/odp_modal_selector.dart';
+import 'package:wifiber/components/reusables/image_preview.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/services/registrant_service.dart';
 
@@ -112,102 +113,125 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
 
               // Perbaikan untuk menampilkan gambar
               if (hasAnyImage) ...[
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: hasUrlPreview
-                      ? Image.network(
-                          urlPreview,
-                          height: 120,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          headers: {
-                            'Authorization':
-                                'Bearer ${authProvider.user?.accessToken}',
-                          },
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Container(
-                              height: 120,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: Colors.grey.shade100,
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: const Center(
-                                child: CircularProgressIndicator(),
-                              ),
-                            );
-                          },
-                          errorBuilder: (context, error, stackTrace) {
-                            debugPrint('Error loading image: $error');
-                            return Container(
-                              height: 120,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: Colors.red.shade50,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.red.shade200),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.error_outline,
-                                    color: Colors.red.shade400,
-                                    size: 32,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'Gagal memuat gambar',
-                                    style: TextStyle(
-                                      color: Colors.red.shade600,
-                                      fontSize: 12,
+                GestureDetector(
+                  onTap: () {
+                    if (hasUrlPreview) {
+                      showImagePreview(
+                        context,
+                        imageUrl: urlPreview,
+                        headers: {
+                          'Authorization':
+                              'Bearer ${authProvider.user?.accessToken}',
+                        },
+                      );
+                    } else {
+                      showImagePreview(
+                        context,
+                        imageFile: File(selectedFile!.path),
+                      );
+                    }
+                  },
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: hasUrlPreview
+                        ? Image.network(
+                            urlPreview,
+                            height: 120,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            headers: {
+                              'Authorization':
+                                  'Bearer ${authProvider.user?.accessToken}',
+                            },
+                            loadingBuilder:
+                                (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                height: 120,
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: Colors.grey.shade100,
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              );
+                            },
+                            errorBuilder:
+                                (context, error, stackTrace) {
+                              debugPrint('Error loading image: $error');
+                              return Container(
+                                height: 120,
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: Colors.red.shade50,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border:
+                                      Border.all(color: Colors.red.shade200),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.error_outline,
+                                      color: Colors.red.shade400,
+                                      size: 32,
                                     ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        )
-                      : Image.file(
-                          File(selectedFile!.path),
-                          height: 120,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              height: 120,
-                              width: double.infinity,
-                              decoration: BoxDecoration(
-                                color: Colors.red.shade50,
-                                borderRadius: BorderRadius.circular(8),
-                                border: Border.all(color: Colors.red.shade200),
-                              ),
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons.error_outline,
-                                    color: Colors.red.shade400,
-                                    size: 32,
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    'File tidak ditemukan',
-                                    style: TextStyle(
-                                      color: Colors.red.shade600,
-                                      fontSize: 12,
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      'Gagal memuat gambar',
+                                      style: TextStyle(
+                                        color: Colors.red.shade600,
+                                        fontSize: 12,
+                                      ),
                                     ),
-                                  ),
-                                ],
-                              ),
-                            );
-                          },
-                        ),
+                                  ],
+                                ),
+                              );
+                            },
+                          )
+                        : Image.file(
+                            File(selectedFile!.path),
+                            height: 120,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                            errorBuilder: (context, error, stackTrace) {
+                              return Container(
+                                height: 120,
+                                width: double.infinity,
+                                decoration: BoxDecoration(
+                                  color: Colors.red.shade50,
+                                  borderRadius: BorderRadius.circular(8),
+                                  border:
+                                      Border.all(color: Colors.red.shade200),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.error_outline,
+                                      color: Colors.red.shade400,
+                                      size: 32,
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      'File tidak ditemukan',
+                                      style: TextStyle(
+                                        color: Colors.red.shade600,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          ),
+                  ),
                 ),
-                const SizedBox(height: 8),
-                Row(
-                  children: [
+              const SizedBox(height: 8),
+              Row(
+                children: [
                     const Icon(Icons.info, size: 16, color: Colors.green),
                     const SizedBox(width: 4),
                     Expanded(

@@ -6,6 +6,7 @@ import 'package:wifiber/helpers/currency_helper.dart';
 import 'package:wifiber/helpers/datetime_helper.dart';
 import 'package:wifiber/models/customer.dart';
 import 'package:wifiber/providers/auth_provider.dart';
+import 'package:wifiber/components/reusables/image_preview.dart';
 
 class CustomerDetailModal extends StatelessWidget {
   final Customer customer;
@@ -110,36 +111,47 @@ class CustomerDetailModal extends StatelessWidget {
               style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
             ),
             const SizedBox(height: 8),
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.network(
-                imageUrl,
-                height: 150,
-                width: double.infinity,
-                fit: BoxFit.cover,
+            GestureDetector(
+              onTap: () => showImagePreview(
+                context,
+                imageUrl: imageUrl,
                 headers: {
-                  'Authorization': 'Bearer ${authProvider.user?.accessToken}',
+                  'Authorization':
+                      'Bearer ${authProvider.user?.accessToken}',
                 },
-                errorBuilder: (context, error, stackTrace) => Container(
+              ),
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: Image.network(
+                  imageUrl,
                   height: 150,
-                  color: Colors.grey[300],
-                  child: const Center(
-                    child: Icon(Icons.broken_image, size: 40),
-                  ),
-                ),
-                loadingBuilder: (context, child, progress) {
-                  if (progress == null) return child;
-                  return Container(
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  headers: {
+                    'Authorization':
+                        'Bearer ${authProvider.user?.accessToken}',
+                  },
+                  errorBuilder: (context, error, stackTrace) => Container(
                     height: 150,
-                    alignment: Alignment.center,
-                    child: CircularProgressIndicator(
-                      value: progress.expectedTotalBytes != null
-                          ? progress.cumulativeBytesLoaded /
-                                progress.expectedTotalBytes!
-                          : null,
+                    color: Colors.grey[300],
+                    child: const Center(
+                      child: Icon(Icons.broken_image, size: 40),
                     ),
-                  );
-                },
+                  ),
+                  loadingBuilder: (context, child, progress) {
+                    if (progress == null) return child;
+                    return Container(
+                      height: 150,
+                      alignment: Alignment.center,
+                      child: CircularProgressIndicator(
+                        value: progress.expectedTotalBytes != null
+                            ? progress.cumulativeBytesLoaded /
+                                progress.expectedTotalBytes!
+                            : null,
+                      ),
+                    );
+                  },
+                ),
               ),
             ),
             const SizedBox(height: 16),

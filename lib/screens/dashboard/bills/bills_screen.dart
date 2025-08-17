@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/components/widgets/customer_search_modal.dart';
+import 'package:wifiber/components/reusables/image_preview.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/exceptions/string_exceptions.dart';
 import 'package:wifiber/helpers/currency_helper.dart';
@@ -11,6 +12,7 @@ import 'package:wifiber/helpers/datetime_helper.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/models/bills.dart';
 import 'package:wifiber/providers/bills_provider.dart';
+import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/screens/dashboard/bills/bills_create_screen.dart';
 import 'package:wifiber/services/http_service.dart';
 
@@ -1079,52 +1081,69 @@ class _BillsScreenState extends State<BillsScreen> {
   }
 
   Widget _buildLocationPhoto(BuildContext context, String photoUrl) {
-    return Container(
-      width: double.infinity,
-      height: 200,
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(color: Colors.grey.shade300),
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: Image.network(
-          photoUrl,
-          fit: BoxFit.cover,
-          errorBuilder: (context, error, stackTrace) => Container(
-            color: Colors.grey.shade100,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Icon(
-                  Icons.image_not_supported,
-                  size: 48,
-                  color: Colors.grey.shade400,
+    return Consumer<AuthProvider>(
+      builder: (context, authProvider, child) {
+        final token = authProvider.user?.accessToken;
+        return GestureDetector(
+          onTap: () => showImagePreview(
+            context,
+            imageUrl: photoUrl,
+            headers: {
+              'Authorization': 'Bearer $token',
+            },
+          ),
+          child: Container(
+            width: double.infinity,
+            height: 200,
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(12),
+              border: Border.all(color: Colors.grey.shade300),
+            ),
+            child: ClipRRect(
+              borderRadius: BorderRadius.circular(12),
+              child: Image.network(
+                photoUrl,
+                fit: BoxFit.cover,
+                headers: {
+                  'Authorization': 'Bearer $token',
+                },
+                errorBuilder: (context, error, stackTrace) => Container(
+                  color: Colors.grey.shade100,
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.image_not_supported,
+                        size: 48,
+                        color: Colors.grey.shade400,
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'Gambar tidak dapat dimuat',
+                        style: TextStyle(color: Colors.grey.shade600),
+                      ),
+                    ],
+                  ),
                 ),
-                const SizedBox(height: 8),
-                Text(
-                  'Gambar tidak dapat dimuat',
-                  style: TextStyle(color: Colors.grey.shade600),
-                ),
-              ],
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return Container(
+                    color: Colors.grey.shade100,
+                    child: Center(
+                      child: CircularProgressIndicator(
+                        value: loadingProgress.expectedTotalBytes != null
+                            ? loadingProgress.cumulativeBytesLoaded /
+                                loadingProgress.expectedTotalBytes!
+                            : null,
+                      ),
+                    ),
+                  );
+                },
+              ),
             ),
           ),
-          loadingBuilder: (context, child, loadingProgress) {
-            if (loadingProgress == null) return child;
-            return Container(
-              color: Colors.grey.shade100,
-              child: Center(
-                child: CircularProgressIndicator(
-                  value: loadingProgress.expectedTotalBytes != null
-                      ? loadingProgress.cumulativeBytesLoaded /
-                            loadingProgress.expectedTotalBytes!
-                      : null,
-                ),
-              ),
-            );
-          },
-        ),
-      ),
+        );
+      },
     );
   }
 
