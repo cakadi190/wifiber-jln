@@ -92,10 +92,12 @@ class RegistrantService {
         path,
         fields: Map.fromEntries(
           registrantData.entries
-              .where((entry) =>
-                  entry.key != 'ktp-photo' &&
-                  entry.key != 'location-photo' &&
-                  entry.value != null)
+              .where(
+                (entry) =>
+                    entry.key != 'ktp-photo' &&
+                    entry.key != 'location-photo' &&
+                    entry.value != null,
+              )
               .map((entry) => MapEntry(entry.key, entry.value.toString())),
         ),
         files: files,
@@ -179,10 +181,12 @@ class RegistrantService {
       // Buat fields tanpa file
       final fields = Map.fromEntries(
         registrantData.entries
-            .where((entry) =>
-                entry.key != 'ktp-photo' &&
-                entry.key != 'location-photo' &&
-                entry.value != null)
+            .where(
+              (entry) =>
+                  entry.key != 'ktp-photo' &&
+                  entry.key != 'location-photo' &&
+                  entry.value != null,
+            )
             .map((entry) => MapEntry(entry.key, entry.value.toString())),
       );
 

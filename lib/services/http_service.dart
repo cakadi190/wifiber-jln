@@ -604,9 +604,7 @@ class HttpService {
       NavigationService.navigatorKey.currentState?.pushAndRemoveUntil(
         MaterialPageRoute(
           builder: (_) => const LoginScreen(),
-          settings: const RouteSettings(
-            arguments: {'showLogoutMessage': true},
-          ),
+          settings: const RouteSettings(arguments: {'showLogoutMessage': true}),
         ),
         (route) => false,
       );
@@ -686,9 +684,7 @@ class HttpService {
       NavigationService.navigatorKey.currentState?.pushAndRemoveUntil(
         MaterialPageRoute(
           builder: (_) => const LoginScreen(),
-          settings: const RouteSettings(
-            arguments: {'showLogoutMessage': true},
-          ),
+          settings: const RouteSettings(arguments: {'showLogoutMessage': true}),
         ),
         (route) => false,
       );

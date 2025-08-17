@@ -26,7 +26,10 @@ class _RegistrantListScreenState extends State<RegistrantListScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        Provider.of<RegistrantProvider>(context, listen: false).loadRegistrants();
+        Provider.of<RegistrantProvider>(
+          context,
+          listen: false,
+        ).loadRegistrants();
       }
     });
   }
@@ -34,7 +37,10 @@ class _RegistrantListScreenState extends State<RegistrantListScreen> {
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    _registrantProvider = Provider.of<RegistrantProvider>(context, listen: false);
+    _registrantProvider = Provider.of<RegistrantProvider>(
+      context,
+      listen: false,
+    );
   }
 
   @override
@@ -74,96 +80,6 @@ class _RegistrantListScreenState extends State<RegistrantListScreen> {
     }
   }
 
-  void _showFilterDialog() {
-    showDialog(
-      context: context,
-      builder: (context) {
-        RegistrantStatus? tempSelectedStatus = _selectedStatus;
-        return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: const Text('Filter Calon Pelanggan'),
-              content: Column(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  DropdownButtonFormField<RegistrantStatus?>(
-                    value: tempSelectedStatus,
-                    decoration: const InputDecoration(
-                      labelText: 'Status',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: [
-                      const DropdownMenuItem(
-                        value: null,
-                        child: Text('Semua Status'),
-                      ),
-                      ...RegistrantStatus.values.map((status) {
-                        String displayName;
-                        switch (status) {
-                          case RegistrantStatus.registrant:
-                            displayName = 'Calon Pelanggan';
-                            break;
-                          case RegistrantStatus.inactive:
-                            displayName = 'Tidak Aktif';
-                            break;
-                          case RegistrantStatus.free:
-                            displayName = 'Gratis';
-                            break;
-                          case RegistrantStatus.isolir:
-                            displayName = 'Isolir';
-                            break;
-                        }
-                        return DropdownMenuItem(
-                          value: status,
-                          child: Text(displayName),
-                        );
-                      }).toList(),
-                    ],
-                    onChanged: (value) {
-                      setState(() {
-                        tempSelectedStatus = value;
-                      });
-                    },
-                  ),
-                ],
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Batal'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _selectedStatus = tempSelectedStatus;
-                    });
-                    Navigator.of(context).pop();
-                    _applyFilter();
-                  },
-                  child: const Text('Terapkan'),
-                ),
-              ],
-            );
-          },
-        );
-      },
-    );
-  }
-
-  void _applyFilter() {
-    if (_registrantProvider != null) {
-      final query = _searchController.text.trim();
-      if (query.isNotEmpty) {
-        _registrantProvider!.searchRegistrants(
-          query,
-          status: _selectedStatus,
-        );
-      } else {
-        _registrantProvider!.loadRegistrants(status: _selectedStatus);
-      }
-    }
-  }
-
   void _clearFilter() {
     setState(() {
       _selectedStatus = null;
@@ -179,10 +95,7 @@ class _RegistrantListScreenState extends State<RegistrantListScreen> {
       if (query.isEmpty) {
         _registrantProvider!.loadRegistrants(status: _selectedStatus);
       } else {
-        _registrantProvider!.searchRegistrants(
-          query,
-          status: _selectedStatus,
-        );
+        _registrantProvider!.searchRegistrants(query, status: _selectedStatus);
       }
     }
   }
@@ -190,8 +103,10 @@ class _RegistrantListScreenState extends State<RegistrantListScreen> {
   void _navigateToForm({Registrant? registrant}) async {
     await Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) =>
-            RegistrantFormScreen(registrant: registrant, isEdit: registrant != null),
+        builder: (context) => RegistrantFormScreen(
+          registrant: registrant,
+          isEdit: registrant != null,
+        ),
       ),
     );
 
@@ -272,17 +187,6 @@ class _RegistrantListScreenState extends State<RegistrantListScreen> {
         backgroundColor: Theme.of(context).primaryColor,
         actions: [
           IconButton(
-            onPressed: _showFilterDialog,
-            icon: const Icon(Icons.filter_list),
-            tooltip: 'Filter',
-          ),
-          if (_selectedStatus != null || _searchController.text.isNotEmpty)
-            IconButton(
-              onPressed: _clearFilter,
-              icon: const Icon(Icons.clear),
-              tooltip: 'Bersihkan Filter',
-            ),
-          IconButton(
             onPressed: () {
               if (_registrantProvider != null) {
                 _registrantProvider!.refresh();
@@ -315,6 +219,7 @@ class _RegistrantListScreenState extends State<RegistrantListScreen> {
                           onPressed: () {
                             _searchController.clear();
                             _onSearchChanged('');
+                            _clearFilter();
                           },
                           icon: const Icon(Icons.clear),
                         )
@@ -426,7 +331,9 @@ class _RegistrantListScreenState extends State<RegistrantListScreen> {
                               horizontal: 16,
                             ),
                             leading: CircleAvatar(
-                              backgroundColor: _getStatusColor(registrant.status),
+                              backgroundColor: _getStatusColor(
+                                registrant.status,
+                              ),
                               child: Text(
                                 registrant.name.isNotEmpty
                                     ? registrant.name[0].toUpperCase()
