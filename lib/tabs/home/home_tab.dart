@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:wifiber/components/widgets/home/dashboard_summary.dart';
 import 'package:wifiber/components/widgets/home/main_menu.dart';
 import 'package:wifiber/components/widgets/home/tickets_summary.dart';
+import 'package:wifiber/components/widgets/home/finance_summary.dart';
 import 'package:wifiber/components/widgets/user_avatar.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/controllers/tabs/home_tab.dart';
@@ -73,6 +74,14 @@ class _HomeTabState extends State<HomeTab> {
                     onTransactionMenuTapped: widget.onTransactionTap,
                     onBillMenuTapped: widget.onBookKeepingTap,
                   ),
+
+                  if (authProvider.user?.permissions.contains('finance') == true)
+                    SizedBox(
+                      width: double.infinity,
+                      child: FinanceSummary(
+                        onFinanceTap: widget.onTransactionTap,
+                      ),
+                    ),
 
                   if (authProvider.user?.permissions.contains('ticket') == true)
                     SizedBox(
