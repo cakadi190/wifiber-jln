@@ -223,9 +223,11 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
                     try {
                       await authProvider.logout();
 
-                      navigator.pop();
+                      if (dialogContext.mounted) {
+                        navigator.pop();
+                      }
 
-                      if(mounted) {
+                      if (mounted) {
                         SnackBars.success(
                           mainContext,
                           "Berhasil mengeluarkan anda dari sesi saat ini. Sampai jumpa di lain waktu!",
@@ -234,9 +236,11 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
 
                       widget.onLogoutTap?.call();
                     } catch (e) {
-                      navigator.pop();
+                      if (dialogContext.mounted) {
+                        navigator.pop();
+                      }
 
-                      if(mounted) {
+                      if (mounted) {
                         SnackBars.error(
                           mainContext,
                           "Gagal mengeluarkan anda dari sesi saat ini. Silahkan coba lagi.",

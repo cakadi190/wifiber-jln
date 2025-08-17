@@ -1,13 +1,18 @@
+import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
 import 'package:wifiber/exceptions/secure_storage_exceptions.dart';
 import 'package:wifiber/exceptions/string_exceptions.dart';
 import 'package:wifiber/exceptions/validation_exceptions.dart';
 import 'package:wifiber/helpers/http_helper.dart';
+import 'package:wifiber/services/auth_service.dart';
+import 'package:wifiber/services/navigation_service.dart';
 import 'package:wifiber/services/secure_storage_service.dart';
+import 'package:wifiber/screens/login_screen.dart';
 
 class HttpService {
   final http.Client _client = http.Client();
@@ -595,6 +600,16 @@ class HttpService {
     final errorCode = _buildErrorCodeMessage(response);
 
     if (response.statusCode == 401) {
+      unawaited(AuthService.logout());
+      NavigationService.navigatorKey.currentState?.pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (_) => const LoginScreen(),
+          settings: const RouteSettings(
+            arguments: {'showLogoutMessage': true},
+          ),
+        ),
+        (route) => false,
+      );
       throw StringException(
         'Sesi Anda telah habis. Silakan login kembali. $errorCode',
       );
@@ -667,6 +682,16 @@ class HttpService {
     final errorCode = _buildErrorCodeMessageFromStatusCode(response.statusCode);
 
     if (response.statusCode == 401) {
+      unawaited(AuthService.logout());
+      NavigationService.navigatorKey.currentState?.pushAndRemoveUntil(
+        MaterialPageRoute(
+          builder: (_) => const LoginScreen(),
+          settings: const RouteSettings(
+            arguments: {'showLogoutMessage': true},
+          ),
+        ),
+        (route) => false,
+      );
       throw StringException(
         'Sesi Anda telah habis. Silakan login kembali. $errorCode',
       );

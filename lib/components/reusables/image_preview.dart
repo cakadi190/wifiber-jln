@@ -17,7 +17,7 @@ void showImagePreview(
 
   showDialog(
     context: context,
-    barrierColor: Colors.black.withOpacity(0.85),
+    barrierColor: Colors.black.withValues(alpha: 0.85),
     builder: (_) {
       Widget imageWidget;
       if (imageUrl != null) {

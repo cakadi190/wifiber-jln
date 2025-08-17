@@ -249,15 +249,30 @@ class RegistrantService {
     }
   }
 
-  Future<RegistrantResponse> searchRegistrants(String query) async {
+  Future<RegistrantResponse> searchRegistrants(
+    String query, {
+    RegistrantStatus? status,
+    int? routerId,
+    int? areaId,
+  }) async {
     try {
       if (query.isEmpty) {
-        return getAllRegistrants(null, null, null);
+        return getAllRegistrants(status, routerId, areaId);
       }
 
       final Map<String, dynamic> queryParams = {
         'search': query.toString().trim(),
       };
+
+      if (status != null) {
+        queryParams['status'] = status.toString().split('.').last;
+      }
+      if (routerId != null) {
+        queryParams['router_id'] = routerId.toString();
+      }
+      if (areaId != null) {
+        queryParams['area_id'] = areaId.toString();
+      }
 
       final response = await _http.get(
         path,

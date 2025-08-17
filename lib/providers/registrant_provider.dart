@@ -229,11 +229,21 @@ class RegistrantProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> searchRegistrants(String query) async {
+  Future<void> searchRegistrants(
+    String query, {
+    RegistrantStatus? status,
+    int? routerId,
+    int? areaId,
+  }) async {
     _setLoading(true);
 
     try {
-      final response = await _registrantService.searchRegistrants(query);
+      final response = await _registrantService.searchRegistrants(
+        query,
+        status: status,
+        routerId: routerId,
+        areaId: areaId,
+      );
       _registrants = response.data;
       _error = null;
     } catch (e) {

@@ -70,10 +70,7 @@ import 'package:flutter/material.dart';
 class SnackBars {
   SnackBars._();
 
-  static BuildContext? _context;
-
   static SnackBars success(BuildContext context, dynamic content) {
-    _context = context;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final snackBar = _createSnackBar(
@@ -86,14 +83,14 @@ class SnackBars {
       textColor: Colors.white,
     );
 
-    _pendingSnackBar = snackBar;
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.clearSnackBars();
+    messenger.showSnackBar(snackBar);
 
     return SnackBars._();
   }
 
   static SnackBars error(BuildContext context, dynamic content) {
-    _context = context;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final snackBar = _createSnackBar(
@@ -106,14 +103,14 @@ class SnackBars {
       textColor: Colors.white,
     );
 
-    _pendingSnackBar = snackBar;
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.clearSnackBars();
+    messenger.showSnackBar(snackBar);
 
     return SnackBars._();
   }
 
   static SnackBars warning(BuildContext context, dynamic content) {
-    _context = context;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final snackBar = _createSnackBar(
@@ -126,14 +123,14 @@ class SnackBars {
       textColor: Colors.white,
     );
 
-    _pendingSnackBar = snackBar;
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.clearSnackBars();
+    messenger.showSnackBar(snackBar);
 
     return SnackBars._();
   }
 
   static SnackBars info(BuildContext context, dynamic content) {
-    _context = context;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final snackBar = _createSnackBar(
@@ -146,14 +143,14 @@ class SnackBars {
       textColor: Colors.white,
     );
 
-    _pendingSnackBar = snackBar;
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.clearSnackBars();
+    messenger.showSnackBar(snackBar);
 
     return SnackBars._();
   }
 
   static SnackBars dark(BuildContext context, dynamic content) {
-    _context = context;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final snackBar = _createSnackBar(
@@ -166,14 +163,14 @@ class SnackBars {
       textColor: Colors.white,
     );
 
-    _pendingSnackBar = snackBar;
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.clearSnackBars();
+    messenger.showSnackBar(snackBar);
 
     return SnackBars._();
   }
 
   static SnackBars primary(BuildContext context, dynamic content) {
-    _context = context;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
     final snackBar = _createSnackBar(
@@ -186,26 +183,14 @@ class SnackBars {
       textColor: Colors.white,
     );
 
-    _pendingSnackBar = snackBar;
-    ScaffoldMessenger.of(context).showSnackBar(snackBar);
+    final messenger = ScaffoldMessenger.of(context);
+    messenger.clearSnackBars();
+    messenger.showSnackBar(snackBar);
 
     return SnackBars._();
   }
 
-  void clearSnackBars() {
-    if (_context != null) {
-      ScaffoldMessenger.of(_context!).removeCurrentSnackBar();
-
-      Future.delayed(const Duration(milliseconds: 100), () {
-        if (_pendingSnackBar != null && _context != null) {
-          ScaffoldMessenger.of(_context!).showSnackBar(_pendingSnackBar!);
-          _pendingSnackBar = null;
-        }
-      });
-    }
-  }
-
-  static SnackBar? _pendingSnackBar;
+  void clearSnackBars() {}
 
   static SnackBar _createSnackBar({
     required BuildContext context,

@@ -152,7 +152,15 @@ class _RegistrantListScreenState extends State<RegistrantListScreen> {
 
   void _applyFilter() {
     if (_registrantProvider != null) {
-      _registrantProvider!.loadRegistrants(status: _selectedStatus);
+      final query = _searchController.text.trim();
+      if (query.isNotEmpty) {
+        _registrantProvider!.searchRegistrants(
+          query,
+          status: _selectedStatus,
+        );
+      } else {
+        _registrantProvider!.loadRegistrants(status: _selectedStatus);
+      }
     }
   }
 
@@ -171,7 +179,10 @@ class _RegistrantListScreenState extends State<RegistrantListScreen> {
       if (query.isEmpty) {
         _registrantProvider!.loadRegistrants(status: _selectedStatus);
       } else {
-        _registrantProvider!.searchRegistrants(query);
+        _registrantProvider!.searchRegistrants(
+          query,
+          status: _selectedStatus,
+        );
       }
     }
   }

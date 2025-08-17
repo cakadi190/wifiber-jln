@@ -17,6 +17,7 @@ import 'package:wifiber/services/customer_service.dart';
 import 'package:wifiber/services/registrant_service.dart';
 import 'package:wifiber/services/router_service.dart';
 import 'package:wifiber/services/transaction_service.dart';
+import 'package:wifiber/services/navigation_service.dart';
 
 void main() {
   runApp(
@@ -52,6 +53,7 @@ class CoreApp extends StatelessWidget {
     return MaterialApp(
       title: 'Wifiber',
       debugShowCheckedModeBanner: false,
+      navigatorKey: NavigationService.navigatorKey,
       theme: ThemeData(
         useMaterial3: true,
         colorScheme: AppColors.colorScheme,
