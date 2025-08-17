@@ -74,10 +74,11 @@ class _HomeTabState extends State<HomeTab> {
                     onBillMenuTapped: widget.onBookKeepingTap,
                   ),
 
-                  SizedBox(
-                    width: double.infinity,
-                    child: TicketSummary(onTicketTap: widget.onTicketTap),
-                  ),
+                  if (authProvider.user?.permissions.contains('ticket') == true)
+                    SizedBox(
+                      width: double.infinity,
+                      child: TicketSummary(onTicketTap: widget.onTicketTap),
+                    ),
                 ],
               ),
             ),
