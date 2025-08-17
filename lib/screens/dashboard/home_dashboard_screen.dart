@@ -15,6 +15,7 @@ import 'package:wifiber/tabs/home/account_center_screen.dart';
 import 'package:wifiber/tabs/home/complaints_tab.dart';
 import 'package:wifiber/tabs/home/home_tab.dart';
 import 'package:wifiber/tabs/home/transaction_tab.dart';
+import 'package:wifiber/helpers/role.dart';
 
 class HomeDashboardScreen extends StatefulWidget {
   const HomeDashboardScreen({super.key});
@@ -75,13 +76,21 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
         );
       });
     } else if (index == 1) {
-      _transactionTabController.refreshTransactions();
+      RoleGuard.check(
+        context: context,
+        permissions: 'transaction',
+        action: () => _transactionTabController.refreshTransactions(),
+      );
     } else if (index == 2) {
       Navigator.of(
         context,
       ).push(MaterialPageRoute(builder: (context) => const BillsScreen()));
     } else if (index == 3) {
-      _complaintController.loadComplaints();
+      RoleGuard.check(
+        context: context,
+        permissions: 'complaint',
+        action: () => _complaintController.loadComplaints(),
+      );
     } else {
       setState(() {
         _internalStyle = SystemUiHelper.light(

@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:wifiber/config/app_colors.dart';
+import 'package:wifiber/helpers/role.dart';
 import 'package:wifiber/screens/dashboard/customers/customer_list_screen.dart';
 import 'package:wifiber/screens/dashboard/registrants/registrant_list_screen.dart';
 import 'package:wifiber/screens/dashboard/infrastructure/infrastructure_home.dart';
@@ -27,6 +28,8 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
   late Animation<double> _slideAnimation;
   late Animation<double> _fadeAnimation;
 
+  late List<MenuItem> _menuItems;
+
   @override
   void initState() {
     super.initState();
@@ -46,7 +49,7 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
     _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
       CurvedAnimation(
         parent: _animationController,
-        curve: Interval(0.2, 1.0, curve: Curves.easeInOut),
+        curve: const Interval(0.2, 1.0, curve: Curves.easeInOut),
       ),
     );
 
@@ -55,11 +58,17 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
         icon: Icons.verified_user_sharp,
         title: 'Calon Pelanggan',
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const RegistrantListScreen(),
-            ),
+          RoleGuard.check(
+            context: context,
+            permissions: 'registrant',
+            action: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const RegistrantListScreen(),
+                ),
+              );
+            },
           );
         },
       ),
@@ -67,34 +76,75 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
         icon: Icons.person,
         title: 'Data Pelanggan',
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const CustomerListScreen()),
+          RoleGuard.check(
+            context: context,
+            permissions: 'customer',
+            action: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const CustomerListScreen(),
+                ),
+              );
+            },
           );
         },
       ),
       MenuItem(
         icon: Icons.warning,
         title: 'Keluhan',
-        onTap: widget.onTicketMenuTapped,
+        onTap: () {
+          RoleGuard.check(
+            context: context,
+            permissions: 'ticket',
+            action: () {
+              widget.onTicketMenuTapped?.call();
+            },
+          );
+        },
       ),
       MenuItem(
         icon: Icons.bookmark,
         title: 'Pembukuan',
-        onTap: widget.onTransactionMenuTapped,
+        onTap: () {
+          RoleGuard.check(
+            context: context,
+            permissions: 'finance',
+            action: () {
+              widget.onTransactionMenuTapped?.call();
+            },
+          );
+        },
       ),
       MenuItem(
         icon: Icons.wallet,
         title: 'Tagihan dan Pembayaran',
-        onTap: widget.onBillMenuTapped,
+        onTap: () {
+          RoleGuard.check(
+            context: context,
+            permissions: ['bill', 'payment'], // support array
+            mode: PermissionMode.any,
+            action: () {
+              widget.onBillMenuTapped?.call();
+            },
+          );
+        },
       ),
       MenuItem(
         icon: Icons.wifi,
         title: 'Router MikroTik',
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const ListMikrotikScreen()),
+          RoleGuard.check(
+            context: context,
+            permissions: 'integration',
+            action: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const ListMikrotikScreen(),
+                ),
+              );
+            },
           );
         },
       ),
@@ -102,9 +152,17 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
         icon: Icons.pin_drop,
         title: 'Peta Infrastruktur',
         onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => const InfrastructureHome()),
+          RoleGuard.check(
+            context: context,
+            permissions: 'infrastructure',
+            action: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => const InfrastructureHome(),
+                ),
+              );
+            },
           );
         },
       ),
@@ -116,8 +174,6 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
     _animationController.dispose();
     super.dispose();
   }
-
-  late List<MenuItem> _menuItems;
 
   @override
   Widget build(BuildContext context) {
@@ -139,7 +195,6 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
       mainAxisSize: MainAxisSize.min,
       children: [
         _buildVisibleItems(),
-
         AnimatedBuilder(
           animation: _slideAnimation,
           builder: (context, child) {

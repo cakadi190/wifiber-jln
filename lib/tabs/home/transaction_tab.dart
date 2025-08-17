@@ -5,7 +5,9 @@ import 'package:wifiber/controllers/tabs/transaction_tab.dart';
 import 'package:wifiber/helpers/currency_helper.dart';
 import 'package:wifiber/helpers/datetime_helper.dart';
 import 'package:wifiber/models/transaction.dart';
+import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/providers/transaction_provider.dart';
+import 'package:wifiber/helpers/role.dart';
 
 class TransactionTab extends StatelessWidget {
   final TransactionTabController controller;
@@ -21,7 +23,10 @@ class TransactionTab extends StatelessWidget {
         builder: (context, provider, child) {
           return Column(
             children: [
-              _buildFilter(context, provider),
+              RoleGuardWidget(
+                permissions: 'transaction',
+                child: _buildFilter(context, provider),
+              ),
               Expanded(
                 child: Container(
                   clipBehavior: Clip.hardEdge,
@@ -388,7 +393,9 @@ class TransactionTab extends StatelessWidget {
               : Colors.white.withValues(alpha: 0.10),
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? Colors.white : Colors.white.withValues(alpha: 0.50),
+            color: isSelected
+                ? Colors.white
+                : Colors.white.withValues(alpha: 0.50),
             width: 1,
           ),
         ),
@@ -405,6 +412,21 @@ class TransactionTab extends StatelessWidget {
   }
 
   Widget _buildContent(BuildContext context, TransactionProvider provider) {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final user = authProvider.user;
+
+    if (user == null) {
+      return Center(
+        child: Center(child: Text("Pengguna belum terautentikasi")),
+      );
+    }
+
+    if (!user.permissions.contains('transaction')) {
+      return Center(
+        child: Center(child: Text("Anda tidak memiliki akses ke bagian ini")),
+      );
+    }
+
     if (provider.isLoading) {
       return Center(child: CircularProgressIndicator());
     }
@@ -587,10 +609,11 @@ class TransactionTab extends StatelessWidget {
               ),
             ),
             Text(error, textAlign: TextAlign.center),
-            if(error.contains("401")) TextButton(
-              onPressed: () => controller.logout(context),
-              child: Text("Autentikasi ulang"),
-            ),
+            if (error.contains("401"))
+              TextButton(
+                onPressed: () => controller.logout(context),
+                child: Text("Autentikasi ulang"),
+              ),
           ],
         ),
       ),

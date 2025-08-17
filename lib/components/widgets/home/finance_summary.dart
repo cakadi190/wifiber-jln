@@ -17,7 +17,8 @@ class FinanceSummary extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChangeNotifierProvider(
-      create: (_) => TransactionProvider(TransactionService())..loadTransactions(),
+      create: (_) =>
+          TransactionProvider(TransactionService())..loadTransactions(),
       child: _FinanceSummaryView(onFinanceTap: onFinanceTap),
     );
   }
@@ -52,9 +53,8 @@ class _FinanceSummaryView extends StatelessWidget {
               message: 'Belum ada transaksi',
               icon: Icons.info,
             ),
-            dataBuilder: (transactions) =>
-                _buildTransactionsList(transactions),
-            isEmpty: (transactions) => transactions.isEmpty,
+            dataBuilder: (transactions) => _buildTransactionsList(transactions),
+            isEmpty: (transactions) => transactions?.isEmpty ?? true,
           ),
         );
       },
@@ -73,7 +73,9 @@ class _FinanceSummaryView extends StatelessWidget {
           leading: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: (isIncome ? Colors.green : Colors.red).withValues(alpha: 0.1),
+              color: (isIncome ? Colors.green : Colors.red).withValues(
+                alpha: 0.1,
+              ),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
@@ -101,4 +103,3 @@ class _FinanceSummaryView extends StatelessWidget {
     );
   }
 }
-
