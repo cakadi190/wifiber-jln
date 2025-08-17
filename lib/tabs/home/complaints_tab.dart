@@ -45,10 +45,6 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
     widget.controller.search('');
   }
 
-  void _onSearchChanged(String query) {
-    widget.controller.search(query);
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(

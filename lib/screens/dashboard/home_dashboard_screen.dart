@@ -78,7 +78,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     } else if (index == 1) {
       RoleGuard.check(
         context: context,
-        permissions: 'transaction',
+        permissions: 'finance',
         action: () => _transactionTabController.refreshTransactions(),
       );
     } else if (index == 2) {
@@ -88,7 +88,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     } else if (index == 3) {
       RoleGuard.check(
         context: context,
-        permissions: 'complaint',
+        permissions: 'ticket',
         action: () => _complaintController.loadComplaints(),
       );
     } else {

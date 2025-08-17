@@ -43,8 +43,6 @@ class AuthService {
           }
         }
 
-        print(user.toJson());
-
         return user;
       } catch (e) {
         await logout();
