@@ -5,7 +5,6 @@ import 'package:wifiber/controllers/tabs/transaction_tab.dart';
 import 'package:wifiber/helpers/currency_helper.dart';
 import 'package:wifiber/helpers/datetime_helper.dart';
 import 'package:wifiber/models/transaction.dart';
-import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/providers/transaction_provider.dart';
 import 'package:wifiber/helpers/role.dart';
 
@@ -24,20 +23,28 @@ class TransactionTab extends StatelessWidget {
           return Column(
             children: [
               RoleGuardWidget(
-                permissions: 'transaction',
+                permissions: 'finance',
                 child: _buildFilter(context, provider),
               ),
+
               Expanded(
                 child: Container(
                   clipBehavior: Clip.hardEdge,
                   decoration: BoxDecoration(
                     color: AppColors.background,
-                    borderRadius: BorderRadius.only(
+                    borderRadius: const BorderRadius.only(
                       topLeft: Radius.circular(24),
                       topRight: Radius.circular(24),
                     ),
                   ),
-                  child: _buildContent(context, provider),
+
+                  child: RoleGuardWidget(
+                    permissions: 'finance',
+                    fallback: Center(
+                      child: Text("Anda tidak memiliki akses ke bagian ini"),
+                    ),
+                    child: _buildContent(context, provider),
+                  ),
                 ),
               ),
             ],
@@ -412,23 +419,8 @@ class TransactionTab extends StatelessWidget {
   }
 
   Widget _buildContent(BuildContext context, TransactionProvider provider) {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-    final user = authProvider.user;
-
-    if (user == null) {
-      return Center(
-        child: Center(child: Text("Pengguna belum terautentikasi")),
-      );
-    }
-
-    if (!user.permissions.contains('transaction')) {
-      return Center(
-        child: Center(child: Text("Anda tidak memiliki akses ke bagian ini")),
-      );
-    }
-
     if (provider.isLoading) {
-      return Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator());
     }
 
     if (provider.error != null) {

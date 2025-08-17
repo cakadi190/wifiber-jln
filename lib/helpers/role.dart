@@ -18,6 +18,8 @@ class RoleGuard {
 
     final allowed = _hasPermission(userPermissions, permissions, mode);
 
+    print(allowed);
+
     if (!allowed) {
       SnackBars.error(
         context,

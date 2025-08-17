@@ -5,6 +5,7 @@ import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/controllers/tabs/complaint_tab_controller.dart';
 import 'package:wifiber/helpers/datetime_helper.dart';
+import 'package:wifiber/helpers/role.dart';
 import 'package:wifiber/models/complaint.dart';
 import 'package:wifiber/providers/complaint_provider.dart';
 import 'package:wifiber/screens/dashboard/complainment/create_complainment_screen.dart';
@@ -52,20 +53,32 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.primary,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () async {
-          await Navigator.of(context).push(
-            MaterialPageRoute(
-              builder: (context) => const CreateComplaintScreen(),
-            ),
-          );
-          if (mounted) {
-            widget.controller.loadComplaints();
-          }
-        },
-        backgroundColor: AppColors.primary,
-        child: const Icon(Icons.add),
+
+      // ✅ Floating Action Button dilindungi role
+      floatingActionButton: RoleGuardWidget(
+        permissions: 'ticket',
+        child: FloatingActionButton(
+          onPressed: () {
+            RoleGuard.check(
+              context: context,
+              permissions: 'ticket',
+              action: () async {
+                await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const CreateComplaintScreen(),
+                  ),
+                );
+                if (mounted) {
+                  widget.controller.loadComplaints();
+                }
+              },
+            );
+          },
+          backgroundColor: AppColors.primary,
+          child: const Icon(Icons.add),
+        ),
       ),
+
       appBar: AppBar(
         title: _isSearching
             ? TextField(
@@ -77,7 +90,7 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
                   hintStyle: TextStyle(color: Colors.white70),
                   border: InputBorder.none,
                 ),
-                onChanged: _onSearchChanged,
+                onChanged: widget.controller.search,
               )
             : const Text('Pengaduan & Keluhan'),
         actions: [
@@ -87,26 +100,34 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
             IconButton(icon: const Icon(Icons.search), onPressed: _startSearch),
         ],
       ),
-      body: Consumer<ComplaintProvider>(
-        builder: (context, provider, child) {
-          return Column(
-            children: [
-              _buildFilter(context, provider),
-              Expanded(
-                child: Container(
-                  decoration: const BoxDecoration(
-                    color: AppColors.background,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(24),
-                      topRight: Radius.circular(24),
+
+      // ✅ Content dilindungi RoleGuardWidget
+      body: RoleGuardWidget(
+        permissions: 'ticket',
+        fallback: const Center(
+          child: Text("Anda tidak punya akses ke keluhan"),
+        ),
+        child: Consumer<ComplaintProvider>(
+          builder: (context, provider, child) {
+            return Column(
+              children: [
+                _buildFilter(context, provider),
+                Expanded(
+                  child: Container(
+                    decoration: const BoxDecoration(
+                      color: AppColors.background,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(24),
+                        topRight: Radius.circular(24),
+                      ),
                     ),
+                    child: _buildContent(context, provider),
                   ),
-                  child: _buildContent(context, provider),
                 ),
-              ),
-            ],
-          );
-        },
+              ],
+            );
+          },
+        ),
       ),
     );
   }
@@ -456,33 +477,30 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
   void _buildOptionsMenu(BuildContext context, Complaint complaint) {
     showModalBottomSheet(
       context: context,
-      isScrollControlled: true,
-      useSafeArea: false,
       backgroundColor: Colors.transparent,
       builder: (context) {
-        return MediaQuery.removePadding(
-          context: context,
-          removeTop: true,
-          removeLeft: true,
-          removeRight: true,
-          child: Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 8),
-                _buildComplaintCard(context, complaint),
-                const SizedBox(height: 16),
-                _buildButton(context, "Lihat Detail", () {
-                  Navigator.pop(context);
-                  _showComplaintDetailModal(context, complaint);
-                }),
-                _buildButton(
+        return Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 8),
+              _buildComplaintCard(context, complaint),
+              const SizedBox(height: 16),
+
+              // ✅ Lihat detail bebas
+              _buildButton(context, "Lihat Detail", () {
+                Navigator.pop(context);
+                _showComplaintDetailModal(context, complaint);
+              }),
+
+              // ✅ Update dilindungi role
+              RoleGuardWidget(
+                permissions: 'ticket',
+                child: _buildButton(
                   context,
                   "Tindak Lanjuti (Perbarui Laporan)",
                   () async {
@@ -494,18 +512,22 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
                             EditComplaintScreen(complaint: complaint),
                       ),
                     );
-                    if (mounted) {
-                      widget.controller.loadComplaints();
-                    }
+                    if (mounted) widget.controller.loadComplaints();
                   },
                 ),
-                _buildButton(context, "Hapus Pengaduan", () {
+              ),
+
+              // ✅ Delete dilindungi role
+              RoleGuardWidget(
+                permissions: 'ticket',
+                child: _buildButton(context, "Hapus Pengaduan", () {
                   Navigator.pop(context);
                   _showComplaintDeleteModal(context, complaint);
                 }, isDangerZone: true),
-                const SizedBox(height: 16),
-              ],
-            ),
+              ),
+
+              const SizedBox(height: 16),
+            ],
           ),
         );
       },
