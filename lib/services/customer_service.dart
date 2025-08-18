@@ -173,7 +173,6 @@ class CustomerService {
         );
       }
 
-      // Buat fields tanpa file
       final fields = Map.fromEntries(
         customerData.entries
             .where(
@@ -183,7 +182,6 @@ class CustomerService {
             .map((entry) => MapEntry(entry.key, entry.value.toString())),
       );
 
-      // Kalau _http punya method PUT multipart
       final streamedResponse = await _http.putUpload(
         '$path/$id',
         fields: fields,

@@ -34,7 +34,6 @@ class _CustomerDeleteContent extends StatelessWidget {
   }
 
   Future<void> _handleDelete(BuildContext context) async {
-    // Close the bottom sheet first
     Navigator.of(context).pop();
 
     final customerProvider = Provider.of<CustomerProvider>(
@@ -79,7 +78,6 @@ class _CustomerDeleteContent extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Handle bar
             Container(
               margin: const EdgeInsets.only(top: 8),
               width: 40,
@@ -90,7 +88,6 @@ class _CustomerDeleteContent extends StatelessWidget {
               ),
             ),
 
-            // Header with customer info
             Container(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -117,7 +114,6 @@ class _CustomerDeleteContent extends StatelessWidget {
               ),
             ),
 
-            // Warning section
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
               padding: const EdgeInsets.all(16),
@@ -157,7 +153,6 @@ class _CustomerDeleteContent extends StatelessWidget {
               ),
             ),
 
-            // Action buttons
             Padding(
               padding: const EdgeInsets.all(20),
               child: Row(

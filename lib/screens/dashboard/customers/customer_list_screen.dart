@@ -233,7 +233,6 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
               title: const Text('Hapus', style: TextStyle(color: Colors.red)),
               onTap: () {
                 Navigator.of(context).pop();
-                // Use the new delete modal instead of the old dialog
                 CustomerDeleteModal.show(context, customer);
               },
             ),

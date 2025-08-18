@@ -1,7 +1,7 @@
 import 'dart:convert';
 
 class HttpHelper {
-  static const String host = "wifiber.web.id";
+  static const String host = "mywifi.biz.id";
   static const String scheme = "https";
   static const String apiPath = "/api/v1/";
 

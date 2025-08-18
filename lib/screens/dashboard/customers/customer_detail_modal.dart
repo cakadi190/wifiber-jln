@@ -63,8 +63,9 @@ class CustomerDetailModal extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: (color ?? Theme.of(context).primaryColor)
-                  .withValues(alpha: 0.1),
+              color: (color ?? Theme.of(context).primaryColor).withValues(
+                alpha: 0.1,
+              ),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
@@ -117,8 +118,7 @@ class CustomerDetailModal extends StatelessWidget {
                 context,
                 imageUrl: imageUrl,
                 headers: {
-                  'Authorization':
-                      'Bearer ${authProvider.user?.accessToken}',
+                  'Authorization': 'Bearer ${authProvider.user?.accessToken}',
                 },
               ),
               child: ClipRRect(
@@ -129,8 +129,7 @@ class CustomerDetailModal extends StatelessWidget {
                   width: double.infinity,
                   fit: BoxFit.cover,
                   headers: {
-                    'Authorization':
-                        'Bearer ${authProvider.user?.accessToken}',
+                    'Authorization': 'Bearer ${authProvider.user?.accessToken}',
                   },
                   errorBuilder: (context, error, stackTrace) => Container(
                     height: 150,
@@ -147,7 +146,7 @@ class CustomerDetailModal extends StatelessWidget {
                       child: CircularProgressIndicator(
                         value: progress.expectedTotalBytes != null
                             ? progress.cumulativeBytesLoaded /
-                                progress.expectedTotalBytes!
+                                  progress.expectedTotalBytes!
                             : null,
                       ),
                     );
@@ -188,7 +187,6 @@ class CustomerDetailModal extends StatelessWidget {
           ),
           child: Column(
             children: [
-              // Drag handle
               Container(
                 width: 40,
                 height: 5,
@@ -212,7 +210,6 @@ class CustomerDetailModal extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
 
-                      // Basic Information
                       _buildDetailRow(
                         context,
                         'Nama',
@@ -254,7 +251,6 @@ class CustomerDetailModal extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
 
-                      // Photos
                       if (customer.ktpPhoto != null)
                         _buildPhotoSection('Foto KTP', customer.ktpPhoto!),
                       if (customer.locationPhoto != null)
@@ -263,7 +259,6 @@ class CustomerDetailModal extends StatelessWidget {
                           customer.locationPhoto!,
                         ),
 
-                      // Package Information
                       _buildDetailRow(
                         context,
                         'Paket',
@@ -309,7 +304,6 @@ class CustomerDetailModal extends StatelessWidget {
                         Icons.schedule,
                       ),
 
-                      // Router Information
                       if (customer.routerName != null)
                         _buildDetailRow(
                           context,
@@ -331,10 +325,8 @@ class CustomerDetailModal extends StatelessWidget {
                 ),
               ),
 
-              // Action Buttons
               Column(
                 children: [
-                  // Open Maps Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -356,7 +348,6 @@ class CustomerDetailModal extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
 
-                  // Close Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(

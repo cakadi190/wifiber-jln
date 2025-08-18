@@ -111,7 +111,6 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
               ),
               const SizedBox(height: 12),
 
-              // Perbaikan untuk menampilkan gambar
               if (hasAnyImage) ...[
                 GestureDetector(
                   onTap: () {

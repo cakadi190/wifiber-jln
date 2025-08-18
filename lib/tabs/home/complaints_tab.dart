@@ -50,7 +50,6 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
     return Scaffold(
       backgroundColor: AppColors.primary,
 
-      // ✅ Floating Action Button dilindungi role
       floatingActionButton: RoleGuardWidget(
         permissions: 'ticket',
         child: FloatingActionButton(
@@ -91,7 +90,6 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
         ],
       ),
 
-      // ✅ Content dilindungi RoleGuardWidget
       body: RoleGuardWidget(
         permissions: 'ticket',
         fallback: const Center(
@@ -481,13 +479,11 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
               _buildComplaintCard(context, complaint),
               const SizedBox(height: 16),
 
-              // ✅ Lihat detail bebas
               _buildButton(context, "Lihat Detail", () {
                 Navigator.pop(context);
                 _showComplaintDetailModal(context, complaint);
               }),
 
-              // ✅ Update dilindungi role
               RoleGuardWidget(
                 permissions: 'ticket',
                 child: _buildButton(
@@ -507,7 +503,6 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
                 ),
               ),
 
-              // ✅ Delete dilindungi role
               RoleGuardWidget(
                 permissions: 'ticket',
                 child: _buildButton(context, "Hapus Pengaduan", () {

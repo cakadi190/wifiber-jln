@@ -63,8 +63,9 @@ class RegistrantDetailModal extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: (color ?? Theme.of(context).primaryColor)
-                  .withValues(alpha: 0.1),
+              color: (color ?? Theme.of(context).primaryColor).withValues(
+                alpha: 0.1,
+              ),
               borderRadius: BorderRadius.circular(8),
             ),
             child: Icon(
@@ -117,9 +118,7 @@ class RegistrantDetailModal extends StatelessWidget {
               onTap: () => showImagePreview(
                 context,
                 imageUrl: imageUrl,
-                headers: {
-                  'Authorization': 'Bearer $token',
-                },
+                headers: {'Authorization': 'Bearer $token'},
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(8),
@@ -128,14 +127,13 @@ class RegistrantDetailModal extends StatelessWidget {
                   height: 150,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  headers: {
-                    'Authorization': 'Bearer $token',
-                  },
+                  headers: {'Authorization': 'Bearer $token'},
                   errorBuilder: (context, error, stackTrace) => Container(
                     height: 150,
                     color: Colors.grey[300],
-                    child:
-                        const Center(child: Icon(Icons.broken_image, size: 40)),
+                    child: const Center(
+                      child: Icon(Icons.broken_image, size: 40),
+                    ),
                   ),
                   loadingBuilder: (context, child, progress) {
                     if (progress == null) return child;
@@ -145,7 +143,7 @@ class RegistrantDetailModal extends StatelessWidget {
                       child: CircularProgressIndicator(
                         value: progress.expectedTotalBytes != null
                             ? progress.cumulativeBytesLoaded /
-                                progress.expectedTotalBytes!
+                                  progress.expectedTotalBytes!
                             : null,
                       ),
                     );
@@ -186,7 +184,6 @@ class RegistrantDetailModal extends StatelessWidget {
           ),
           child: Column(
             children: [
-              // Drag handle
               Container(
                 width: 40,
                 height: 5,
@@ -210,7 +207,6 @@ class RegistrantDetailModal extends StatelessWidget {
                       ),
                       const SizedBox(height: 16),
 
-                      // Basic Information
                       _buildDetailRow(
                         context,
                         'Nama',
@@ -252,7 +248,6 @@ class RegistrantDetailModal extends StatelessWidget {
                       ),
                       const SizedBox(height: 8),
 
-                      // Photos
                       if (registrant.ktpPhoto != null)
                         _buildPhotoSection('Foto KTP', registrant.ktpPhoto!),
                       if (registrant.locationPhoto != null)
@@ -261,7 +256,6 @@ class RegistrantDetailModal extends StatelessWidget {
                           registrant.locationPhoto!,
                         ),
 
-                      // Package Information
                       _buildDetailRow(
                         context,
                         'Paket',
@@ -307,7 +301,6 @@ class RegistrantDetailModal extends StatelessWidget {
                         Icons.schedule,
                       ),
 
-                      // Router Information
                       if (registrant.routerName != null)
                         _buildDetailRow(
                           context,
@@ -329,10 +322,8 @@ class RegistrantDetailModal extends StatelessWidget {
                 ),
               ),
 
-              // Action Buttons
               Column(
                 children: [
-                  // Open Maps Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -354,7 +345,6 @@ class RegistrantDetailModal extends StatelessWidget {
                   ),
                   const SizedBox(height: 8),
 
-                  // Close Button
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(

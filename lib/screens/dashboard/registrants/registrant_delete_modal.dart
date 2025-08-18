@@ -34,7 +34,6 @@ class _RegistrantDeleteContent extends StatelessWidget {
   }
 
   Future<void> _handleDelete(BuildContext context) async {
-    // Close the bottom sheet first
     Navigator.of(context).pop();
 
     final registrantProvider = Provider.of<RegistrantProvider>(
@@ -58,7 +57,9 @@ class _RegistrantDeleteContent extends StatelessWidget {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text(registrantProvider.error ?? 'Gagal menghapus pelanggan'),
+          content: Text(
+            registrantProvider.error ?? 'Gagal menghapus pelanggan',
+          ),
           backgroundColor: Colors.red,
         ),
       );
@@ -79,7 +80,6 @@ class _RegistrantDeleteContent extends StatelessWidget {
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            // Handle bar
             Container(
               margin: const EdgeInsets.only(top: 8),
               width: 40,
@@ -90,7 +90,6 @@ class _RegistrantDeleteContent extends StatelessWidget {
               ),
             ),
 
-            // Header with registrant info
             Container(
               padding: const EdgeInsets.all(20),
               child: Column(
@@ -117,7 +116,6 @@ class _RegistrantDeleteContent extends StatelessWidget {
               ),
             ),
 
-            // Warning section
             Container(
               margin: const EdgeInsets.symmetric(horizontal: 20),
               padding: const EdgeInsets.all(16),
@@ -157,7 +155,6 @@ class _RegistrantDeleteContent extends StatelessWidget {
               ),
             ),
 
-            // Action buttons
             Padding(
               padding: const EdgeInsets.all(20),
               child: Row(

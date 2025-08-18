@@ -113,7 +113,6 @@ class _PackageButtonSelectorState extends State<PackageButtonSelector> {
               ),
               child: Column(
                 children: [
-                  // Handle bar
                   Container(
                     margin: const EdgeInsets.only(top: 12, bottom: 8),
                     height: 5,
@@ -124,7 +123,6 @@ class _PackageButtonSelectorState extends State<PackageButtonSelector> {
                     ),
                   ),
 
-                  // Header
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Row(
@@ -155,7 +153,6 @@ class _PackageButtonSelectorState extends State<PackageButtonSelector> {
 
                   Divider(height: 1, color: Colors.grey.shade300),
 
-                  // Content
                   Expanded(child: _buildContent(scrollController)),
                 ],
               ),
@@ -259,7 +256,6 @@ class _PackageButtonSelectorState extends State<PackageButtonSelector> {
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
-                    // Package Icon
                     Container(
                       width: 48,
                       height: 48,
@@ -278,7 +274,6 @@ class _PackageButtonSelectorState extends State<PackageButtonSelector> {
 
                     const SizedBox(width: 16),
 
-                    // Package Details
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -361,7 +356,6 @@ class _PackageButtonSelectorState extends State<PackageButtonSelector> {
                       ),
                     ),
 
-                    // Selection Indicator
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       width: 24,

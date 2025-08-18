@@ -111,7 +111,6 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
               ),
               const SizedBox(height: 12),
 
-              // Perbaikan untuk menampilkan gambar
               if (hasAnyImage) ...[
                 GestureDetector(
                   onTap: () {

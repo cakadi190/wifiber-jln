@@ -136,7 +136,6 @@ class _OdpButtonSelectorState extends State<OdpButtonSelector> {
               ),
               child: Column(
                 children: [
-                  // Handle bar
                   Container(
                     margin: const EdgeInsets.only(top: 12, bottom: 8),
                     height: 5,
@@ -147,7 +146,6 @@ class _OdpButtonSelectorState extends State<OdpButtonSelector> {
                     ),
                   ),
 
-                  // Header
                   Padding(
                     padding: const EdgeInsets.all(16.0),
                     child: Row(
@@ -178,7 +176,6 @@ class _OdpButtonSelectorState extends State<OdpButtonSelector> {
 
                   Divider(height: 1, color: Colors.grey.shade300),
 
-                  // Content
                   Expanded(child: _buildContent(scrollController)),
                 ],
               ),
@@ -282,7 +279,6 @@ class _OdpButtonSelectorState extends State<OdpButtonSelector> {
                 padding: const EdgeInsets.all(16),
                 child: Row(
                   children: [
-                    // ODP Icon
                     Container(
                       width: 48,
                       height: 48,
@@ -301,7 +297,6 @@ class _OdpButtonSelectorState extends State<OdpButtonSelector> {
 
                     const SizedBox(width: 16),
 
-                    // ODP Details
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -405,7 +400,6 @@ class _OdpButtonSelectorState extends State<OdpButtonSelector> {
                       ),
                     ),
 
-                    // Selection Indicator
                     AnimatedContainer(
                       duration: const Duration(milliseconds: 200),
                       width: 24,
