@@ -13,9 +13,10 @@ import 'package:wifiber/components/reusables/odp_modal_selector.dart';
 import 'package:wifiber/components/reusables/image_preview.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/services/registrant_service.dart';
-import 'package:wifiber/components/widgets/map_picker.dart';
+import 'package:wifiber/components/widgets/map_picker_page.dart';
 import 'package:wifiber/services/location_service.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:geolocator/geolocator.dart';
 
 class RegistrantFormScreen extends StatefulWidget {
   final Registrant? registrant;
@@ -39,26 +40,41 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
     super.initState();
     _controller = RegistrantFormController();
     _controller.initializeWithRegistrant(widget.registrant);
-
-    _loadInitialLocation();
+    if (widget.registrant?.latitude != null &&
+        widget.registrant?.longitude != null) {
+      _selectedLocation = LatLng(
+        double.parse(widget.registrant!.latitude!),
+        double.parse(widget.registrant!.longitude!),
+      );
+    }
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _controller.initializeEditData();
     });
   }
 
-  Future<void> _loadInitialLocation() async {
+  Future<void> _pickCurrentLocation() async {
     setState(() {
       _isFetchingLocation = true;
       _locationError = null;
     });
     try {
-      final location = await LocationService.getCurrentPosition();
-      if (location != null) {
+      final permission = await LocationService.requestLocationPermission();
+      if (permission == LocationPermission.always ||
+          permission == LocationPermission.whileInUse) {
+        final location = await LocationService.getCurrentPosition();
+        if (location != null) {
+          setState(() {
+            _selectedLocation = location;
+            _controller.latitudeController.text =
+                location.latitude.toString();
+            _controller.longitudeController.text =
+                location.longitude.toString();
+          });
+        }
+      } else {
         setState(() {
-          _selectedLocation = location;
-          _controller.latitudeController.text = location.latitude.toString();
-          _controller.longitudeController.text = location.longitude.toString();
+          _locationError = 'Location permission denied';
         });
       }
     } catch (e) {
@@ -703,39 +719,38 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 8),
-                                SizedBox(
-                                  height: 200,
-                                  child: MapPicker(
-                                    initialLocation: _selectedLocation,
-                                    onLocationPicked: (latlng) {
-                                      setState(() {
-                                        _selectedLocation = latlng;
-                                        _controller.latitudeController.text =
-                                            latlng.latitude.toString();
-                                        _controller.longitudeController.text =
-                                            latlng.longitude.toString();
-                                      });
-                                    },
-                                  ),
-                                ),
-                                const SizedBox(height: 8),
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: Text(
-                                        _selectedLocation != null
-                                            ? '${_selectedLocation!.latitude.toStringAsFixed(6)}, ${_selectedLocation!.longitude.toStringAsFixed(6)}'
-                                            : 'Lokasi belum dipilih',
-                                        style: TextStyle(
-                                          color: Colors.grey.shade700,
-                                          fontSize: 12,
+                                      child: OutlinedButton(
+                                        onPressed: () async {
+                                          final result = await Navigator.of(context)
+                                              .push<LatLng>(MaterialPageRoute(
+                                            builder: (_) => MapPickerPage(
+                                              initialLocation: _selectedLocation,
+                                            ),
+                                          ));
+                                          if (result != null) {
+                                            setState(() {
+                                              _selectedLocation = result;
+                                              _controller.latitudeController.text =
+                                                  result.latitude.toString();
+                                              _controller.longitudeController.text =
+                                                  result.longitude.toString();
+                                            });
+                                          }
+                                        },
+                                        child: Text(
+                                          _selectedLocation != null
+                                              ? '${_selectedLocation!.latitude.toStringAsFixed(6)}, ${_selectedLocation!.longitude.toStringAsFixed(6)}'
+                                              : 'Pilih Lokasi',
                                         ),
                                       ),
                                     ),
                                     IconButton(
                                       onPressed: _isFetchingLocation
                                           ? null
-                                          : _loadInitialLocation,
+                                          : _pickCurrentLocation,
                                       icon: _isFetchingLocation
                                           ? const SizedBox(
                                               width: 20,
