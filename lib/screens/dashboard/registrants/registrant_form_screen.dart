@@ -13,6 +13,9 @@ import 'package:wifiber/components/reusables/odp_modal_selector.dart';
 import 'package:wifiber/components/reusables/image_preview.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/services/registrant_service.dart';
+import 'package:wifiber/components/widgets/map_picker.dart';
+import 'package:wifiber/services/location_service.dart';
+import 'package:latlong2/latlong.dart';
 
 class RegistrantFormScreen extends StatefulWidget {
   final Registrant? registrant;
@@ -27,6 +30,9 @@ class RegistrantFormScreen extends StatefulWidget {
 class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
   final _formKey = GlobalKey<FormState>();
   late RegistrantFormController _controller;
+  LatLng? _selectedLocation;
+  bool _isFetchingLocation = false;
+  String? _locationError;
 
   @override
   void initState() {
@@ -34,9 +40,36 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
     _controller = RegistrantFormController();
     _controller.initializeWithRegistrant(widget.registrant);
 
+    _loadInitialLocation();
+
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _controller.initializeEditData();
     });
+  }
+
+  Future<void> _loadInitialLocation() async {
+    setState(() {
+      _isFetchingLocation = true;
+      _locationError = null;
+    });
+    try {
+      final location = await LocationService.getCurrentPosition();
+      if (location != null) {
+        setState(() {
+          _selectedLocation = location;
+          _controller.latitudeController.text = location.latitude.toString();
+          _controller.longitudeController.text = location.longitude.toString();
+        });
+      }
+    } catch (e) {
+      setState(() {
+        _locationError = e.toString();
+      });
+    } finally {
+      setState(() {
+        _isFetchingLocation = false;
+      });
+    }
   }
 
   @override
@@ -670,43 +703,62 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
                                   ),
                                 ),
                                 const SizedBox(height: 8),
-                                Text(
-                                  'Kedua koordinat harus diisi atau biarkan keduanya kosong',
-                                  style: TextStyle(
-                                    color: Colors.grey.shade600,
-                                    fontSize: 12,
+                                SizedBox(
+                                  height: 200,
+                                  child: MapPicker(
+                                    initialLocation: _selectedLocation,
+                                    onLocationPicked: (latlng) {
+                                      setState(() {
+                                        _selectedLocation = latlng;
+                                        _controller.latitudeController.text =
+                                            latlng.latitude.toString();
+                                        _controller.longitudeController.text =
+                                            latlng.longitude.toString();
+                                      });
+                                    },
                                   ),
                                 ),
-                                const SizedBox(height: 16),
-                                TextFormField(
-                                  controller: controller.latitudeController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Latitude',
-                                    border: OutlineInputBorder(),
-                                    prefixIcon: Icon(Icons.my_location),
-                                  ),
-                                  keyboardType:
-                                      const TextInputType.numberWithOptions(
-                                        decimal: true,
+                                const SizedBox(height: 8),
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        _selectedLocation != null
+                                            ? '${_selectedLocation!.latitude.toStringAsFixed(6)}, ${_selectedLocation!.longitude.toStringAsFixed(6)}'
+                                            : 'Lokasi belum dipilih',
+                                        style: TextStyle(
+                                          color: Colors.grey.shade700,
+                                          fontSize: 12,
+                                        ),
                                       ),
-                                  validator: (value) => controller
-                                      .validateCoordinates(value, true),
+                                    ),
+                                    IconButton(
+                                      onPressed: _isFetchingLocation
+                                          ? null
+                                          : _loadInitialLocation,
+                                      icon: _isFetchingLocation
+                                          ? const SizedBox(
+                                              width: 20,
+                                              height: 20,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                              ),
+                                            )
+                                          : const Icon(Icons.my_location),
+                                    ),
+                                  ],
                                 ),
-                                const SizedBox(height: 16),
-                                TextFormField(
-                                  controller: controller.longitudeController,
-                                  decoration: const InputDecoration(
-                                    labelText: 'Longitude',
-                                    border: OutlineInputBorder(),
-                                    prefixIcon: Icon(Icons.my_location),
-                                  ),
-                                  keyboardType:
-                                      const TextInputType.numberWithOptions(
-                                        decimal: true,
+                                if (_locationError != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8.0),
+                                    child: Text(
+                                      _locationError!,
+                                      style: const TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 12,
                                       ),
-                                  validator: (value) => controller
-                                      .validateCoordinates(value, false),
-                                ),
+                                    ),
+                                  ),
                               ],
                             ),
                           ),

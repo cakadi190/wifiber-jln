@@ -9,6 +9,7 @@ import 'package:wifiber/models/registrant.dart';
 import 'package:wifiber/providers/registrant_provider.dart';
 import 'package:wifiber/services/registrant_service.dart';
 import 'package:wifiber/services/http_service.dart';
+import 'package:wifiber/services/location_service.dart';
 
 class RegistrantFormController extends ChangeNotifier {
   final HttpService _http = HttpService();
@@ -375,6 +376,25 @@ class RegistrantFormController extends ChangeNotifier {
   }) async {
     isLoading = true;
     notifyListeners();
+
+    if (latitudeController.text.trim().isEmpty ||
+        longitudeController.text.trim().isEmpty) {
+      try {
+        final current = await LocationService.getCurrentPosition();
+        if (current != null) {
+          latitudeController.text = current.latitude.toString();
+          longitudeController.text = current.longitude.toString();
+        }
+      } catch (e) {
+        isLoading = false;
+        notifyListeners();
+        SnackBars.error(
+          context,
+          'Izin lokasi diperlukan untuk menambahkan data',
+        ).clearSnackBars();
+        return false;
+      }
+    }
 
     final registrantData = <String, dynamic>{
       'name': nameController.text.trim(),

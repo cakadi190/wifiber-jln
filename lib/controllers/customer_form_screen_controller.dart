@@ -9,6 +9,7 @@ import 'package:wifiber/models/customer.dart';
 import 'package:wifiber/providers/customer_provider.dart';
 import 'package:wifiber/services/customer_service.dart';
 import 'package:wifiber/services/http_service.dart';
+import 'package:wifiber/services/location_service.dart';
 
 class CustomerFormController extends ChangeNotifier {
   final HttpService _http = HttpService();
@@ -337,6 +338,25 @@ class CustomerFormController extends ChangeNotifier {
   }) async {
     isLoading = true;
     notifyListeners();
+
+    if (latitudeController.text.trim().isEmpty ||
+        longitudeController.text.trim().isEmpty) {
+      try {
+        final current = await LocationService.getCurrentPosition();
+        if (current != null) {
+          latitudeController.text = current.latitude.toString();
+          longitudeController.text = current.longitude.toString();
+        }
+      } catch (e) {
+        isLoading = false;
+        notifyListeners();
+        SnackBars.error(
+          context,
+          'Izin lokasi diperlukan untuk menambahkan data',
+        ).clearSnackBars();
+        return false;
+      }
+    }
 
     final customerData = <String, dynamic>{
       'name': nameController.text.trim(),
