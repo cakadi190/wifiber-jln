@@ -19,6 +19,7 @@ class Registrant {
   final String? latitude;
   final String? longitude;
   final String discount;
+  final bool isProrate;
   final String packageName;
   final String packagePrice;
   final String packagePpn;
@@ -46,6 +47,7 @@ class Registrant {
     this.latitude,
     this.longitude,
     required this.discount,
+    required this.isProrate,
     required this.packageName,
     required this.packagePrice,
     required this.packagePpn,
@@ -75,6 +77,8 @@ class Registrant {
       latitude: json['latitude'],
       longitude: json['longitude'],
       discount: json['discount'].toString(),
+      isProrate:
+          json['is_prorate'] == true || json['is_prorate'].toString() == '1',
       packageName: json['package_name'],
       packagePrice: json['package_price'].toString(),
       packagePpn: json['package_ppn'].toString(),
@@ -105,6 +109,7 @@ class Registrant {
       'latitude': latitude,
       'longitude': longitude,
       'discount': discount,
+      'is_prorate': isProrate,
       'package_name': packageName,
       'package_price': packagePrice,
       'package_ppn': packagePpn,

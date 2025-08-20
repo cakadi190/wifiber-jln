@@ -637,6 +637,14 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
                                   validator: (value) => controller
                                       .validateRequired(value, 'Diskon'),
                                 ),
+                                const SizedBox(height: 16),
+                                CheckboxListTile(
+                                  contentPadding: EdgeInsets.zero,
+                                  title: const Text('Buat Prorata?'),
+                                  value: controller.isProrate,
+                                  onChanged: (value) =>
+                                      controller.setProrate(value ?? false),
+                                ),
                               ],
                             ),
                           ),
