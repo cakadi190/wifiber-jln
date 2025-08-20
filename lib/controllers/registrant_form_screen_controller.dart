@@ -43,6 +43,7 @@ class RegistrantFormController extends ChangeNotifier {
 
   bool isLoading = false;
   bool isInitializing = false;
+  bool isProrate = false;
 
   XFile? ktpPhotoFile;
   XFile? locationPhotoFile;
@@ -83,6 +84,7 @@ class RegistrantFormController extends ChangeNotifier {
     latitudeController.text = registrant.latitude ?? '';
     longitudeController.text = registrant.longitude ?? '';
     discountController.text = registrant.discount;
+    isProrate = registrant.isProrate;
 
     ktpPhotoUrl = registrant.ktpPhoto?.isNotEmpty == true
         ? registrant.ktpPhoto
@@ -97,6 +99,11 @@ class RegistrantFormController extends ChangeNotifier {
     selectedRouterId = registrant.routerId;
     selectedOdpId = registrant.odpId;
 
+    notifyListeners();
+  }
+
+  void setProrate(bool value) {
+    isProrate = value;
     notifyListeners();
   }
 
@@ -389,6 +396,7 @@ class RegistrantFormController extends ChangeNotifier {
       'discount': discountController.text.trim().isEmpty
           ? '0'
           : discountController.text.trim(),
+      'is-prorate': isProrate.toString(),
     };
 
     if (latitudeController.text.trim().isNotEmpty &&
