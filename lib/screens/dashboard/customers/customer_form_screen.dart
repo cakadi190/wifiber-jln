@@ -13,9 +13,10 @@ import 'package:wifiber/components/reusables/image_preview.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/services/customer_service.dart';
 import 'package:wifiber/middlewares/auth_middleware.dart';
-import 'package:wifiber/components/widgets/map_picker.dart';
+import 'package:wifiber/components/widgets/map_picker_page.dart';
 import 'package:wifiber/services/location_service.dart';
 import 'package:latlong2/latlong.dart';
+import 'package:geolocator/geolocator.dart';
 
 class CustomerFormScreen extends StatefulWidget {
   final Customer? customer;
@@ -39,26 +40,41 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
     super.initState();
     _controller = CustomerFormController();
     _controller.initializeWithCustomer(widget.customer);
-
-    _loadInitialLocation();
+    if (widget.customer?.latitude != null &&
+        widget.customer?.longitude != null) {
+      _selectedLocation = LatLng(
+        double.parse(widget.customer!.latitude!),
+        double.parse(widget.customer!.longitude!),
+      );
+    }
 
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _controller.initializeEditData();
     });
   }
 
-  Future<void> _loadInitialLocation() async {
+  Future<void> _pickCurrentLocation() async {
     setState(() {
       _isFetchingLocation = true;
       _locationError = null;
     });
     try {
-      final location = await LocationService.getCurrentPosition();
-      if (location != null) {
+      final permission = await LocationService.requestLocationPermission();
+      if (permission == LocationPermission.always ||
+          permission == LocationPermission.whileInUse) {
+        final location = await LocationService.getCurrentPosition();
+        if (location != null) {
+          setState(() {
+            _selectedLocation = location;
+            _controller.latitudeController.text =
+                location.latitude.toString();
+            _controller.longitudeController.text =
+                location.longitude.toString();
+          });
+        }
+      } else {
         setState(() {
-          _selectedLocation = location;
-          _controller.latitudeController.text = location.latitude.toString();
-          _controller.longitudeController.text = location.longitude.toString();
+          _locationError = 'Location permission denied';
         });
       }
     } catch (e) {
@@ -702,61 +718,61 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                                     ),
                                   ),
                                   const SizedBox(height: 8),
-                                  SizedBox(
-                                    height: 200,
-                                    child: MapPicker(
-                                      initialLocation: _selectedLocation,
-                                      onLocationPicked: (latlng) {
-                                        setState(() {
-                                          _selectedLocation = latlng;
-                                          _controller.latitudeController.text =
-                                              latlng.latitude.toString();
-                                          _controller.longitudeController.text =
-                                              latlng.longitude.toString();
-                                        });
-                                      },
-                                    ),
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    children: [
-                                      Expanded(
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: OutlinedButton(
+                                        onPressed: () async {
+                                          final result = await Navigator.of(context)
+                                              .push<LatLng>(MaterialPageRoute(
+                                            builder: (_) => MapPickerPage(
+                                              initialLocation: _selectedLocation,
+                                            ),
+                                          ));
+                                          if (result != null) {
+                                            setState(() {
+                                              _selectedLocation = result;
+                                              _controller.latitudeController.text =
+                                                  result.latitude.toString();
+                                              _controller.longitudeController.text =
+                                                  result.longitude.toString();
+                                            });
+                                          }
+                                        },
                                         child: Text(
                                           _selectedLocation != null
                                               ? '${_selectedLocation!.latitude.toStringAsFixed(6)}, ${_selectedLocation!.longitude.toStringAsFixed(6)}'
-                                              : 'Lokasi belum dipilih',
-                                          style: TextStyle(
-                                            color: Colors.grey.shade700,
-                                            fontSize: 12,
-                                          ),
-                                        ),
-                                      ),
-                                      IconButton(
-                                        onPressed:
-                                            _isFetchingLocation ? null : _loadInitialLocation,
-                                        icon: _isFetchingLocation
-                                            ? const SizedBox(
-                                                width: 20,
-                                                height: 20,
-                                                child: CircularProgressIndicator(
-                                                  strokeWidth: 2,
-                                                ),
-                                              )
-                                            : const Icon(Icons.my_location),
-                                      ),
-                                    ],
-                                  ),
-                                  if (_locationError != null)
-                                    Padding(
-                                      padding: const EdgeInsets.only(top: 8.0),
-                                      child: Text(
-                                        _locationError!,
-                                        style: const TextStyle(
-                                          color: Colors.red,
-                                          fontSize: 12,
+                                              : 'Pilih Lokasi',
                                         ),
                                       ),
                                     ),
+                                    IconButton(
+                                      onPressed: _isFetchingLocation
+                                          ? null
+                                          : _pickCurrentLocation,
+                                      icon: _isFetchingLocation
+                                          ? const SizedBox(
+                                              width: 20,
+                                              height: 20,
+                                              child: CircularProgressIndicator(
+                                                strokeWidth: 2,
+                                              ),
+                                            )
+                                          : const Icon(Icons.my_location),
+                                    ),
+                                  ],
+                                ),
+                                if (_locationError != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(top: 8.0),
+                                    child: Text(
+                                      _locationError!,
+                                      style: const TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
