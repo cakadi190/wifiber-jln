@@ -306,7 +306,7 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
                           ),
                         ),
 
-                        const SizedBox(height: 32),
+                        const SizedBox(height: 0),
                       ],
                     ),
                   ),
@@ -314,7 +314,7 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
               ),
 
               Container(
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                 child: SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
