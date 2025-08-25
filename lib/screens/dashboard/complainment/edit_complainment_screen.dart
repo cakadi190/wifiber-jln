@@ -165,7 +165,7 @@ class _EditComplaintScreenState extends State<EditComplaintScreen> {
                             ],
                           ),
 
-                          const SizedBox(height: 100),
+                            const SizedBox(height: 0),
                         ],
                       ),
                     ),
@@ -174,7 +174,7 @@ class _EditComplaintScreenState extends State<EditComplaintScreen> {
 
                 Container(
                   width: double.infinity,
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
                   decoration: const BoxDecoration(color: Colors.white),
                   child: ElevatedButton(
                     onPressed: _isLoading ? null : _onSubmit,
