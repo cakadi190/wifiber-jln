@@ -34,8 +34,9 @@ class _MapPickerState extends State<MapPicker> {
       ),
       children: [
         TileLayer(
-          urlTemplate: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+          urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
           subdomains: const ['a', 'b', 'c'],
+          userAgentPackageName: 'com.kodinus.wifiber',
         ),
         if (_selected != null)
           MarkerLayer(

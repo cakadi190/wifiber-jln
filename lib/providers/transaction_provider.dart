@@ -101,4 +101,39 @@ class TransactionProvider with ChangeNotifier {
       return null;
     }
   }
+
+  Future<void> addTransaction({
+    required int amount,
+    required String description,
+    required String type,
+  }) async {
+    await _service.createTransaction(
+      amount: amount,
+      description: description,
+      type: type,
+    );
+    await loadTransactions();
+  }
+
+  Future<void> updateTransaction(
+    int id, {
+    required int amount,
+    required String description,
+    required String type,
+  }) async {
+    await _service.updateTransaction(
+      id,
+      amount: amount,
+      description: description,
+      type: type,
+    );
+    await loadTransactions();
+  }
+
+  Future<void> deleteTransaction(int id) async {
+    await _service.deleteTransaction(id);
+    _transactions.removeWhere((tx) => tx.id == id);
+    _applyFilter();
+    notifyListeners();
+  }
 }

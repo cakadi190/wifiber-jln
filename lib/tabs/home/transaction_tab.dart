@@ -7,6 +7,7 @@ import 'package:wifiber/helpers/datetime_helper.dart';
 import 'package:wifiber/models/transaction.dart';
 import 'package:wifiber/providers/transaction_provider.dart';
 import 'package:wifiber/helpers/role.dart';
+import 'package:wifiber/screens/dashboard/transactions/transaction_form_screen.dart';
 
 class TransactionTab extends StatelessWidget {
   final TransactionTabController controller;
@@ -18,6 +19,20 @@ class TransactionTab extends StatelessWidget {
     return Scaffold(
       backgroundColor: AppColors.primary,
       appBar: AppBar(title: const Text('Keuangan')),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () async {
+          final result = await Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => const TransactionFormScreen(),
+            ),
+          );
+          if (result == true) {
+            controller.refreshTransactions();
+          }
+        },
+        child: const Icon(Icons.add),
+      ),
       body: RoleGuardWidget(
         permissions: 'finance',
         fallback: const Center(
@@ -571,8 +586,136 @@ class TransactionTab extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          trailing: Text(CurrencyHelper.formatCurrency(tx.amount)),
+          trailing: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(CurrencyHelper.formatCurrency(tx.amount)),
+              IconButton(
+                icon: const Icon(Icons.more_vert),
+                onPressed: () => _showTransactionOptions(context, tx),
+              ),
+            ],
+          ),
           onTap: () => _showTransactionDetailModal(context, tx),
+        );
+      },
+    );
+  }
+
+  void _showTransactionOptions(BuildContext context, Transaction transaction) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return SafeArea(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: const Icon(Icons.visibility),
+                title: const Text('Tampil Data'),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showTransactionDetailModal(context, transaction);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.edit),
+                title: const Text('Ubah Data'),
+                onTap: () async {
+                  Navigator.pop(context);
+                  final result = await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (_) => TransactionFormScreen(
+                        transaction: transaction,
+                      ),
+                    ),
+                  );
+                  if (result == true) {
+                    controller.refreshTransactions();
+                  }
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.delete, color: Colors.red),
+                title: const Text(
+                  'Hapus Data',
+                  style: TextStyle(color: Colors.red),
+                ),
+                onTap: () {
+                  Navigator.pop(context);
+                  _showDeleteConfirmation(context, transaction);
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  void _showDeleteConfirmation(
+    BuildContext context,
+    Transaction transaction,
+  ) {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
+      builder: (context) {
+        return Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Hapus transaksi ini?',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('Batal'),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                      ),
+                      onPressed: () async {
+                        Navigator.pop(context);
+                        final provider =
+                            context.read<TransactionProvider>();
+                        try {
+                          await provider.deleteTransaction(transaction.id);
+                          controller.refreshTransactions();
+                        } catch (e) {
+                          if (context.mounted) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Gagal menghapus transaksi: $e'),
+                              ),
+                            );
+                          }
+                        }
+                      },
+                      child: const Text('Hapus'),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         );
       },
     );
