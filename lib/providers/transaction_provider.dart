@@ -1,8 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:wifiber/models/transaction.dart';
 import 'package:wifiber/services/transaction_service.dart';
+import 'package:wifiber/utils/safe_change_notifier.dart';
 
-class TransactionProvider with ChangeNotifier {
+class TransactionProvider extends SafeChangeNotifier {
   final TransactionService _service;
 
   TransactionProvider(this._service);

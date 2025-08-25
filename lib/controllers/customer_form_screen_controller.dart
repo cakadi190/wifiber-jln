@@ -10,8 +10,9 @@ import 'package:wifiber/providers/customer_provider.dart';
 import 'package:wifiber/services/customer_service.dart';
 import 'package:wifiber/services/http_service.dart';
 import 'package:wifiber/services/location_service.dart';
+import 'package:wifiber/utils/safe_change_notifier.dart';
 
-class CustomerFormController extends ChangeNotifier {
+class CustomerFormController extends SafeChangeNotifier {
   final HttpService _http = HttpService();
   final ImagePicker _picker = ImagePicker();
 

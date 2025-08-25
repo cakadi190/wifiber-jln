@@ -9,8 +9,9 @@ import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/exceptions/validation_exceptions.dart';
 import 'package:wifiber/models/auth_user.dart';
 import 'package:wifiber/providers/auth_provider.dart';
+import 'package:wifiber/utils/safe_change_notifier.dart';
 
-class ProfileController extends ChangeNotifier {
+class ProfileController extends SafeChangeNotifier {
   final ImagePicker _picker = ImagePicker();
   final AuthProvider _authProvider;
 

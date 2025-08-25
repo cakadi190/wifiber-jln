@@ -10,8 +10,9 @@ import 'package:wifiber/providers/registrant_provider.dart';
 import 'package:wifiber/services/registrant_service.dart';
 import 'package:wifiber/services/http_service.dart';
 import 'package:wifiber/services/location_service.dart';
+import 'package:wifiber/utils/safe_change_notifier.dart';
 
-class RegistrantFormController extends ChangeNotifier {
+class RegistrantFormController extends SafeChangeNotifier {
   final HttpService _http = HttpService();
   final ImagePicker _picker = ImagePicker();
 

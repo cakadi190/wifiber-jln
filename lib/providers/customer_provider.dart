@@ -3,8 +3,9 @@ import 'dart:io';
 import 'package:flutter/foundation.dart';
 import 'package:wifiber/models/customer.dart';
 import 'package:wifiber/services/customer_service.dart';
+import 'package:wifiber/utils/safe_change_notifier.dart';
 
-class CustomerProvider extends ChangeNotifier {
+class CustomerProvider extends SafeChangeNotifier {
   final CustomerService _customerService;
 
   CustomerProvider(this._customerService);
