@@ -154,7 +154,7 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
         onTap: () {
           RoleGuard.check(
             context: context,
-            permissions: 'infrastructure',
+            permissions: 'area',
             action: () {
               Navigator.push(
                 context,

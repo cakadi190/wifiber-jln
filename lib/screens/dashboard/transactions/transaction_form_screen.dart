@@ -25,8 +25,9 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
     _amountController = TextEditingController(
       text: widget.transaction?.amount.toString() ?? '',
     );
-    _descriptionController =
-        TextEditingController(text: widget.transaction?.description ?? '');
+    _descriptionController = TextEditingController(
+      text: widget.transaction?.description ?? '',
+    );
     _type = widget.transaction?.type ?? 'income';
   }
 
@@ -88,6 +89,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
       body: SingleChildScrollView(
         child: Container(
           width: double.infinity,
+          height: double.infinity,
           padding: const EdgeInsets.all(16),
           decoration: const BoxDecoration(
             color: Colors.white,
@@ -140,10 +142,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
                     prefixIcon: Icon(Icons.swap_vert),
                   ),
                   items: const [
-                    DropdownMenuItem(
-                      value: 'income',
-                      child: Text('Pemasukan'),
-                    ),
+                    DropdownMenuItem(value: 'income', child: Text('Pemasukan')),
                     DropdownMenuItem(
                       value: 'expense',
                       child: Text('Pengeluaran'),
@@ -176,4 +175,3 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
     );
   }
 }
-

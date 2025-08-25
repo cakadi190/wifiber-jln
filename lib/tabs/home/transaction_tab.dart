@@ -20,12 +20,11 @@ class TransactionTab extends StatelessWidget {
       backgroundColor: AppColors.primary,
       appBar: AppBar(title: const Text('Keuangan')),
       floatingActionButton: FloatingActionButton(
+        backgroundColor: AppColors.primary,
         onPressed: () async {
           final result = await Navigator.push(
             context,
-            MaterialPageRoute(
-              builder: (_) => const TransactionFormScreen(),
-            ),
+            MaterialPageRoute(builder: (_) => const TransactionFormScreen()),
           );
           if (result == true) {
             controller.refreshTransactions();
@@ -562,6 +561,7 @@ class TransactionTab extends StatelessWidget {
         final isIncome = tx.type == "income";
 
         return ListTile(
+          onLongPress: () => _showTransactionOptions(context, tx),
           leading: Container(
             decoration: BoxDecoration(
               color: isIncome ? Colors.green : Colors.red,
@@ -586,16 +586,7 @@ class TransactionTab extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          trailing: Row(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(CurrencyHelper.formatCurrency(tx.amount)),
-              IconButton(
-                icon: const Icon(Icons.more_vert),
-                onPressed: () => _showTransactionOptions(context, tx),
-              ),
-            ],
-          ),
+          trailing: Text(CurrencyHelper.formatCurrency(tx.amount)),
           onTap: () => _showTransactionDetailModal(context, tx),
         );
       },
@@ -629,9 +620,8 @@ class TransactionTab extends StatelessWidget {
                   final result = await Navigator.push(
                     context,
                     MaterialPageRoute(
-                      builder: (_) => TransactionFormScreen(
-                        transaction: transaction,
-                      ),
+                      builder: (_) =>
+                          TransactionFormScreen(transaction: transaction),
                     ),
                   );
                   if (result == true) {
@@ -657,10 +647,7 @@ class TransactionTab extends StatelessWidget {
     );
   }
 
-  void _showDeleteConfirmation(
-    BuildContext context,
-    Transaction transaction,
-  ) {
+  void _showDeleteConfirmation(BuildContext context, Transaction transaction) {
     showModalBottomSheet(
       context: context,
       shape: const RoundedRectangleBorder(
@@ -694,8 +681,7 @@ class TransactionTab extends StatelessWidget {
                       ),
                       onPressed: () async {
                         Navigator.pop(context);
-                        final provider =
-                            context.read<TransactionProvider>();
+                        final provider = context.read<TransactionProvider>();
                         try {
                           await provider.deleteTransaction(transaction.id);
                           controller.refreshTransactions();
