@@ -90,7 +90,9 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
         builder: (context, constraints) {
           return SingleChildScrollView(
             child: ConstrainedBox(
-              constraints: BoxConstraints(minHeight: constraints.maxHeight),
+              constraints: constraints.maxHeight.isFinite
+                  ? BoxConstraints(minHeight: constraints.maxHeight)
+                  : const BoxConstraints(),
               child: Container(
                 width: double.infinity,
                 padding: const EdgeInsets.all(16),
