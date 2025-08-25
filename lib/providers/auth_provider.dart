@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:wifiber/models/auth_user.dart';
 import 'package:wifiber/services/auth_service.dart';
+import 'package:wifiber/utils/safe_change_notifier.dart';
 
-class AuthProvider extends ChangeNotifier {
+class AuthProvider extends SafeChangeNotifier {
   AuthUser? user;
   bool isLoading = true;
 

@@ -1,8 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:wifiber/models/registrant.dart';
 import 'package:wifiber/services/registrant_service.dart';
+import 'package:wifiber/utils/safe_change_notifier.dart';
 
-class RegistrantProvider extends ChangeNotifier {
+class RegistrantProvider extends SafeChangeNotifier {
   final RegistrantService _registrantService;
 
   RegistrantProvider(this._registrantService);

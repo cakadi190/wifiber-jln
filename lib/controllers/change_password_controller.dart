@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/models/auth_user.dart';
 import 'package:wifiber/services/http_service.dart';
+import 'package:wifiber/utils/safe_change_notifier.dart';
 
 enum PasswordStrength { weak, medium, strong, veryStrong }
 
@@ -21,7 +22,7 @@ class PasswordMeter {
   });
 }
 
-class ChangePasswordController extends ChangeNotifier {
+class ChangePasswordController extends SafeChangeNotifier {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController currentPasswordController =
   TextEditingController();

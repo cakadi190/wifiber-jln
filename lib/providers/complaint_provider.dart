@@ -1,8 +1,9 @@
 import 'package:flutter/foundation.dart';
 import 'package:wifiber/models/complaint.dart';
 import 'package:wifiber/services/complaint_service.dart';
+import 'package:wifiber/utils/safe_change_notifier.dart';
 
-class ComplaintProvider extends ChangeNotifier {
+class ComplaintProvider extends SafeChangeNotifier {
   final ComplaintService _complaintService;
 
   ComplaintProvider(this._complaintService);

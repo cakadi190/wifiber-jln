@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:wifiber/models/router.dart';
 import 'package:wifiber/services/router_service.dart';
+import 'package:wifiber/utils/safe_change_notifier.dart';
 
 enum RouterState { initial, loading, success, error }
 
-class RouterProvider with ChangeNotifier {
+class RouterProvider extends SafeChangeNotifier {
   final RouterService _routerService;
 
   RouterProvider(this._routerService);

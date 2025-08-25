@@ -5,8 +5,9 @@ import 'package:wifiber/screens/dashboard/home_dashboard_screen.dart';
 import 'package:wifiber/screens/login_screen.dart';
 import 'package:wifiber/screens/onboarding_screen.dart';
 import 'package:wifiber/services/first_launch_service.dart';
+import 'package:wifiber/utils/safe_change_notifier.dart';
 
-class SplashScreenController extends ChangeNotifier {
+class SplashScreenController extends SafeChangeNotifier {
   final BuildContext context;
   String _splashText = "Memuat...";
 

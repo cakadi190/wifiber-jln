@@ -3,10 +3,11 @@ import 'package:wifiber/exceptions/string_exceptions.dart';
 import 'package:wifiber/exceptions/validation_exceptions.dart';
 import 'package:wifiber/models/bills.dart';
 import 'package:wifiber/services/bills_service.dart';
+import 'package:wifiber/utils/safe_change_notifier.dart';
 
 enum BillsState { initial, loading, loaded, error }
 
-class BillsProvider extends ChangeNotifier {
+class BillsProvider extends SafeChangeNotifier {
   final BillsService _billsService;
 
   BillsProvider(this._billsService);
