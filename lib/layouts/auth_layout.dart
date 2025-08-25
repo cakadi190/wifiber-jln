@@ -69,7 +69,9 @@ class _AuthLayoutState extends State<AuthLayout> {
                       builder: (context, constraints) {
                         return SingleChildScrollView(
                           child: ConstrainedBox(
-                            constraints: BoxConstraints(minHeight: constraints.maxHeight),
+                            constraints: constraints.maxHeight.isFinite
+                                ? BoxConstraints(minHeight: constraints.maxHeight)
+                                : const BoxConstraints(),
                             child: IntrinsicHeight(
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
