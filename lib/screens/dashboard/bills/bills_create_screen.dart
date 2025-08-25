@@ -277,451 +277,454 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
         child: Scaffold(
           backgroundColor: AppColors.primary,
           appBar: AppBar(
-          title: const Text('Buat Bill Baru'),
-          leading: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () => Navigator.pop(context),
-          ),
-          actions: [
-            TextButton(
-              onPressed: _isLoading ? null : _createBill,
-              child: _isLoading
-                  ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        color: Colors.white,
-                        strokeWidth: 2,
-                      ),
-                    )
-                  : const Icon(Icons.save, color: Colors.white),
+            title: const Text('Buat Tagihan'),
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => Navigator.pop(context),
             ),
-          ],
-        ),
-        body: SafeArea(
-          child: Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(24),
-                topRight: Radius.circular(24),
+            actions: [
+              TextButton(
+                onPressed: _isLoading ? null : _createBill,
+                child: _isLoading
+                    ? const SizedBox(
+                        width: 20,
+                        height: 20,
+                        child: CircularProgressIndicator(
+                          color: Colors.white,
+                          strokeWidth: 2,
+                        ),
+                      )
+                    : const Icon(Icons.save, color: Colors.white),
               ),
-            ),
-            child: Form(
-              key: _formKey,
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const Text(
-                      'Pelanggan',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+            ],
+          ),
+          body: SafeArea(
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
+                ),
+              ),
+              child: Form(
+                key: _formKey,
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Pelanggan',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    InkWell(
-                      onTap: _isLoading ? null : _showCustomerSearchModal,
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 16,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(
-                            color: _isLoading
-                                ? Colors.grey.shade400
-                                : Colors.grey.shade300,
+                      const SizedBox(height: 8),
+                      InkWell(
+                        onTap: _isLoading ? null : _showCustomerSearchModal,
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 16,
                           ),
-                          borderRadius: BorderRadius.circular(8),
-                          color: _isLoading ? Colors.grey.shade50 : null,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Text(
-                                    selectedCustomer?.name ?? 'Pilih Pelanggan',
-                                    style: TextStyle(
-                                      color: selectedCustomer != null
-                                          ? Colors.black
-                                          : Colors.grey.shade600,
-                                      fontSize: 16,
-                                      fontWeight: selectedCustomer != null
-                                          ? FontWeight.w500
-                                          : FontWeight.normal,
-                                    ),
-                                  ),
-                                  if (selectedCustomer != null)
-                                    Text(
-                                      selectedCustomer!.phone,
-                                      style: TextStyle(
-                                        color: Colors.grey.shade600,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            ),
-                            Icon(
-                              Icons.arrow_drop_down,
+                          decoration: BoxDecoration(
+                            border: Border.all(
                               color: _isLoading
                                   ? Colors.grey.shade400
-                                  : Colors.grey.shade600,
+                                  : Colors.grey.shade300,
                             ),
-                          ],
-                        ),
-                      ),
-                    ),
-                    const SizedBox(height: 24),
-
-                    const Text(
-                      'Periode',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    InkWell(
-                      onTap: _selectPeriod,
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(12),
-                          color: Colors.grey.shade50,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              _formatPeriod(_selectedPeriod),
-                              style: const TextStyle(color: Colors.black87),
-                            ),
-                            Icon(
-                              Icons.calendar_month,
-                              color: AppColors.primary,
-                              size: 20,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    const Text(
-                      'Tanggal Pembayaran',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    InkWell(
-                      onTap: _selectPaymentDate,
-                      child: Container(
-                        width: double.infinity,
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(12),
-                          color: Colors.grey.shade50,
-                        ),
-                        child: Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Text(
-                              _formatDate(_paymentAt),
-                              style: const TextStyle(color: Colors.black87),
-                            ),
-                            Icon(
-                              Icons.calendar_today,
-                              color: AppColors.primary,
-                              size: 20,
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Sudah Dibayar',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
+                            borderRadius: BorderRadius.circular(8),
+                            color: _isLoading ? Colors.grey.shade50 : null,
                           ),
-                        ),
-                        Switch(
-                          value: _isPaid,
-                          onChanged: (value) {
-                            setState(() {
-                              _isPaid = value;
-                            });
-                          },
-                          activeColor: AppColors.primary,
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        const Text(
-                          'Buka Isolir',
-                          style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        Switch(
-                          value: _openIsolir,
-                          onChanged: (value) {
-                            setState(() {
-                              _openIsolir = value;
-                            });
-                          },
-                          activeColor: AppColors.primary,
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    const Text(
-                      'Metode Pembayaran (Opsional)',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                      controller: _paymentMethodController,
-                      decoration: InputDecoration(
-                        hintText: 'Contoh: Transfer Bank, Tunai, QRIS',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: AppColors.primary),
-                        ),
-                        filled: true,
-                        fillColor: Colors.grey.shade50,
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    const Text(
-                      'Bukti Pembayaran (Opsional)',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-
-                    selectedPaymentProof != null
-                        ? Container(
-                            width: double.infinity,
-                            padding: const EdgeInsets.all(16),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.green.shade300),
-                              borderRadius: BorderRadius.circular(12),
-                              color: Colors.green.shade50,
-                            ),
-                            child: Row(
-                              children: [
-                                _getFileIcon(paymentProofFileName!),
-                                const SizedBox(width: 12),
-                                Expanded(
-                                  child: Column(
-                                    crossAxisAlignment:
-                                        CrossAxisAlignment.start,
-                                    children: [
-                                      Text(
-                                        paymentProofFileName!,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.w500,
-                                        ),
-                                        overflow: TextOverflow.ellipsis,
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      selectedCustomer?.name ??
+                                          'Pilih Pelanggan',
+                                      style: TextStyle(
+                                        color: selectedCustomer != null
+                                            ? Colors.black
+                                            : Colors.grey.shade600,
+                                        fontSize: 16,
+                                        fontWeight: selectedCustomer != null
+                                            ? FontWeight.w500
+                                            : FontWeight.normal,
                                       ),
-                                      const SizedBox(height: 2),
+                                    ),
+                                    if (selectedCustomer != null)
                                       Text(
-                                        'Berkas terpilih',
+                                        selectedCustomer!.phone,
                                         style: TextStyle(
-                                          fontSize: 12,
-                                          color: Colors.green.shade700,
+                                          color: Colors.grey.shade600,
+                                          fontSize: 14,
                                         ),
                                       ),
-                                    ],
-                                  ),
+                                  ],
                                 ),
-                                IconButton(
-                                  onPressed: _removePaymentProofFile,
-                                  icon: Icon(
-                                    Icons.close,
-                                    color: Colors.red.shade600,
-                                  ),
-                                ),
-                              ],
+                              ),
+                              Icon(
+                                Icons.arrow_drop_down,
+                                color: _isLoading
+                                    ? Colors.grey.shade400
+                                    : Colors.grey.shade600,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 24),
+
+                      const Text(
+                        'Periode',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      InkWell(
+                        onTap: _selectPeriod,
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(12),
+                            color: Colors.grey.shade50,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                _formatPeriod(_selectedPeriod),
+                                style: const TextStyle(color: Colors.black87),
+                              ),
+                              Icon(
+                                Icons.calendar_month,
+                                color: AppColors.primary,
+                                size: 20,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      const Text(
+                        'Tanggal Pembayaran',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      InkWell(
+                        onTap: _selectPaymentDate,
+                        child: Container(
+                          width: double.infinity,
+                          padding: const EdgeInsets.all(16),
+                          decoration: BoxDecoration(
+                            border: Border.all(color: Colors.grey.shade300),
+                            borderRadius: BorderRadius.circular(12),
+                            color: Colors.grey.shade50,
+                          ),
+                          child: Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text(
+                                _formatDate(_paymentAt),
+                                style: const TextStyle(color: Colors.black87),
+                              ),
+                              Icon(
+                                Icons.calendar_today,
+                                color: AppColors.primary,
+                                size: 20,
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Sudah Dibayar',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
                             ),
-                          )
-                        : InkWell(
-                            onTap: _isLoading ? null : _pickPaymentProofFile,
-                            child: Container(
+                          ),
+                          Switch(
+                            value: _isPaid,
+                            onChanged: (value) {
+                              setState(() {
+                                _isPaid = value;
+                              });
+                            },
+                            activeColor: AppColors.primary,
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          const Text(
+                            'Buka Isolir',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontWeight: FontWeight.w600,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          Switch(
+                            value: _openIsolir,
+                            onChanged: (value) {
+                              setState(() {
+                                _openIsolir = value;
+                              });
+                            },
+                            activeColor: AppColors.primary,
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      const Text(
+                        'Metode Pembayaran (Opsional)',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: _paymentMethodController,
+                        decoration: InputDecoration(
+                          hintText: 'Contoh: Transfer Bank, Tunai, QRIS',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: AppColors.primary),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey.shade50,
+                        ),
+                      ),
+
+                      const SizedBox(height: 24),
+
+                      const Text(
+                        'Bukti Pembayaran (Opsional)',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+
+                      selectedPaymentProof != null
+                          ? Container(
                               width: double.infinity,
                               padding: const EdgeInsets.all(16),
                               decoration: BoxDecoration(
                                 border: Border.all(
-                                  color: Colors.grey.shade300,
-                                  style: BorderStyle.solid,
+                                  color: Colors.green.shade300,
                                 ),
                                 borderRadius: BorderRadius.circular(12),
-                                color: Colors.grey.shade50,
+                                color: Colors.green.shade50,
                               ),
                               child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  Icon(
-                                    Icons.upload_file,
-                                    color: AppColors.primary,
-                                    size: 24,
-                                  ),
+                                  _getFileIcon(paymentProofFileName!),
                                   const SizedBox(width: 12),
-                                  Text(
-                                    'Pilih File Bukti Pembayaran',
-                                    style: TextStyle(
-                                      color: AppColors.primary,
-                                      fontWeight: FontWeight.w500,
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          paymentProofFileName!,
+                                          style: const TextStyle(
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                          overflow: TextOverflow.ellipsis,
+                                        ),
+                                        const SizedBox(height: 2),
+                                        Text(
+                                          'Berkas terpilih',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.green.shade700,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                  IconButton(
+                                    onPressed: _removePaymentProofFile,
+                                    icon: Icon(
+                                      Icons.close,
+                                      color: Colors.red.shade600,
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                          ),
-
-                    const SizedBox(height: 8),
-                    Text(
-                      'Format yang didukung: JPG, JPEG, PNG, PDF (Maks. 5MB)',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: Colors.grey.shade600,
-                      ),
-                    ),
-
-                    const SizedBox(height: 24),
-
-                    const Text(
-                      'Catatan Pembayaran (Opsional)',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                      controller: _paymentNoteController,
-                      maxLines: 3,
-                      decoration: InputDecoration(
-                        hintText: 'Catatan tambahan untuk pembayaran',
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                        ),
-                        enabledBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: Colors.grey.shade300),
-                        ),
-                        focusedBorder: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide(color: AppColors.primary),
-                        ),
-                        filled: true,
-                        fillColor: Colors.grey.shade50,
-                      ),
-                    ),
-
-                    const SizedBox(height: 32),
-
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: _isLoading ? null : _createBill,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 16),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                        ),
-                        child: _isLoading
-                            ? const Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 2,
-                                    ),
+                            )
+                          : InkWell(
+                              onTap: _isLoading ? null : _pickPaymentProofFile,
+                              child: Container(
+                                width: double.infinity,
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.grey.shade300,
+                                    style: BorderStyle.solid,
                                   ),
-                                  SizedBox(width: 8),
-                                  Text(
-                                    'Memproses...',
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
+                                  borderRadius: BorderRadius.circular(12),
+                                  color: Colors.grey.shade50,
+                                ),
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.upload_file,
+                                      color: AppColors.primary,
+                                      size: 24,
                                     ),
-                                  ),
-                                ],
-                              )
-                            : const Text(
-                                'Buat Tagihan',
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w600,
+                                    const SizedBox(width: 12),
+                                    Text(
+                                      'Pilih File Bukti Pembayaran',
+                                      style: TextStyle(
+                                        color: AppColors.primary,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
+                            ),
+
+                      const SizedBox(height: 8),
+                      Text(
+                        'Format yang didukung: JPG, JPEG, PNG, PDF (Maks. 5MB)',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: Colors.grey.shade600,
+                        ),
                       ),
-                    ),
-                  ],
+
+                      const SizedBox(height: 24),
+
+                      const Text(
+                        'Catatan Pembayaran (Opsional)',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                        controller: _paymentNoteController,
+                        maxLines: 3,
+                        decoration: InputDecoration(
+                          hintText: 'Catatan tambahan untuk pembayaran',
+                          border: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          enabledBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: Colors.grey.shade300),
+                          ),
+                          focusedBorder: OutlineInputBorder(
+                            borderRadius: BorderRadius.circular(12),
+                            borderSide: BorderSide(color: AppColors.primary),
+                          ),
+                          filled: true,
+                          fillColor: Colors.grey.shade50,
+                        ),
+                      ),
+
+                      const SizedBox(height: 32),
+
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: _isLoading ? null : _createBill,
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          child: _isLoading
+                              ? const Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    ),
+                                    SizedBox(width: 8),
+                                    Text(
+                                      'Memproses...',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              : const Text(
+                                  'Buat Tagihan',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w600,
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               ),
             ),
           ),
-        ),
         ),
       ),
     );

@@ -165,52 +165,48 @@ class _EditComplaintScreenState extends State<EditComplaintScreen> {
                             ],
                           ),
 
-                            const SizedBox(height: 0),
+                          const SizedBox(height: 16),
+
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: _isLoading ? null : _onSubmit,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: _isLoading
+                                    ? Colors.grey.shade400
+                                    : AppColors.primary,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: _isLoading
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor:
+                                            AlwaysStoppedAnimation<Color>(
+                                              Colors.white,
+                                            ),
+                                      ),
+                                    )
+                                  : const Text(
+                                      'Buat Pengaduan',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                    ),
+                            ),
+                          ),
                         ],
                       ),
                     ),
-                  ),
-                ),
-
-                Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-                  decoration: const BoxDecoration(color: Colors.white),
-                  child: ElevatedButton(
-                    onPressed: _isLoading ? null : _onSubmit,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                    ),
-                    child: _isLoading
-                        ? const Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                    Colors.white,
-                                  ),
-                                ),
-                              ),
-                              SizedBox(width: 8),
-                              Text('Menyimpan...'),
-                            ],
-                          )
-                        : const Text(
-                            'Simpan Tindak Lanjut',
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
                   ),
                 ),
               ],
