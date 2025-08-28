@@ -17,6 +17,7 @@ import 'package:wifiber/components/widgets/map_picker_page.dart';
 import 'package:wifiber/services/location_service.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:wifiber/components/forms/backend_validation_mixin.dart';
 
 class CustomerFormScreen extends StatefulWidget {
   final Customer? customer;
@@ -28,7 +29,8 @@ class CustomerFormScreen extends StatefulWidget {
   State<CustomerFormScreen> createState() => _CustomerFormScreenState();
 }
 
-class _CustomerFormScreenState extends State<CustomerFormScreen> {
+class _CustomerFormScreenState extends State<CustomerFormScreen>
+    with BackendValidationMixin {
   final _formKey = GlobalKey<FormState>();
   late CustomerFormController _controller;
   LatLng? _selectedLocation;
@@ -87,6 +89,9 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
       });
     }
   }
+
+  @override
+  GlobalKey<FormState> get formKey => _formKey;
 
   @override
   void dispose() {
@@ -394,10 +399,12 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                     IconButton(
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
+                          clearBackendErrors();
                           await controller.submitForm(
                             context,
                             isEdit: widget.isEdit,
                             customer: widget.customer,
+                            onValidationError: setBackendErrors,
                           );
                         }
                       },
@@ -448,11 +455,13 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                                       border: OutlineInputBorder(),
                                       prefixIcon: Icon(Icons.person),
                                     ),
-                                    validator: (value) =>
-                                        controller.validateRequired(
-                                          value,
-                                          'Nama lengkap',
-                                        ),
+                                    validator: validator(
+                                      'name',
+                                      (value) => controller.validateRequired(
+                                        value,
+                                        'Nama lengkap',
+                                      ),
+                                    ),
                                   ),
                                   const SizedBox(height: 16),
                                   TextFormField(
@@ -472,11 +481,13 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                                       prefixIcon: Icon(Icons.phone),
                                     ),
                                     keyboardType: TextInputType.phone,
-                                    validator: (value) =>
-                                        controller.validateRequired(
-                                          value,
-                                          'Nomor telepon',
-                                        ),
+                                    validator: validator(
+                                      'phone',
+                                      (value) => controller.validateRequired(
+                                        value,
+                                        'Nomor telepon',
+                                      ),
+                                    ),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
@@ -496,11 +507,13 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                                       border: OutlineInputBorder(),
                                       prefixIcon: Icon(Icons.credit_card),
                                     ),
-                                    validator: (value) =>
-                                        controller.validateRequired(
-                                          value,
-                                          'Nomor KTP (atau isi dengan "-")',
-                                        ),
+                                    validator: validator(
+                                      'ktp',
+                                      (value) => controller.validateRequired(
+                                        value,
+                                        'Nomor KTP (atau isi dengan "-")',
+                                      ),
+                                    ),
                                   ),
                                   const SizedBox(height: 16),
                                   TextFormField(
@@ -511,8 +524,11 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                                       prefixIcon: Icon(Icons.location_on),
                                     ),
                                     maxLines: 3,
-                                    validator: (value) => controller
-                                        .validateRequired(value, 'Alamat'),
+                                    validator: validator(
+                                      'address',
+                                      (value) => controller
+                                          .validateRequired(value, 'Alamat'),
+                                    ),
                                   ),
                                   const SizedBox(height: 16),
                                   DropdownButtonFormField<CustomerStatus>(
@@ -600,8 +616,11 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                                       prefixIcon: Icon(Icons.map),
                                     ),
                                     keyboardType: TextInputType.number,
-                                    validator: (value) => controller
-                                        .validateRequired(value, 'ID Area'),
+                                    validator: validator(
+                                      'area',
+                                      (value) => controller
+                                          .validateRequired(value, 'ID Area'),
+                                    ),
                                   ),
                                   const SizedBox(height: 16),
                                   RouterButtonSelector(
@@ -633,11 +652,13 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                                       border: OutlineInputBorder(),
                                       prefixIcon: Icon(Icons.vpn_key),
                                     ),
-                                    validator: (value) =>
-                                        controller.validateRequired(
-                                          value,
-                                          'PPPoE Secret',
-                                        ),
+                                    validator: validator(
+                                      'pppoe_secret',
+                                      (value) => controller.validateRequired(
+                                        value,
+                                        'PPPoE Secret',
+                                      ),
+                                    ),
                                   ),
                                   const SizedBox(height: 16),
                                   TextFormField(
@@ -648,11 +669,13 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                                       prefixIcon: Icon(Icons.calendar_month),
                                       border: OutlineInputBorder(),
                                     ),
-                                    validator: (value) =>
-                                        controller.validateRequired(
-                                          value,
-                                          'Tanggal jatuh tempo',
-                                        ),
+                                    validator: validator(
+                                      'due-date',
+                                      (value) => controller.validateRequired(
+                                        value,
+                                        'Tanggal jatuh tempo',
+                                      ),
+                                    ),
                                   ),
                                   const SizedBox(height: 2),
                                   Text(
@@ -690,8 +713,11 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                                       suffixText: '%',
                                     ),
                                     keyboardType: TextInputType.number,
-                                    validator: (value) => controller
-                                        .validateRequired(value, 'Diskon'),
+                                    validator: validator(
+                                      'discount',
+                                      (value) => controller
+                                          .validateRequired(value, 'Diskon'),
+                                    ),
                                   ),
                                 ],
                               ),
@@ -859,10 +885,12 @@ class _CustomerFormScreenState extends State<CustomerFormScreen> {
                                       : () async {
                                           if (_formKey.currentState!
                                               .validate()) {
+                                            clearBackendErrors();
                                             await controller.submitForm(
                                               context,
                                               isEdit: widget.isEdit,
                                               customer: widget.customer,
+                                              onValidationError: setBackendErrors,
                                             );
                                           }
                                         },

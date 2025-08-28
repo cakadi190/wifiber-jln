@@ -7,6 +7,8 @@ import 'package:wifiber/models/complaint.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/providers/complaint_provider.dart';
 import 'package:wifiber/middlewares/auth_middleware.dart';
+import 'package:wifiber/components/forms/backend_validation_mixin.dart';
+import 'package:wifiber/exceptions/validation_exceptions.dart';
 
 class EditComplaintScreen extends StatefulWidget {
   const EditComplaintScreen({super.key, required this.complaint});
@@ -17,11 +19,15 @@ class EditComplaintScreen extends StatefulWidget {
   State<EditComplaintScreen> createState() => _EditComplaintScreenState();
 }
 
-class _EditComplaintScreenState extends State<EditComplaintScreen> {
-  GlobalKey<FormState> formKey = GlobalKey<FormState>();
+class _EditComplaintScreenState extends State<EditComplaintScreen>
+    with BackendValidationMixin {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
   late TextEditingController detailController;
   bool _isLoading = false;
   bool _isDone = false;
+
+  @override
+  GlobalKey<FormState> get formKey => _formKey;
 
   @override
   void initState() {
@@ -42,7 +48,8 @@ class _EditComplaintScreenState extends State<EditComplaintScreen> {
   }
 
   void _onSubmit() async {
-    if (formKey.currentState?.validate() ?? false) {
+    if (_formKey.currentState?.validate() ?? false) {
+      clearBackendErrors();
       setState(() {
         _isLoading = true;
       });
@@ -80,6 +87,12 @@ class _EditComplaintScreenState extends State<EditComplaintScreen> {
             _isLoading = false;
           });
         }
+      } on ValidationException catch (e) {
+        setBackendErrors(e.errors);
+        SnackBars.error(context, e.message).clearSnackBars();
+        setState(() {
+          _isLoading = false;
+        });
       } catch (e) {
         SnackBars.error(
           context,
@@ -118,7 +131,7 @@ class _EditComplaintScreenState extends State<EditComplaintScreen> {
               children: [
                 Expanded(
                   child: Form(
-                    key: formKey,
+                    key: _formKey,
                     child: SingleChildScrollView(
                       padding: const EdgeInsets.symmetric(
                         vertical: 20,
@@ -140,12 +153,15 @@ class _EditComplaintScreenState extends State<EditComplaintScreen> {
                             minLines: 3,
                             keyboardType: TextInputType.multiline,
                             enabled: !_isLoading,
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Deskripsi pengaduan tidak boleh kosong';
-                              }
-                              return null;
-                            },
+                            validator: validator(
+                              'detail',
+                              (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Deskripsi pengaduan tidak boleh kosong';
+                                }
+                                return null;
+                              },
+                            ),
                           ),
 
                           const SizedBox(height: 16),

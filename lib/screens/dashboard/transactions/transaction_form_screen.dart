@@ -7,6 +7,8 @@ import 'package:provider/provider.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/models/transaction.dart';
 import 'package:wifiber/providers/transaction_provider.dart';
+import 'package:wifiber/components/forms/backend_validation_mixin.dart';
+import 'package:wifiber/exceptions/validation_exceptions.dart';
 
 class TransactionFormScreen extends StatefulWidget {
   final Transaction? transaction;
@@ -16,7 +18,8 @@ class TransactionFormScreen extends StatefulWidget {
   State<TransactionFormScreen> createState() => _TransactionFormScreenState();
 }
 
-class _TransactionFormScreenState extends State<TransactionFormScreen> {
+class _TransactionFormScreenState extends State<TransactionFormScreen>
+    with BackendValidationMixin {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nominalController;
   late TextEditingController _descriptionController;
@@ -46,6 +49,9 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
     );
     _type = widget.transaction?.type ?? 'income';
   }
+
+  @override
+  GlobalKey<FormState> get formKey => _formKey;
 
   @override
   void dispose() {
@@ -126,6 +132,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
 
+    clearBackendErrors();
     setState(() => _isLoading = true);
     final provider = context.read<TransactionProvider>();
 
@@ -157,6 +164,13 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
       }
 
       if (mounted) Navigator.pop(context, true);
+    } on ValidationException catch (e) {
+      setBackendErrors(e.errors);
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(e.message), backgroundColor: Colors.red),
+        );
+      }
     } catch (e) {
       print('Error submitting transaction: $e');
       if (mounted) {
@@ -212,15 +226,18 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
                           prefixIcon: Icon(Icons.attach_money),
                         ),
                         keyboardType: TextInputType.number,
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Nominal belum diisi';
-                          }
-                          if (int.tryParse(value) == null) {
-                            return 'Nominal harus berupa angka';
-                          }
-                          return null;
-                        },
+                        validator: validator(
+                          'nominal',
+                          (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Nominal belum diisi';
+                            }
+                            if (int.tryParse(value) == null) {
+                              return 'Nominal harus berupa angka';
+                            }
+                            return null;
+                          },
+                        ),
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
@@ -229,12 +246,15 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
                           labelText: 'Deskripsi',
                           prefixIcon: Icon(Icons.description),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Deskripsi belum diisi';
-                          }
-                          return null;
-                        },
+                        validator: validator(
+                          'description',
+                          (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Deskripsi belum diisi';
+                            }
+                            return null;
+                          },
+                        ),
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
@@ -243,12 +263,15 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
                           labelText: 'Dibuat Oleh',
                           prefixIcon: Icon(Icons.person),
                         ),
-                        validator: (value) {
-                          if (value == null || value.isEmpty) {
-                            return 'Pembuat belum diisi';
-                          }
-                          return null;
-                        },
+                        validator: validator(
+                          'created_by',
+                          (value) {
+                            if (value == null || value.isEmpty) {
+                              return 'Pembuat belum diisi';
+                            }
+                            return null;
+                          },
+                        ),
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
@@ -258,6 +281,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
                           labelText: 'Tanggal',
                           prefixIcon: Icon(Icons.calendar_today),
                         ),
+                        validator: validator('created_at'),
                         onTap: _selectDateTime,
                       ),
                       const SizedBox(height: 16),
@@ -290,6 +314,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
                         onChanged: (val) {
                           if (val != null) setState(() => _type = val);
                         },
+                        validator: validator('type'),
                       ),
                       const SizedBox(height: 24),
                       SizedBox(

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:wifiber/exceptions/validation_exceptions.dart';
 import 'package:wifiber/models/complaint.dart';
 import 'package:wifiber/services/http_service.dart';
 
@@ -28,6 +29,8 @@ class ComplaintService {
       } else {
         throw Exception('Failed to load complaints');
       }
+    } on ValidationException {
+      rethrow;
     } catch (e) {
       throw Exception('Error: $e');
     }
@@ -46,6 +49,8 @@ class ComplaintService {
       } else {
         throw Exception('Failed to load complaint');
       }
+    } on ValidationException {
+      rethrow;
     } catch (e) {
       throw Exception('Error: $e');
     }

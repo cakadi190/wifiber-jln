@@ -1,3 +1,4 @@
+import 'package:wifiber/exceptions/validation_exceptions.dart';
 import 'package:wifiber/models/complaint.dart';
 import 'package:wifiber/services/complaint_service.dart';
 import 'package:wifiber/utils/safe_change_notifier.dart';
@@ -91,11 +92,15 @@ class ComplaintProvider extends SafeChangeNotifier {
         _setError(response.message);
         return false;
       }
+    } on ValidationException catch (e) {
+      _setError(e.message);
+      _setLoading(false);
+      rethrow;
     } catch (e) {
       _setError(e.toString());
       return false;
     } finally {
-      _setLoading(false);
+      if (_isLoading) _setLoading(false);
     }
   }
 
@@ -111,11 +116,15 @@ class ComplaintProvider extends SafeChangeNotifier {
         _setError(response.message);
         return false;
       }
+    } on ValidationException catch (e) {
+      _setError(e.message);
+      _setLoading(false);
+      rethrow;
     } catch (e) {
       _setError(e.toString());
       return false;
     } finally {
-      _setLoading(false);
+      if (_isLoading) _setLoading(false);
     }
   }
 

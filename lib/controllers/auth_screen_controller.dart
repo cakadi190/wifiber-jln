@@ -4,6 +4,7 @@ import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/screens/dashboard/home_dashboard_screen.dart';
 import 'package:wifiber/screens/forgot_password_screen.dart';
 import 'package:wifiber/exceptions/validation_exceptions.dart';
+import 'package:wifiber/exceptions/string_exceptions.dart';
 
 class LoginScreenController {
   final BuildContext context;
@@ -91,10 +92,29 @@ class LoginScreenController {
           e.message,
         ).clearSnackBars();
       }
+    } on StringException catch (e) {
+      var message = e.toString();
+      if (message.contains('422')) {
+        onValidationError?.call({
+          'username': message,
+          'password': message,
+        });
+      }
+      if (context.mounted) {
+        SnackBars.error(
+          context,
+          message,
+        ).clearSnackBars();
+      }
     } catch (e) {
-      final message = e.toString().contains("400")
-          ? "Nama pengguna atau kata sandi salah."
-          : e.toString();
+      String message = e.toString();
+      if (message.contains("400")) {
+        message = "Nama pengguna atau kata sandi salah.";
+        onValidationError?.call({
+          'username': message,
+          'password': message,
+        });
+      }
       if (context.mounted) {
         SnackBars.error(
           context,
