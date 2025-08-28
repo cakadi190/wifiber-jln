@@ -5,6 +5,7 @@ import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/models/auth_user.dart';
 import 'package:wifiber/services/http_service.dart';
 import 'package:wifiber/utils/safe_change_notifier.dart';
+import 'package:wifiber/exceptions/validation_exceptions.dart';
 
 enum PasswordStrength { weak, medium, strong, veryStrong }
 
@@ -25,10 +26,10 @@ class PasswordMeter {
 class ChangePasswordController extends SafeChangeNotifier {
   final GlobalKey<FormState> formKey = GlobalKey<FormState>();
   final TextEditingController currentPasswordController =
-  TextEditingController();
+      TextEditingController();
   final TextEditingController passwordController = TextEditingController();
   final TextEditingController confirmPasswordController =
-  TextEditingController();
+      TextEditingController();
 
   final String resetPasswordPath = '/reset-password';
   final HttpService _http = HttpService();
@@ -196,7 +197,11 @@ class ChangePasswordController extends SafeChangeNotifier {
     return null;
   }
 
-  Future<bool> changePassword(BuildContext context, AuthUser? user) async {
+  Future<bool> changePassword(
+    BuildContext context,
+    AuthUser? user, {
+    void Function(Map<String, dynamic> errors)? onValidationError,
+  }) async {
     if (user == null) {
       return false;
     }
@@ -228,6 +233,10 @@ class ChangePasswordController extends SafeChangeNotifier {
         _showErrorMessage(context, 'Kata sandi sekarang tidak valid');
         return false;
       }
+    } on ValidationException catch (e) {
+      onValidationError?.call(e.errors);
+      _showErrorMessage(context, e.message);
+      return false;
     } catch (e) {
       if (!context.mounted) return false;
 

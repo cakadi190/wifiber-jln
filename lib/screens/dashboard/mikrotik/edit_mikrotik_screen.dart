@@ -7,6 +7,8 @@ import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/models/router.dart';
 import 'package:wifiber/providers/router_provider.dart';
 import 'package:wifiber/middlewares/auth_middleware.dart';
+import 'package:wifiber/components/forms/backend_validation_mixin.dart';
+import 'package:wifiber/exceptions/validation_exceptions.dart';
 
 class EditMikrotikScreen extends StatefulWidget {
   final RouterModel router;
@@ -17,7 +19,8 @@ class EditMikrotikScreen extends StatefulWidget {
   State<EditMikrotikScreen> createState() => _EditMikrotikScreenState();
 }
 
-class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
+class _EditMikrotikScreenState extends State<EditMikrotikScreen>
+    with BackendValidationMixin {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _hostnameController = TextEditingController();
@@ -48,6 +51,9 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
     _hostnameController.text = widget.router.host;
     _toleranceDaysController.text = widget.router.toleranceDays.toString();
   }
+
+  @override
+  GlobalKey<FormState> get formKey => _formKey;
 
   @override
   void dispose() {
@@ -93,6 +99,8 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
         isAutoIsolate: _isAutoIsolate,
       );
 
+      clearBackendErrors();
+
       try {
         final success = await routerProvider.updateRouter(
           widget.router.id,
@@ -106,6 +114,11 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
 
         if (mounted && !success) {
           SnackBars.error(context, 'Gagal memperbarui router');
+        }
+      } on ValidationException catch (e) {
+        setBackendErrors(e.errors);
+        if (mounted) {
+          SnackBars.error(context, e.message);
         }
       } catch (e) {
         if (mounted) {
@@ -391,6 +404,7 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
                   const SizedBox(height: 16),
 
                   _buildTextFormField(
+                    field: 'name',
                     controller: _nameController,
                     label: 'Nama Router',
                     hint: 'Masukkan nama router',
@@ -406,6 +420,7 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
                   const SizedBox(height: 16),
 
                   _buildTextFormField(
+                    field: 'hostname',
                     controller: _hostnameController,
                     label: 'Hostname/IP Address',
                     hint: 'Masukkan hostname atau IP address',
@@ -422,6 +437,7 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
                   const SizedBox(height: 16),
 
                   _buildTextFormField(
+                    field: 'username',
                     controller: _usernameController,
                     label: 'Username',
                     hint: 'Masukkan username',
@@ -437,6 +453,7 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
                   const SizedBox(height: 16),
 
                   _buildTextFormField(
+                    field: 'password',
                     controller: _passwordController,
                     label: 'Password',
                     hint: 'Masukkan password',
@@ -466,6 +483,7 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
                   const SizedBox(height: 16),
 
                   _buildTextFormField(
+                    field: 'port',
                     controller: _portController,
                     label: 'Port',
                     hint: 'Masukkan port (default: 8728)',
@@ -486,6 +504,7 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
                   const SizedBox(height: 16),
 
                   _buildTextFormField(
+                    field: 'tolerance_days',
                     controller: _toleranceDaysController,
                     label: 'Hari Toleransi',
                     hint: 'Masukkan jumlah hari toleransi',
@@ -555,6 +574,7 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
                   if (_isolateAction == 'change-profile') ...[
                     const SizedBox(height: 16),
                     _buildTextFormField(
+                      field: 'isolate_profile',
                       controller: _isolateProfileController,
                       label: 'Profil Isolasi',
                       hint: 'Masukkan profil isolasi',
@@ -744,6 +764,7 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
   }
 
   Widget _buildTextFormField({
+    required String field,
     required TextEditingController controller,
     required String label,
     required String hint,
@@ -757,7 +778,7 @@ class _EditMikrotikScreenState extends State<EditMikrotikScreen> {
       controller: controller,
       keyboardType: keyboardType,
       obscureText: obscureText,
-      validator: validator,
+      validator: this.validator(field, validator),
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:wifiber/models/router.dart';
 import 'package:wifiber/services/http_service.dart';
+import 'package:wifiber/exceptions/validation_exceptions.dart';
 
 class RouterService {
   static const String baseUrl = 'routers';
@@ -69,6 +70,7 @@ class RouterService {
         throw Exception('Failed to add router: ${response.statusCode}');
       }
     } catch (e) {
+      if (e is ValidationException) rethrow;
       throw Exception('Error adding router: $e');
     }
   }
@@ -87,6 +89,7 @@ class RouterService {
         throw Exception('Failed to update router: ${response.statusCode}');
       }
     } catch (e) {
+      if (e is ValidationException) rethrow;
       throw Exception('Error updating router: $e');
     }
   }

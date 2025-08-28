@@ -9,6 +9,7 @@ import 'package:wifiber/helpers/network_helper.dart';
 import 'package:wifiber/layouts/auth_layout.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:flutter/scheduler.dart';
+import 'package:wifiber/components/forms/backend_validation_mixin.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -17,10 +18,14 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
+class _LoginScreenState extends State<LoginScreen>
+    with BackendValidationMixin {
   late LoginScreenController _controller;
   String _ipAddress = 'Unknown';
   bool _loadingIpAddress = true;
+
+  @override
+  GlobalKey<FormState> get formKey => _controller.formKey;
 
   @override
   void initState() {
@@ -99,7 +104,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         color: AppColors.primary,
                       ),
                     ),
-                    validator: _controller.validateUsername,
+                    validator:
+                        validator('username', _controller.validateUsername),
                     onFieldSubmitted: (_) => _handleSubmit(),
                   ),
                 ),
@@ -134,7 +140,8 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-                    validator: _controller.validatePassword,
+                    validator:
+                        validator('password', _controller.validatePassword),
                     onFieldSubmitted: (_) => _handleSubmit(),
                   ),
                 ),
@@ -187,14 +194,16 @@ class _LoginScreenState extends State<LoginScreen> {
   void _handleSubmit() {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
+    clearBackendErrors();
+
     _controller.submitForm(
       onLoading: () => setState(() => _controller.formLoading = true),
       onComplete: () {
         setState(() => _controller.formLoading = false);
-
         _saveCredentialsToPasswordManager();
       },
       authProvider: authProvider,
+      onValidationError: setBackendErrors,
     );
   }
 

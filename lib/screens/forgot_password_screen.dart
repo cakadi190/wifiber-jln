@@ -7,6 +7,7 @@ import 'package:wifiber/controllers/forgot_password_controller.dart';
 import 'package:wifiber/helpers/network_helper.dart';
 import 'package:wifiber/layouts/auth_layout.dart';
 import 'package:wifiber/providers/auth_provider.dart';
+import 'package:wifiber/components/forms/backend_validation_mixin.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -15,10 +16,14 @@ class ForgotPasswordScreen extends StatefulWidget {
   State<ForgotPasswordScreen> createState() => _ForgotPasswordScreenState();
 }
 
-class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
+class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
+    with BackendValidationMixin {
   late ForgotPasswordController _controller;
   String _ipAddress = 'Unknown';
   bool _loadingIpAddress = true;
+
+  @override
+  GlobalKey<FormState> get formKey => _controller.formKey;
 
   @override
   void initState() {
@@ -76,7 +81,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                         color: AppColors.primary,
                       ),
                     ),
-                    validator: _controller.validateEmail,
+                    validator: validator('email', _controller.validateEmail),
                     onFieldSubmitted: (_) => _handleSubmit(),
                   ),
                 ),
@@ -133,12 +138,15 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   void _handleSubmit() {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
+    clearBackendErrors();
+
     _controller.submitForm(
       onLoading: () => setState(() => _controller.formLoading = true),
       onComplete: () {
         setState(() => _controller.formLoading = false);
       },
       authProvider: authProvider,
+      onValidationError: setBackendErrors,
     );
   }
 

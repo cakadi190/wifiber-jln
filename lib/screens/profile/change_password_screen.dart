@@ -10,6 +10,7 @@ import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:remixicon/remixicon.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/screens/forgot_password_screen.dart';
+import 'package:wifiber/components/forms/backend_validation_mixin.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -18,8 +19,12 @@ class ChangePasswordScreen extends StatefulWidget {
   State<ChangePasswordScreen> createState() => _ChangePasswordScreenState();
 }
 
-class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
+class _ChangePasswordScreenState extends State<ChangePasswordScreen>
+    with BackendValidationMixin {
   late ChangePasswordController _controller;
+
+  @override
+  GlobalKey<FormState> get formKey => _controller.formKey;
 
   @override
   void initState() {
@@ -130,7 +135,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                   ),
                                 ),
                               ),
-                              validator: _controller.validateCurrentPassword,
+                              validator: validator(
+                                'existing_password',
+                                _controller.validateCurrentPassword,
+                              ),
                             );
                           },
                         ),
@@ -186,8 +194,11 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                         color: AppColors.primary,
                                       ),
                                     ),
-                                  ),
-                                  validator: _controller.validateNewPassword,
+                              ),
+                              validator: validator(
+                                'new_password',
+                                _controller.validateNewPassword,
+                              ),
                                 ),
 
                                 PasswordMeterWidget(
@@ -220,7 +231,10 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
                                   ),
                                 ),
                               ),
-                              validator: _controller.validateConfirmPassword,
+                              validator: validator(
+                                'new_password_confirmation',
+                                _controller.validateConfirmPassword,
+                              ),
                               onFieldSubmitted: (_) => _handleSubmit(),
                             );
                           },
@@ -287,7 +301,13 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen> {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final user = authProvider.user;
 
-    final success = await _controller.changePassword(context, user);
+    clearBackendErrors();
+
+    final success = await _controller.changePassword(
+      context,
+      user,
+      onValidationError: setBackendErrors,
+    );
     if (success && mounted) {
       Navigator.pop(context);
     }

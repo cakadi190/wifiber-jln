@@ -3,6 +3,7 @@ import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/screens/dashboard/home_dashboard_screen.dart';
 import 'package:wifiber/screens/forgot_password_screen.dart';
+import 'package:wifiber/exceptions/validation_exceptions.dart';
 
 class LoginScreenController {
   final BuildContext context;
@@ -55,6 +56,7 @@ class LoginScreenController {
     required VoidCallback onLoading,
     required VoidCallback onComplete,
     required AuthProvider authProvider,
+    void Function(Map<String, dynamic> errors)? onValidationError,
   }) async {
     final isValid = formKey.currentState?.validate() ?? false;
     if (!isValid) return;
@@ -81,15 +83,18 @@ class LoginScreenController {
           );
         }
       }
-    } catch (e) {
-      String message = e.toString();
-
-      if(e.toString().contains("400")) {
-        message = "Nama pengguna atau kata sandi salah.";
-      } else {
-        message = e.toString();
+    } on ValidationException catch (e) {
+      onValidationError?.call(e.errors);
+      if (context.mounted) {
+        SnackBars.error(
+          context,
+          e.message,
+        ).clearSnackBars();
       }
-
+    } catch (e) {
+      final message = e.toString().contains("400")
+          ? "Nama pengguna atau kata sandi salah."
+          : e.toString();
       if (context.mounted) {
         SnackBars.error(
           context,

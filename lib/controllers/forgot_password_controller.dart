@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/exceptions/string_exceptions.dart';
+import 'package:wifiber/exceptions/validation_exceptions.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/screens/login_screen.dart';
 import 'package:wifiber/services/http_service.dart';
@@ -37,6 +38,7 @@ class ForgotPasswordController {
     required VoidCallback onLoading,
     required VoidCallback onComplete,
     required AuthProvider authProvider,
+    void Function(Map<String, dynamic> errors)? onValidationError,
   }) async {
     final isValid = formKey.currentState?.validate() ?? false;
     if (!isValid) return;
@@ -76,6 +78,11 @@ class ForgotPasswordController {
             Navigator.of(context).pop();
           }
         }
+      }
+    } on ValidationException catch (e) {
+      onValidationError?.call(e.errors);
+      if (context.mounted) {
+        SnackBars.error(context, e.message).clearSnackBars();
       }
     } on StringException catch (e) {
       if (context.mounted) {

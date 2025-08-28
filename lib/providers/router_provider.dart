@@ -1,6 +1,7 @@
 import 'package:wifiber/models/router.dart';
 import 'package:wifiber/services/router_service.dart';
 import 'package:wifiber/utils/safe_change_notifier.dart';
+import 'package:wifiber/exceptions/validation_exceptions.dart';
 
 enum RouterState { initial, loading, success, error }
 
@@ -68,6 +69,10 @@ class RouterProvider extends SafeChangeNotifier {
       await getAllRouters();
       notifyListeners();
       return true;
+    } on ValidationException catch (e) {
+      _isAddingRouter = false;
+      notifyListeners();
+      throw e;
     } catch (e) {
       _isAddingRouter = false;
       _setError(e.toString());
@@ -87,6 +92,10 @@ class RouterProvider extends SafeChangeNotifier {
       _isUpdatingRouter = false;
       notifyListeners();
       return true;
+    } on ValidationException catch (e) {
+      _isUpdatingRouter = false;
+      notifyListeners();
+      throw e;
     } catch (e) {
       _isUpdatingRouter = false;
       _setError(e.toString());

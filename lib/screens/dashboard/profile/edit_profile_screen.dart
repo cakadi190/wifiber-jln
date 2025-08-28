@@ -7,6 +7,8 @@ import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/middlewares/auth_middleware.dart';
+import 'dart:convert';
+import 'package:wifiber/components/forms/backend_validation_mixin.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({
@@ -24,10 +26,14 @@ class EditProfileScreen extends StatefulWidget {
   State<EditProfileScreen> createState() => _EditProfileScreenState();
 }
 
-class _EditProfileScreenState extends State<EditProfileScreen> {
+class _EditProfileScreenState extends State<EditProfileScreen>
+    with BackendValidationMixin {
   final _formKey = GlobalKey<FormState>();
   final _controller = TextEditingController(text: '');
   bool _isLoading = false;
+
+  @override
+  GlobalKey<FormState> get formKey => _formKey;
 
   @override
   void initState() {
@@ -43,6 +49,8 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   Future<void> _submitProfile() async {
     if (!_formKey.currentState!.validate()) return;
+
+    clearBackendErrors();
 
     final auth = Provider.of<AuthProvider>(context, listen: false);
     final user = auth.user!;
@@ -81,6 +89,20 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
             ),
           );
           Navigator.of(context).pop(_controller.text);
+        }
+      } else if (response.statusCode == 422) {
+        final data = jsonDecode(response.body);
+        final errors = data['errors'] ?? data['error']?['message'];
+        if (errors is Map<String, dynamic>) {
+          setBackendErrors(errors);
+        }
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(data['message'] ?? 'Data tidak valid'),
+              backgroundColor: Colors.red,
+            ),
+          );
         }
       } else {
         if (mounted) {
@@ -183,12 +205,15 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       labelText: widget.formLabel,
                       border: const OutlineInputBorder(),
                     ),
-                    validator: (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Harap isi ${widget.formLabel.toLowerCase()}';
-                      }
-                      return null;
-                    },
+                    validator: validator(
+                      widget.formName,
+                      (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Harap isi ${widget.formLabel.toLowerCase()}';
+                        }
+                        return null;
+                      },
+                    ),
                   ),
                   const SizedBox(height: 16),
                   SizedBox(
