@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:wifiber/exceptions/validation_exceptions.dart';
 import 'package:wifiber/models/registrant.dart';
 import 'package:wifiber/services/http_service.dart';
 
@@ -148,6 +149,8 @@ class RegistrantService {
             : 'Failed to create registrant: $statusCode';
         throw Exception(message);
       }
+    } on ValidationException {
+      rethrow;
     } catch (e) {
       throw Exception('Error creating registrant: $e');
     }
@@ -231,6 +234,8 @@ class RegistrantService {
       } else {
         throw Exception('Failed to update registrant: $statusCode');
       }
+    } on ValidationException {
+      rethrow;
     } catch (e) {
       throw Exception('Error updating registrant: $e');
     }

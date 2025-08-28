@@ -13,6 +13,7 @@ import 'package:wifiber/models/bills.dart';
 import 'package:wifiber/models/customer.dart';
 import 'package:wifiber/providers/bills_provider.dart';
 import 'package:wifiber/middlewares/auth_middleware.dart';
+import 'package:wifiber/components/forms/backend_validation_mixin.dart';
 
 class BillsCreateScreen extends StatefulWidget {
   const BillsCreateScreen({super.key});
@@ -21,7 +22,8 @@ class BillsCreateScreen extends StatefulWidget {
   State<BillsCreateScreen> createState() => _BillsCreateScreenState();
 }
 
-class _BillsCreateScreenState extends State<BillsCreateScreen> {
+class _BillsCreateScreenState extends State<BillsCreateScreen>
+    with BackendValidationMixin {
   final _formKey = GlobalKey<FormState>();
   final _customerIdController = TextEditingController();
   final _paymentMethodController = TextEditingController();
@@ -36,6 +38,9 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
   DateTime _paymentAt = DateTime.now();
   DateTime _selectedPeriod = DateTime.now();
   bool _isLoading = false;
+
+  @override
+  GlobalKey<FormState> get formKey => _formKey;
 
   @override
   void dispose() {
@@ -156,6 +161,8 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
   Future<void> _createBill() async {
     if (!_formKey.currentState!.validate()) return;
 
+    clearBackendErrors();
+
     if (selectedCustomer == null) {
       SnackBars.error(
         context,
@@ -212,19 +219,9 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
         ).clearSnackBars();
       }
     } on ValidationException catch (e) {
-      String errorMessage = "Periksa kembali data yang kamu masukkan!";
-
-      if (e.errors.isNotEmpty) {
-        final firstError = e.errors.values.first;
-        if (firstError is List && firstError.isNotEmpty) {
-          errorMessage = firstError.first.toString();
-        } else if (firstError is String) {
-          errorMessage = firstError;
-        }
-      }
-
+      setBackendErrors(e.errors);
       if (mounted) {
-        SnackBars.error(context, errorMessage).clearSnackBars();
+        SnackBars.error(context, e.message).clearSnackBars();
       }
     } catch (e) {
       if (mounted) {
@@ -536,6 +533,7 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
                           filled: true,
                           fillColor: Colors.grey.shade50,
                         ),
+                        validator: validator('payment_method'),
                       ),
 
                       const SizedBox(height: 24),
@@ -672,6 +670,7 @@ class _BillsCreateScreenState extends State<BillsCreateScreen> {
                           filled: true,
                           fillColor: Colors.grey.shade50,
                         ),
+                        validator: validator('payment_note'),
                       ),
 
                       const SizedBox(height: 32),

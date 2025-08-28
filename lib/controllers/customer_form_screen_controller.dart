@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/ui/snackbars.dart';
+import 'package:wifiber/exceptions/validation_exceptions.dart';
 import 'package:wifiber/helpers/datetime_helper.dart';
 import 'package:wifiber/models/customer.dart';
 import 'package:wifiber/providers/customer_provider.dart';
@@ -336,6 +337,7 @@ class CustomerFormController extends SafeChangeNotifier {
     BuildContext context, {
     required bool isEdit,
     Customer? customer,
+    void Function(Map<String, dynamic> errors)? onValidationError,
   }) async {
     isLoading = true;
     notifyListeners();
@@ -399,10 +401,18 @@ class CustomerFormController extends SafeChangeNotifier {
     final provider = Provider.of<CustomerProvider>(context, listen: false);
     bool success;
 
-    if (isEdit && customer != null) {
-      success = await provider.updateCustomer(customer.id, customerData);
-    } else {
-      success = await provider.createCustomer(customerData);
+    try {
+      if (isEdit && customer != null) {
+        success = await provider.updateCustomer(customer.id, customerData);
+      } else {
+        success = await provider.createCustomer(customerData);
+      }
+    } on ValidationException catch (e) {
+      isLoading = false;
+      notifyListeners();
+      onValidationError?.call(e.errors);
+      SnackBars.error(context, e.message).clearSnackBars();
+      return false;
     }
 
     isLoading = false;
