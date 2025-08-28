@@ -3,6 +3,7 @@ import 'dart:io';
 
 import 'package:http/http.dart' as http;
 import 'package:image_picker/image_picker.dart';
+import 'package:wifiber/exceptions/validation_exceptions.dart';
 import 'package:wifiber/models/customer.dart';
 import 'package:wifiber/services/http_service.dart';
 
@@ -143,6 +144,8 @@ class CustomerService {
       } else {
         throw Exception('Failed to create customer: $statusCode');
       }
+    } on ValidationException {
+      rethrow;
     } catch (e) {
       throw Exception('Error creating customer: $e');
     }
@@ -224,6 +227,8 @@ class CustomerService {
       } else {
         throw Exception('Failed to update customer: $statusCode');
       }
+    } on ValidationException {
+      rethrow;
     } catch (e) {
       throw Exception('Error updating customer: $e');
     }

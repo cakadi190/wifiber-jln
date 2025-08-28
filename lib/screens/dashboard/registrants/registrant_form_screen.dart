@@ -5,6 +5,7 @@ import 'package:path/path.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/controllers/registrant_form_screen_controller.dart';
+import 'package:wifiber/components/forms/backend_validation_mixin.dart';
 import 'package:wifiber/models/registrant.dart';
 import 'package:wifiber/components/reusables/package_modal_action.dart';
 import 'package:wifiber/components/reusables/router_modal_selector.dart';
@@ -28,7 +29,8 @@ class RegistrantFormScreen extends StatefulWidget {
   State<RegistrantFormScreen> createState() => _RegistrantFormScreenState();
 }
 
-class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
+class _RegistrantFormScreenState extends State<RegistrantFormScreen>
+    with BackendValidationMixin {
   final _formKey = GlobalKey<FormState>();
   late RegistrantFormController _controller;
   LatLng? _selectedLocation;
@@ -87,6 +89,9 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
       });
     }
   }
+
+  @override
+  GlobalKey<FormState> get formKey => _formKey;
 
   @override
   void dispose() {
@@ -394,10 +399,12 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
                   IconButton(
                     onPressed: () async {
                       if (_formKey.currentState!.validate()) {
+                        clearBackendErrors();
                         await controller.submitForm(
                           context,
                           isEdit: widget.isEdit,
                           registrant: widget.registrant,
+                          onValidationError: setBackendErrors,
                         );
                       }
                     },
@@ -448,8 +455,11 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
                                     border: OutlineInputBorder(),
                                     prefixIcon: Icon(Icons.person),
                                   ),
-                                  validator: (value) => controller
-                                      .validateRequired(value, 'Nama lengkap'),
+                                  validator: validator(
+                                    'name',
+                                    (value) => controller
+                                        .validateRequired(value, 'Nama lengkap'),
+                                  ),
                                 ),
                                 const SizedBox(height: 16),
                                 TextFormField(
@@ -469,8 +479,11 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
                                     prefixIcon: Icon(Icons.phone),
                                   ),
                                   keyboardType: TextInputType.phone,
-                                  validator: (value) => controller
-                                      .validateRequired(value, 'Nomor telepon'),
+                                  validator: validator(
+                                    'phone',
+                                    (value) => controller
+                                        .validateRequired(value, 'Nomor telepon'),
+                                  ),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
@@ -490,11 +503,13 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
                                     border: OutlineInputBorder(),
                                     prefixIcon: Icon(Icons.credit_card),
                                   ),
-                                  validator: (value) =>
-                                      controller.validateRequired(
-                                        value,
-                                        'Nomor KTP (atau isi dengan "-")',
-                                      ),
+                                  validator: validator(
+                                    'identity-number',
+                                    (value) => controller.validateRequired(
+                                      value,
+                                      'Nomor KTP (atau isi dengan "-")',
+                                    ),
+                                  ),
                                 ),
                                 const SizedBox(height: 16),
                                 TextFormField(
@@ -505,8 +520,11 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
                                     prefixIcon: Icon(Icons.location_on),
                                   ),
                                   maxLines: 3,
-                                  validator: (value) => controller
-                                      .validateRequired(value, 'Alamat'),
+                                  validator: validator(
+                                    'address',
+                                    (value) =>
+                                        controller.validateRequired(value, 'Alamat'),
+                                  ),
                                 ),
                                 const SizedBox(height: 16),
                                 DropdownButtonFormField<RegistrantStatus>(
@@ -629,8 +647,11 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
                                     border: OutlineInputBorder(),
                                     prefixIcon: Icon(Icons.vpn_key),
                                   ),
-                                  validator: (value) => controller
-                                      .validateRequired(value, 'PPPoE Secret'),
+                                  validator: validator(
+                                    'pppoe_secret',
+                                    (value) => controller
+                                        .validateRequired(value, 'PPPoE Secret'),
+                                  ),
                                 ),
                                 const SizedBox(height: 16),
                                 TextFormField(
@@ -641,11 +662,13 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
                                     prefixIcon: Icon(Icons.calendar_month),
                                     border: OutlineInputBorder(),
                                   ),
-                                  validator: (value) =>
-                                      controller.validateRequired(
-                                        value,
-                                        'Tanggal jatuh tempo',
-                                      ),
+                                  validator: validator(
+                                    'due-date',
+                                    (value) => controller.validateRequired(
+                                      value,
+                                      'Tanggal jatuh tempo',
+                                    ),
+                                  ),
                                 ),
                                 const SizedBox(height: 2),
                                 Text(
@@ -683,8 +706,11 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
                                     suffixText: '%',
                                   ),
                                   keyboardType: TextInputType.number,
-                                  validator: (value) => controller
-                                      .validateRequired(value, 'Diskon'),
+                                  validator: validator(
+                                    'discount',
+                                    (value) =>
+                                        controller.validateRequired(value, 'Diskon'),
+                                  ),
                                 ),
                                 const SizedBox(height: 16),
                                 CheckboxListTile(
@@ -859,10 +885,12 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen> {
                                     ? null
                                     : () async {
                                         if (_formKey.currentState!.validate()) {
+                                          clearBackendErrors();
                                           await controller.submitForm(
                                             context,
                                             isEdit: widget.isEdit,
                                             registrant: widget.registrant,
+                                            onValidationError: setBackendErrors,
                                           );
                                         }
                                       },

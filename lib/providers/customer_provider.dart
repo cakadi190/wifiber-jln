@@ -1,5 +1,6 @@
 import 'dart:io';
 
+import 'package:wifiber/exceptions/validation_exceptions.dart';
 import 'package:wifiber/models/customer.dart';
 import 'package:wifiber/services/customer_service.dart';
 import 'package:wifiber/utils/safe_change_notifier.dart';
@@ -101,11 +102,15 @@ class CustomerProvider extends SafeChangeNotifier {
       _error = null;
       notifyListeners();
       return true;
+    } on ValidationException catch (e) {
+      _setError(e.message);
+      _setLoading(false);
+      rethrow;
     } catch (e) {
       _setError(e.toString());
       return false;
     } finally {
-      _setLoading(false);
+      if (_isLoading) _setLoading(false);
     }
   }
 
@@ -139,11 +144,15 @@ class CustomerProvider extends SafeChangeNotifier {
       _error = null;
       notifyListeners();
       return true;
+    } on ValidationException catch (e) {
+      _setError(e.message);
+      _setLoading(false);
+      rethrow;
     } catch (e) {
       _setError(e.toString());
       return false;
     } finally {
-      _setLoading(false);
+      if (_isLoading) _setLoading(false);
     }
   }
 

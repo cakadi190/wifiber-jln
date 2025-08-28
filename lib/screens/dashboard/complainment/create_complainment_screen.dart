@@ -6,6 +6,8 @@ import 'package:wifiber/controllers/tabs/complaint_tab_controller.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/models/customer.dart';
 import 'package:wifiber/middlewares/auth_middleware.dart';
+import 'package:wifiber/components/forms/backend_validation_mixin.dart';
+import 'package:wifiber/exceptions/validation_exceptions.dart';
 
 class CreateComplaintScreen extends StatefulWidget {
   const CreateComplaintScreen({super.key});
@@ -14,8 +16,9 @@ class CreateComplaintScreen extends StatefulWidget {
   State<CreateComplaintScreen> createState() => _CreateComplaintScreenState();
 }
 
-class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
-  GlobalKey<FormState> formKey = GlobalKey<FormState>();
+class _CreateComplaintScreenState extends State<CreateComplaintScreen>
+    with BackendValidationMixin {
+  final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
 
   late final ComplaintTabController _complaintController;
 
@@ -23,6 +26,9 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
   String? complaintDescription;
   DateTime? selectedDate;
   bool _isLoading = false;
+
+  @override
+  GlobalKey<FormState> get formKey => _formKey;
 
   void _showCustomerSearchModal() {
     showModalBottomSheet(
@@ -66,10 +72,12 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
   }
 
   Future<void> _handleSubmit() async {
-    if (!_validateForm()) {
+    if (!_formKey.currentState!.validate() || !_validateForm()) {
       _complaintController.showErrorMessage('Mohon lengkapi semua field!');
       return;
     }
+
+    clearBackendErrors();
 
     setState(() {
       _isLoading = true;
@@ -90,6 +98,9 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
       } else {
         _complaintController.showErrorMessage('Gagal membuat pengaduan!');
       }
+    } on ValidationException catch (e) {
+      setBackendErrors(e.errors);
+      _complaintController.showErrorMessage(e.message);
     } catch (e) {
       _complaintController.showErrorMessage(
         'Terjadi kesalahan: ${e.toString()}',
@@ -145,7 +156,7 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.all(16),
                     child: Form(
-                      key: formKey,
+                      key: _formKey,
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -238,12 +249,15 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen> {
                                 complaintDescription = value;
                               });
                             },
-                            validator: (value) {
-                              if (value == null || value.trim().isEmpty) {
-                                return 'Deskripsi pengaduan tidak boleh kosong';
-                              }
-                              return null;
-                            },
+                            validator: validator(
+                              'topic',
+                              (value) {
+                                if (value == null || value.trim().isEmpty) {
+                                  return 'Deskripsi pengaduan tidak boleh kosong';
+                                }
+                                return null;
+                              },
+                            ),
                           ),
                           const SizedBox(height: 24),
 

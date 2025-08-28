@@ -1,3 +1,4 @@
+import 'package:wifiber/exceptions/validation_exceptions.dart';
 import 'package:wifiber/models/registrant.dart';
 import 'package:wifiber/services/registrant_service.dart';
 import 'package:wifiber/utils/safe_change_notifier.dart';
@@ -99,11 +100,15 @@ class RegistrantProvider extends SafeChangeNotifier {
       _error = null;
       notifyListeners();
       return true;
+    } on ValidationException catch (e) {
+      _setError(e.message);
+      _setLoading(false);
+      rethrow;
     } catch (e) {
       _setError(e.toString());
       return false;
     } finally {
-      _setLoading(false);
+      if (_isLoading) _setLoading(false);
     }
   }
 
@@ -139,11 +144,15 @@ class RegistrantProvider extends SafeChangeNotifier {
       _error = null;
       notifyListeners();
       return true;
+    } on ValidationException catch (e) {
+      _setError(e.message);
+      _setLoading(false);
+      rethrow;
     } catch (e) {
       _setError(e.toString());
       return false;
     } finally {
-      _setLoading(false);
+      if (_isLoading) _setLoading(false);
     }
   }
 
