@@ -1,4 +1,5 @@
-import 'package:flutter/foundation.dart';
+import 'dart:io';
+
 import 'package:wifiber/models/transaction.dart';
 import 'package:wifiber/services/transaction_service.dart';
 import 'package:wifiber/utils/safe_change_notifier.dart';
@@ -104,31 +105,48 @@ class TransactionProvider extends SafeChangeNotifier {
   }
 
   Future<void> addTransaction({
-    required int amount,
+    required int nominal,
     required String description,
     required String type,
+    required DateTime createdAt,
+    required String createdBy,
+    File? image,
   }) async {
     await _service.createTransaction(
-      amount: amount,
+      nominal: nominal,
       description: description,
       type: type,
+      createdAt: createdAt,
+      createdBy: createdBy,
+      image: image,
     );
     await loadTransactions();
   }
 
   Future<void> updateTransaction(
     int id, {
-    required int amount,
+    required int nominal,
     required String description,
     required String type,
+    required DateTime createdAt,
+    required String createdBy,
+    File? image,
   }) async {
-    await _service.updateTransaction(
-      id,
-      amount: amount,
-      description: description,
-      type: type,
-    );
-    await loadTransactions();
+    try {
+      await _service.updateTransaction(
+        id,
+        nominal: nominal,
+        description: description,
+        type: type,
+        createdAt: createdAt,
+        createdBy: createdBy,
+        image: image,
+      );
+      await loadTransactions();
+    } catch (e) {
+      print('Error updating transaction: $e');
+      rethrow;
+    }
   }
 
   Future<void> deleteTransaction(int id) async {

@@ -586,7 +586,7 @@ class TransactionTab extends StatelessWidget {
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
-          trailing: Text(CurrencyHelper.formatCurrency(tx.amount)),
+          trailing: Text(CurrencyHelper.formatCurrency(tx.nominal)),
           onTap: () => _showTransactionDetailModal(context, tx),
         );
       },
@@ -798,8 +798,16 @@ class TransactionTab extends StatelessWidget {
 
               _buildDetailRow(
                 context,
+                'Dibuat Oleh',
+                transaction.createdBy ?? '-',
+                Icons.person,
+              ),
+              SizedBox(height: 16),
+
+              _buildDetailRow(
+                context,
                 'Jumlah',
-                CurrencyHelper.formatCurrency(transaction.amount),
+                CurrencyHelper.formatCurrency(transaction.nominal),
                 Icons.attach_money,
                 color: transaction.type == 'income' ? Colors.green : Colors.red,
               ),

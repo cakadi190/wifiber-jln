@@ -1,7 +1,9 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:wifiber/models/transaction.dart';
 import 'package:wifiber/services/http_service.dart';
+import 'package:http/http.dart' as http;
 
 class TransactionService {
   static final HttpService _http = HttpService();
@@ -13,8 +15,10 @@ class TransactionService {
     String endpoint = '/transactions';
 
     if (startDate != null && endDate != null) {
-      final startDateStr = "${startDate.year}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}";
-      final endDateStr = "${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}";
+      final startDateStr =
+          "${startDate.year}-${startDate.month.toString().padLeft(2, '0')}-${startDate.day.toString().padLeft(2, '0')}";
+      final endDateStr =
+          "${endDate.year}-${endDate.month.toString().padLeft(2, '0')}-${endDate.day.toString().padLeft(2, '0')}";
       endpoint += "?start_date=$startDateStr&end_date=$endDateStr";
     }
 
@@ -42,58 +46,118 @@ class TransactionService {
   }
 
   Future<void> createTransaction({
-    required int amount,
+    required int nominal,
     required String description,
     required String type,
+    required DateTime createdAt,
+    required String createdBy,
+    File? image,
   }) async {
-    final response = await _http.postForm(
-      '/transactions',
-      fields: {
-        'nominal': amount.toString(),
-        'description': description,
-        'type': type,
-      },
-      requiresAuth: true,
-    );
+    final fields = {
+      'nominal': nominal.toString(),
+      'description': description,
+      'type': type,
+      'created_at': createdAt.toIso8601String(),
+      'created_by': createdBy,
+    };
 
-    if (response.statusCode != 200) {
+    http.Response response;
+    if (image != null) {
+      final streamed = await _http.uploadFile(
+        '/transactions',
+        'image',
+        image,
+        fields: fields,
+        requiresAuth: true,
+      );
+      response = await _http.streamedResponseToResponse(streamed);
+    } else {
+      response = await _http.postForm(
+        '/transactions',
+        fields: fields,
+        requiresAuth: true,
+      );
+    }
+
+    if (response.statusCode != 200 && response.statusCode != 201) {
+      final body = json.decode(response.body);
+      final errors = body['errors'];
+      final message = body['message'];
+
+      if (errors != null) {
+        print('Error creating transaction: 422');
+        print('Validation errors:');
+        errors.forEach((error) {
+          print(' - ${error['field']}: ${error['message']}');
+        });
+      } else {
+        print('Error creating transaction: ${response.statusCode}');
+        print('Error message: $message');
+      }
+
       throw Exception('Failed to create transaction');
     }
 
     final body = json.decode(response.body);
     if (body['success'] != true) {
+      print('Error message from backend: ${body['message']}');
       throw Exception(body['message'] ?? 'Failed to create transaction');
     }
   }
 
   Future<void> updateTransaction(
     int id, {
-    required int amount,
+    required int nominal,
     required String description,
     required String type,
+    required DateTime createdAt,
+    required String createdBy,
+    File? image,
   }) async {
-    final response = await _http.postForm(
-      '/transactions/$id',
-      fields: {
-        'nominal': amount.toString(),
-        'description': description,
-        'type': type,
-      },
-      requiresAuth: true,
-    );
+    final fields = {
+      'nominal': nominal.toString(),
+      'description': description,
+      'type': type,
+      'created_at': createdAt.toIso8601String(),
+      'created_by': createdBy,
+    };
+
+    http.Response response;
+    if (image != null) {
+      final streamed = await _http.uploadFile(
+        '/transactions/$id',
+        'image',
+        image,
+        fields: fields,
+        requiresAuth: true,
+      );
+      response = await _http.streamedResponseToResponse(streamed);
+    } else {
+      response = await _http.postForm(
+        '/transactions/$id',
+        fields: fields,
+        requiresAuth: true,
+      );
+    }
+
+    print('Response update transaction: ${response.statusCode}');
 
     if (response.statusCode != 200) {
-      throw Exception('Failed to update transaction');
+      throw Exception('Failed to update transaction: ${response.statusCode}');
     }
 
     final body = json.decode(response.body);
     if (body['success'] != true) {
+      print('Error message from backend: ${body['message']}');
       throw Exception(body['message'] ?? 'Failed to update transaction');
     }
   }
 
   Future<void> deleteTransaction(int id) async {
-    final response = await _http.delete('/transactions/$id', requiresAuth: true);
+    final response = await _http.delete(
+      '/transactions/$id',
+      requiresAuth: true,
+    );
 
     if (response.statusCode != 200) {
       throw Exception('Failed to delete transaction');

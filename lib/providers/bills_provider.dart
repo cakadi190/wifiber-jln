@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:wifiber/exceptions/string_exceptions.dart';
 import 'package:wifiber/exceptions/validation_exceptions.dart';
 import 'package:wifiber/models/bills.dart';
@@ -38,10 +37,8 @@ class BillsProvider extends SafeChangeNotifier {
     (sum, bill) => sum + (int.tryParse(bill.totalAmount.toString()) ?? 0),
   );
 
-  int get totalUnpaidAmount => unpaidBills.fold(
-    0,
-    (sum, bill) => sum + (bill.totalAmount.toInt()),
-  );
+  int get totalUnpaidAmount =>
+      unpaidBills.fold(0, (sum, bill) => sum + (bill.totalAmount.toInt()));
 
   Future<void> fetchBills({
     String? customerId,

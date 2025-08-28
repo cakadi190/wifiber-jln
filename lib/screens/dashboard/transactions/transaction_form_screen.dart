@@ -1,4 +1,8 @@
+import 'dart:io';
+
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
+import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/models/transaction.dart';
@@ -14,28 +18,109 @@ class TransactionFormScreen extends StatefulWidget {
 
 class _TransactionFormScreenState extends State<TransactionFormScreen> {
   final _formKey = GlobalKey<FormState>();
-  late TextEditingController _amountController;
+  late TextEditingController _nominalController;
   late TextEditingController _descriptionController;
+  late TextEditingController _createdByController;
+  late TextEditingController _createdAtController;
+  DateTime _createdAt = DateTime.now();
   String _type = 'income';
   bool _isLoading = false;
+  XFile? _imageFile;
+  final ImagePicker _picker = ImagePicker();
 
   @override
   void initState() {
     super.initState();
-    _amountController = TextEditingController(
-      text: widget.transaction?.amount.toString() ?? '',
+    _nominalController = TextEditingController(
+      text: widget.transaction?.nominal.toString() ?? '',
     );
     _descriptionController = TextEditingController(
       text: widget.transaction?.description ?? '',
+    );
+    _createdByController = TextEditingController(
+      text: widget.transaction?.createdBy ?? '',
+    );
+    _createdAt = widget.transaction?.createdAt ?? DateTime.now();
+    _createdAtController = TextEditingController(
+      text: DateFormat('yyyy-MM-dd HH:mm:ss').format(_createdAt),
     );
     _type = widget.transaction?.type ?? 'income';
   }
 
   @override
   void dispose() {
-    _amountController.dispose();
+    _nominalController.dispose();
     _descriptionController.dispose();
+    _createdByController.dispose();
+    _createdAtController.dispose();
     super.dispose();
+  }
+
+  Future<void> _selectDateTime() async {
+    final date = await showDatePicker(
+      context: context,
+      initialDate: _createdAt,
+      firstDate: DateTime(2000),
+      lastDate: DateTime(2100),
+    );
+    if (date == null) return;
+    final time = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(_createdAt),
+    );
+    if (time == null) return;
+    final selected = DateTime(
+      date.year,
+      date.month,
+      date.day,
+      time.hour,
+      time.minute,
+    );
+    setState(() {
+      _createdAt = selected;
+      _createdAtController.text = DateFormat(
+        'yyyy-MM-dd HH:mm:ss',
+      ).format(selected);
+    });
+  }
+
+  Future<void> _pickImage(ImageSource source) async {
+    final picked = await _picker.pickImage(source: source);
+    if (picked != null) {
+      setState(() => _imageFile = picked);
+    }
+  }
+
+  void _showImagePicker() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (_) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library, color: Colors.blue),
+              title: const Text('Pilih dari Galeri'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.gallery);
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt, color: Colors.green),
+              title: const Text('Ambil dengan Kamera'),
+              onTap: () {
+                Navigator.pop(context);
+                _pickImage(ImageSource.camera);
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _submit() async {
@@ -45,26 +130,35 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
     final provider = context.read<TransactionProvider>();
 
     try {
-      final amount = int.parse(_amountController.text.trim());
+      final nominal = int.parse(_nominalController.text.trim());
       final description = _descriptionController.text.trim();
+      final createdBy = _createdByController.text.trim();
+      final imageFile = _imageFile != null ? File(_imageFile!.path) : null;
 
       if (widget.transaction == null) {
         await provider.addTransaction(
-          amount: amount,
+          nominal: nominal,
           description: description,
           type: _type,
+          createdAt: _createdAt,
+          createdBy: createdBy,
+          image: imageFile,
         );
       } else {
         await provider.updateTransaction(
           widget.transaction!.id,
-          amount: amount,
+          nominal: nominal,
           description: description,
           type: _type,
+          createdAt: _createdAt,
+          createdBy: createdBy,
+          image: imageFile,
         );
       }
 
       if (mounted) Navigator.pop(context, true);
     } catch (e) {
+      print('Error submitting transaction: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Gagal menyimpan transaksi: $e')),
@@ -112,7 +206,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
                     crossAxisAlignment: CrossAxisAlignment.stretch,
                     children: [
                       TextFormField(
-                        controller: _amountController,
+                        controller: _nominalController,
                         decoration: const InputDecoration(
                           labelText: 'Nominal',
                           prefixIcon: Icon(Icons.attach_money),
@@ -141,6 +235,40 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
                           }
                           return null;
                         },
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _createdByController,
+                        decoration: const InputDecoration(
+                          labelText: 'Dibuat Oleh',
+                          prefixIcon: Icon(Icons.person),
+                        ),
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Pembuat belum diisi';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                        controller: _createdAtController,
+                        readOnly: true,
+                        decoration: const InputDecoration(
+                          labelText: 'Tanggal',
+                          prefixIcon: Icon(Icons.calendar_today),
+                        ),
+                        onTap: _selectDateTime,
+                      ),
+                      const SizedBox(height: 16),
+                      TextButton.icon(
+                        onPressed: _showImagePicker,
+                        icon: const Icon(Icons.image),
+                        label: Text(
+                          _imageFile != null
+                              ? _imageFile!.name
+                              : 'Pilih Gambar (opsional)',
+                        ),
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(

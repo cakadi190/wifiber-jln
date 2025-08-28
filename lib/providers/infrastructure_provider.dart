@@ -1,9 +1,9 @@
-import 'package:flutter/foundation.dart';
 import 'dart:convert';
+
 import 'package:latlong2/latlong.dart';
+import 'package:wifiber/models/infrastructure.dart';
 import 'package:wifiber/services/http_service.dart';
 import 'package:wifiber/services/location_service.dart';
-import 'package:wifiber/models/infrastructure.dart';
 import 'package:wifiber/utils/safe_change_notifier.dart';
 
 class InfrastructureProvider extends SafeChangeNotifier {

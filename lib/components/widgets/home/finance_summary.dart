@@ -84,7 +84,7 @@ class _FinanceSummaryView extends StatelessWidget {
             ),
           ),
           title: Text(
-            CurrencyHelper.formatCurrency(tx.amount),
+            CurrencyHelper.formatCurrency(tx.nominal),
             style: const TextStyle(fontWeight: FontWeight.bold),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,

@@ -1,4 +1,3 @@
-import 'package:flutter/foundation.dart';
 import 'package:wifiber/models/registrant.dart';
 import 'package:wifiber/services/registrant_service.dart';
 import 'package:wifiber/utils/safe_change_notifier.dart';
@@ -126,7 +125,9 @@ class RegistrantProvider extends SafeChangeNotifier {
         registrantData,
       );
 
-      final index = _registrants.indexWhere((registrant) => registrant.id == id);
+      final index = _registrants.indexWhere(
+        (registrant) => registrant.id == id,
+      );
       if (index != -1) {
         _registrants[index] = updatedRegistrant;
       }
