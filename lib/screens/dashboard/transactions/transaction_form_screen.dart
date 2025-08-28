@@ -82,7 +82,9 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
     return Scaffold(
       backgroundColor: AppColors.primary,
       appBar: AppBar(
-        title: Text(isEdit ? 'Ubah Transaksi' : 'Tambah Transaksi'),
+        title: Text(
+          isEdit ? 'Ubah Transaksi Keuangan' : 'Tambah Transaksi Keuangan',
+        ),
         backgroundColor: AppColors.primary,
         foregroundColor: Colors.white,
       ),
@@ -148,7 +150,10 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
                           prefixIcon: Icon(Icons.swap_vert),
                         ),
                         items: const [
-                          DropdownMenuItem(value: 'income', child: Text('Pemasukan')),
+                          DropdownMenuItem(
+                            value: 'income',
+                            child: Text('Pemasukan'),
+                          ),
                           DropdownMenuItem(
                             value: 'expense',
                             child: Text('Pengeluaran'),
@@ -169,7 +174,9 @@ class _TransactionFormScreenState extends State<TransactionFormScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 16),
                           ),
                           child: _isLoading
-                              ? const CircularProgressIndicator(color: Colors.white)
+                              ? const CircularProgressIndicator(
+                                  color: Colors.white,
+                                )
                               : Text(isEdit ? 'Perbarui' : 'Simpan'),
                         ),
                       ),
