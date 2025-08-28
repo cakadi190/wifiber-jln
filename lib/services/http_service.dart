@@ -219,7 +219,7 @@ class HttpService {
     }
 
     final streamedResponse = await _client.send(request);
-    _handleStreamedResponseErrors(streamedResponse);
+    await _handleStreamedResponseErrors(streamedResponse);
     return streamedResponse;
   }
 
@@ -246,7 +246,7 @@ class HttpService {
     }
 
     final streamedResponse = await _client.send(request);
-    _handleStreamedResponseErrors(streamedResponse);
+    await _handleStreamedResponseErrors(streamedResponse);
     return streamedResponse;
   }
 
@@ -273,7 +273,7 @@ class HttpService {
     }
 
     final streamedResponse = await _client.send(request);
-    _handleStreamedResponseErrors(streamedResponse);
+    await _handleStreamedResponseErrors(streamedResponse);
     return streamedResponse;
   }
 
@@ -676,7 +676,9 @@ class HttpService {
     }
   }
 
-  void _handleStreamedResponseErrors(http.StreamedResponse response) {
+  Future<void> _handleStreamedResponseErrors(
+    http.StreamedResponse response,
+  ) async {
     final errorCode = _buildErrorCodeMessageFromStatusCode(response.statusCode);
 
     if (response.statusCode == 401) {
@@ -707,6 +709,46 @@ class HttpService {
       throw StringException(
         'Terjadi kesalahan: metode request Anda tidak diperbolehkan. $errorCode',
       );
+    } else if (response.statusCode == 422) {
+      try {
+        final body = await response.stream.bytesToString();
+        final json = jsonDecode(body);
+
+        Map<String, dynamic>? validationErrors;
+        String mainMessage = 'Validasi gagal.';
+
+        if (json['error']?['message'] != null &&
+            json['error']['message'] is Map<String, dynamic>) {
+          validationErrors =
+              Map<String, dynamic>.from(json['error']['message']);
+          mainMessage = json['message'] ?? mainMessage;
+        } else if (json['errors'] != null &&
+            json['errors'] is Map<String, dynamic>) {
+          validationErrors = Map<String, dynamic>.from(json['errors']);
+          mainMessage = json['message'] ?? mainMessage;
+        } else if (json is Map<String, dynamic>) {
+          validationErrors = Map<String, dynamic>.from(json);
+          validationErrors.removeWhere(
+            (key, value) => key == 'message' || key == 'error' || key == 'status',
+          );
+          if (validationErrors.isEmpty) {
+            validationErrors = null;
+          }
+          mainMessage = json['message'] ?? mainMessage;
+        }
+
+        if (validationErrors != null && validationErrors.isNotEmpty) {
+          throw ValidationException(
+            errors: validationErrors,
+            message: mainMessage,
+          );
+        } else {
+          throw StringException('$mainMessage $errorCode');
+        }
+      } catch (e) {
+        if (e is ValidationException) rethrow;
+        throw StringException('Validasi gagal. $errorCode');
+      }
     } else if (response.statusCode >= 500) {
       throw StringException('Terjadi kesalahan server. $errorCode');
     } else if (response.statusCode >= 400) {
