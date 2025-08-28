@@ -92,9 +92,14 @@ class LoginScreenController {
         ).clearSnackBars();
       }
     } catch (e) {
-      final message = e.toString().contains("400")
-          ? "Nama pengguna atau kata sandi salah."
-          : e.toString();
+      String message = e.toString();
+      if (message.contains("400")) {
+        message = "Nama pengguna atau kata sandi salah.";
+        onValidationError?.call({
+          'username': message,
+          'password': message,
+        });
+      }
       if (context.mounted) {
         SnackBars.error(
           context,
