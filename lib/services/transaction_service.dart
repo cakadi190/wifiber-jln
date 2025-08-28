@@ -1,9 +1,10 @@
 import 'dart:convert';
 import 'dart:io';
 
+import 'package:http/http.dart' as http;
+import 'package:wifiber/exceptions/validation_exceptions.dart';
 import 'package:wifiber/models/transaction.dart';
 import 'package:wifiber/services/http_service.dart';
-import 'package:http/http.dart' as http;
 
 class TransactionService {
   static final HttpService _http = HttpService();
@@ -57,51 +58,53 @@ class TransactionService {
       'nominal': nominal.toString(),
       'description': description,
       'type': type,
-      'created_at': createdAt.toIso8601String(),
+      'created_at':
+          '${createdAt.year.toString().padLeft(4, '0')}-${createdAt.month.toString().padLeft(2, '0')}-${createdAt.day.toString().padLeft(2, '0')} ${createdAt.hour.toString().padLeft(2, '0')}:${createdAt.minute.toString().padLeft(2, '0')}:${createdAt.second.toString().padLeft(2, '0')}',
       'created_by': createdBy,
     };
 
-    http.Response response;
-    if (image != null) {
-      final streamed = await _http.uploadFile(
-        '/transactions',
-        'image',
-        image,
-        fields: fields,
-        requiresAuth: true,
-      );
-      response = await _http.streamedResponseToResponse(streamed);
-    } else {
-      response = await _http.postForm(
-        '/transactions',
-        fields: fields,
-        requiresAuth: true,
-      );
-    }
-
-    if (response.statusCode != 200 && response.statusCode != 201) {
-      final body = json.decode(response.body);
-      final errors = body['errors'];
-      final message = body['message'];
-
-      if (errors != null) {
-        print('Error creating transaction: 422');
-        print('Validation errors:');
-        errors.forEach((error) {
-          print(' - ${error['field']}: ${error['message']}');
-        });
+    try {
+      http.Response response;
+      if (image != null) {
+        final multipartFile = await _http.createMultipartFile('image', image);
+        final streamed = await _http.postUpload(
+          '/transactions',
+          fields: fields,
+          files: [multipartFile],
+          requiresAuth: true,
+        );
+        response = await _http.streamedResponseToResponse(streamed);
       } else {
-        print('Error creating transaction: ${response.statusCode}');
-        print('Error message: $message');
+        response = await _http.postForm(
+          '/transactions',
+          fields: fields,
+          requiresAuth: true,
+        );
       }
 
-      throw Exception('Failed to create transaction');
-    }
+      if (response.statusCode != 200 && response.statusCode != 201) {
+        final body = json.decode(response.body);
+        final errors = body['errors'];
+        // final message = body['message'];
 
-    final body = json.decode(response.body);
-    if (body['success'] != true) {
-      print('Error message from backend: ${body['message']}');
-      throw Exception(body['message'] ?? 'Failed to create transaction');
+        if (errors != null) {
+          errors.forEach((error) {});
+        } else {}
+
+        throw Exception('Failed to create transaction');
+      }
+
+      final body = json.decode(response.body);
+      if (body['success'] != true) {
+        throw Exception(body['message'] ?? 'Failed to create transaction');
+      }
+    } on ValidationException {
+      // Re-throw ValidationException tanpa mengubahnya
+      rethrow;
+    } catch (e) {
+      // Handle error lainnya
+
+      rethrow;
     }
   }
 
@@ -122,34 +125,40 @@ class TransactionService {
       'created_by': createdBy,
     };
 
-    http.Response response;
-    if (image != null) {
-      final streamed = await _http.uploadFile(
-        '/transactions/$id',
-        'image',
-        image,
-        fields: fields,
-        requiresAuth: true,
-      );
-      response = await _http.streamedResponseToResponse(streamed);
-    } else {
-      response = await _http.postForm(
-        '/transactions/$id',
-        fields: fields,
-        requiresAuth: true,
-      );
-    }
+    try {
+      http.Response response;
+      if (image != null) {
+        final multipartFile = await _http.createMultipartFile('image', image);
+        final streamed = await _http.patchUpload(
+          '/transactions/$id',
+          fields: fields,
+          files: [multipartFile],
+          requiresAuth: true,
+        );
+        response = await _http.streamedResponseToResponse(streamed);
+      } else {
+        response = await _http.patchForm(
+          '/transactions/$id',
+          fields: fields,
+          requiresAuth: true,
+        );
+      }
 
-    print('Response update transaction: ${response.statusCode}');
+      if (response.statusCode != 200) {
+        throw Exception('Failed to update transaction: ${response.statusCode}');
+      }
 
-    if (response.statusCode != 200) {
-      throw Exception('Failed to update transaction: ${response.statusCode}');
-    }
+      final body = json.decode(response.body);
+      if (body['success'] != true) {
+        throw Exception(body['message'] ?? 'Failed to update transaction');
+      }
+    } on ValidationException {
+      // Re-throw ValidationException tanpa mengubahnya
+      rethrow;
+    } catch (e) {
+      // Handle error lainnya
 
-    final body = json.decode(response.body);
-    if (body['success'] != true) {
-      print('Error message from backend: ${body['message']}');
-      throw Exception(body['message'] ?? 'Failed to update transaction');
+      rethrow;
     }
   }
 

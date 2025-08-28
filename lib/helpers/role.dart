@@ -16,8 +16,6 @@ class RoleGuard {
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
     final userPermissions = authProvider.user?.permissions ?? [];
 
-    print(userPermissions);
-
     final allowed = _hasPermission(userPermissions, permissions, mode);
 
     if (!allowed) {

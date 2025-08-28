@@ -112,6 +112,7 @@ class TransactionProvider extends SafeChangeNotifier {
     required String createdBy,
     File? image,
   }) async {
+    // ValidationException akan di-throw langsung ke form
     await _service.createTransaction(
       nominal: nominal,
       description: description,
@@ -132,21 +133,17 @@ class TransactionProvider extends SafeChangeNotifier {
     required String createdBy,
     File? image,
   }) async {
-    try {
-      await _service.updateTransaction(
-        id,
-        nominal: nominal,
-        description: description,
-        type: type,
-        createdAt: createdAt,
-        createdBy: createdBy,
-        image: image,
-      );
-      await loadTransactions();
-    } catch (e) {
-      print('Error updating transaction: $e');
-      rethrow;
-    }
+    // ValidationException akan di-throw langsung ke form
+    await _service.updateTransaction(
+      id,
+      nominal: nominal,
+      description: description,
+      type: type,
+      createdAt: createdAt,
+      createdBy: createdBy,
+      image: image,
+    );
+    await loadTransactions();
   }
 
   Future<void> deleteTransaction(int id) async {

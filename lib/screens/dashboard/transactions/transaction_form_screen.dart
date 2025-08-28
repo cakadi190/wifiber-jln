@@ -172,7 +172,6 @@ class _TransactionFormScreenState extends State<TransactionFormScreen>
         );
       }
     } catch (e) {
-      print('Error submitting transaction: $e');
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Gagal menyimpan transaksi: $e')),
@@ -226,18 +225,15 @@ class _TransactionFormScreenState extends State<TransactionFormScreen>
                           prefixIcon: Icon(Icons.attach_money),
                         ),
                         keyboardType: TextInputType.number,
-                        validator: validator(
-                          'nominal',
-                          (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Nominal belum diisi';
-                            }
-                            if (int.tryParse(value) == null) {
-                              return 'Nominal harus berupa angka';
-                            }
-                            return null;
-                          },
-                        ),
+                        validator: validator('nominal', (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Nominal belum diisi';
+                          }
+                          if (int.tryParse(value) == null) {
+                            return 'Nominal harus berupa angka';
+                          }
+                          return null;
+                        }),
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
@@ -246,15 +242,12 @@ class _TransactionFormScreenState extends State<TransactionFormScreen>
                           labelText: 'Deskripsi',
                           prefixIcon: Icon(Icons.description),
                         ),
-                        validator: validator(
-                          'description',
-                          (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Deskripsi belum diisi';
-                            }
-                            return null;
-                          },
-                        ),
+                        validator: validator('description', (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Deskripsi belum diisi';
+                          }
+                          return null;
+                        }),
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
@@ -263,15 +256,12 @@ class _TransactionFormScreenState extends State<TransactionFormScreen>
                           labelText: 'Dibuat Oleh',
                           prefixIcon: Icon(Icons.person),
                         ),
-                        validator: validator(
-                          'created_by',
-                          (value) {
-                            if (value == null || value.isEmpty) {
-                              return 'Pembuat belum diisi';
-                            }
-                            return null;
-                          },
-                        ),
+                        validator: validator('created_by', (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Pembuat belum diisi';
+                          }
+                          return null;
+                        }),
                       ),
                       const SizedBox(height: 16),
                       TextFormField(
