@@ -9,6 +9,8 @@ import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/screens/apps/about_app_screen.dart';
 import 'package:wifiber/screens/dashboard/profile/main_profile_screen.dart';
 import 'package:wifiber/screens/profile/change_password_screen.dart';
+import 'package:wifiber/screens/dashboard/areas/area_list_screen.dart';
+import 'package:wifiber/screens/dashboard/packages/package_list_screen.dart';
 
 class AccountCenterScreen extends StatefulWidget {
   const AccountCenterScreen({super.key, this.onLogoutTap});
@@ -155,6 +157,40 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
           onTap: () {
             _accountCenterController.navigateToScreen(
               screen: const AboutAppScreen(),
+              context: context,
+            );
+          },
+        ),
+        ListTile(
+          leading: PhosphorIcon(
+            PhosphorIcons.mapTrifold(PhosphorIconsStyle.duotone),
+            color: AppColors.primary,
+          ),
+          title: const Text('Area'),
+          trailing: const Icon(
+            Icons.chevron_right_rounded,
+            color: AppColors.primary,
+          ),
+          onTap: () {
+            _accountCenterController.navigateToScreen(
+              screen: const AreaListScreen(),
+              context: context,
+            );
+          },
+        ),
+        ListTile(
+          leading: PhosphorIcon(
+            PhosphorIcons.package(PhosphorIconsStyle.duotone),
+            color: AppColors.primary,
+          ),
+          title: const Text('Paket'),
+          trailing: const Icon(
+            Icons.chevron_right_rounded,
+            color: AppColors.primary,
+          ),
+          onTap: () {
+            _accountCenterController.navigateToScreen(
+              screen: const PackageListScreen(),
               context: context,
             );
           },

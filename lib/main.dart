@@ -10,6 +10,8 @@ import 'package:wifiber/providers/registrant_provider.dart';
 import 'package:wifiber/providers/router_provider.dart';
 import 'package:wifiber/providers/transaction_provider.dart';
 import 'package:wifiber/providers/infrastructure_provider.dart';
+import 'package:wifiber/providers/area_provider.dart';
+import 'package:wifiber/providers/package_provider.dart';
 import 'package:wifiber/screens/splash_screen.dart';
 import 'package:wifiber/services/bills_service.dart';
 import 'package:wifiber/services/complaint_service.dart';
@@ -18,6 +20,8 @@ import 'package:wifiber/services/registrant_service.dart';
 import 'package:wifiber/services/router_service.dart';
 import 'package:wifiber/services/transaction_service.dart';
 import 'package:wifiber/services/navigation_service.dart';
+import 'package:wifiber/services/area_service.dart';
+import 'package:wifiber/services/package_service.dart';
 
 void main() {
   runApp(
@@ -38,6 +42,8 @@ void main() {
         ),
         ChangeNotifierProvider(create: (_) => BillsProvider(BillsService())),
         ChangeNotifierProvider(create: (_) => RouterProvider(RouterService())),
+        ChangeNotifierProvider(create: (_) => AreaProvider(AreaService())),
+        ChangeNotifierProvider(create: (_) => PackageProvider(PackageService())),
         ChangeNotifierProvider(create: (_) => InfrastructureProvider()),
       ],
       child: const CoreApp(),
