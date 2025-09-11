@@ -146,23 +146,6 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
         ),
         ListTile(
           leading: PhosphorIcon(
-            PhosphorIcons.info(PhosphorIconsStyle.duotone),
-            color: AppColors.primary,
-          ),
-          title: const Text('Tentang Aplikasi'),
-          trailing: const Icon(
-            Icons.chevron_right_rounded,
-            color: AppColors.primary,
-          ),
-          onTap: () {
-            _accountCenterController.navigateToScreen(
-              screen: const AboutAppScreen(),
-              context: context,
-            );
-          },
-        ),
-        ListTile(
-          leading: PhosphorIcon(
             PhosphorIcons.mapTrifold(PhosphorIconsStyle.duotone),
             color: AppColors.primary,
           ),
@@ -191,6 +174,23 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
           onTap: () {
             _accountCenterController.navigateToScreen(
               screen: const PackageListScreen(),
+              context: context,
+            );
+          },
+        ),
+        ListTile(
+          leading: PhosphorIcon(
+            PhosphorIcons.info(PhosphorIconsStyle.duotone),
+            color: AppColors.primary,
+          ),
+          title: const Text('Tentang Aplikasi'),
+          trailing: const Icon(
+            Icons.chevron_right_rounded,
+            color: AppColors.primary,
+          ),
+          onTap: () {
+            _accountCenterController.navigateToScreen(
+              screen: const AboutAppScreen(),
               context: context,
             );
           },
