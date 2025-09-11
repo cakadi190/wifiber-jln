@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/models/package.dart';
 import 'package:wifiber/providers/package_provider.dart';
 
@@ -36,9 +37,17 @@ class _PackageFormScreenState extends State<PackageFormScreen> {
   Widget build(BuildContext context) {
     final isEdit = widget.package != null;
     return Scaffold(
+      backgroundColor: AppColors.primary,
       appBar: AppBar(title: Text(isEdit ? 'Edit Paket' : 'Tambah Paket')),
-      body: Padding(
-        padding: const EdgeInsets.all(16),
+      body: Container(
+        padding: EdgeInsets.all(16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
         child: Form(
           key: _formKey,
           child: Column(
@@ -46,34 +55,40 @@ class _PackageFormScreenState extends State<PackageFormScreen> {
               TextFormField(
                 controller: _nameController,
                 decoration: const InputDecoration(labelText: 'Nama'),
-                validator: (v) => v == null || v.isEmpty ? 'Nama wajib diisi' : null,
+                validator: (v) =>
+                    v == null || v.isEmpty ? 'Nama wajib diisi' : null,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 24),
               TextFormField(
                 controller: _descController,
                 decoration: const InputDecoration(labelText: 'Deskripsi'),
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 24),
               TextFormField(
                 controller: _priceController,
                 decoration: const InputDecoration(labelText: 'Harga'),
                 keyboardType: TextInputType.number,
-                validator: (v) => v == null || v.isEmpty ? 'Harga wajib diisi' : null,
+                validator: (v) =>
+                    v == null || v.isEmpty ? 'Harga wajib diisi' : null,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 24),
               TextFormField(
                 controller: _ppnController,
                 decoration: const InputDecoration(labelText: 'PPN %'),
                 keyboardType: TextInputType.number,
-                validator: (v) => v == null || v.isEmpty ? 'PPN wajib diisi' : null,
+                validator: (v) =>
+                    v == null || v.isEmpty ? 'PPN wajib diisi' : null,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: 24),
               DropdownButtonFormField<String>(
                 value: _status,
                 decoration: const InputDecoration(labelText: 'Status'),
                 items: const [
                   DropdownMenuItem(value: 'active', child: Text('Aktif')),
-                  DropdownMenuItem(value: 'inactive', child: Text('Tidak Aktif')),
+                  DropdownMenuItem(
+                    value: 'inactive',
+                    child: Text('Tidak Aktif'),
+                  ),
                 ],
                 onChanged: (v) {
                   setState(() {
@@ -81,10 +96,22 @@ class _PackageFormScreenState extends State<PackageFormScreen> {
                   });
                 },
               ),
-              const SizedBox(height: 16),
-              ElevatedButton(
-                onPressed: () => _save(context),
-                child: Text(isEdit ? 'Update' : 'Simpan'),
+              const SizedBox(height: 32),
+
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  onPressed: () => _save(context),
+                  child: Text(isEdit ? 'Perbarui' : 'Simpan'),
+                ),
               ),
             ],
           ),
