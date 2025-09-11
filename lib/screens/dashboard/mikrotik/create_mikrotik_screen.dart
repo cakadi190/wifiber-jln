@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/config/app_colors.dart';
+import 'package:wifiber/components/reusables/options_bottom_sheet.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/models/router.dart';
 import 'package:wifiber/providers/router_provider.dart';
@@ -427,89 +428,58 @@ class _CreateMikrotikScreenState extends State<CreateMikrotikScreen>
   }
 
   void _showIsolateActionBottomSheet() {
-    showModalBottomSheet(
+    showOptionModalBottomSheet(
       context: context,
-      backgroundColor: Colors.white,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      header: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: const [
+          Text(
+            'Pilih Aksi Isolasi',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
+          ),
+          SizedBox(height: 16),
+        ],
       ),
-      builder: (context) => Container(
-        padding: EdgeInsets.symmetric(vertical: 20),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey.shade300,
-                borderRadius: BorderRadius.circular(2),
+      items: _isolateActions.entries.map((entry) {
+        final selected = _isolateAction == entry.key;
+        return OptionMenuItem(
+          leading: Container(
+            width: 24,
+            height: 24,
+            decoration: BoxDecoration(
+              shape: BoxShape.circle,
+              border: Border.all(
+                color:
+                    selected ? AppColors.primary : Colors.grey.shade400,
+                width: 2,
               ),
             ),
-            SizedBox(height: 20),
-            Padding(
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              child: Text(
-                'Pilih Aksi Isolasi',
-                style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-              ),
-            ),
-            SizedBox(height: 16),
-            ..._isolateActions.entries.map((entry) {
-              return ListTile(
-                leading: Container(
-                  width: 24,
-                  height: 24,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: _isolateAction == entry.key
-                          ? AppColors.primary
-                          : Colors.grey.shade400,
-                      width: 2,
+            child: selected
+                ? Center(
+                    child: Container(
+                      width: 12,
+                      height: 12,
+                      decoration: const BoxDecoration(
+                        shape: BoxShape.circle,
+                        color: AppColors.primary,
+                      ),
                     ),
-                  ),
-                  child: _isolateAction == entry.key
-                      ? Center(
-                          child: Container(
-                            width: 12,
-                            height: 12,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: AppColors.primary,
-                            ),
-                          ),
-                        )
-                      : null,
-                ),
-                title: Text(
-                  entry.value,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: _isolateAction == entry.key
-                        ? FontWeight.w600
-                        : FontWeight.normal,
-                    color: _isolateAction == entry.key
-                        ? AppColors.primary
-                        : Colors.black,
-                  ),
-                ),
-                onTap: () {
-                  setState(() {
-                    _isolateAction = entry.key;
-
-                    if (entry.key == 'toggle') {
-                      _isolateProfileController.clear();
-                    }
-                  });
-                  Navigator.pop(context);
-                },
-              );
-            }),
-            SizedBox(height: 20),
-          ],
-        ),
-      ),
+                  )
+                : null,
+          ),
+          title: entry.value,
+          trailing: null,
+          onTap: () {
+            setState(() {
+              _isolateAction = entry.key;
+              if (entry.key == 'toggle') {
+                _isolateProfileController.clear();
+              }
+            });
+            Navigator.pop(context);
+          },
+        );
+      }).toList(),
     );
   }
 

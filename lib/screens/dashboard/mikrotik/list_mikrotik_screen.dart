@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/config/app_colors.dart';
+import 'package:wifiber/components/reusables/options_bottom_sheet.dart';
 import 'package:wifiber/helpers/datetime_helper.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/models/router.dart';
@@ -729,135 +730,52 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
   }
 
   void _showActionBottomSheet(RouterModel router, RouterProvider provider) {
-    showModalBottomSheet(
+    showOptionModalBottomSheet(
       context: context,
-      backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+      header: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: _getStatusColor(router.status),
+            child: const Icon(Icons.router, color: Colors.white),
           ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 12),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: Row(
-                children: [
-                  CircleAvatar(
-                    backgroundColor: _getStatusColor(router.status),
-                    child: const Icon(Icons.router, color: Colors.white),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  router.name,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          router.name,
-                          style: const TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
-
-            _buildActionItem(
-              icon: Icons.edit,
-              title: 'Edit Router',
-              subtitle: 'Ubah pengaturan router',
-              onTap: () {
-                Navigator.pop(context);
-                _editRouter(router);
-              },
-            ),
-
-            _buildActionItem(
-              icon: Icons.delete,
-              title: 'Hapus Router',
-              subtitle: 'Hapus router dari daftar',
-              isDestructive: true,
-              onTap: () {
-                Navigator.pop(context);
-                _showDeleteConfirmation(router, provider);
-              },
-            ),
-
-            SizedBox(height: MediaQuery.of(context).padding.bottom + 20),
-          ],
-        ),
+          ),
+        ],
       ),
-    );
-  }
-
-  Widget _buildActionItem({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    required VoidCallback onTap,
-    bool isDestructive = false,
-  }) {
-    return InkWell(
-      onTap: onTap,
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
-        child: Row(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(8),
-              decoration: BoxDecoration(
-                color: (isDestructive ? Colors.red : AppColors.primary)
-                    .withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Icon(
-                icon,
-                color: isDestructive ? Colors.red : AppColors.primary,
-                size: 20,
-              ),
-            ),
-            const SizedBox(width: 16),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.w500,
-                      color: isDestructive ? Colors.red : Colors.black87,
-                    ),
-                  ),
-                  Text(
-                    subtitle,
-                    style: TextStyle(fontSize: 12, color: Colors.grey[600]),
-                  ),
-                ],
-              ),
-            ),
-            Icon(Icons.chevron_right, color: Colors.grey[400]),
-          ],
+      items: [
+        OptionMenuItem(
+          icon: Icons.edit,
+          title: 'Edit Router',
+          subtitle: 'Ubah pengaturan router',
+          onTap: () {
+            Navigator.pop(context);
+            _editRouter(router);
+          },
         ),
-      ),
+        OptionMenuItem(
+          icon: Icons.delete,
+          title: 'Hapus Router',
+          subtitle: 'Hapus router dari daftar',
+          isDestructive: true,
+          onTap: () {
+            Navigator.pop(context);
+            _showDeleteConfirmation(router, provider);
+          },
+        ),
+      ],
     );
   }
 
