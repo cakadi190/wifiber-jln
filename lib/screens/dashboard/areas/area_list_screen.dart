@@ -7,6 +7,7 @@ import 'package:wifiber/middlewares/auth_middleware.dart';
 import 'package:wifiber/models/area.dart';
 import 'package:wifiber/providers/area_provider.dart';
 import 'package:wifiber/screens/dashboard/areas/area_form_screen.dart';
+import 'package:wifiber/components/reusables/options_bottom_sheet.dart';
 
 class AreaListScreen extends StatefulWidget {
   const AreaListScreen({super.key});
@@ -138,6 +139,69 @@ class _AreaListScreenState extends State<AreaListScreen> {
   }
 
   void _showActionBottomSheet(AreaModel area) {
+    showOptionModalBottomSheet(
+      context: context,
+      header: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: Colors.grey,
+            child: const Icon(Icons.map, color: Colors.white),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  area.name,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      items: [
+        OptionMenuItem(
+          icon: Icons.edit,
+          title: 'Edit Area',
+          subtitle: 'Ubah detail area',
+          onTap: () {
+            Navigator.pop(context);
+            _openForm(context, area: area);
+          },
+        ),
+        OptionMenuItem(
+          icon: Icons.delete,
+          title: 'Hapus Area',
+          subtitle: 'Hapus area dari daftar',
+          isDestructive: true,
+          onTap: () {
+            _delete(context, area.id);
+          },
+        ),
+      ],
+    );
+  }
+
+  void _openForm(BuildContext context, {AreaModel? area}) {
+    final mainContext = this.context;
+
+    Future.delayed(Duration.zero, () {
+      Navigator.of(mainContext)
+          .push(MaterialPageRoute(builder: (_) => AreaFormScreen(area: area)))
+          .then((_) => mainContext.read<AreaProvider>().loadAreas());
+    });
+  }
+
+  Future<void> _delete(BuildContext context, String id) async {
+    final mainContext = this.context;
+
+    Navigator.pop(context);
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -161,59 +225,112 @@ class _AreaListScreenState extends State<AreaListScreen> {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-            ListTile(
-              leading: const Icon(Icons.edit),
-              title: const Text('Edit'),
-              onTap: () => _openForm(context, area: area),
+
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: const Icon(
+                      Icons.delete_outline,
+                      color: Colors.red,
+                      size: 32,
+                    ),
+                  ),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Hapus Router',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Apakah Anda yakin ingin menghapus area ini?',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Tindakan ini tidak dapat dibatalkan.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.red[400],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
             ),
-            ListTile(
-              leading: const Icon(Icons.delete, color: Colors.red),
-              title: const Text('Hapus', style: TextStyle(color: Colors.red)),
-              onTap: () => _delete(context, area.id),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        mainContext.read<AreaProvider>().deleteArea(id);
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        'Ya, Hapus Router',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.grey[700],
+                        side: BorderSide(color: Colors.grey[300]!),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Batal',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
             ),
+
+            SizedBox(height: MediaQuery.of(context).padding.bottom + 24),
           ],
         ),
       ),
     );
-  }
-
-  void _openForm(BuildContext context, {AreaModel? area}) {
-    final mainContext = this.context;
-
-    Navigator.pop(context);
-
-    Future.delayed(Duration.zero, () {
-      Navigator.of(mainContext)
-          .push(MaterialPageRoute(builder: (_) => AreaFormScreen(area: area)))
-          .then((_) => mainContext.read<AreaProvider>().loadAreas());
-    });
-  }
-
-  Future<void> _delete(BuildContext context, String id) async {
-    final mainContext = this.context;
-
-    Navigator.pop(context);
-
-    final confirmed = await showDialog<bool>(
-      context: mainContext,
-      builder: (context) => AlertDialog(
-        title: const Text('Hapus Area'),
-        content: const Text('Yakin ingin menghapus area ini?'),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.pop(context, false),
-            child: const Text('Batal'),
-          ),
-          TextButton(
-            onPressed: () => Navigator.pop(context, true),
-            child: const Text('Hapus'),
-          ),
-        ],
-      ),
-    );
-
-    if (confirmed == true) {
-      await mainContext.read<AreaProvider>().deleteArea(id);
-    }
   }
 }

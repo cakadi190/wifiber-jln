@@ -18,8 +18,10 @@ class OptionMenuItem {
     this.isDestructive = false,
     required this.onTap,
     this.trailing,
-  }) : assert(icon != null || leading != null,
-            'Either icon or leading must be provided');
+  }) : assert(
+         icon != null || leading != null,
+         'Either icon or leading must be provided',
+       );
 }
 
 Future<T?> showOptionModalBottomSheet<T>({
@@ -40,7 +42,7 @@ class _OptionModalContent extends StatelessWidget {
   final Widget? header;
   final List<OptionMenuItem> items;
 
-  const _OptionModalContent({super.key, this.header, required this.items});
+  const _OptionModalContent({this.header, required this.items});
 
   @override
   Widget build(BuildContext context) {
@@ -65,10 +67,7 @@ class _OptionModalContent extends StatelessWidget {
             ),
           ),
           if (header != null)
-            Padding(
-              padding: const EdgeInsets.all(20),
-              child: header,
-            ),
+            Padding(padding: const EdgeInsets.all(20), child: header),
           ...items.map((item) => _OptionItem(item)).toList(),
           SizedBox(height: MediaQuery.of(context).padding.bottom + 20),
         ],
@@ -83,7 +82,8 @@ class _OptionItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Widget leading = item.leading ??
+    final Widget leading =
+        item.leading ??
         Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
@@ -136,4 +136,3 @@ class _OptionItem extends StatelessWidget {
     );
   }
 }
-
