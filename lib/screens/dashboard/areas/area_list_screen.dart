@@ -78,26 +78,47 @@ class _AreaListScreenState extends State<AreaListScreen> {
                             itemCount: areas.length,
                             itemBuilder: (context, index) {
                               final AreaModel area = areas[index];
-                              return ListTile(
-                                title: Text(
-                                  area.name,
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                subtitle: Text(area.code),
-                                trailing: Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.edit),
-                                      onPressed: () =>
-                                          _openForm(context, area: area),
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.delete),
-                                      onPressed: () =>
-                                          _delete(context, area.id),
-                                    ),
-                                  ],
+
+                              return InkWell(
+                                onLongPress: () => _showActionBottomSheet(area),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(16),
+                                  child: Row(
+                                    children: [
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              area.name,
+                                              style: const TextStyle(
+                                                fontWeight: FontWeight.w600,
+                                                fontSize: 16,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 4),
+                                            Text(
+                                              area.code,
+                                              style: TextStyle(
+                                                color: Colors.grey[600],
+                                                fontSize: 14,
+                                              ),
+                                            ),
+                                            const SizedBox(height: 8),
+                                          ],
+                                        ),
+                                      ),
+                                      InkWell(
+                                        onTap: () =>
+                                            _showActionBottomSheet(area),
+                                        child: Icon(
+                                          Icons.more_vert,
+                                          color: Colors.grey[400],
+                                        ),
+                                      ),
+                                    ],
+                                  ),
                                 ),
                               );
                             },
@@ -116,15 +137,65 @@ class _AreaListScreenState extends State<AreaListScreen> {
     );
   }
 
+  void _showActionBottomSheet(AreaModel area) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            ListTile(
+              leading: const Icon(Icons.edit),
+              title: const Text('Edit'),
+              onTap: () => _openForm(context, area: area),
+            ),
+            ListTile(
+              leading: const Icon(Icons.delete, color: Colors.red),
+              title: const Text('Hapus', style: TextStyle(color: Colors.red)),
+              onTap: () => _delete(context, area.id),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   void _openForm(BuildContext context, {AreaModel? area}) {
-    Navigator.of(context)
-        .push(MaterialPageRoute(builder: (_) => AreaFormScreen(area: area)))
-        .then((_) => context.read<AreaProvider>().loadAreas());
+    final mainContext = this.context;
+
+    Navigator.pop(context);
+
+    Future.delayed(Duration.zero, () {
+      Navigator.of(mainContext)
+          .push(MaterialPageRoute(builder: (_) => AreaFormScreen(area: area)))
+          .then((_) => mainContext.read<AreaProvider>().loadAreas());
+    });
   }
 
   Future<void> _delete(BuildContext context, String id) async {
+    final mainContext = this.context;
+
+    Navigator.pop(context);
+
     final confirmed = await showDialog<bool>(
-      context: context,
+      context: mainContext,
       builder: (context) => AlertDialog(
         title: const Text('Hapus Area'),
         content: const Text('Yakin ingin menghapus area ini?'),
@@ -140,8 +211,9 @@ class _AreaListScreenState extends State<AreaListScreen> {
         ],
       ),
     );
+
     if (confirmed == true) {
-      await context.read<AreaProvider>().deleteArea(id);
+      await mainContext.read<AreaProvider>().deleteArea(id);
     }
   }
 }
