@@ -85,7 +85,6 @@ class TransactionService {
       if (response.statusCode != 200 && response.statusCode != 201) {
         final body = json.decode(response.body);
         final errors = body['errors'];
-        // final message = body['message'];
 
         if (errors != null) {
           errors.forEach((error) {});

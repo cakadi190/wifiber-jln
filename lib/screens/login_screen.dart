@@ -18,8 +18,7 @@ class LoginScreen extends StatefulWidget {
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen>
-    with BackendValidationMixin {
+class _LoginScreenState extends State<LoginScreen> with BackendValidationMixin {
   late LoginScreenController _controller;
   String _ipAddress = 'Unknown';
   bool _loadingIpAddress = true;
@@ -104,8 +103,10 @@ class _LoginScreenState extends State<LoginScreen>
                         color: AppColors.primary,
                       ),
                     ),
-                    validator:
-                        validator('username', _controller.validateUsername),
+                    validator: validator(
+                      'username',
+                      _controller.validateUsername,
+                    ),
                     onFieldSubmitted: (_) => _handleSubmit(),
                   ),
                 ),
@@ -140,8 +141,10 @@ class _LoginScreenState extends State<LoginScreen>
                         ),
                       ),
                     ),
-                    validator:
-                        validator('password', _controller.validatePassword),
+                    validator: validator(
+                      'password',
+                      _controller.validatePassword,
+                    ),
                     onFieldSubmitted: (_) => _handleSubmit(),
                   ),
                 ),
@@ -186,7 +189,6 @@ class _LoginScreenState extends State<LoginScreen>
             ),
           ),
         ),
-        _buildInfoFooter(),
       ],
     );
   }
@@ -242,31 +244,6 @@ class _LoginScreenState extends State<LoginScreen>
     return Skeletonizer(
       enabled: _loadingIpAddress,
       child: Text("Diakses dari $_ipAddress", textAlign: TextAlign.center),
-    );
-  }
-
-  Widget _buildInfoFooter() {
-    return Container(
-      padding: const EdgeInsets.only(top: 16),
-      decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: Colors.grey.shade100)),
-      ),
-      width: double.infinity,
-      child: Text.rich(
-        TextSpan(
-          children: [
-            const TextSpan(text: "Butuh ID?"),
-            TextSpan(
-              text: " Silahkan Hubungi Kami di WhatsApp.",
-              style: TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        textAlign: TextAlign.center,
-      ),
     );
   }
 }
