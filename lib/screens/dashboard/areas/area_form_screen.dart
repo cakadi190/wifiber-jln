@@ -18,6 +18,7 @@ class _AreaFormScreenState extends State<AreaFormScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _descController = TextEditingController();
   String _status = 'active';
+  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -98,8 +99,17 @@ class _AreaFormScreenState extends State<AreaFormScreen> {
                       borderRadius: BorderRadius.circular(12),
                     ),
                   ),
-                  onPressed: () => _save(context),
-                  child: Text(isEdit ? 'Perbarui' : 'Simpan'),
+                  onPressed: _isSubmitting ? null : () => _save(context),
+                  child: _isSubmitting
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 2,
+                            valueColor: AlwaysStoppedAnimation(Colors.white),
+                          ),
+                        )
+                      : Text(isEdit ? 'Perbarui' : 'Simpan'),
                 ),
               ),
             ],
@@ -119,11 +129,13 @@ class _AreaFormScreenState extends State<AreaFormScreen> {
     };
     final provider = context.read<AreaProvider>();
     bool success;
+    setState(() => _isSubmitting = true);
     if (widget.area == null) {
       success = await provider.addArea(data);
     } else {
       success = await provider.updateArea(widget.area!.id, data);
     }
+    if (mounted) setState(() => _isSubmitting = false);
     if (success && mounted) {
       Navigator.pop(context);
     }
