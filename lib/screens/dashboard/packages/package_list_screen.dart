@@ -57,96 +57,40 @@ class _PackageListScreenState extends State<PackageListScreen> {
                 topRight: Radius.circular(20),
               ),
             ),
-            child: Column(
-              children: [
-                Expanded(
-                  child: Consumer<PackageProvider>(
-                    builder: (context, provider, child) {
-                      if (provider.state == PackageState.loading) {
-                        return const Center(child: CircularProgressIndicator());
-                      }
-                      if (provider.state == PackageState.error) {
-                        return Center(child: Text(provider.error ?? 'Error'));
-                      }
-                      final packages = provider.packages;
-                      if (packages.isEmpty) {
-                        return const Center(child: Text('Tidak ada data'));
-                      }
-                      return RefreshIndicator(
-                        child: Padding(
-                          padding: const EdgeInsets.all(8),
-                          child: ListView.builder(
-                            itemCount: packages.length,
-                            itemBuilder: (context, index) {
-                              final PackageModel pkg = packages[index];
+            child: Consumer<PackageProvider>(
+              builder: (context, provider, child) {
+                if (provider.state == PackageState.loading) {
+                  return const Center(child: CircularProgressIndicator());
+                }
 
-                              return InkWell(
-                                onLongPress: () => _showActionBottomSheet(pkg),
-                                child: Padding(
-                                  padding: const EdgeInsets.all(16),
-                                  child: Row(
-                                    children: [
-                                      Expanded(
-                                        child: Column(
-                                          crossAxisAlignment:
-                                              CrossAxisAlignment.start,
-                                          children: [
-                                            Text(
-                                              pkg.name,
-                                              style: const TextStyle(
-                                                fontWeight: FontWeight.w600,
-                                                fontSize: 16,
-                                              ),
-                                            ),
-                                            const SizedBox(height: 4),
-                                            Text(
-                                              'Rp ${_formatPrice(pkg.price)}',
-                                              style: TextStyle(
-                                                color: AppColors.primary,
-                                                fontSize: 14,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                            if (pkg.description != null &&
-                                                pkg
-                                                    .description!
-                                                    .isNotEmpty) ...[
-                                              const SizedBox(height: 4),
-                                              Text(
-                                                pkg.description!,
-                                                style: TextStyle(
-                                                  color: Colors.grey[600],
-                                                  fontSize: 12,
-                                                ),
-                                                maxLines: 1,
-                                                overflow: TextOverflow.ellipsis,
-                                              ),
-                                            ],
-                                            const SizedBox(height: 8),
-                                          ],
-                                        ),
-                                      ),
-                                      InkWell(
-                                        onTap: () =>
-                                            _showActionBottomSheet(pkg),
-                                        child: Icon(
-                                          Icons.more_vert,
-                                          color: Colors.grey[400],
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
-                        ),
-                        onRefresh: () => provider.loadPackages(),
-                      );
-                    },
+                if (provider.state == PackageState.error) {
+                  return Center(child: Text(provider.error ?? 'Error'));
+                }
+
+                final packages = provider.packages;
+                if (packages.isEmpty) {
+                  return const Center(child: Text('Tidak ada data'));
+                }
+
+                return RefreshIndicator(
+                  onRefresh: () => provider.loadPackages(),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: ListView.builder(
+                      itemCount: packages.length,
+                      itemBuilder: (context, index) {
+                        final PackageModel package = packages[index];
+                        return _PackageListItem(
+                          package: package,
+                          onTap: () => _showPackageDetail(package),
+                          onLongPress: () => _showActionBottomSheet(package),
+                          onMoreTap: () => _showActionBottomSheet(package),
+                        );
+                      },
+                    ),
                   ),
-                ),
-              ],
+                );
+              },
             ),
           ),
         ),
@@ -156,14 +100,195 @@ class _PackageListScreenState extends State<PackageListScreen> {
 
   String _formatPrice(dynamic price) {
     if (price == null) return '0';
-    // Format angka dengan pemisah ribuan
     return price.toString().replaceAllMapped(
       RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
       (Match m) => '${m[1]}.',
     );
   }
 
-  void _showActionBottomSheet(PackageModel pkg) {
+  void _showPackageDetail(PackageModel package) {
+    showModalBottomSheet(
+      context: context,
+      backgroundColor: Colors.transparent,
+      isScrollControlled: true,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: Icon(
+                      Icons.inventory_2,
+                      color: AppColors.primary,
+                      size: 32,
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          package.name,
+                          style: const TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                            color: Colors.black87,
+                          ),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Rp ${_formatPrice(package.price)}',
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.w600,
+                            color: AppColors.primary,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.of(context).pop(),
+                    icon: const Icon(Icons.close, color: Colors.grey),
+                  ),
+                ],
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (package.description != null &&
+                      package.description!.isNotEmpty) ...[
+                    const Text(
+                      'Deskripsi',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.w600,
+                        color: Colors.black87,
+                      ),
+                    ),
+                    const SizedBox(height: 8),
+                    Text(
+                      package.description!,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.grey[600],
+                        height: 1.5,
+                      ),
+                    ),
+                    const SizedBox(height: 24),
+                  ],
+
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.grey[50],
+                      borderRadius: BorderRadius.circular(12),
+                      border: Border.all(color: Colors.grey[200]!),
+                    ),
+                    child: Column(
+                      children: [
+                        _DetailRow(
+                          icon: Icons.payment,
+                          label: 'Harga',
+                          value: 'Rp ${_formatPrice(package.price)}',
+                          valueColor: AppColors.primary,
+                        ),
+                        const SizedBox(height: 12),
+                        _DetailRow(
+                          icon: Icons.badge,
+                          label: 'ID Paket',
+                          value: package.id,
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Row(
+                children: [
+                  Expanded(
+                    child: OutlinedButton.icon(
+                      onPressed: () {
+                        _openForm(context, package: package);
+                      },
+                      icon: const Icon(Icons.edit),
+                      label: const Text('Edit'),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: AppColors.primary,
+                        side: BorderSide(color: AppColors.primary),
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _showDeleteConfirmation(package.id);
+                      },
+                      icon: const Icon(Icons.delete),
+                      label: const Text('Hapus'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        elevation: 0,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            SizedBox(height: MediaQuery.of(context).padding.bottom),
+          ],
+        ),
+      ),
+    );
+  }
+
+  void _showActionBottomSheet(PackageModel package) {
     showOptionModalBottomSheet(
       context: context,
       header: Row(
@@ -178,14 +303,14 @@ class _PackageListScreenState extends State<PackageListScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  pkg.name,
+                  package.name,
                   style: const TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 Text(
-                  'Rp ${_formatPrice(pkg.price)}',
+                  'Rp ${_formatPrice(package.price)}',
                   style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                 ),
               ],
@@ -195,12 +320,21 @@ class _PackageListScreenState extends State<PackageListScreen> {
       ),
       items: [
         OptionMenuItem(
+          icon: Icons.visibility,
+          title: 'Lihat Detail',
+          subtitle: 'Tampilkan detail paket',
+          onTap: () {
+            Navigator.pop(context);
+            _showPackageDetail(package);
+          },
+        ),
+        OptionMenuItem(
           icon: Icons.edit,
           title: 'Edit Paket',
           subtitle: 'Ubah detail paket',
           onTap: () {
             Navigator.pop(context);
-            _openForm(context, package: pkg);
+            _openForm(context, package: package);
           },
         ),
         OptionMenuItem(
@@ -209,7 +343,8 @@ class _PackageListScreenState extends State<PackageListScreen> {
           subtitle: 'Hapus paket dari daftar',
           isDestructive: true,
           onTap: () {
-            _delete(context, pkg.id);
+            Navigator.pop(context);
+            _showDeleteConfirmation(package.id);
           },
         ),
       ],
@@ -217,24 +352,16 @@ class _PackageListScreenState extends State<PackageListScreen> {
   }
 
   void _openForm(BuildContext context, {PackageModel? package}) {
-    final mainContext = this.context;
-
-    Future.delayed(Duration.zero, () {
-      Navigator.of(mainContext)
-          .push(
-            MaterialPageRoute(
-              builder: (_) => PackageFormScreen(package: package),
-            ),
-          )
-          .then((_) => mainContext.read<PackageProvider>().loadPackages());
-    });
+    Navigator.of(context)
+        .push(
+          MaterialPageRoute(
+            builder: (_) => PackageFormScreen(package: package),
+          ),
+        )
+        .then((_) => context.read<PackageProvider>().loadPackages());
   }
 
-  Future<void> _delete(BuildContext context, String id) async {
-    final mainContext = this.context;
-
-    Navigator.pop(context);
-
+  void _showDeleteConfirmation(String id) {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
@@ -258,7 +385,6 @@ class _PackageListScreenState extends State<PackageListScreen> {
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.all(24),
               child: Column(
@@ -303,7 +429,6 @@ class _PackageListScreenState extends State<PackageListScreen> {
                 ],
               ),
             ),
-
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 24),
               child: Column(
@@ -313,7 +438,7 @@ class _PackageListScreenState extends State<PackageListScreen> {
                     child: ElevatedButton(
                       onPressed: () {
                         Navigator.of(context).pop();
-                        mainContext.read<PackageProvider>().deletePackage(id);
+                        context.read<PackageProvider>().deletePackage(id);
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red,
@@ -334,7 +459,6 @@ class _PackageListScreenState extends State<PackageListScreen> {
                     ),
                   ),
                   const SizedBox(height: 12),
-
                   SizedBox(
                     width: double.infinity,
                     child: OutlinedButton(
@@ -359,11 +483,147 @@ class _PackageListScreenState extends State<PackageListScreen> {
                 ],
               ),
             ),
-
             SizedBox(height: MediaQuery.of(context).padding.bottom + 24),
           ],
         ),
       ),
+    );
+  }
+}
+
+class _PackageListItem extends StatelessWidget {
+  final PackageModel package;
+  final VoidCallback onTap;
+  final VoidCallback onLongPress;
+  final VoidCallback onMoreTap;
+
+  const _PackageListItem({
+    required this.package,
+    required this.onTap,
+    required this.onLongPress,
+    required this.onMoreTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      margin: const EdgeInsets.only(bottom: 2),
+      elevation: 0,
+      child: InkWell(
+        onTap: onTap,
+        onLongPress: onLongPress,
+        borderRadius: BorderRadius.circular(12),
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: AppColors.primary.withValues(alpha: 0.1),
+                  borderRadius: BorderRadius.circular(8),
+                ),
+                child: Icon(
+                  Icons.inventory_2,
+                  color: AppColors.primary,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      package.name,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.w600,
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      'Rp ${_formatPrice(package.price)}',
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              InkWell(
+                onTap: onMoreTap,
+                borderRadius: BorderRadius.circular(20),
+                child: Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Icon(
+                    Icons.more_vert,
+                    color: Colors.grey[400],
+                    size: 20,
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  String _formatPrice(dynamic price) {
+    if (price == null) return '0';
+    return price.toString().replaceAllMapped(
+      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
+      (Match m) => '${m[1]}.',
+    );
+  }
+}
+
+class _DetailRow extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final String value;
+  final Color? valueColor;
+
+  const _DetailRow({
+    required this.icon,
+    required this.label,
+    required this.value,
+    this.valueColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Icon(icon, size: 20, color: Colors.grey[600]),
+        const SizedBox(width: 12),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 12,
+                  color: Colors.grey[600],
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w600,
+                  color: valueColor ?? Colors.black87,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
