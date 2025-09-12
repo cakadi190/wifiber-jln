@@ -328,7 +328,16 @@ class _AreaButtonSelectorState extends State<AreaButtonSelector> {
             labelText: 'Pilih Area',
             hintText: 'Pilih Area',
             prefixIcon: const Icon(Icons.map),
-            suffixIcon: const Icon(Icons.arrow_drop_down),
+            suffixIcon: _loading
+                ? const Padding(
+                    padding: EdgeInsets.all(12),
+                    child: SizedBox(
+                      width: 16,
+                      height: 16,
+                      child: CircularProgressIndicator(strokeWidth: 2),
+                    ),
+                  )
+                : const Icon(Icons.arrow_drop_down),
             border: const OutlineInputBorder(),
             focusedBorder: OutlineInputBorder(
               borderSide: BorderSide(color: Colors.green[600]!),

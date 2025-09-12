@@ -19,6 +19,7 @@ class _PackageFormScreenState extends State<PackageFormScreen> {
   final TextEditingController _priceController = TextEditingController();
   final TextEditingController _ppnController = TextEditingController();
   String _status = 'active';
+  bool _isSubmitting = false;
 
   @override
   void initState() {
@@ -115,8 +116,17 @@ class _PackageFormScreenState extends State<PackageFormScreen> {
                           borderRadius: BorderRadius.circular(12),
                         ),
                       ),
-                      onPressed: () => _save(context),
-                      child: Text(isEdit ? 'Perbarui' : 'Simpan'),
+                      onPressed: _isSubmitting ? null : () => _save(context),
+                      child: _isSubmitting
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                valueColor: AlwaysStoppedAnimation(Colors.white),
+                              ),
+                            )
+                          : Text(isEdit ? 'Perbarui' : 'Simpan'),
                     ),
                   ),
                 ],
@@ -139,11 +149,13 @@ class _PackageFormScreenState extends State<PackageFormScreen> {
     };
     final provider = context.read<PackageProvider>();
     bool success;
+    setState(() => _isSubmitting = true);
     if (widget.package == null) {
       success = await provider.addPackage(data);
     } else {
       success = await provider.updatePackage(widget.package!.id, data);
     }
+    if (mounted) setState(() => _isSubmitting = false);
     if (success && mounted) {
       Navigator.pop(context);
     }
