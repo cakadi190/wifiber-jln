@@ -30,6 +30,14 @@ class RoleGuard {
     action.call();
   }
 
+  static Future<bool> hasPermission({
+    required dynamic permissions,
+    PermissionMode mode = PermissionMode.any,
+    required List<String> userPermissions,
+  }) async {
+    return _hasPermission(userPermissions, permissions, mode);
+  }
+
   static bool _hasPermission(
     List<String> userPermissions,
     dynamic permissions,

@@ -1,4 +1,4 @@
-package com.kodinus.wifiber
+package id.kodinus.wifiber
 
 import io.flutter.embedding.android.FlutterActivity
 

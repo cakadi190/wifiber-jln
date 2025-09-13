@@ -1,5 +1,5 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.kodinus.wifiber">
+    package="id.kodinus.wifiber">
 
     <uses-feature
         android:name="android.hardware.camera"
@@ -55,7 +55,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
-                    android:host="wifiber.web.id"
+                    android:host="mywifi.biz.id"
                     android:scheme="https" />
             </intent-filter>
         </activity>
@@ -71,7 +71,7 @@
 
         <provider
             android:name="androidx.core.content.FileProvider"
-            android:authorities="com.kodinus.wifiber.fileprovider"
+            android:authorities="id.kodinus.wifiber.fileprovider"
             android:exported="false"
             android:grantUriPermissions="true">
             <meta-data

@@ -98,11 +98,8 @@ class TransactionService {
         throw Exception(body['message'] ?? 'Failed to create transaction');
       }
     } on ValidationException {
-      // Re-throw ValidationException tanpa mengubahnya
       rethrow;
     } catch (e) {
-      // Handle error lainnya
-
       rethrow;
     }
   }
@@ -152,11 +149,8 @@ class TransactionService {
         throw Exception(body['message'] ?? 'Failed to update transaction');
       }
     } on ValidationException {
-      // Re-throw ValidationException tanpa mengubahnya
       rethrow;
     } catch (e) {
-      // Handle error lainnya
-
       rethrow;
     }
   }

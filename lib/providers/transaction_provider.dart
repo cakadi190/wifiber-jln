@@ -112,7 +112,6 @@ class TransactionProvider extends SafeChangeNotifier {
     required String createdBy,
     File? image,
   }) async {
-    // ValidationException akan di-throw langsung ke form
     await _service.createTransaction(
       nominal: nominal,
       description: description,
@@ -133,7 +132,6 @@ class TransactionProvider extends SafeChangeNotifier {
     required String createdBy,
     File? image,
   }) async {
-    // ValidationException akan di-throw langsung ke form
     await _service.updateTransaction(
       id,
       nominal: nominal,

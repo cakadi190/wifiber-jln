@@ -125,86 +125,104 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
   }
 
   Widget _buildActionTileLists(BuildContext context) {
-    return Column(
-      children: [
-        ListTile(
-          leading: PhosphorIcon(
-            PhosphorIcons.lock(PhosphorIconsStyle.duotone),
-            color: AppColors.primary,
-          ),
-          title: const Text('Ubah Kata Sandi'),
-          trailing: const Icon(
-            Icons.chevron_right_rounded,
-            color: AppColors.primary,
-          ),
-          onTap: () {
-            _accountCenterController.navigateToScreen(
-              screen: ChangePasswordScreen(),
-              context: context,
-            );
-          },
-        ),
-        ListTile(
-          leading: PhosphorIcon(
-            PhosphorIcons.mapTrifold(PhosphorIconsStyle.duotone),
-            color: AppColors.primary,
-          ),
-          title: const Text('Area'),
-          trailing: const Icon(
-            Icons.chevron_right_rounded,
-            color: AppColors.primary,
-          ),
-          onTap: () {
-            _accountCenterController.navigateToScreen(
-              screen: const AreaListScreen(),
-              context: context,
-            );
-          },
-        ),
-        ListTile(
-          leading: PhosphorIcon(
-            PhosphorIcons.package(PhosphorIconsStyle.duotone),
-            color: AppColors.primary,
-          ),
-          title: const Text('Paket'),
-          trailing: const Icon(
-            Icons.chevron_right_rounded,
-            color: AppColors.primary,
-          ),
-          onTap: () {
-            _accountCenterController.navigateToScreen(
-              screen: const PackageListScreen(),
-              context: context,
-            );
-          },
-        ),
-        ListTile(
-          leading: PhosphorIcon(
-            PhosphorIcons.info(PhosphorIconsStyle.duotone),
-            color: AppColors.primary,
-          ),
-          title: const Text('Tentang Aplikasi'),
-          trailing: const Icon(
-            Icons.chevron_right_rounded,
-            color: AppColors.primary,
-          ),
-          onTap: () {
-            _accountCenterController.navigateToScreen(
-              screen: const AboutAppScreen(),
-              context: context,
-            );
-          },
-        ),
-        ListTile(
-          leading: PhosphorIcon(
-            PhosphorIcons.signOut(PhosphorIconsStyle.duotone),
-            color: Colors.red,
-          ),
-          title: const Text('Keluar', style: TextStyle(color: Colors.red)),
-          trailing: const Icon(Icons.chevron_right_rounded, color: Colors.red),
-          onTap: () => _logout(context, context.read<AuthProvider>()),
-        ),
-      ],
+    return Consumer<AuthProvider>(
+      builder: (context, authProvider, child) {
+        final user = authProvider.user;
+        final hasAreaPermission = user?.permissions.contains('area') ?? false;
+        final hasPackagePermission =
+            user?.permissions.contains('package') ?? false;
+
+        return Column(
+          children: [
+            ListTile(
+              leading: PhosphorIcon(
+                PhosphorIcons.lock(PhosphorIconsStyle.duotone),
+                color: AppColors.primary,
+              ),
+              title: const Text('Ubah Kata Sandi'),
+              trailing: const Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.primary,
+              ),
+              onTap: () {
+                _accountCenterController.navigateToScreen(
+                  screen: ChangePasswordScreen(),
+                  context: context,
+                );
+              },
+            ),
+
+            if (hasAreaPermission)
+              ListTile(
+                leading: PhosphorIcon(
+                  PhosphorIcons.mapTrifold(PhosphorIconsStyle.duotone),
+                  color: AppColors.primary,
+                ),
+                title: const Text('Area'),
+                trailing: const Icon(
+                  Icons.chevron_right_rounded,
+                  color: AppColors.primary,
+                ),
+                onTap: () {
+                  _accountCenterController.navigateToScreen(
+                    screen: const AreaListScreen(),
+                    context: context,
+                  );
+                },
+              ),
+
+            if (hasPackagePermission)
+              ListTile(
+                leading: PhosphorIcon(
+                  PhosphorIcons.package(PhosphorIconsStyle.duotone),
+                  color: AppColors.primary,
+                ),
+                title: const Text('Paket'),
+                trailing: const Icon(
+                  Icons.chevron_right_rounded,
+                  color: AppColors.primary,
+                ),
+                onTap: () {
+                  _accountCenterController.navigateToScreen(
+                    screen: const PackageListScreen(),
+                    context: context,
+                  );
+                },
+              ),
+
+            ListTile(
+              leading: PhosphorIcon(
+                PhosphorIcons.info(PhosphorIconsStyle.duotone),
+                color: AppColors.primary,
+              ),
+              title: const Text('Tentang Aplikasi'),
+              trailing: const Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.primary,
+              ),
+              onTap: () {
+                _accountCenterController.navigateToScreen(
+                  screen: const AboutAppScreen(),
+                  context: context,
+                );
+              },
+            ),
+
+            ListTile(
+              leading: PhosphorIcon(
+                PhosphorIcons.signOut(PhosphorIconsStyle.duotone),
+                color: Colors.red,
+              ),
+              title: const Text('Keluar', style: TextStyle(color: Colors.red)),
+              trailing: const Icon(
+                Icons.chevron_right_rounded,
+                color: Colors.red,
+              ),
+              onTap: () => _logout(context, context.read<AuthProvider>()),
+            ),
+          ],
+        );
+      },
     );
   }
 

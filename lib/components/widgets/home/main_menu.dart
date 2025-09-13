@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/helpers/role.dart';
+import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/screens/dashboard/customers/customer_list_screen.dart';
 import 'package:wifiber/screens/dashboard/registrants/registrant_list_screen.dart';
 import 'package:wifiber/screens/dashboard/infrastructure/infrastructure_home.dart';
@@ -28,7 +30,8 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
   late Animation<double> _slideAnimation;
   late Animation<double> _fadeAnimation;
 
-  late List<MenuItem> _menuItems;
+  late List<MenuItem> _allMenuItems;
+  List<MenuItem> _filteredMenuItems = [];
 
   @override
   void initState() {
@@ -53,104 +56,76 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
       ),
     );
 
-    _menuItems = [
+    _initializeMenuItems();
+    _filterMenuItemsByRole();
+  }
+
+  void _initializeMenuItems() {
+    _allMenuItems = [
       MenuItem(
         icon: Icons.verified_user_sharp,
         title: 'Calon Pelanggan',
+        permissions: 'registrant',
         onTap: () {
-          RoleGuard.check(
-            context: context,
-            permissions: 'registrant',
-            action: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const RegistrantListScreen(),
-                ),
-              );
-            },
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => const RegistrantListScreen(),
+            ),
           );
         },
       ),
       MenuItem(
         icon: Icons.person,
         title: 'Data Pelanggan',
+        permissions: 'customer',
         onTap: () {
-          RoleGuard.check(
-            context: context,
-            permissions: 'customer',
-            action: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const CustomerListScreen(),
-                ),
-              );
-            },
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const CustomerListScreen()),
           );
         },
       ),
       MenuItem(
         icon: Icons.warning,
         title: 'Keluhan',
+        permissions: 'ticket',
         onTap: () {
-          RoleGuard.check(
-            context: context,
-            permissions: 'ticket',
-            action: () {
-              widget.onTicketMenuTapped?.call();
-            },
-          );
+          widget.onTicketMenuTapped?.call();
         },
       ),
       MenuItem(
         icon: Icons.bookmark,
         title: 'Pembukuan',
+        permissions: 'finance',
         onTap: () {
-          RoleGuard.check(
-            context: context,
-            permissions: 'finance',
-            action: () {
-              widget.onTransactionMenuTapped?.call();
-            },
-          );
+          widget.onTransactionMenuTapped?.call();
         },
       ),
       MenuItem(
         icon: Icons.wallet,
         title: 'Tagihan dan Pembayaran',
+        permissions: ['bill'],
+        mode: PermissionMode.any,
         onTap: () {
-          RoleGuard.check(
-            context: context,
-            permissions: ['bill', 'payment'], // support array
-            mode: PermissionMode.any,
-            action: () {
-              widget.onBillMenuTapped?.call();
-            },
-          );
+          widget.onBillMenuTapped?.call();
         },
       ),
       MenuItem(
         icon: Icons.wifi,
         title: 'Router MikroTik',
+        permissions: 'integration',
         onTap: () {
-          RoleGuard.check(
-            context: context,
-            permissions: 'integration',
-            action: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const ListMikrotikScreen(),
-                ),
-              );
-            },
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const ListMikrotikScreen()),
           );
         },
       ),
       MenuItem(
         icon: Icons.pin_drop,
         title: 'Peta Infrastruktur',
+        permissions: null,
         onTap: () {
           Navigator.push(
             context,
@@ -161,6 +136,34 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
     ];
   }
 
+  void _filterMenuItemsByRole() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final userPermissions = authProvider.user?.permissions ?? [];
+
+    List<MenuItem> filtered = [];
+
+    for (MenuItem item in _allMenuItems) {
+      if (item.permissions == null) {
+        filtered.add(item);
+        continue;
+      }
+
+      bool hasAccess = await RoleGuard.hasPermission(
+        permissions: item.permissions!,
+        mode: item.mode ?? PermissionMode.all,
+        userPermissions: userPermissions,
+      );
+
+      if (hasAccess) {
+        filtered.add(item);
+      }
+    }
+
+    setState(() {
+      _filteredMenuItems = filtered;
+    });
+  }
+
   @override
   void dispose() {
     _animationController.dispose();
@@ -169,6 +172,20 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    if (_filteredMenuItems.isEmpty && _allMenuItems.isNotEmpty) {
+      return Container(
+        margin: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: const Padding(
+          padding: EdgeInsets.all(16.0),
+          child: Center(child: CircularProgressIndicator()),
+        ),
+      );
+    }
+
     return Container(
       margin: const EdgeInsets.only(bottom: 16, left: 16, right: 16),
       decoration: BoxDecoration(
@@ -183,6 +200,15 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
   }
 
   Widget _buildMenuGrid() {
+    if (_filteredMenuItems.isEmpty) {
+      return const Center(
+        child: Text(
+          'Tidak ada menu yang tersedia',
+          style: TextStyle(fontSize: 14, color: Colors.grey),
+        ),
+      );
+    }
+
     return Column(
       mainAxisSize: MainAxisSize.min,
       children: [
@@ -210,8 +236,9 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
   }
 
   Widget _buildVisibleItems() {
-    final visibleItems = _menuItems.take(3).toList();
-    final totalItems = visibleItems.length + 1;
+    final visibleItems = _filteredMenuItems.take(3).toList();
+    final needsCollapseButton = _filteredMenuItems.length > 3;
+    final totalItems = visibleItems.length + (needsCollapseButton ? 1 : 0);
 
     return GridView.builder(
       shrinkWrap: true,
@@ -224,7 +251,7 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
       ),
       itemCount: totalItems,
       itemBuilder: (context, index) {
-        if (index == visibleItems.length) {
+        if (needsCollapseButton && index == visibleItems.length) {
           return _buildCollapseButton();
         }
         return _buildMenuItem(visibleItems[index]);
@@ -233,9 +260,9 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
   }
 
   Widget _buildCollapsibleItems() {
-    if (_menuItems.length <= 3) return const SizedBox.shrink();
+    if (_filteredMenuItems.length <= 3) return const SizedBox.shrink();
 
-    final collapsibleItems = _menuItems.skip(3).toList();
+    final collapsibleItems = _filteredMenuItems.skip(3).toList();
 
     return Container(
       margin: const EdgeInsets.only(top: 12),
@@ -347,7 +374,15 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
 class MenuItem {
   final IconData icon;
   final String title;
+  final dynamic permissions;
+  final PermissionMode? mode;
   final VoidCallback? onTap;
 
-  MenuItem({required this.icon, required this.title, this.onTap});
+  MenuItem({
+    required this.icon,
+    required this.title,
+    this.permissions,
+    this.mode,
+    this.onTap,
+  });
 }

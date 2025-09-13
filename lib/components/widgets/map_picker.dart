@@ -20,7 +20,6 @@ class _MapPickerState extends State<MapPicker> {
   LatLng? _selected;
   final MapController _mapController = MapController();
 
-  // Default location (Jakarta, Indonesia)
   static const LatLng _defaultLocation = LatLng(-6.2088, 106.8456);
 
   @override
@@ -37,7 +36,7 @@ class _MapPickerState extends State<MapPicker> {
       setState(() {
         _selected = widget.initialLocation;
       });
-      // Move map to new location
+
       WidgetsBinding.instance.addPostFrameCallback((_) {
         _mapController.move(widget.initialLocation!, 16);
       });
@@ -71,7 +70,7 @@ class _MapPickerState extends State<MapPicker> {
       children: [
         TileLayer(
           urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-          userAgentPackageName: 'com.kodinus.wifiber',
+          userAgentPackageName: 'id.kodinus.wifiber',
           maxZoom: 18,
           subdomains: const ['a', 'b', 'c'],
           errorTileCallback: (tile, error, stackTrace) {
@@ -103,7 +102,7 @@ class _MapPickerState extends State<MapPicker> {
               ),
             ],
           ),
-        // Add attribution layer at bottom right
+
         Positioned(
           bottom: 0,
           right: 0,
