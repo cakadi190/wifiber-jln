@@ -53,8 +53,10 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
 
       floatingActionButton: Consumer<AuthProvider>(
         builder: (context, authProvider, child) {
-          if (authProvider.user?.groupName != 'Admin') {
-            return SizedBox();
+          final user = authProvider.user;
+
+          if (user == null || user.groupName == 'Admin') {
+            return const SizedBox.shrink();
           }
 
           return RoleGuardWidget(
