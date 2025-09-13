@@ -30,6 +30,9 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   late final TransactionTabController _transactionTabController;
   late final ComplaintTabController _complaintController;
 
+  DateTime? _lastBackPressed;
+  bool _showExitMessage = false;
+
   SystemUiOverlayStyle _internalStyle = SystemUiHelper.duotone(
     statusBarColor: Colors.transparent,
     navigationBarColor: AppColor.violet50,
@@ -102,7 +105,40 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
 
     setState(() {
       _selectedIndex = index == 2 ? _selectedIndex : index;
+
+      _showExitMessage = false;
     });
+  }
+
+  bool _handleBackNavigation() {
+    final now = DateTime.now();
+
+    if (_selectedIndex != 0) {
+      _onItemTapped(0);
+      return false;
+    }
+
+    if (_lastBackPressed == null ||
+        now.difference(_lastBackPressed!) > const Duration(seconds: 2)) {
+      _lastBackPressed = now;
+
+      setState(() {
+        _showExitMessage = true;
+      });
+
+      Future.delayed(const Duration(seconds: 2), () {
+        if (mounted) {
+          setState(() {
+            _showExitMessage = false;
+          });
+        }
+      });
+
+      return false;
+    }
+
+    SystemChannels.platform.invokeMethod('SystemNavigator.pop');
+    return true;
   }
 
   @override
@@ -110,79 +146,118 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     return SystemUiWrapper(
       style: _internalStyle,
       child: AuthGuard(
-        child: Scaffold(
-          body: _widgetOptions.elementAt(_selectedIndex),
-          bottomNavigationBar: Theme(
-            data: ThemeData(
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
-            ),
-            child: BottomNavigationBar(
-              backgroundColor: AppColor.violet50,
-              currentIndex: _selectedIndex,
-              onTap: _onItemTapped,
-              selectedItemColor: AppColors.primary,
-              unselectedItemColor: Colors.grey,
-              showUnselectedLabels: true,
-              type: BottomNavigationBarType.fixed,
-              items: [
-                BottomNavigationBarItem(
-                  icon: PhosphorIcon(
-                    PhosphorIcons.house(PhosphorIconsStyle.duotone),
-                  ),
-                  label: 'Beranda',
-                ),
-                BottomNavigationBarItem(
-                  icon: PhosphorIcon(
-                    PhosphorIcons.wallet(PhosphorIconsStyle.duotone),
-                  ),
-                  label: 'Keuangan',
-                ),
-                BottomNavigationBarItem(
-                  icon: Container(
-                    padding: const EdgeInsets.symmetric(
-                      vertical: 6,
-                      horizontal: 12,
-                    ),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        PhosphorIcon(
-                          PhosphorIcons.qrCode(PhosphorIconsStyle.duotone),
-                          size: 20,
-                          color: Colors.white,
+        child: PopScope(
+          canPop: false,
+          onPopInvokedWithResult: (bool didPop, dynamic result) {
+            if (!didPop) {
+              _handleBackNavigation();
+            }
+          },
+          child: Scaffold(
+            body: Stack(
+              children: [
+                _widgetOptions.elementAt(_selectedIndex),
+
+                if (_showExitMessage)
+                  Positioned(
+                    bottom: 100,
+                    left: 16,
+                    right: 16,
+                    child: Material(
+                      color: Colors.transparent,
+                      child: Container(
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 16,
+                          vertical: 12,
                         ),
-                        const SizedBox(height: 2),
-                        const Text(
-                          'Bayar',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 10,
-                            fontWeight: FontWeight.w600,
-                          ),
+                        decoration: BoxDecoration(
+                          color: Colors.black87,
+                          borderRadius: BorderRadius.circular(8),
                         ),
-                      ],
+                        child: const Text(
+                          'Tekan tombol kembali sekali lagi untuk keluar dari aplikasi',
+                          style: TextStyle(color: Colors.white, fontSize: 14),
+                          textAlign: TextAlign.center,
+                        ),
+                      ),
                     ),
                   ),
-                  label: '',
-                ),
-                BottomNavigationBarItem(
-                  icon: PhosphorIcon(
-                    PhosphorIcons.chatCenteredDots(PhosphorIconsStyle.duotone),
-                  ),
-                  label: 'Pengaduan',
-                ),
-                BottomNavigationBarItem(
-                  icon: PhosphorIcon(
-                    PhosphorIcons.user(PhosphorIconsStyle.duotone),
-                  ),
-                  label: 'Akun',
-                ),
               ],
+            ),
+            bottomNavigationBar: Theme(
+              data: ThemeData(
+                splashColor: Colors.transparent,
+                highlightColor: Colors.transparent,
+              ),
+              child: BottomNavigationBar(
+                backgroundColor: AppColor.violet50,
+                currentIndex: _selectedIndex,
+                onTap: _onItemTapped,
+                selectedItemColor: AppColors.primary,
+                unselectedItemColor: Colors.grey,
+                showUnselectedLabels: true,
+                type: BottomNavigationBarType.fixed,
+                items: [
+                  BottomNavigationBarItem(
+                    icon: PhosphorIcon(
+                      PhosphorIcons.house(PhosphorIconsStyle.duotone),
+                    ),
+                    label: 'Beranda',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: PhosphorIcon(
+                      PhosphorIcons.wallet(PhosphorIconsStyle.duotone),
+                    ),
+                    label: 'Keuangan',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Container(
+                      padding: const EdgeInsets.symmetric(
+                        vertical: 6,
+                        horizontal: 12,
+                      ),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          PhosphorIcon(
+                            PhosphorIcons.qrCode(PhosphorIconsStyle.duotone),
+                            size: 20,
+                            color: Colors.white,
+                          ),
+                          const SizedBox(height: 2),
+                          const Text(
+                            'Bayar',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 10,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    label: '',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: PhosphorIcon(
+                      PhosphorIcons.chatCenteredDots(
+                        PhosphorIconsStyle.duotone,
+                      ),
+                    ),
+                    label: 'Pengaduan',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: PhosphorIcon(
+                      PhosphorIcons.user(PhosphorIconsStyle.duotone),
+                    ),
+                    label: 'Akun',
+                  ),
+                ],
+              ),
             ),
           ),
         ),
