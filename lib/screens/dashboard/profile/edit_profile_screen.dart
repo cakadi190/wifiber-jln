@@ -65,22 +65,17 @@ class _EditProfileScreenState extends State<EditProfileScreen>
         'https://wifiber.web.id/api/v1/profiles/${user.userId}',
       );
 
-      final Map<String, String> requestHeaders = {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Authorization': 'Bearer $token',
-      };
+      final request = http.MultipartRequest('POST', url)
+        ..headers['Authorization'] = 'Bearer $token'
+        ..fields[widget.formName] = _controller.text;
 
-      final Map<String, String> requestBody = {
-        widget.formName: _controller.text,
-      };
-
-      final response = await http.post(
-        url,
-        headers: requestHeaders,
-        body: _encodeFormData(requestBody),
-      );
+      final response = await request.send();
+      final responseBody =
+          await response.stream.transform(utf8.decoder).join();
 
       if (response.statusCode == 200 || response.statusCode == 201) {
+        await auth.reinitialize(force: true);
+
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -91,7 +86,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
           Navigator.of(context).pop(_controller.text);
         }
       } else if (response.statusCode == 422) {
-        final data = jsonDecode(response.body);
+        final data = jsonDecode(responseBody);
         final errors = data['errors'] ?? data['error']?['message'];
         if (errors is Map<String, dynamic>) {
           setBackendErrors(errors);
@@ -132,12 +127,6 @@ class _EditProfileScreenState extends State<EditProfileScreen>
         });
       }
     }
-  }
-
-  String _encodeFormData(Map<String, String> data) {
-    return data.keys
-        .map((key) => '$key=${Uri.encodeQueryComponent(data[key]!)}')
-        .join('&');
   }
 
   @override
