@@ -32,13 +32,56 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
   bool _isFetchingLocation = false;
   String? _locationError;
   bool _isMapLoading = true;
+  MapController? _mapController;
 
   @override
   void initState() {
     super.initState();
     _selectedLocation = widget.initialLocation;
+    _mapController = MapController();
     if (_selectedLocation != null) {
       _isMapLoading = false;
+    }
+  }
+
+  @override
+  void didUpdateWidget(LocationPickerWidget oldWidget) {
+    super.didUpdateWidget(oldWidget);
+
+    if (oldWidget.initialLocation != widget.initialLocation) {
+      setState(() {
+        _selectedLocation = widget.initialLocation;
+        if (_selectedLocation != null && !_isMapLoading) {
+          // sudah ada peta, jangan loading ulang
+        } else if (_selectedLocation != null) {
+          _isMapLoading = false;
+        }
+      });
+
+      if (widget.initialLocation != null &&
+          _mapController != null &&
+          !_isMapLoading) {
+        _moveMapToLocation(widget.initialLocation!);
+      }
+    }
+  }
+
+  @override
+  void dispose() {
+    _mapController?.dispose();
+    super.dispose();
+  }
+
+  /// Helper untuk memindahkan peta
+  void _moveMapToLocation(LatLng location, {double zoom = 15.0}) {
+    if (_mapController != null && mounted) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        try {
+          _mapController!.move(location, zoom);
+        } catch (e) {
+          debugPrint('Error moving map: $e');
+        }
+      });
     }
   }
 
@@ -59,6 +102,8 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
             _isMapLoading = false;
           });
           widget.onLocationChanged(_selectedLocation);
+
+          _moveMapToLocation(location);
         }
       } else {
         setState(() {
@@ -90,6 +135,8 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
         _isMapLoading = false;
       });
       widget.onLocationChanged(_selectedLocation);
+
+      _moveMapToLocation(result);
     }
   }
 
@@ -98,6 +145,18 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
       return '${_selectedLocation!.latitude.toStringAsFixed(6)}, ${_selectedLocation!.longitude.toStringAsFixed(6)}';
     }
     return 'Pilih Lokasi';
+  }
+
+  void _onMapReady() {
+    if (mounted) {
+      setState(() {
+        _isMapLoading = false;
+      });
+
+      if (_selectedLocation != null && _mapController != null) {
+        _moveMapToLocation(_selectedLocation!);
+      }
+    }
   }
 
   @override
@@ -195,50 +254,22 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
                         child: Stack(
                           children: [
                             FlutterMap(
+                              mapController: _mapController,
                               options: MapOptions(
                                 initialCenter: _selectedLocation!,
                                 initialZoom: 15.0,
                                 interactionOptions: const InteractionOptions(
                                   flags: InteractiveFlag.none,
                                 ),
-
                                 backgroundColor: Colors.grey.shade100,
-                                onMapReady: () {
-                                  if (mounted) {
-                                    setState(() {
-                                      _isMapLoading = false;
-                                    });
-                                  }
-                                },
+                                onMapReady: _onMapReady,
                               ),
                               children: [
                                 TileLayer(
                                   urlTemplate:
-                                      'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                                  subdomains: const ['a', 'b', 'c'],
+                                      'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png',
+                                  subdomains: const ['a', 'b', 'c', 'd'],
                                   userAgentPackageName: 'id.kodinus.wifiber',
-
-                                  maxZoom: 18,
-                                  maxNativeZoom: 19,
-                                  tileSize: 256,
-                                  retinaMode: false,
-
-                                  additionalOptions: const {
-                                    'userAgentPackageName':
-                                        'id.kodinus.wifiber',
-                                  },
-
-                                  fallbackUrl:
-                                      'https://cartodb-basemaps-{s}.global.ssl.fastly.net/light_all/{z}/{x}/{y}.png',
-
-                                  errorTileCallback: (tile, error, stackTrace) {
-                                    debugPrint('Tile loading error: $error');
-                                  },
-                                  tileProvider: NetworkTileProvider(
-                                    headers: const {
-                                      'User-Agent': 'id.kodinus.wifiber',
-                                    },
-                                  ),
                                 ),
 
                                 MarkerLayer(

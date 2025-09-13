@@ -1,23 +1,22 @@
 import 'dart:io';
+
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:latlong2/latlong.dart';
 import 'package:path/path.dart';
 import 'package:provider/provider.dart';
-import 'package:wifiber/config/app_colors.dart';
-import 'package:wifiber/controllers/customer_form_screen_controller.dart';
-import 'package:wifiber/models/customer.dart';
+import 'package:wifiber/components/forms/backend_validation_mixin.dart';
+import 'package:wifiber/components/reusables/image_preview.dart';
+import 'package:wifiber/components/reusables/location_picker_widget.dart';
+import 'package:wifiber/components/reusables/odp_modal_selector.dart';
 import 'package:wifiber/components/reusables/package_modal_action.dart';
 import 'package:wifiber/components/reusables/router_modal_selector.dart';
-import 'package:wifiber/components/reusables/odp_modal_selector.dart';
-import 'package:wifiber/components/reusables/image_preview.dart';
+import 'package:wifiber/config/app_colors.dart';
+import 'package:wifiber/controllers/customer_form_screen_controller.dart';
+import 'package:wifiber/middlewares/auth_middleware.dart';
+import 'package:wifiber/models/customer.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/services/customer_service.dart';
-import 'package:wifiber/middlewares/auth_middleware.dart';
-import 'package:wifiber/components/widgets/map_picker_page.dart';
-import 'package:wifiber/services/location_service.dart';
-import 'package:latlong2/latlong.dart';
-import 'package:geolocator/geolocator.dart';
-import 'package:wifiber/components/forms/backend_validation_mixin.dart';
 
 class CustomerFormScreen extends StatefulWidget {
   final Customer? customer;
@@ -34,7 +33,6 @@ class _CustomerFormScreenState extends State<CustomerFormScreen>
   final _formKey = GlobalKey<FormState>();
   late CustomerFormController _controller;
   LatLng? _selectedLocation;
-  bool _isFetchingLocation = false;
   String? _locationError;
 
   @override
@@ -53,41 +51,6 @@ class _CustomerFormScreenState extends State<CustomerFormScreen>
     WidgetsBinding.instance.addPostFrameCallback((_) async {
       await _controller.initializeEditData();
     });
-  }
-
-  Future<void> _pickCurrentLocation() async {
-    setState(() {
-      _isFetchingLocation = true;
-      _locationError = null;
-    });
-    try {
-      final permission = await LocationService.requestLocationPermission();
-      if (permission == LocationPermission.always ||
-          permission == LocationPermission.whileInUse) {
-        final location = await LocationService.getCurrentPosition();
-        if (location != null) {
-          setState(() {
-            _selectedLocation = location;
-            _controller.latitudeController.text =
-                location.latitude.toString();
-            _controller.longitudeController.text =
-                location.longitude.toString();
-          });
-        }
-      } else {
-        setState(() {
-          _locationError = 'Location permission denied';
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _locationError = e.toString();
-      });
-    } finally {
-      setState(() {
-        _isFetchingLocation = false;
-      });
-    }
   }
 
   @override
@@ -526,8 +489,10 @@ class _CustomerFormScreenState extends State<CustomerFormScreen>
                                     maxLines: 3,
                                     validator: validator(
                                       'address',
-                                      (value) => controller
-                                          .validateRequired(value, 'Alamat'),
+                                      (value) => controller.validateRequired(
+                                        value,
+                                        'Alamat',
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(height: 16),
@@ -618,8 +583,10 @@ class _CustomerFormScreenState extends State<CustomerFormScreen>
                                     keyboardType: TextInputType.number,
                                     validator: validator(
                                       'area',
-                                      (value) => controller
-                                          .validateRequired(value, 'ID Area'),
+                                      (value) => controller.validateRequired(
+                                        value,
+                                        'ID Area',
+                                      ),
                                     ),
                                   ),
                                   const SizedBox(height: 16),
@@ -715,8 +682,10 @@ class _CustomerFormScreenState extends State<CustomerFormScreen>
                                     keyboardType: TextInputType.number,
                                     validator: validator(
                                       'discount',
-                                      (value) => controller
-                                          .validateRequired(value, 'Diskon'),
+                                      (value) => controller.validateRequired(
+                                        value,
+                                        'Diskon',
+                                      ),
                                     ),
                                   ),
                                 ],
@@ -737,68 +706,49 @@ class _CustomerFormScreenState extends State<CustomerFormScreen>
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   const Text(
-                                    'Koordinat Lokasi (Wajib Diisi)',
+                                    'Lokasi (Wajib Diisi)',
                                     style: TextStyle(
                                       fontSize: 18,
                                       fontWeight: FontWeight.bold,
                                     ),
                                   ),
                                   const SizedBox(height: 8),
-                                Row(
-                                  children: [
-                                    Expanded(
-                                      child: OutlinedButton(
-                                        onPressed: () async {
-                                          final result = await Navigator.of(context)
-                                              .push<LatLng>(MaterialPageRoute(
-                                            builder: (_) => MapPickerPage(
-                                              initialLocation: _selectedLocation,
-                                            ),
-                                          ));
-                                          if (result != null) {
-                                            setState(() {
-                                              _selectedLocation = result;
-                                              _controller.latitudeController.text =
-                                                  result.latitude.toString();
-                                              _controller.longitudeController.text =
-                                                  result.longitude.toString();
-                                            });
-                                          }
-                                        },
-                                        child: Text(
-                                          _selectedLocation != null
-                                              ? '${_selectedLocation!.latitude.toStringAsFixed(6)}, ${_selectedLocation!.longitude.toStringAsFixed(6)}'
-                                              : 'Pilih Lokasi',
+                                  LocationPickerWidget(
+                                    initialLocation: _selectedLocation,
+                                    label: 'Lokasi',
+                                    helperText:
+                                        'Pilih lokasi pemasangan pada peta atau gunakan lokasi saat ini',
+                                    isRequired: true,
+                                    onLocationChanged: (location) {
+                                      setState(() {
+                                        _selectedLocation = location;
+                                        if (location != null) {
+                                          _controller.latitudeController.text =
+                                              location.latitude.toString();
+                                          _controller.longitudeController.text =
+                                              location.longitude.toString();
+                                          _locationError = null;
+                                        }
+                                      });
+                                    },
+                                    validator: (location) {
+                                      if (location == null) {
+                                        return 'Lokasi wajib dipilih';
+                                      }
+                                      return null;
+                                    },
+                                  ),
+                                  if (_locationError != null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8.0),
+                                      child: Text(
+                                        _locationError!,
+                                        style: const TextStyle(
+                                          color: Colors.red,
+                                          fontSize: 12,
                                         ),
                                       ),
                                     ),
-                                    IconButton(
-                                      onPressed: _isFetchingLocation
-                                          ? null
-                                          : _pickCurrentLocation,
-                                      icon: _isFetchingLocation
-                                          ? const SizedBox(
-                                              width: 20,
-                                              height: 20,
-                                              child: CircularProgressIndicator(
-                                                strokeWidth: 2,
-                                              ),
-                                            )
-                                          : const Icon(Icons.my_location),
-                                    ),
-                                  ],
-                                ),
-                                if (_locationError != null)
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 8.0),
-                                    child: Text(
-                                      _locationError!,
-                                      style: const TextStyle(
-                                        color: Colors.red,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                  ),
                                 ],
                               ),
                             ),
@@ -890,7 +840,8 @@ class _CustomerFormScreenState extends State<CustomerFormScreen>
                                               context,
                                               isEdit: widget.isEdit,
                                               customer: widget.customer,
-                                              onValidationError: setBackendErrors,
+                                              onValidationError:
+                                                  setBackendErrors,
                                             );
                                           }
                                         },

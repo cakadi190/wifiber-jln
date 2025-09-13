@@ -711,7 +711,7 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen>
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 const Text(
-                                  'Koordinat Lokasi (Wajib Diisi)',
+                                  'Lokasi (Wajib Diisi)',
                                   style: TextStyle(
                                     fontSize: 18,
                                     fontWeight: FontWeight.bold,
