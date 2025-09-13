@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/components/ui/snackbars.dart';
@@ -32,6 +33,8 @@ class _BillsCreateScreenState extends State<BillsCreateScreen>
   Customer? selectedCustomer;
   File? selectedPaymentProof;
   String? paymentProofFileName;
+
+  final ImagePicker _picker = ImagePicker();
 
   bool _isPaid = false;
   bool _openIsolir = false;
@@ -81,9 +84,9 @@ class _BillsCreateScreenState extends State<BillsCreateScreen>
     }
   }
 
-  Future<void> _pickPaymentProofFile() async {
+  Future<void> _pickPaymentProofFromGallery() async {
     try {
-      FilePickerResult? result = await FilePicker.platform.pickFiles(
+      final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
         allowedExtensions: ['jpg', 'jpeg', 'png', 'pdf'],
         allowMultiple: false,
@@ -105,6 +108,63 @@ class _BillsCreateScreenState extends State<BillsCreateScreen>
         ).clearSnackBars();
       }
     }
+  }
+
+  Future<void> _capturePaymentProofWithCamera() async {
+    try {
+      final picked = await _picker.pickImage(
+        source: ImageSource.camera,
+        imageQuality: 85,
+      );
+
+      if (!mounted) return;
+
+      if (picked != null) {
+        setState(() {
+          selectedPaymentProof = File(picked.path);
+          paymentProofFileName = picked.name;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        SnackBars.error(
+          context,
+          "Gagal mengambil foto: ${e.toString()}",
+        ).clearSnackBars();
+      }
+    }
+  }
+
+  void _showPaymentProofPicker() {
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library, color: Colors.blue),
+              title: const Text('Pilih dari Galeri'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _pickPaymentProofFromGallery();
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt, color: Colors.green),
+              title: const Text('Ambil dengan Kamera'),
+              onTap: () {
+                Navigator.pop(ctx);
+                _capturePaymentProofWithCamera();
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   void _removePaymentProofFile() {
@@ -597,7 +657,7 @@ class _BillsCreateScreenState extends State<BillsCreateScreen>
                               ),
                             )
                           : InkWell(
-                              onTap: _isLoading ? null : _pickPaymentProofFile,
+                              onTap: _isLoading ? null : _showPaymentProofPicker,
                               child: Container(
                                 width: double.infinity,
                                 padding: const EdgeInsets.all(16),
