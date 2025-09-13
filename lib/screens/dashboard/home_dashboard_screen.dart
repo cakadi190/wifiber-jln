@@ -18,6 +18,18 @@ import 'package:wifiber/tabs/home/home_tab.dart';
 import 'package:wifiber/tabs/home/transaction_tab.dart';
 import 'package:wifiber/helpers/role.dart';
 
+class _TabItem {
+  final String key;
+  final Widget widget;
+  final BottomNavigationBarItem item;
+
+  const _TabItem({
+    required this.key,
+    required this.widget,
+    required this.item,
+  });
+}
+
 class HomeDashboardScreen extends StatefulWidget {
   const HomeDashboardScreen({super.key});
 
@@ -26,7 +38,7 @@ class HomeDashboardScreen extends StatefulWidget {
 }
 
 class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
-  int _selectedIndex = 0;
+  String _selectedTab = 'home';
   late final TransactionTabController _transactionTabController;
   late final ComplaintTabController _complaintController;
 
@@ -47,85 +59,80 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     _complaintController = ComplaintTabController(context);
   }
 
-  List<Widget> _buildWidgetOptions(AuthProvider authProvider) {
-    List<Widget> widgets = [];
+  List<_TabItem> _buildTabs(AuthProvider authProvider) {
+    final tabs = <_TabItem>[];
 
-    widgets.add(
-      HomeTab(
-        onTransactionTap: () => _onItemTapped(1),
-        onBookKeepingTap: () => _onItemTapped(2),
-        onLogoutTap: _onLogoutRedirect,
-        onTicketTap: () => _onItemTapped(
-          (authProvider.user?.permissions.contains('finance') ?? false) ? 3 : 1,
+    tabs.add(
+      _TabItem(
+        key: 'home',
+        widget: HomeTab(
+          onTransactionTap: () => _onTabSelected('finance'),
+          onBookKeepingTap: () => _onTabSelected('bills'),
+          onLogoutTap: _onLogoutRedirect,
+          onTicketTap: () => _onTabSelected('ticket'),
+        ),
+        item: BottomNavigationBarItem(
+          icon: PhosphorIcon(PhosphorIcons.house(PhosphorIconsStyle.duotone)),
+          label: 'Beranda',
         ),
       ),
     );
 
     if (authProvider.user?.permissions.contains('finance') ?? false) {
-      widgets.add(TransactionTab(controller: _transactionTabController));
-      widgets.add(Container());
+      tabs.add(
+        _TabItem(
+          key: 'finance',
+          widget: TransactionTab(controller: _transactionTabController),
+          item: BottomNavigationBarItem(
+            icon: PhosphorIcon(PhosphorIcons.wallet(PhosphorIconsStyle.duotone)),
+            label: 'Keuangan',
+          ),
+        ),
+      );
+
+      if (authProvider.user?.permissions.contains('bill') ?? false) {
+        tabs.add(
+          _TabItem(
+            key: 'bills',
+            widget: Container(),
+            item: BottomNavigationBarItem(
+              icon: PhosphorIcon(
+                PhosphorIcons.listChecks(PhosphorIconsStyle.duotone),
+              ),
+              label: 'Tagihan',
+            ),
+          ),
+        );
+      }
     }
 
     if (authProvider.user?.permissions.contains('ticket') ?? false) {
-      widgets.add(ComplaintsTab(controller: _complaintController));
+      tabs.add(
+        _TabItem(
+          key: 'ticket',
+          widget: ComplaintsTab(controller: _complaintController),
+          item: BottomNavigationBarItem(
+            icon: PhosphorIcon(
+              PhosphorIcons.chatCenteredDots(PhosphorIconsStyle.duotone),
+            ),
+            label: 'Pengaduan',
+          ),
+        ),
+      );
     }
 
-    widgets.add(AccountCenterScreen());
-
-    return widgets;
-  }
-
-  List<BottomNavigationBarItem> _buildBottomNavItems(
-    AuthProvider authProvider,
-  ) {
-    List<BottomNavigationBarItem> items = [];
-
-    items.add(
-      BottomNavigationBarItem(
-        icon: PhosphorIcon(PhosphorIcons.house(PhosphorIconsStyle.duotone)),
-        label: 'Beranda',
+    tabs.add(
+      _TabItem(
+        key: 'account',
+        widget: AccountCenterScreen(),
+        item: BottomNavigationBarItem(
+          icon: PhosphorIcon(PhosphorIcons.user(PhosphorIconsStyle.duotone)),
+          label: 'Akun',
+        ),
       ),
     );
 
-    if (authProvider.user?.permissions.contains('finance') ?? false) {
-      items.add(
-        BottomNavigationBarItem(
-          icon: PhosphorIcon(PhosphorIcons.wallet(PhosphorIconsStyle.duotone)),
-          label: 'Keuangan',
-        ),
-      );
-    }
-
-    if (authProvider.user?.permissions.contains('bill') ?? false) {
-      items.add(
-        BottomNavigationBarItem(
-          icon: PhosphorIcon(
-            PhosphorIcons.listChecks(PhosphorIconsStyle.duotone),
-          ),
-          label: 'Tagihan',
-        ),
-      );
-    }
-
-    if (authProvider.user?.permissions.contains('ticket') ?? false) {
-      items.add(
-        BottomNavigationBarItem(
-          icon: PhosphorIcon(
-            PhosphorIcons.chatCenteredDots(PhosphorIconsStyle.duotone),
-          ),
-          label: 'Pengaduan',
-        ),
-      );
-    }
-
-    items.add(
-      BottomNavigationBarItem(
-        icon: PhosphorIcon(PhosphorIcons.user(PhosphorIconsStyle.duotone)),
-        label: 'Akun',
-      ),
-    );
-
-    return items;
+    return tabs;
   }
 
   void _onLogoutRedirect() {
@@ -138,22 +145,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     );
   }
 
-  void _onItemTapped(int index) {
-    final authProvider = context.read<AuthProvider>();
-    bool hasFinance =
-        authProvider.user?.permissions.contains('finance') ?? false;
-    bool hasTicket = authProvider.user?.permissions.contains('ticket') ?? false;
-
-    List<String> availableTabs = ['home'];
-    if (hasFinance) availableTabs.addAll(['finance', 'bills']);
-    if (hasTicket) availableTabs.add('ticket');
-    availableTabs.add('account');
-
-    if (index >= availableTabs.length) return;
-
-    String selectedTab = availableTabs[index];
-
-    switch (selectedTab) {
+  void _onTabSelected(String key) {
+    switch (key) {
       case 'home':
         setState(() {
           _internalStyle = SystemUiHelper.light(
@@ -192,7 +185,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     }
 
     setState(() {
-      _selectedIndex = selectedTab == 'bills' ? _selectedIndex : index;
+      _selectedTab = key == 'bills' ? _selectedTab : key;
       _showExitMessage = false;
     });
   }
@@ -200,8 +193,8 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
   bool _handleBackNavigation() {
     final now = DateTime.now();
 
-    if (_selectedIndex != 0) {
-      _onItemTapped(0);
+    if (_selectedTab != 'home') {
+      _onTabSelected('home');
       return false;
     }
 
@@ -242,17 +235,15 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
           },
           child: Consumer<AuthProvider>(
             builder: (context, authProvider, child) {
-              final widgetOptions = _buildWidgetOptions(authProvider);
-              final bottomNavItems = _buildBottomNavItems(authProvider);
-
-              final safeSelectedIndex = _selectedIndex >= widgetOptions.length
-                  ? 0
-                  : _selectedIndex;
+              final tabs = _buildTabs(authProvider);
+              final currentIndex =
+                  tabs.indexWhere((t) => t.key == _selectedTab);
+              final safeIndex = currentIndex < 0 ? 0 : currentIndex;
 
               return Scaffold(
                 body: Stack(
                   children: [
-                    widgetOptions.elementAt(safeSelectedIndex),
+                    tabs[safeIndex].widget,
 
                     if (_showExitMessage)
                       Positioned(
@@ -290,13 +281,13 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                   ),
                   child: BottomNavigationBar(
                     backgroundColor: AppColor.violet50,
-                    currentIndex: safeSelectedIndex,
-                    onTap: _onItemTapped,
+                    currentIndex: safeIndex,
+                    onTap: (index) => _onTabSelected(tabs[index].key),
                     selectedItemColor: AppColors.primary,
                     unselectedItemColor: Colors.grey,
                     showUnselectedLabels: true,
                     type: BottomNavigationBarType.fixed,
-                    items: bottomNavItems,
+                    items: tabs.map((t) => t.item).toList(),
                   ),
                 ),
               );
