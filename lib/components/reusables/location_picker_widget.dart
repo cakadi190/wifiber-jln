@@ -37,6 +37,9 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
   void initState() {
     super.initState();
     _selectedLocation = widget.initialLocation;
+    if (_selectedLocation != null) {
+      _isMapLoading = false;
+    }
   }
 
   Future<void> _pickCurrentLocation() async {
@@ -53,6 +56,7 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
         if (location != null) {
           setState(() {
             _selectedLocation = location;
+            _isMapLoading = false;
           });
           widget.onLocationChanged(_selectedLocation);
         }
@@ -83,6 +87,7 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
       setState(() {
         _selectedLocation = result;
         _locationError = null;
+        _isMapLoading = false;
       });
       widget.onLocationChanged(_selectedLocation);
     }
