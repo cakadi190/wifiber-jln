@@ -234,7 +234,11 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
                                   errorTileCallback: (tile, error, stackTrace) {
                                     debugPrint('Tile loading error: $error');
                                   },
-                                  tileProvider: NetworkTileProvider(),
+                                  tileProvider: NetworkTileProvider(
+                                    headers: const {
+                                      'User-Agent': 'id.kodinus.wifiber',
+                                    },
+                                  ),
                                 ),
 
                                 MarkerLayer(
