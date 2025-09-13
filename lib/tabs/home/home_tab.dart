@@ -40,6 +40,11 @@ class _HomeTabState extends State<HomeTab> {
           authProvider: authProvider,
         );
 
+        final hasFinancePermission =
+            authProvider.user?.permissions.contains('finance') == true;
+        final hasTicketPermission =
+            authProvider.user?.permissions.contains('ticket') == true;
+
         return Scaffold(
           backgroundColor: AppColors.background,
           appBar: AppBar(
@@ -62,21 +67,13 @@ class _HomeTabState extends State<HomeTab> {
             child: SafeArea(
               child: Column(
                 children: [
-                  Consumer<AuthProvider>(
-                    builder: (context, authProvider, _) {
-                      if (authProvider.user?.permissions.contains('finance') !=
-                          true) {
-                        SizedBox();
-                      }
-
-                      return SizedBox(
-                        width: double.infinity,
-                        child: DashboardSummary(
-                          onTransactionTap: widget.onTransactionTap,
-                        ),
-                      );
-                    },
-                  ),
+                  if (hasFinancePermission)
+                    SizedBox(
+                      width: double.infinity,
+                      child: DashboardSummary(
+                        onTransactionTap: widget.onTransactionTap,
+                      ),
+                    ),
 
                   MainMenu(
                     onTicketMenuTapped: widget.onTicketTap,
@@ -84,8 +81,7 @@ class _HomeTabState extends State<HomeTab> {
                     onBillMenuTapped: widget.onBookKeepingTap,
                   ),
 
-                  if (authProvider.user?.permissions.contains('finance') ==
-                      true)
+                  if (hasFinancePermission)
                     SizedBox(
                       width: double.infinity,
                       child: FinanceSummary(
@@ -93,7 +89,7 @@ class _HomeTabState extends State<HomeTab> {
                       ),
                     ),
 
-                  if (authProvider.user?.permissions.contains('ticket') == true)
+                  if (hasTicketPermission)
                     SizedBox(
                       width: double.infinity,
                       child: TicketSummary(onTicketTap: widget.onTicketTap),

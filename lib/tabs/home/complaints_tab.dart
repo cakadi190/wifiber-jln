@@ -7,6 +7,7 @@ import 'package:wifiber/controllers/tabs/complaint_tab_controller.dart';
 import 'package:wifiber/helpers/datetime_helper.dart';
 import 'package:wifiber/helpers/role.dart';
 import 'package:wifiber/models/complaint.dart';
+import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/providers/complaint_provider.dart';
 import 'package:wifiber/screens/dashboard/complainment/create_complainment_screen.dart';
 import 'package:wifiber/screens/dashboard/complainment/edit_complainment_screen.dart';
@@ -50,22 +51,30 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
     return Scaffold(
       backgroundColor: AppColors.primary,
 
-      floatingActionButton: RoleGuardWidget(
-        permissions: 'ticket',
-        child: FloatingActionButton(
-          onPressed: () async {
-            await Navigator.of(context).push(
-              MaterialPageRoute(
-                builder: (context) => const CreateComplaintScreen(),
-              ),
-            );
-            if (mounted) {
-              widget.controller.loadComplaints();
-            }
-          },
-          backgroundColor: AppColors.primary,
-          child: const Icon(Icons.add),
-        ),
+      floatingActionButton: Consumer<AuthProvider>(
+        builder: (context, authProvider, child) {
+          if (authProvider.user?.groupName != 'Admin') {
+            return SizedBox();
+          }
+
+          return RoleGuardWidget(
+            permissions: 'ticket',
+            child: FloatingActionButton(
+              onPressed: () async {
+                await Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => const CreateComplaintScreen(),
+                  ),
+                );
+                if (mounted) {
+                  widget.controller.loadComplaints();
+                }
+              },
+              backgroundColor: AppColors.primary,
+              child: const Icon(Icons.add),
+            ),
+          );
+        },
       ),
 
       appBar: AppBar(
