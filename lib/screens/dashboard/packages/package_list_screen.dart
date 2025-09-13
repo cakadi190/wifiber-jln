@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/config/app_colors.dart';
+import 'package:wifiber/helpers/currency_helper.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/middlewares/auth_middleware.dart';
 import 'package:wifiber/models/package.dart';
@@ -99,11 +100,7 @@ class _PackageListScreenState extends State<PackageListScreen> {
   }
 
   String _formatPrice(dynamic price) {
-    if (price == null) return '0';
-    return price.toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]}.',
-    );
+    return CurrencyHelper.formatCurrency(price);
   }
 
   void _showPackageDetail(PackageModel package) {
@@ -163,7 +160,7 @@ class _PackageListScreenState extends State<PackageListScreen> {
                         ),
                         const SizedBox(height: 4),
                         Text(
-                          'Rp ${_formatPrice(package.price)}',
+                          _formatPrice(package.price),
                           style: TextStyle(
                             fontSize: 18,
                             fontWeight: FontWeight.w600,
@@ -219,15 +216,35 @@ class _PackageListScreenState extends State<PackageListScreen> {
                       children: [
                         _DetailRow(
                           icon: Icons.payment,
-                          label: 'Harga',
-                          value: 'Rp ${_formatPrice(package.price)}',
-                          valueColor: AppColors.primary,
+                          label: 'Harga (Tanpa PPn)',
+                          value: _formatPrice(package.price),
                         ),
-                        const SizedBox(height: 12),
+                        const SizedBox(height: 16),
                         _DetailRow(
                           icon: Icons.badge,
-                          label: 'ID Paket',
-                          value: package.id,
+                          label: 'PPn (Pajak Pertambahan Nilai)',
+                          value: package.ppnPercent > 0
+                              ? "${package.ppnPercent}%"
+                              : "Tidak Ada",
+                        ),
+                        const SizedBox(height: 16),
+                        _DetailRow(
+                          icon: Icons.payment,
+                          label: 'Harga (Dengan PPn)',
+                          value: _formatPrice(
+                            package.price +
+                                (package.price * package.ppnPercent / 100),
+                          ),
+                          valueColor: AppColors.primary,
+                        ),
+                        const SizedBox(height: 16),
+                        _DetailRow(
+                          icon: Icons.check,
+                          label: 'Paket Aktif',
+                          value: package.status == 'active' ? "Ya" : "Tidak",
+                          valueColor: package.status == 'active'
+                              ? Colors.green
+                              : Colors.red,
                         ),
                       ],
                     ),
@@ -310,7 +327,7 @@ class _PackageListScreenState extends State<PackageListScreen> {
                   ),
                 ),
                 Text(
-                  'Rp ${_formatPrice(package.price)}',
+                  _formatPrice(package.price),
                   style: TextStyle(fontSize: 14, color: Colors.grey[600]),
                 ),
               ],
@@ -543,7 +560,7 @@ class _PackageListItem extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      'Rp ${_formatPrice(package.price)}',
+                      _formatPrice(package.price),
                       style: TextStyle(
                         color: AppColors.primary,
                         fontSize: 14,
@@ -573,11 +590,7 @@ class _PackageListItem extends StatelessWidget {
   }
 
   String _formatPrice(dynamic price) {
-    if (price == null) return '0';
-    return price.toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]}.',
-    );
+    return CurrencyHelper.formatCurrency(price);
   }
 }
 
