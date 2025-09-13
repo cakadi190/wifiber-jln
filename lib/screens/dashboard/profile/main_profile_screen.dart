@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/components/widgets/user_avatar.dart';
@@ -34,12 +35,47 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
   }
 
   Future<void> _pickImage() async {
-    try {
-      await _profileController.pickImage();
-      await _showCropPreviewDialog();
-    } catch (e) {
-      _showErrorSnackBar(e.toString());
-    }
+    showModalBottomSheet(
+      context: context,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+      ),
+      builder: (ctx) => SafeArea(
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ListTile(
+              leading: const Icon(Icons.photo_library, color: Colors.blue),
+              title: const Text('Pilih dari Galeri'),
+              onTap: () async {
+                Navigator.pop(ctx);
+                try {
+                  await _profileController.pickImage(
+                      source: ImageSource.gallery);
+                  await _showCropPreviewDialog();
+                } catch (e) {
+                  _showErrorSnackBar(e.toString());
+                }
+              },
+            ),
+            ListTile(
+              leading: const Icon(Icons.camera_alt, color: Colors.green),
+              title: const Text('Ambil dengan Kamera'),
+              onTap: () async {
+                Navigator.pop(ctx);
+                try {
+                  await _profileController.pickImage(
+                      source: ImageSource.camera);
+                  await _showCropPreviewDialog();
+                } catch (e) {
+                  _showErrorSnackBar(e.toString());
+                }
+              },
+            ),
+          ],
+        ),
+      ),
+    );
   }
 
   Future<void> _showCropPreviewDialog() async {
