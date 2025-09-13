@@ -68,7 +68,7 @@ class _OptionModalContent extends StatelessWidget {
           ),
           if (header != null)
             Padding(padding: const EdgeInsets.all(20), child: header),
-          ...items.map((item) => _OptionItem(item)).toList(),
+          ...items.map((item) => _OptionItem(item)),
           SizedBox(height: MediaQuery.of(context).padding.bottom + 20),
         ],
       ),

@@ -533,7 +533,7 @@ class _BillsCreateScreenState extends State<BillsCreateScreen>
                                 _isPaid = value;
                               });
                             },
-                            activeColor: AppColors.primary,
+                            activeThumbColor: AppColors.primary,
                           ),
                         ],
                       ),
@@ -558,7 +558,7 @@ class _BillsCreateScreenState extends State<BillsCreateScreen>
                                 _openIsolir = value;
                               });
                             },
-                            activeColor: AppColors.primary,
+                            activeThumbColor: AppColors.primary,
                           ),
                         ],
                       ),
@@ -657,7 +657,9 @@ class _BillsCreateScreenState extends State<BillsCreateScreen>
                               ),
                             )
                           : InkWell(
-                              onTap: _isLoading ? null : _showPaymentProofPicker,
+                              onTap: _isLoading
+                                  ? null
+                                  : _showPaymentProofPicker,
                               child: Container(
                                 width: double.infinity,
                                 padding: const EdgeInsets.all(16),

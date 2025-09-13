@@ -88,7 +88,7 @@ class _PackageFormScreenState extends State<PackageFormScreen> {
                   ),
                   const SizedBox(height: 24),
                   DropdownButtonFormField<String>(
-                    value: _status,
+                    initialValue: _status,
                     decoration: const InputDecoration(labelText: 'Status'),
                     items: const [
                       DropdownMenuItem(value: 'active', child: Text('Aktif')),

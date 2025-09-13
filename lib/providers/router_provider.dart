@@ -69,10 +69,10 @@ class RouterProvider extends SafeChangeNotifier {
       await getAllRouters();
       notifyListeners();
       return true;
-    } on ValidationException catch (e) {
+    } on ValidationException {
       _isAddingRouter = false;
       notifyListeners();
-      throw e;
+      rethrow;
     } catch (e) {
       _isAddingRouter = false;
       _setError(e.toString());
@@ -92,10 +92,10 @@ class RouterProvider extends SafeChangeNotifier {
       _isUpdatingRouter = false;
       notifyListeners();
       return true;
-    } on ValidationException catch (e) {
+    } on ValidationException {
       _isUpdatingRouter = false;
       notifyListeners();
-      throw e;
+      rethrow;
     } catch (e) {
       _isUpdatingRouter = false;
       _setError(e.toString());

@@ -497,7 +497,7 @@ class _CustomerFormScreenState extends State<CustomerFormScreen>
                                   ),
                                   const SizedBox(height: 16),
                                   DropdownButtonFormField<CustomerStatus>(
-                                    value: controller.selectedStatus,
+                                    initialValue: controller.selectedStatus,
                                     decoration: const InputDecoration(
                                       labelText: 'Status',
                                       border: OutlineInputBorder(),

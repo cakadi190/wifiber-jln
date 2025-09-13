@@ -497,7 +497,7 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen>
                                 ),
                                 const SizedBox(height: 16),
                                 DropdownButtonFormField<RegistrantStatus>(
-                                  value: controller.selectedStatus,
+                                  initialValue: controller.selectedStatus,
                                   decoration: const InputDecoration(
                                     labelText: 'Status',
                                     border: OutlineInputBorder(),

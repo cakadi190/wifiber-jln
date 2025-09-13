@@ -92,7 +92,7 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                 mainAxisSize: MainAxisSize.min,
                 children: [
                   DropdownButtonFormField<CustomerStatus?>(
-                    value: tempSelectedStatus,
+                    initialValue: tempSelectedStatus,
                     decoration: const InputDecoration(
                       labelText: 'Status',
                       border: OutlineInputBorder(),
@@ -122,7 +122,7 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                           value: status,
                           child: Text(displayName),
                         );
-                      }).toList(),
+                      }),
                     ],
                     onChanged: (value) {
                       setState(() {

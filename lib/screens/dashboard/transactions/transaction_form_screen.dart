@@ -286,7 +286,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen>
                       ),
                       const SizedBox(height: 16),
                       DropdownButtonFormField<String>(
-                        value: _type,
+                        initialValue: _type,
                         decoration: const InputDecoration(
                           labelText: 'Jenis',
                           prefixIcon: Icon(Icons.swap_vert),
