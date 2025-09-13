@@ -7,7 +7,7 @@ import 'package:wifiber/controllers/profile_controller.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/screens/dashboard/profile/edit_profile_screen.dart';
-import 'package:wifiber/middlewares/auth_middleware.dart';
+import 'package:wifiber/screens/profile/change_password_screen.dart';
 
 class MainProfileScreen extends StatefulWidget {
   const MainProfileScreen({super.key});
@@ -181,13 +181,11 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                   ? AppColors.primary
                   : Colors.white,
             ),
-            child: AuthGuard(
-              requiredPermissions: const ['company-profile'],
-              child: Scaffold(
-                backgroundColor: AppColors.primary,
-                appBar: AppBar(title: Text('Profil Saya')),
-                body: Consumer2<AuthProvider, ProfileController>(
-                  builder: (context, authProvider, profileController, child) {
+            child: Scaffold(
+              backgroundColor: AppColors.primary,
+              appBar: AppBar(title: Text('Profil Saya')),
+              body: Consumer2<AuthProvider, ProfileController>(
+                builder: (context, authProvider, profileController, child) {
                   if (authProvider.user == null) {
                     return Container(
                       width: double.infinity,
@@ -266,7 +264,7 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                                             : UserAvatar(
                                                 imageUrl:
                                                     user.picture ??
-                                                    'https://via.placeholder.com/150',
+                                                    'https://placeholder.com/150.png',
                                                 name:
                                                     user.name.isNotEmpty == true
                                                     ? user.name
@@ -390,6 +388,25 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                                           user.groupName ?? 'Pengguna Biasa',
                                     ),
                                   ),
+                                  _buildProfileItem(
+                                    ListTileItem(
+                                      title: 'Kata Sandi',
+                                      subtitle: "*******",
+                                      onTap: () async {
+                                        await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                ChangePasswordScreen(),
+                                          ),
+                                        );
+
+                                        await authProvider.reinitialize(
+                                          force: true,
+                                        );
+                                      },
+                                    ),
+                                  ),
                                 ],
                               ),
                             ),
@@ -430,7 +447,6 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                     ),
                   );
                 },
-                ),
               ),
             ),
           );

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/components/ui/alert.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/providers/auth_provider.dart';
-import 'package:wifiber/middlewares/auth_middleware.dart';
-import 'dart:convert';
 import 'package:wifiber/components/forms/backend_validation_mixin.dart';
+import 'package:wifiber/services/http_service.dart';
+import 'package:wifiber/exceptions/validation_exceptions.dart';
+import 'package:wifiber/exceptions/string_exceptions.dart';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({
@@ -30,6 +30,7 @@ class _EditProfileScreenState extends State<EditProfileScreen>
     with BackendValidationMixin {
   final _formKey = GlobalKey<FormState>();
   final _controller = TextEditingController(text: '');
+  final _httpService = HttpService();
   bool _isLoading = false;
 
   @override
@@ -54,71 +55,35 @@ class _EditProfileScreenState extends State<EditProfileScreen>
 
     final auth = Provider.of<AuthProvider>(context, listen: false);
     final user = auth.user!;
-    final token = user.accessToken;
 
     setState(() {
       _isLoading = true;
     });
 
     try {
-      final url = Uri.parse(
-        'https://wifiber.web.id/api/v1/profiles/${user.userId}',
+      await _httpService.postForm(
+        '/profiles/${user.userId}',
+        fields: {widget.formName: _controller.text},
+        requiresAuth: true,
       );
 
-      final request = http.MultipartRequest('POST', url)
-        ..headers['Authorization'] = 'Bearer $token'
-        ..fields[widget.formName] = _controller.text;
+      await auth.reinitialize(force: true);
 
-      final response = await request.send();
-      final responseBody =
-          await response.stream.transform(utf8.decoder).join();
-
-      if (response.statusCode == 200 || response.statusCode == 201) {
-        await auth.reinitialize(force: true);
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('${widget.formLabel} berhasil diperbarui'),
-              backgroundColor: Colors.green,
-            ),
-          );
-          Navigator.of(context).pop(_controller.text);
-        }
-      } else if (response.statusCode == 422) {
-        final data = jsonDecode(responseBody);
-        final errors = data['errors'] ?? data['error']?['message'];
-        if (errors is Map<String, dynamic>) {
-          setBackendErrors(errors);
-        }
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(data['message'] ?? 'Data tidak valid'),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
-      } else {
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(
-                'Gagal memperbarui ${widget.formLabel.toLowerCase()}',
-              ),
-              backgroundColor: Colors.red,
-            ),
-          );
-        }
+      if (mounted) {
+        _showSuccessMessage('${widget.formLabel} berhasil diperbarui');
+        Navigator.of(context).pop(_controller.text);
+      }
+    } on ValidationException catch (e) {
+      if (mounted) {
+        _handleValidationErrors(e);
+      }
+    } on StringException catch (e) {
+      if (mounted) {
+        _showErrorMessage(e.message);
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Terjadi kesalahan: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        _showErrorMessage('Terjadi kesalahan tidak terduga: ${e.toString()}');
       }
     } finally {
       if (mounted) {
@@ -129,6 +94,103 @@ class _EditProfileScreenState extends State<EditProfileScreen>
     }
   }
 
+  void _handleValidationErrors(ValidationException exception) {
+    setBackendErrors(exception.errors);
+
+    _showErrorMessage(exception.message);
+
+    _showValidationErrorDialog(exception.errors);
+  }
+
+  void _showValidationErrorDialog(Map<String, dynamic> errors) {
+    final errorMessages = <String>[];
+
+    errors.forEach((field, messages) {
+      if (messages is List) {
+        for (final message in messages) {
+          errorMessages.add('• $message');
+        }
+      } else if (messages is String) {
+        errorMessages.add('• $messages');
+      }
+    });
+
+    if (errorMessages.isNotEmpty) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Row(
+              children: [
+                Icon(Icons.error_outline, color: Colors.red),
+                SizedBox(width: 8),
+                Text('Error Validasi'),
+              ],
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Mohon perbaiki error berikut:',
+                  style: TextStyle(fontWeight: FontWeight.w500),
+                ),
+                const SizedBox(height: 8),
+                ...errorMessages.map(
+                  (message) => Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: Text(message, style: const TextStyle(fontSize: 14)),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              TextButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('OK'),
+              ),
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  void _showSuccessMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.check_circle, color: Colors.white),
+            const SizedBox(width: 8),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: Colors.green,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+      ),
+    );
+  }
+
+  void _showErrorMessage(String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Row(
+          children: [
+            const Icon(Icons.error, color: Colors.white),
+            const SizedBox(width: 8),
+            Expanded(child: Text(message)),
+          ],
+        ),
+        backgroundColor: Colors.red,
+        behavior: SnackBarBehavior.floating,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+        duration: const Duration(seconds: 4),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SystemUiWrapper(
@@ -136,11 +198,9 @@ class _EditProfileScreenState extends State<EditProfileScreen>
         statusBarColor: AppColors.primary,
         navigationBarColor: Colors.white,
       ),
-      child: AuthGuard(
-        requiredPermissions: const ['company-profile'],
-        child: Scaffold(
-          backgroundColor: AppColors.primary,
-          appBar: AppBar(
+      child: Scaffold(
+        backgroundColor: AppColors.primary,
+        appBar: AppBar(
           title: Text("Perbarui ${widget.formLabel}"),
           actions: [
             _isLoading
@@ -184,25 +244,21 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                       style: TextStyle(fontSize: 14),
                     ),
                   ),
-
                   const SizedBox(height: 32),
-
                   TextFormField(
                     controller: _controller,
                     enabled: !_isLoading,
                     decoration: InputDecoration(
                       labelText: widget.formLabel,
                       border: const OutlineInputBorder(),
+                      prefixIcon: _getFieldIcon(widget.formName),
                     ),
-                    validator: validator(
-                      widget.formName,
-                      (value) {
-                        if (value == null || value.isEmpty) {
-                          return 'Harap isi ${widget.formLabel.toLowerCase()}';
-                        }
-                        return null;
-                      },
-                    ),
+                    validator: validator(widget.formName, (value) {
+                      if (value == null || value.isEmpty) {
+                        return 'Harap isi ${widget.formLabel.toLowerCase()}';
+                      }
+                      return null;
+                    }),
                   ),
                   const SizedBox(height: 16),
                   SizedBox(
@@ -213,6 +269,10 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                             ? Colors.grey
                             : AppColors.primary,
                         foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
                       ),
                       onPressed: _isLoading ? null : _submitProfile,
                       child: _isLoading
@@ -231,7 +291,13 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                                 Text('Menyimpan...'),
                               ],
                             )
-                          : const Text('Simpan'),
+                          : Text(
+                              'Simpan ${widget.formLabel}',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
                     ),
                   ),
                 ],
@@ -240,7 +306,29 @@ class _EditProfileScreenState extends State<EditProfileScreen>
           ),
         ),
       ),
-    ),
     );
+  }
+
+  Widget? _getFieldIcon(String fieldName) {
+    switch (fieldName.toLowerCase()) {
+      case 'name':
+      case 'full_name':
+      case 'nama':
+        return const Icon(Icons.person);
+      case 'email':
+        return const Icon(Icons.email);
+      case 'phone':
+      case 'phone_number':
+      case 'telepon':
+        return const Icon(Icons.phone);
+      case 'address':
+      case 'alamat':
+        return const Icon(Icons.location_on);
+      case 'company':
+      case 'perusahaan':
+        return const Icon(Icons.business);
+      default:
+        return const Icon(Icons.edit);
+    }
   }
 }
