@@ -152,17 +152,9 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
         icon: Icons.pin_drop,
         title: 'Peta Infrastruktur',
         onTap: () {
-          RoleGuard.check(
-            context: context,
-            permissions: 'area',
-            action: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => const InfrastructureHome(),
-                ),
-              );
-            },
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const InfrastructureHome()),
           );
         },
       ),

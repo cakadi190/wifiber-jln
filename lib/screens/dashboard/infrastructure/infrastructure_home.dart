@@ -145,6 +145,8 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
         children: [
           TileLayer(
             urlTemplate: 'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+            subdomains: const ['a', 'b', 'c'],
+            userAgentPackageName: 'com.kodinus.wifiber',
             additionalOptions: {'userAgentPackageName': 'com.kodinus.wifiber'},
           ),
           MarkerLayer(
