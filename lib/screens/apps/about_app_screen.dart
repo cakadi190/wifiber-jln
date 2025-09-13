@@ -93,7 +93,7 @@ class AboutAppScreen extends StatelessWidget {
                   "WhatsApp / Telepon",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                subtitle: Text("0853-3338-3432"),
+                subtitle: Text("+62 853-3338-3432"),
               ),
               const ListTile(
                 leading: Icon(RemixIcons.mail_line),
@@ -101,7 +101,7 @@ class AboutAppScreen extends StatelessWidget {
                   "Email",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                subtitle: Text("admin@wifiber.web.id"),
+                subtitle: Text("superadmin@mywifi.biz.id"),
               ),
 
               ListTile(
@@ -110,9 +110,9 @@ class AboutAppScreen extends StatelessWidget {
                   "Website",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                subtitle: Text("https://www.wifiber.web.id"),
+                subtitle: Text("https://mywifi.biz.id"),
                 onTap: () async {
-                  final url = Uri.parse('https://www.wifiber.web.id');
+                  final url = Uri.parse('https://mywifi.biz.id');
                   try {
                     if (await canLaunchUrl(url)) {
                       await launchUrl(
