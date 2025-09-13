@@ -62,11 +62,20 @@ class _HomeTabState extends State<HomeTab> {
             child: SafeArea(
               child: Column(
                 children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: DashboardSummary(
-                      onTransactionTap: widget.onTransactionTap,
-                    ),
+                  Consumer<AuthProvider>(
+                    builder: (context, authProvider, _) {
+                      if (authProvider.user?.permissions.contains('finance') !=
+                          true) {
+                        SizedBox();
+                      }
+
+                      return SizedBox(
+                        width: double.infinity,
+                        child: DashboardSummary(
+                          onTransactionTap: widget.onTransactionTap,
+                        ),
+                      );
+                    },
                   ),
 
                   MainMenu(
@@ -75,7 +84,8 @@ class _HomeTabState extends State<HomeTab> {
                     onBillMenuTapped: widget.onBookKeepingTap,
                   ),
 
-                  if (authProvider.user?.permissions.contains('finance') == true)
+                  if (authProvider.user?.permissions.contains('finance') ==
+                      true)
                     SizedBox(
                       width: double.infinity,
                       child: FinanceSummary(
