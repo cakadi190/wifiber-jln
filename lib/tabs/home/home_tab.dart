@@ -75,6 +75,8 @@ class _HomeTabState extends State<HomeTab> {
                       ),
                     ),
 
+                  if (!hasFinancePermission) SizedBox(height: 24),
+
                   MainMenu(
                     onTicketMenuTapped: widget.onTicketTap,
                     onTransactionMenuTapped: widget.onTransactionTap,
