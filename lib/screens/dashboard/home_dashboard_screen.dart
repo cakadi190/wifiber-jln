@@ -211,36 +211,10 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                     label: 'Keuangan',
                   ),
                   BottomNavigationBarItem(
-                    icon: Container(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 6,
-                        horizontal: 12,
-                      ),
-                      decoration: BoxDecoration(
-                        color: AppColors.primary,
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Column(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          PhosphorIcon(
-                            PhosphorIcons.qrCode(PhosphorIconsStyle.duotone),
-                            size: 20,
-                            color: Colors.white,
-                          ),
-                          const SizedBox(height: 2),
-                          const Text(
-                            'Bayar',
-                            style: TextStyle(
-                              color: Colors.white,
-                              fontSize: 10,
-                              fontWeight: FontWeight.w600,
-                            ),
-                          ),
-                        ],
-                      ),
+                    icon: PhosphorIcon(
+                      PhosphorIcons.listChecks(PhosphorIconsStyle.duotone),
                     ),
-                    label: '',
+                    label: 'Tagihan',
                   ),
                   BottomNavigationBarItem(
                     icon: PhosphorIcon(
