@@ -9,6 +9,7 @@ import 'package:wifiber/providers/employee_provider.dart';
 import 'package:wifiber/screens/dashboard/employees/employee_form_screen.dart';
 import 'package:wifiber/screens/dashboard/employees/employee_detail_modal.dart';
 import 'package:wifiber/screens/dashboard/employees/employee_delete_modal.dart';
+import 'package:wifiber/components/reusables/options_bottom_sheet.dart';
 
 class EmployeeListScreen extends StatefulWidget {
   const EmployeeListScreen({super.key});
@@ -71,6 +72,63 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
           EmployeeDeleteModal.show(context, employee);
         },
       ),
+    );
+  }
+
+  void _showActionBottomSheet(Employee employee) {
+    showOptionModalBottomSheet(
+      context: context,
+      header: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: AppColors.primary,
+            child: Text(
+              employee.name.isNotEmpty ? employee.name[0] : '?',
+              style: const TextStyle(color: Colors.white),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              employee.name,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
+        ],
+      ),
+      items: [
+        OptionMenuItem(
+          icon: Icons.visibility,
+          title: 'Lihat Detail',
+          subtitle: 'Tampilkan informasi karyawan',
+          onTap: () {
+            Navigator.pop(context);
+            _showDetail(employee);
+          },
+        ),
+        OptionMenuItem(
+          icon: Icons.edit,
+          title: 'Edit Karyawan',
+          subtitle: 'Ubah data karyawan',
+          onTap: () {
+            Navigator.pop(context);
+            _navigateToForm(employee: employee);
+          },
+        ),
+        OptionMenuItem(
+          icon: Icons.delete,
+          title: 'Hapus Karyawan',
+          subtitle: 'Hapus karyawan dari daftar',
+          isDestructive: true,
+          onTap: () {
+            Navigator.pop(context);
+            EmployeeDeleteModal.show(context, employee);
+          },
+        ),
+      ],
     );
   }
 
@@ -153,7 +211,10 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                               child: ListTile(
                                 title: Text(employee.name),
                                 subtitle: Text(employee.username ?? ''),
+                                trailing: const Icon(Icons.more_vert,
+                                    color: Colors.grey),
                                 onTap: () => _showDetail(employee),
+                                onLongPress: () => _showActionBottomSheet(employee),
                               ),
                             );
                           },
