@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/config/app_colors.dart';
+import 'package:wifiber/components/reusables/options_bottom_sheet.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/middlewares/auth_middleware.dart';
 import 'package:wifiber/models/employee.dart';
@@ -91,6 +92,45 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
     setState(() => _isLoading = false);
   }
 
+  void _showRolePicker() {
+    showOptionModalBottomSheet(
+      context: context,
+      header: const Text(
+        'Pilih Role',
+        style: TextStyle(
+          fontSize: 18,
+          fontWeight: FontWeight.w600,
+        ),
+      ),
+      items: [
+        OptionMenuItem(
+          icon: Icons.supervisor_account,
+          title: 'Super Administrator',
+          onTap: () {
+            setState(() => _roleController.text = 'Super Administrator');
+            Navigator.pop(context);
+          },
+        ),
+        OptionMenuItem(
+          icon: Icons.admin_panel_settings,
+          title: 'Admin',
+          onTap: () {
+            setState(() => _roleController.text = 'Admin');
+            Navigator.pop(context);
+          },
+        ),
+        OptionMenuItem(
+          icon: Icons.build,
+          title: 'Teknisi',
+          onTap: () {
+            setState(() => _roleController.text = 'Teknisi');
+            Navigator.pop(context);
+          },
+        ),
+      ],
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return SystemUiWrapper(
@@ -166,8 +206,14 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
                           _buildTextField(
                             controller: _roleController,
                             label: 'Role',
-                            hint: 'Masukkan role',
+                            hint: 'Pilih role',
                             icon: Icons.badge,
+                            readOnly: true,
+                            onTap: _showRolePicker,
+                            validator: (v) =>
+                                v == null || v.trim().isEmpty
+                                    ? 'Role wajib dipilih'
+                                    : null,
                           ),
                           const SizedBox(height: 32),
                           ElevatedButton(
@@ -222,12 +268,16 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
     TextInputType? keyboardType,
     String? Function(String?)? validator,
     bool obscureText = false,
+    bool readOnly = false,
+    VoidCallback? onTap,
   }) {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
       validator: validator,
       obscureText: obscureText,
+      readOnly: readOnly,
+      onTap: onTap,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
