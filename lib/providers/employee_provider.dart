@@ -291,7 +291,7 @@ class EmployeeProvider extends SafeChangeNotifier {
 
     if (error is ValidationException) {
       // Handle ValidationException dari HttpService
-      message = error.message ?? 'Validasi gagal';
+      message = error.message;
       validationErrors = error.errors;
 
       _debugLog('ValidationException caught: $message');
