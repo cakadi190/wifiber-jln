@@ -88,19 +88,6 @@ class _MainMenuState extends State<MainMenu> with TickerProviderStateMixin {
         },
       ),
       MenuItem(
-        icon: Icons.people,
-        title: 'Data Karyawan',
-        permissions: 'employee',
-        onTap: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => const EmployeeListScreen(),
-            ),
-          );
-        },
-      ),
-      MenuItem(
         icon: Icons.warning,
         title: 'Keluhan',
         permissions: 'ticket',

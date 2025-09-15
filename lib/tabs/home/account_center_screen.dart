@@ -7,6 +7,7 @@ import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/controllers/tabs/account_center_controller.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/screens/apps/about_app_screen.dart';
+import 'package:wifiber/screens/dashboard/employees/employee_list_screen.dart';
 import 'package:wifiber/screens/dashboard/profile/main_profile_screen.dart';
 import 'package:wifiber/screens/profile/change_password_screen.dart';
 import 'package:wifiber/screens/dashboard/areas/area_list_screen.dart';
@@ -134,6 +135,8 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
             user?.permissions.contains('package') ?? false;
         final hasCompanyPermission =
             user?.permissions.contains('company-profile') ?? false;
+        final hasEmployeePermission =
+            user?.permissions.contains('employee') ?? false;
 
         return Column(
           children: [
@@ -186,14 +189,14 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
                   color: AppColors.primary,
                 ),
                 onTap: () {
-                    _accountCenterController.navigateToScreen(
-                      screen: const PackageListScreen(),
-                      context: context,
-                    );
-                  },
-                ),
+                  _accountCenterController.navigateToScreen(
+                    screen: const PackageListScreen(),
+                    context: context,
+                  );
+                },
+              ),
 
-              if (hasCompanyPermission)
+            if (hasCompanyPermission)
               ListTile(
                 leading: PhosphorIcon(
                   PhosphorIcons.buildingOffice(PhosphorIconsStyle.duotone),
@@ -207,6 +210,25 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
                 onTap: () {
                   _accountCenterController.navigateToScreen(
                     screen: const CompanyProfileScreen(),
+                    context: context,
+                  );
+                },
+              ),
+
+            if (hasEmployeePermission)
+              ListTile(
+                leading: PhosphorIcon(
+                  PhosphorIcons.usersFour(PhosphorIconsStyle.duotone),
+                  color: AppColors.primary,
+                ),
+                title: const Text('Karyawan'),
+                trailing: const Icon(
+                  Icons.chevron_right_rounded,
+                  color: AppColors.primary,
+                ),
+                onTap: () {
+                  _accountCenterController.navigateToScreen(
+                    screen: const EmployeeListScreen(),
                     context: context,
                   );
                 },
