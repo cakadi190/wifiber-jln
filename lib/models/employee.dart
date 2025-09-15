@@ -2,15 +2,17 @@ class Employee {
   final String id;
   final String name;
   final String? email;
-  final String? phone;
-  final String? position;
+  final String? username;
+  final String? role;
+  final String? picture;
 
   Employee({
     required this.id,
     required this.name,
     this.email,
-    this.phone,
-    this.position,
+    this.username,
+    this.role,
+    this.picture,
   });
 
   factory Employee.fromJson(Map<String, dynamic> json) {
@@ -18,8 +20,9 @@ class Employee {
       id: json['id'].toString(),
       name: json['name'] ?? '',
       email: json['email'],
-      phone: json['phone'],
-      position: json['position'],
+      username: json['username'],
+      role: json['role']?.toString(),
+      picture: json['picture'],
     );
   }
 
@@ -28,8 +31,9 @@ class Employee {
       'id': id,
       'name': name,
       'email': email,
-      'phone': phone,
-      'position': position,
+      'username': username,
+      'role': role,
+      'picture': picture,
     };
   }
 }

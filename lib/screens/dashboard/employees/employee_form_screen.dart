@@ -21,8 +21,9 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
   final _formKey = GlobalKey<FormState>();
   final _nameController = TextEditingController();
   final _emailController = TextEditingController();
-  final _phoneController = TextEditingController();
-  final _positionController = TextEditingController();
+  final _usernameController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _roleController = TextEditingController();
 
   bool _isLoading = false;
 
@@ -32,8 +33,8 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
     if (widget.employee != null) {
       _nameController.text = widget.employee!.name;
       _emailController.text = widget.employee!.email ?? '';
-      _phoneController.text = widget.employee!.phone ?? '';
-      _positionController.text = widget.employee!.position ?? '';
+      _usernameController.text = widget.employee!.username ?? '';
+      _roleController.text = widget.employee!.role ?? '';
     }
   }
 
@@ -41,8 +42,9 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
   void dispose() {
     _nameController.dispose();
     _emailController.dispose();
-    _phoneController.dispose();
-    _positionController.dispose();
+    _usernameController.dispose();
+    _passwordController.dispose();
+    _roleController.dispose();
     super.dispose();
   }
 
@@ -54,9 +56,13 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
     final data = {
       'name': _nameController.text.trim(),
       'email': _emailController.text.trim(),
-      'phone': _phoneController.text.trim(),
-      'position': _positionController.text.trim(),
+      'username': _usernameController.text.trim(),
+      'role': _roleController.text.trim(),
     };
+
+    if (_passwordController.text.trim().isNotEmpty) {
+      data['password'] = _passwordController.text.trim();
+    }
 
     bool success = false;
     if (widget.isEdit && widget.employee != null) {
@@ -143,17 +149,24 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
                           ),
                           const SizedBox(height: 16),
                           _buildTextField(
-                            controller: _phoneController,
-                            label: 'No. Telepon',
-                            hint: 'Masukkan nomor telepon',
-                            icon: Icons.phone,
-                            keyboardType: TextInputType.phone,
+                            controller: _usernameController,
+                            label: 'Username',
+                            hint: 'Masukkan username',
+                            icon: Icons.person_outline,
                           ),
                           const SizedBox(height: 16),
                           _buildTextField(
-                            controller: _positionController,
-                            label: 'Jabatan',
-                            hint: 'Masukkan jabatan',
+                            controller: _passwordController,
+                            label: 'Password',
+                            hint: 'Masukkan password',
+                            icon: Icons.lock,
+                            obscureText: true,
+                          ),
+                          const SizedBox(height: 16),
+                          _buildTextField(
+                            controller: _roleController,
+                            label: 'Role',
+                            hint: 'Masukkan role',
                             icon: Icons.badge,
                           ),
                           const SizedBox(height: 32),
@@ -208,11 +221,13 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
     required IconData icon,
     TextInputType? keyboardType,
     String? Function(String?)? validator,
+    bool obscureText = false,
   }) {
     return TextFormField(
       controller: controller,
       keyboardType: keyboardType,
       validator: validator,
+      obscureText: obscureText,
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
