@@ -6,6 +6,7 @@ import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/providers/bills_provider.dart';
 import 'package:wifiber/providers/complaint_provider.dart';
 import 'package:wifiber/providers/customer_provider.dart';
+import 'package:wifiber/providers/employee_provider.dart';
 import 'package:wifiber/providers/registrant_provider.dart';
 import 'package:wifiber/providers/router_provider.dart';
 import 'package:wifiber/providers/transaction_provider.dart';
@@ -16,6 +17,7 @@ import 'package:wifiber/screens/splash_screen.dart';
 import 'package:wifiber/services/bills_service.dart';
 import 'package:wifiber/services/complaint_service.dart';
 import 'package:wifiber/services/customer_service.dart';
+import 'package:wifiber/services/employee_service.dart';
 import 'package:wifiber/services/registrant_service.dart';
 import 'package:wifiber/services/router_service.dart';
 import 'package:wifiber/services/transaction_service.dart';
@@ -36,6 +38,9 @@ void main() {
         ),
         ChangeNotifierProvider(
           create: (_) => CustomerProvider(CustomerService()),
+        ),
+        ChangeNotifierProvider(
+          create: (_) => EmployeeProvider(EmployeeService()),
         ),
         ChangeNotifierProvider(
           create: (_) => ComplaintProvider(ComplaintService()),
