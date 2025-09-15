@@ -207,6 +207,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                           itemBuilder: (context, index) {
                             final employee = provider.employees[index];
                             return Card(
+                              elevation: 0,
                               margin: const EdgeInsets.only(bottom: 12),
                               child: ListTile(
                                 title: Text(employee.name),
