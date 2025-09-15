@@ -152,7 +152,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                               margin: const EdgeInsets.only(bottom: 12),
                               child: ListTile(
                                 title: Text(employee.name),
-                                subtitle: Text(employee.position ?? ''),
+                                subtitle: Text(employee.username ?? ''),
                                 onTap: () => _showDetail(employee),
                               ),
                             );

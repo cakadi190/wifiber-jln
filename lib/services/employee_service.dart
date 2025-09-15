@@ -51,7 +51,7 @@ class EmployeeService {
 
   Future<Employee> updateEmployee(String id, Map<String, dynamic> data) async {
     try {
-      final response = await _http.put(
+      final response = await _http.post(
         '$path/$id',
         body: json.encode(data),
         requiresAuth: true,

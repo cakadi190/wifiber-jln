@@ -51,10 +51,10 @@ class EmployeeDetailModal extends StatelessWidget {
             const SizedBox(height: 8),
             if (employee.email != null && employee.email!.isNotEmpty)
               Text(employee.email!),
-            if (employee.phone != null && employee.phone!.isNotEmpty)
-              Text(employee.phone!),
-            if (employee.position != null && employee.position!.isNotEmpty)
-              Text(employee.position!),
+            if (employee.username != null && employee.username!.isNotEmpty)
+              Text('Username: ${employee.username!}'),
+            if (employee.role != null && employee.role!.isNotEmpty)
+              Text('Role: ${employee.role!}'),
             const SizedBox(height: 24),
             Row(
               children: [
