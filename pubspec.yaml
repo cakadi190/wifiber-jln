@@ -1,7 +1,7 @@
 name: wifiber
 description: "Aplikasi portal billing Wifi milik PT Jawara Lintas Nusantara"
 publish_to: "none"
-version: 1.0.5+5
+version: 1.0.6+1
 environment:
   sdk: ^3.8.1
 
@@ -44,6 +44,7 @@ dependencies:
   permission_handler: ^12.0.1
   flutter_image_compress: ^2.4.0
 
+  meta: any
 dev_dependencies:
   flutter_test:
     sdk: flutter

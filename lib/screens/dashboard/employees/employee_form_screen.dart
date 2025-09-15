@@ -28,7 +28,7 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
 
   bool _isLoading = false;
   String? _selectedRoleValue;
-  Map<String, String> _fieldErrors = {}; // Untuk menyimpan error per field
+  final Map<String, String> _fieldErrors = {}; // Untuk menyimpan error per field
 
   // Mapping role untuk konversi
   final Map<String, String> _roleMapping = {
