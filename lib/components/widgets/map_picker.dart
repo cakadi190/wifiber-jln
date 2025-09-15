@@ -85,19 +85,17 @@ class _MapPickerState extends State<MapPicker> {
                 width: 50,
                 height: 50,
                 alignment: Alignment.topCenter,
-                child: Container(
-                  child: const Icon(
-                    Icons.location_on,
-                    color: Colors.red,
-                    size: 40,
-                    shadows: [
-                      Shadow(
-                        blurRadius: 3,
-                        color: Colors.black26,
-                        offset: Offset(0, 2),
-                      ),
-                    ],
-                  ),
+                child: const Icon(
+                  Icons.location_on,
+                  color: Colors.red,
+                  size: 40,
+                  shadows: [
+                    Shadow(
+                      blurRadius: 3,
+                      color: Colors.black26,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
                 ),
               ),
             ],

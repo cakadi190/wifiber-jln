@@ -78,8 +78,8 @@ class _CreateMikrotikScreenState extends State<CreateMikrotikScreen>
         toleranceDays: int.parse(_toleranceDaysController.text.trim()),
         isolateAction: _isolateAction,
         isolateProfile:
-            _isolateAction == 'change-profile' &&
-                _isolateProfileController.text.trim().isNotEmpty
+        _isolateAction == 'change-profile' &&
+            _isolateProfileController.text.trim().isNotEmpty
             ? _isolateProfileController.text.trim()
             : null,
         isAutoIsolate: _isAutoIsolate,
@@ -144,7 +144,7 @@ class _CreateMikrotikScreenState extends State<CreateMikrotikScreen>
               return SingleChildScrollView(
                 child: ConstrainedBox(
                   constraints:
-                      BoxConstraints(minHeight: constraints.maxHeight),
+                  BoxConstraints(minHeight: constraints.maxHeight),
                   child: Container(
                     width: double.infinity,
                     padding: const EdgeInsets.all(16),
@@ -162,251 +162,251 @@ class _CreateMikrotikScreenState extends State<CreateMikrotikScreen>
                         children: [
                           const SizedBox(height: 16),
 
-                    _buildTextFormField(
-                      field: 'name',
-                      controller: _nameController,
-                      label: 'Nama Router',
-                      hint: 'Masukkan nama router',
-                      icon: Icons.router,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Nama router tidak boleh kosong';
-                        }
-                        return null;
-                      },
-                    ),
+                          _buildTextFormField(
+                            field: 'name',
+                            controller: _nameController,
+                            label: 'Nama Router',
+                            hint: 'Masukkan nama router',
+                            icon: Icons.router,
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Nama router tidak boleh kosong';
+                              }
+                              return null;
+                            },
+                          ),
 
-                    const SizedBox(height: 16),
+                          const SizedBox(height: 16),
 
-                    _buildTextFormField(
-                      field: 'hostname',
-                      controller: _hostnameController,
-                      label: 'Hostname/IP Address',
-                      hint: 'Masukkan hostname atau IP address',
-                      icon: Icons.dns,
-                      keyboardType: TextInputType.url,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Hostname tidak boleh kosong';
-                        }
-                        return null;
-                      },
-                    ),
+                          _buildTextFormField(
+                            field: 'hostname',
+                            controller: _hostnameController,
+                            label: 'Hostname/IP Address',
+                            hint: 'Masukkan hostname atau IP address',
+                            icon: Icons.dns,
+                            keyboardType: TextInputType.url,
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Hostname tidak boleh kosong';
+                              }
+                              return null;
+                            },
+                          ),
 
-                    const SizedBox(height: 16),
+                          const SizedBox(height: 16),
 
-                    _buildTextFormField(
-                      field: 'username',
-                      controller: _usernameController,
-                      label: 'Username',
-                      hint: 'Masukkan username',
-                      icon: Icons.person,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Username tidak boleh kosong';
-                        }
-                        return null;
-                      },
-                    ),
+                          _buildTextFormField(
+                            field: 'username',
+                            controller: _usernameController,
+                            label: 'Username',
+                            hint: 'Masukkan username',
+                            icon: Icons.person,
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Username tidak boleh kosong';
+                              }
+                              return null;
+                            },
+                          ),
 
-                    const SizedBox(height: 16),
+                          const SizedBox(height: 16),
 
-                    _buildTextFormField(
-                      field: 'password',
-                      controller: _passwordController,
-                      label: 'Password',
-                      hint: 'Masukkan password',
-                      icon: Icons.lock,
-                      obscureText: !_isPasswordVisible,
-                      suffixIcon: IconButton(
-                        icon: Icon(
-                          _isPasswordVisible
-                              ? Icons.visibility
-                              : Icons.visibility_off,
-                          color: Colors.grey,
-                        ),
-                        onPressed: () {
-                          setState(() {
-                            _isPasswordVisible = !_isPasswordVisible;
-                          });
-                        },
-                      ),
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Password tidak boleh kosong';
-                        }
-                        return null;
-                      },
-                    ),
+                          _buildTextFormField(
+                            field: 'password',
+                            controller: _passwordController,
+                            label: 'Password',
+                            hint: 'Masukkan password',
+                            icon: Icons.lock,
+                            obscureText: !_isPasswordVisible,
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _isPasswordVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                                color: Colors.grey,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _isPasswordVisible = !_isPasswordVisible;
+                                });
+                              },
+                            ),
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Password tidak boleh kosong';
+                              }
+                              return null;
+                            },
+                          ),
 
-                    const SizedBox(height: 16),
+                          const SizedBox(height: 16),
 
-                    _buildTextFormField(
-                      field: 'port',
-                      controller: _portController,
-                      label: 'Port',
-                      hint: 'Masukkan port (default: 8728)',
-                      icon: Icons.settings_input_composite,
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Port tidak boleh kosong';
-                        }
-                        final port = int.tryParse(value.trim());
-                        if (port == null || port < 1 || port > 65535) {
-                          return 'Port harus berupa angka antara 1-65535';
-                        }
-                        return null;
-                      },
-                    ),
+                          _buildTextFormField(
+                            field: 'port',
+                            controller: _portController,
+                            label: 'Port',
+                            hint: 'Masukkan port (default: 8728)',
+                            icon: Icons.settings_input_composite,
+                            keyboardType: TextInputType.number,
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Port tidak boleh kosong';
+                              }
+                              final port = int.tryParse(value.trim());
+                              if (port == null || port < 1 || port > 65535) {
+                                return 'Port harus berupa angka antara 1-65535';
+                              }
+                              return null;
+                            },
+                          ),
 
-                    const SizedBox(height: 16),
+                          const SizedBox(height: 16),
 
-                    _buildTextFormField(
-                      field: 'tolerance_days',
-                      controller: _toleranceDaysController,
-                      label: 'Hari Toleransi',
-                      hint: 'Masukkan jumlah hari toleransi',
-                      icon: Icons.calendar_today,
-                      keyboardType: TextInputType.number,
-                      validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
-                          return 'Hari toleransi tidak boleh kosong';
-                        }
-                        final days = int.tryParse(value.trim());
-                        if (days == null || days < 0) {
-                          return 'Hari toleransi harus berupa angka positif';
-                        }
-                        return null;
-                      },
-                    ),
+                          _buildTextFormField(
+                            field: 'tolerance_days',
+                            controller: _toleranceDaysController,
+                            label: 'Hari Toleransi',
+                            hint: 'Masukkan jumlah hari toleransi',
+                            icon: Icons.calendar_today,
+                            keyboardType: TextInputType.number,
+                            validator: (value) {
+                              if (value == null || value.trim().isEmpty) {
+                                return 'Hari toleransi tidak boleh kosong';
+                              }
+                              final days = int.tryParse(value.trim());
+                              if (days == null || days < 0) {
+                                return 'Hari toleransi harus berupa angka positif';
+                              }
+                              return null;
+                            },
+                          ),
 
-                    const SizedBox(height: 16),
+                          const SizedBox(height: 16),
 
-                    GestureDetector(
-                      onTap: () => _showIsolateActionBottomSheet(),
-                      child: Container(
-                        padding: EdgeInsets.symmetric(
-                          horizontal: 16,
-                          vertical: 16,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey.shade300),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: Row(
-                          children: [
-                            Icon(Icons.block, color: Colors.grey),
-                            SizedBox(width: 12),
-                            Expanded(
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
+                          GestureDetector(
+                            onTap: () => _showIsolateActionBottomSheet(),
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 16,
+                                vertical: 16,
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey.shade300),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Row(
                                 children: [
-                                  Text(
-                                    'Aksi Isolasi',
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: Colors.grey.shade600,
+                                  Icon(Icons.block, color: Colors.grey),
+                                  SizedBox(width: 12),
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          'Aksi Isolasi',
+                                          style: TextStyle(
+                                            fontSize: 12,
+                                            color: Colors.grey.shade600,
+                                          ),
+                                        ),
+                                        SizedBox(height: 4),
+                                        Text(
+                                          _isolateAction.isEmpty
+                                              ? '- Pilih -'
+                                              : _isolateActions[_isolateAction]!,
+                                          style: TextStyle(
+                                            fontSize: 16,
+                                            color: _isolateAction.isEmpty
+                                                ? Colors.grey.shade600
+                                                : Colors.black,
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                  SizedBox(height: 4),
-                                  Text(
-                                    _isolateAction.isEmpty
-                                        ? '- Pilih -'
-                                        : _isolateActions[_isolateAction]!,
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: _isolateAction.isEmpty
-                                          ? Colors.grey.shade600
-                                          : Colors.black,
-                                    ),
-                                  ),
+                                  Icon(Icons.arrow_drop_down, color: Colors.grey),
                                 ],
                               ),
                             ),
-                            Icon(Icons.arrow_drop_down, color: Colors.grey),
+                          ),
+
+                          if (_isolateAction == 'change-profile') ...[
+                            const SizedBox(height: 16),
+                            _buildTextFormField(
+                              field: 'isolate_profile',
+                              controller: _isolateProfileController,
+                              label: 'Profil Isolasi',
+                              hint: 'Masukkan profil isolasi',
+                              icon: Icons.person_outline,
+                              validator: (value) {
+                                if (_isolateAction == 'change-profile' &&
+                                    (value == null || value.trim().isEmpty)) {
+                                  return 'Profil isolasi tidak boleh kosong';
+                                }
+                                return null;
+                              },
+                            ),
                           ],
-                        ),
-                      ),
-                    ),
 
-                    if (_isolateAction == 'change-profile') ...[
-                      const SizedBox(height: 16),
-                      _buildTextFormField(
-                        field: 'isolate_profile',
-                        controller: _isolateProfileController,
-                        label: 'Profil Isolasi',
-                        hint: 'Masukkan profil isolasi',
-                        icon: Icons.person_outline,
-                        validator: (value) {
-                          if (_isolateAction == 'change-profile' &&
-                              (value == null || value.trim().isEmpty)) {
-                            return 'Profil isolasi tidak boleh kosong';
-                          }
-                          return null;
-                        },
-                      ),
-                    ],
+                          const SizedBox(height: 16),
 
-                    const SizedBox(height: 16),
-
-                    Container(
-                      padding: EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(8),
-                      ),
-                      child: Row(
-                        children: [
-                          Icon(Icons.auto_awesome, color: Colors.grey),
-                          SizedBox(width: 12),
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                          Container(
+                            padding: EdgeInsets.all(16),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey.shade300),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Row(
                               children: [
-                                Text(
-                                  'Auto Isolasi',
-                                  style: TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w500,
+                                Icon(Icons.auto_awesome, color: Colors.grey),
+                                SizedBox(width: 12),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Auto Isolasi',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                      Text(
+                                        'Aktifkan isolasi otomatis',
+                                        style: TextStyle(
+                                          fontSize: 12,
+                                          color: Colors.grey.shade600,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                                Text(
-                                  'Aktifkan isolasi otomatis',
-                                  style: TextStyle(
-                                    fontSize: 12,
-                                    color: Colors.grey.shade600,
-                                  ),
+                                Switch(
+                                  value: _isAutoIsolate,
+                                  onChanged: (value) {
+                                    setState(() {
+                                      _isAutoIsolate = value;
+                                    });
+                                  },
+                                  activeThumbColor: AppColors.primary,
                                 ),
                               ],
                             ),
                           ),
-                          Switch(
-                            value: _isAutoIsolate,
-                            onChanged: (value) {
-                              setState(() {
-                                _isAutoIsolate = value;
-                              });
-                            },
-                            activeThumbColor: AppColors.primary,
-                          ),
-                        ],
-                      ),
-                    ),
 
-                    const SizedBox(height: 32),
+                          const SizedBox(height: 32),
 
-                    ElevatedButton(
-                      onPressed: _isLoading ? null : _submitForm,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                      ),
-                      child: _isLoading
-                          ? SizedBox(
+                          ElevatedButton(
+                            onPressed: _isLoading ? null : _submitForm,
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              padding: EdgeInsets.symmetric(vertical: 16),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: _isLoading
+                                ? SizedBox(
                               height: 20,
                               width: 20,
                               child: CircularProgressIndicator(
@@ -414,7 +414,7 @@ class _CreateMikrotikScreenState extends State<CreateMikrotikScreen>
                                 strokeWidth: 2,
                               ),
                             )
-                          : Text(
+                                : Text(
                               'Tambah Router',
                               style: TextStyle(
                                 fontSize: 16,
@@ -422,15 +422,18 @@ class _CreateMikrotikScreenState extends State<CreateMikrotikScreen>
                                 color: Colors.white,
                               ),
                             ),
-                    ),
+                          ),
 
-                    const SizedBox(height: 16),
-                  ],
+                          const SizedBox(height: 16),
+                        ],
+                      ),
+                    ),
+                  ),
                 ),
-              ),
-            ),
-          );
-        },
+              );
+            },
+          ),
+        ),
       ),
     );
   }
@@ -463,15 +466,15 @@ class _CreateMikrotikScreenState extends State<CreateMikrotikScreen>
             ),
             child: selected
                 ? Center(
-                    child: Container(
-                      width: 12,
-                      height: 12,
-                      decoration: const BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                  )
+              child: Container(
+                width: 12,
+                height: 12,
+                decoration: const BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: AppColors.primary,
+                ),
+              ),
+            )
                 : null,
           ),
           title: entry.value,

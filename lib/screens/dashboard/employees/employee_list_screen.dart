@@ -6,7 +6,6 @@ import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/middlewares/auth_middleware.dart';
 import 'package:wifiber/models/employee.dart';
 import 'package:wifiber/providers/employee_provider.dart';
-import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/screens/dashboard/employees/employee_form_screen.dart';
 import 'package:wifiber/screens/dashboard/employees/employee_detail_modal.dart';
 import 'package:wifiber/screens/dashboard/employees/employee_delete_modal.dart';
@@ -52,7 +51,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
       ),
     );
     if (mounted) {
-      context.read(EmployeeProvider>().refresh();
+      context.read<EmployeeProvider>().refresh();
     }
   }
 
@@ -112,9 +111,9 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                   child: TextField(
                     controller: _searchController,
                     onChanged: _onSearchChanged,
-                    decoration: InputDecoration(
+                    decoration: const InputDecoration(
                       hintText: 'Cari karyawan',
-                      prefixIcon: const Icon(Icons.search),
+                      prefixIcon: Icon(Icons.search),
                     ),
                   ),
                 ),
