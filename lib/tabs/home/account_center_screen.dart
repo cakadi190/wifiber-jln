@@ -11,6 +11,7 @@ import 'package:wifiber/screens/dashboard/profile/main_profile_screen.dart';
 import 'package:wifiber/screens/profile/change_password_screen.dart';
 import 'package:wifiber/screens/dashboard/areas/area_list_screen.dart';
 import 'package:wifiber/screens/dashboard/packages/package_list_screen.dart';
+import 'package:wifiber/screens/dashboard/company/company_profile_screen.dart';
 
 class AccountCenterScreen extends StatefulWidget {
   const AccountCenterScreen({super.key, this.onLogoutTap});
@@ -131,6 +132,8 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
         final hasAreaPermission = user?.permissions.contains('area') ?? false;
         final hasPackagePermission =
             user?.permissions.contains('package') ?? false;
+        final hasCompanyPermission =
+            user?.permissions.contains('company-profile') ?? false;
 
         return Column(
           children: [
@@ -183,30 +186,31 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
                   color: AppColors.primary,
                 ),
                 onTap: () {
+                    _accountCenterController.navigateToScreen(
+                      screen: const PackageListScreen(),
+                      context: context,
+                    );
+                  },
+                ),
+
+              if (hasCompanyPermission)
+              ListTile(
+                leading: PhosphorIcon(
+                  PhosphorIcons.buildingOffice(PhosphorIconsStyle.duotone),
+                  color: AppColors.primary,
+                ),
+                title: const Text('Detail Perusahaan'),
+                trailing: const Icon(
+                  Icons.chevron_right_rounded,
+                  color: AppColors.primary,
+                ),
+                onTap: () {
                   _accountCenterController.navigateToScreen(
-                    screen: const PackageListScreen(),
+                    screen: const CompanyProfileScreen(),
                     context: context,
                   );
                 },
               ),
-
-            ListTile(
-              leading: PhosphorIcon(
-                PhosphorIcons.buildingOffice(PhosphorIconsStyle.duotone),
-                color: AppColors.primary,
-              ),
-              title: const Text('Detail Perusahaan'),
-              trailing: const Icon(
-                Icons.chevron_right_rounded,
-                color: AppColors.primary,
-              ),
-              onTap: () {
-                // _accountCenterController.navigateToScreen(
-                //   screen: const AboutAppScreen(),
-                //   context: context,
-                // );
-              },
-            ),
 
             ListTile(
               leading: PhosphorIcon(
