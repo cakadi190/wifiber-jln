@@ -17,8 +17,11 @@ class EmployeeProvider extends SafeChangeNotifier {
   Map<String, dynamic>? _validationErrors;
 
   List<Employee> get employees => _employees;
+
   bool get isLoading => _isLoading;
+
   String? get error => _error;
+
   Map<String, dynamic>? get validationErrors => _validationErrors;
 
   void _setLoading(bool value) {
@@ -48,7 +51,7 @@ class EmployeeProvider extends SafeChangeNotifier {
         print('[EmployeeProvider] StackTrace: $stackTrace');
       }
     }
-    // Gunakan developer.log untuk debugging yang lebih advanced
+
     developer.log(
       message,
       name: 'EmployeeProvider',
@@ -62,14 +65,16 @@ class EmployeeProvider extends SafeChangeNotifier {
       print('[EmployeeProvider] $operation Response Details:');
       if (response != null) {
         try {
-          // Jika response adalah string JSON
           if (response is String) {
             final decoded = jsonDecode(response);
-            final prettyJson = const JsonEncoder.withIndent('  ').convert(decoded);
+            final prettyJson = const JsonEncoder.withIndent(
+              '  ',
+            ).convert(decoded);
             print('[EmployeeProvider] Response Body: $prettyJson');
           } else {
-            // Jika response sudah dalam bentuk object
-            final prettyJson = const JsonEncoder.withIndent('  ').convert(response);
+            final prettyJson = const JsonEncoder.withIndent(
+              '  ',
+            ).convert(response);
             print('[EmployeeProvider] Response Object: $prettyJson');
           }
         } catch (e) {
@@ -96,7 +101,6 @@ class EmployeeProvider extends SafeChangeNotifier {
       _setError(errorMessage);
       _debugLog('Failed to load employees', error: e, stackTrace: stackTrace);
 
-      // Print detailed error untuk debugging
       if (kDebugMode) {
         print('[EmployeeProvider] =================================');
         print('[EmployeeProvider] LOAD EMPLOYEES ERROR DETAILS:');
@@ -133,10 +137,12 @@ class EmployeeProvider extends SafeChangeNotifier {
       return false;
     } catch (e, stackTrace) {
       final errorData = _parseError(e);
-      _setError(errorData['message'], validationErrors: errorData['validationErrors']);
+      _setError(
+        errorData['message'],
+        validationErrors: errorData['validationErrors'],
+      );
       _debugLog('Failed to create employee', error: e, stackTrace: stackTrace);
 
-      // Print detailed error untuk debugging
       if (kDebugMode) {
         print('[EmployeeProvider] =================================');
         print('[EmployeeProvider] CREATE EMPLOYEE ERROR DETAILS:');
@@ -144,9 +150,10 @@ class EmployeeProvider extends SafeChangeNotifier {
         print('[EmployeeProvider] Error Type: ${e.runtimeType}');
         print('[EmployeeProvider] Error String: ${e.toString()}');
         print('[EmployeeProvider] Parsed Message: ${errorData['message']}');
-        print('[EmployeeProvider] Validation Errors: ${errorData['validationErrors']}');
+        print(
+          '[EmployeeProvider] Validation Errors: ${errorData['validationErrors']}',
+        );
 
-        // Jika error adalah ValidationException, print detail validation
         if (e is ValidationException) {
           print('[EmployeeProvider] ValidationException Details:');
           print('[EmployeeProvider] - Message: ${e.message}');
@@ -183,10 +190,12 @@ class EmployeeProvider extends SafeChangeNotifier {
       return true;
     } catch (e, stackTrace) {
       final errorData = _parseError(e);
-      _setError(errorData['message'], validationErrors: errorData['validationErrors']);
+      _setError(
+        errorData['message'],
+        validationErrors: errorData['validationErrors'],
+      );
       _debugLog('Failed to update employee', error: e, stackTrace: stackTrace);
 
-      // Print detailed error untuk debugging
       if (kDebugMode) {
         print('[EmployeeProvider] =================================');
         print('[EmployeeProvider] UPDATE EMPLOYEE ERROR DETAILS:');
@@ -195,9 +204,10 @@ class EmployeeProvider extends SafeChangeNotifier {
         print('[EmployeeProvider] Error Type: ${e.runtimeType}');
         print('[EmployeeProvider] Error String: ${e.toString()}');
         print('[EmployeeProvider] Parsed Message: ${errorData['message']}');
-        print('[EmployeeProvider] Validation Errors: ${errorData['validationErrors']}');
+        print(
+          '[EmployeeProvider] Validation Errors: ${errorData['validationErrors']}',
+        );
 
-        // Jika error adalah ValidationException, print detail validation
         if (e is ValidationException) {
           print('[EmployeeProvider] ValidationException Details:');
           print('[EmployeeProvider] - Message: ${e.message}');
@@ -237,7 +247,6 @@ class EmployeeProvider extends SafeChangeNotifier {
       _setError(errorMessage);
       _debugLog('Failed to delete employee', error: e, stackTrace: stackTrace);
 
-      // Print detailed error untuk debugging
       if (kDebugMode) {
         print('[EmployeeProvider] =================================');
         print('[EmployeeProvider] DELETE EMPLOYEE ERROR DETAILS:');
@@ -290,13 +299,11 @@ class EmployeeProvider extends SafeChangeNotifier {
     Map<String, dynamic>? validationErrors;
 
     if (error is ValidationException) {
-      // Handle ValidationException dari HttpService
       message = error.message;
       validationErrors = error.errors;
 
       _debugLog('ValidationException caught: $message');
       _debugLog('Validation errors: ${jsonEncode(validationErrors)}');
-
     } else if (error is Exception) {
       String errorString = error.toString();
 
@@ -304,11 +311,11 @@ class EmployeeProvider extends SafeChangeNotifier {
         errorString = errorString.substring(11);
       }
 
-      // Handle specific error patterns
       if (errorString.contains('email') && errorString.contains('unique')) {
         message = 'Email sudah digunakan';
         validationErrors = {'email': 'Email sudah digunakan'};
-      } else if (errorString.contains('username') && errorString.contains('unique')) {
+      } else if (errorString.contains('username') &&
+          errorString.contains('unique')) {
         message = 'Username sudah digunakan';
         validationErrors = {'username': 'Username sudah digunakan'};
       } else if (errorString.contains('validation')) {
@@ -336,9 +343,6 @@ class EmployeeProvider extends SafeChangeNotifier {
       }
     }
 
-    return {
-      'message': message,
-      'validationErrors': validationErrors,
-    };
+    return {'message': message, 'validationErrors': validationErrors};
   }
 }
