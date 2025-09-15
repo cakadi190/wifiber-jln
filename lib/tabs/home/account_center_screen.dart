@@ -192,6 +192,24 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
 
             ListTile(
               leading: PhosphorIcon(
+                PhosphorIcons.buildingOffice(PhosphorIconsStyle.duotone),
+                color: AppColors.primary,
+              ),
+              title: const Text('Detail Perusahaan'),
+              trailing: const Icon(
+                Icons.chevron_right_rounded,
+                color: AppColors.primary,
+              ),
+              onTap: () {
+                // _accountCenterController.navigateToScreen(
+                //   screen: const AboutAppScreen(),
+                //   context: context,
+                // );
+              },
+            ),
+
+            ListTile(
+              leading: PhosphorIcon(
                 PhosphorIcons.info(PhosphorIconsStyle.duotone),
                 color: AppColors.primary,
               ),
