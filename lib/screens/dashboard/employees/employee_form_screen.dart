@@ -27,6 +27,21 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
   final _roleController = TextEditingController();
 
   bool _isLoading = false;
+  String? _selectedRoleValue;
+  Map<String, String> _fieldErrors = {}; // Untuk menyimpan error per field
+
+  // Mapping role untuk konversi
+  final Map<String, String> _roleMapping = {
+    '1': 'Super Administrator',
+    '2': 'Admin',
+    '3': 'Teknisi',
+  };
+
+  final Map<String, String> _reverseRoleMapping = {
+    'Super Administrator': '1',
+    'Admin': '2',
+    'Teknisi': '3',
+  };
 
   @override
   void initState() {
@@ -35,7 +50,18 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
       _nameController.text = widget.employee!.name;
       _emailController.text = widget.employee!.email ?? '';
       _usernameController.text = widget.employee!.username ?? '';
-      _roleController.text = widget.employee!.role ?? '';
+
+      // Handle role initialization
+      final employeeRole = widget.employee!.role ?? '';
+      if (_roleMapping.containsKey(employeeRole)) {
+        _selectedRoleValue = employeeRole;
+        _roleController.text = _roleMapping[employeeRole]!;
+      } else if (_reverseRoleMapping.containsKey(employeeRole)) {
+        _selectedRoleValue = _reverseRoleMapping[employeeRole];
+        _roleController.text = employeeRole;
+      } else {
+        _roleController.text = employeeRole;
+      }
     }
   }
 
@@ -49,7 +75,50 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
     super.dispose();
   }
 
+  void _clearFieldErrors() {
+    setState(() {
+      _fieldErrors.clear();
+    });
+  }
+
+  void _parseErrorMessage(String errorMessage) {
+    _fieldErrors.clear();
+
+    // Contoh parsing untuk berbagai format error
+    if (errorMessage.contains('validation')) {
+      // Format: "Validation failed: field_name is required"
+      final regex = RegExp(r'(\w+)\s+(is\s+\w+|sudah\s+\w+|wajib\s+\w+|tidak\s+\w+)');
+      final matches = regex.allMatches(errorMessage.toLowerCase());
+
+      for (final match in matches) {
+        final field = match.group(1);
+        final message = match.group(0);
+        if (field != null && message != null) {
+          _fieldErrors[field] = message;
+        }
+      }
+    } else if (errorMessage.contains('email')) {
+      _fieldErrors['email'] = 'Format email tidak valid';
+    } else if (errorMessage.contains('username')) {
+      _fieldErrors['username'] = 'Username sudah digunakan';
+    } else if (errorMessage.contains('name')) {
+      _fieldErrors['name'] = 'Nama tidak valid';
+    }
+
+    // Jika tidak ada field error yang spesifik, tampilkan error umum
+    if (_fieldErrors.isEmpty) {
+      _fieldErrors['general'] = errorMessage;
+    }
+  }
+
+  String? _getFieldError(String fieldName) {
+    return _fieldErrors[fieldName];
+  }
+
   Future<void> _submit() async {
+    // Clear previous errors
+    _clearFieldErrors();
+
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
@@ -58,7 +127,7 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
       'name': _nameController.text.trim(),
       'email': _emailController.text.trim(),
       'username': _usernameController.text.trim(),
-      'role': _roleController.text.trim(),
+      'role': _selectedRoleValue ?? '3',
     };
 
     if (_passwordController.text.trim().isNotEmpty) {
@@ -77,16 +146,24 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
     if (success) {
       SnackBars.success(
         context,
-        widget.isEdit ? 'Karyawan diperbarui' : 'Karyawan ditambahkan',
+        widget.isEdit ? 'Karyawan berhasil diperbarui' : 'Karyawan berhasil ditambahkan',
       );
       Navigator.pop(context, true);
     } else {
+      // Parse error untuk menampilkan detail error
+      final errorMessage = provider.error ?? 'Terjadi kesalahan yang tidak diketahui';
+      _parseErrorMessage(errorMessage);
+
+      // Tampilkan snackbar dengan error umum
       SnackBars.error(
         context,
-        widget.isEdit
+        _fieldErrors['general'] ?? (widget.isEdit
             ? 'Gagal memperbarui karyawan'
-            : 'Gagal menambahkan karyawan',
+            : 'Gagal menambahkan karyawan'),
       );
+
+      // Trigger form validation ulang untuk menampilkan field errors
+      _formKey.currentState!.validate();
     }
 
     setState(() => _isLoading = false);
@@ -107,7 +184,11 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
           icon: Icons.supervisor_account,
           title: 'Super Administrator',
           onTap: () {
-            setState(() => _roleController.text = 'Super Administrator');
+            setState(() {
+              _selectedRoleValue = '1';
+              _roleController.text = 'Super Administrator';
+              _fieldErrors.remove('role'); // Clear role error
+            });
             Navigator.pop(context);
           },
         ),
@@ -115,7 +196,11 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
           icon: Icons.admin_panel_settings,
           title: 'Admin',
           onTap: () {
-            setState(() => _roleController.text = 'Admin');
+            setState(() {
+              _selectedRoleValue = '2';
+              _roleController.text = 'Admin';
+              _fieldErrors.remove('role'); // Clear role error
+            });
             Navigator.pop(context);
           },
         ),
@@ -123,7 +208,11 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
           icon: Icons.build,
           title: 'Teknisi',
           onTap: () {
-            setState(() => _roleController.text = 'Teknisi');
+            setState(() {
+              _selectedRoleValue = '3';
+              _roleController.text = 'Teknisi';
+              _fieldErrors.remove('role'); // Clear role error
+            });
             Navigator.pop(context);
           },
         ),
@@ -174,10 +263,16 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
                             label: 'Nama',
                             hint: 'Masukkan nama karyawan',
                             icon: Icons.person,
-                            validator: (v) =>
-                                v == null || v.trim().isEmpty
-                                    ? 'Nama wajib diisi'
-                                    : null,
+                            fieldName: 'name',
+                            validator: (v) {
+                              if (v == null || v.trim().isEmpty) {
+                                return 'Nama wajib diisi';
+                              }
+                              if (v.trim().length < 2) {
+                                return 'Nama minimal 2 karakter';
+                              }
+                              return _getFieldError('name');
+                            },
                           ),
                           const SizedBox(height: 16),
                           _buildTextField(
@@ -185,7 +280,17 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
                             label: 'Email',
                             hint: 'Masukkan email',
                             icon: Icons.email,
+                            fieldName: 'email',
                             keyboardType: TextInputType.emailAddress,
+                            validator: (v) {
+                              if (v != null && v.trim().isNotEmpty) {
+                                final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
+                                if (!emailRegex.hasMatch(v.trim())) {
+                                  return 'Format email tidak valid';
+                                }
+                              }
+                              return _getFieldError('email');
+                            },
                           ),
                           const SizedBox(height: 16),
                           _buildTextField(
@@ -193,58 +298,82 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
                             label: 'Username',
                             hint: 'Masukkan username',
                             icon: Icons.person_outline,
+                            fieldName: 'username',
+                            validator: (v) {
+                              if (v != null && v.trim().isNotEmpty) {
+                                if (v.trim().length < 3) {
+                                  return 'Username minimal 3 karakter';
+                                }
+                                if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(v.trim())) {
+                                  return 'Username hanya boleh mengandung huruf, angka, dan underscore';
+                                }
+                              }
+                              return _getFieldError('username');
+                            },
                           ),
                           const SizedBox(height: 16),
                           _buildTextField(
                             controller: _passwordController,
-                            label: 'Password',
+                            label: widget.isEdit ? 'Password (kosongkan jika tidak ingin mengubah)' : 'Password',
                             hint: 'Masukkan password',
                             icon: Icons.lock,
+                            fieldName: 'password',
                             obscureText: true,
+                            validator: (v) {
+                              if (!widget.isEdit && (v == null || v.trim().isEmpty)) {
+                                return 'Password wajib diisi';
+                              }
+                              if (v != null && v.trim().isNotEmpty && v.trim().length < 6) {
+                                return 'Password minimal 6 karakter';
+                              }
+                              return _getFieldError('password');
+                            },
                           ),
                           const SizedBox(height: 16),
                           _buildTextField(
                             controller: _roleController,
-                            label: 'Role',
+                            label: 'Role / Grup Karyawan',
                             hint: 'Pilih role',
                             icon: Icons.badge,
+                            fieldName: 'role',
                             readOnly: true,
                             onTap: _showRolePicker,
-                            validator: (v) =>
-                                v == null || v.trim().isEmpty
-                                    ? 'Role wajib dipilih'
-                                    : null,
+                            validator: (v) {
+                              if (v == null || v.trim().isEmpty) {
+                                return 'Role wajib dipilih';
+                              }
+                              return _getFieldError('role');
+                            },
                           ),
                           const SizedBox(height: 32),
                           ElevatedButton(
                             onPressed: _isLoading ? null : _submit,
                             style: ElevatedButton.styleFrom(
                               backgroundColor: AppColors.primary,
-                              padding:
-                                  const EdgeInsets.symmetric(vertical: 16),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             ),
                             child: _isLoading
                                 ? const SizedBox(
-                                    height: 20,
-                                    width: 20,
-                                    child: CircularProgressIndicator(
-                                      color: Colors.white,
-                                      strokeWidth: 2,
-                                    ),
-                                  )
+                              height: 20,
+                              width: 20,
+                              child: CircularProgressIndicator(
+                                color: Colors.white,
+                                strokeWidth: 2,
+                              ),
+                            )
                                 : Text(
-                                    widget.isEdit
-                                        ? 'Simpan Perubahan'
-                                        : 'Tambah Karyawan',
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.w600,
-                                      color: Colors.white,
-                                    ),
-                                  ),
+                              widget.isEdit
+                                  ? 'Simpan Perubahan'
+                                  : 'Tambah Karyawan',
+                              style: const TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.white,
+                              ),
+                            ),
                           ),
                           const SizedBox(height: 16),
                         ],
@@ -265,6 +394,7 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
     required String label,
     required String hint,
     required IconData icon,
+    required String fieldName,
     TextInputType? keyboardType,
     String? Function(String?)? validator,
     bool obscureText = false,
@@ -278,10 +408,39 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
       obscureText: obscureText,
       readOnly: readOnly,
       onTap: onTap,
+      onChanged: (value) {
+        // Clear field error saat user mengetik
+        if (_fieldErrors.containsKey(fieldName)) {
+          setState(() {
+            _fieldErrors.remove(fieldName);
+          });
+        }
+      },
       decoration: InputDecoration(
         labelText: label,
         hintText: hint,
         prefixIcon: Icon(icon, color: Colors.grey),
+        errorMaxLines: 2,
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        enabledBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: Colors.grey.shade300),
+        ),
+        focusedBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide(color: AppColors.primary),
+        ),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Colors.red),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: const BorderSide(color: Colors.red),
+        ),
       ),
     );
   }
