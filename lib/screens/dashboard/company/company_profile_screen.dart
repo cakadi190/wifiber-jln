@@ -95,70 +95,74 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
     return Scaffold(
       backgroundColor: AppColors.primary,
       appBar: AppBar(title: const Text('Detail Perusahaan')),
-      body: Container(
-        padding: const EdgeInsets.all(16),
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-        ),
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              children: [
-                logoWidget,
-                const SizedBox(height: 24),
-                TextFormField(
-                  controller: _nameController,
-                  decoration: const InputDecoration(labelText: 'Nama'),
-                  validator: (v) => v == null || v.isEmpty ? 'Nama wajib diisi' : null,
+      body: Column(
+        children: [
+          Expanded(
+            child: Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
                 ),
-                const SizedBox(height: 24),
-                TextFormField(
-                  controller: _shortNameController,
-                  decoration: const InputDecoration(labelText: 'Nama Singkat'),
-                  validator: (v) => v == null || v.isEmpty ? 'Nama singkat wajib diisi' : null,
-                ),
-                const SizedBox(height: 24),
-                TextFormField(
-                  controller: _sloganController,
-                  decoration: const InputDecoration(labelText: 'Slogan'),
-                ),
-                const SizedBox(height: 24),
-                TextFormField(
-                  controller: _emailController,
-                  decoration: const InputDecoration(labelText: 'Email'),
-                  validator: (v) => v == null || v.isEmpty ? 'Email wajib diisi' : null,
-                ),
-                const SizedBox(height: 24),
-                TextFormField(
-                  controller: _addressController,
-                  decoration: const InputDecoration(labelText: 'Alamat'),
-                ),
-                const SizedBox(height: 24),
-                TextFormField(
-                  controller: _csPhoneController,
-                  decoration: const InputDecoration(labelText: 'Nomor CS'),
-                  validator: (v) => v == null || v.isEmpty ? 'Nomor CS wajib diisi' : null,
-                ),
-                const SizedBox(height: 32),
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      foregroundColor: Colors.white,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(12),
+              ),
+              child: SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      logoWidget,
+                      const SizedBox(height: 24),
+                      TextFormField(
+                        controller: _nameController,
+                        decoration: const InputDecoration(labelText: 'Nama'),
+                        validator: (v) => v == null || v.isEmpty ? 'Nama wajib diisi' : null,
                       ),
-                    ),
-                    onPressed: _isSubmitting ? null : _save,
-                    child: _isSubmitting
-                        ? const SizedBox(
+                      const SizedBox(height: 24),
+                      TextFormField(
+                        controller: _shortNameController,
+                        decoration: const InputDecoration(labelText: 'Nama Singkat'),
+                        validator: (v) => v == null || v.isEmpty ? 'Nama singkat wajib diisi' : null,
+                      ),
+                      const SizedBox(height: 24),
+                      TextFormField(
+                        controller: _sloganController,
+                        decoration: const InputDecoration(labelText: 'Slogan'),
+                      ),
+                      const SizedBox(height: 24),
+                      TextFormField(
+                        controller: _emailController,
+                        decoration: const InputDecoration(labelText: 'Email'),
+                        validator: (v) => v == null || v.isEmpty ? 'Email wajib diisi' : null,
+                      ),
+                      const SizedBox(height: 24),
+                      TextFormField(
+                        controller: _addressController,
+                        decoration: const InputDecoration(labelText: 'Alamat'),
+                      ),
+                      const SizedBox(height: 24),
+                      TextFormField(
+                        controller: _csPhoneController,
+                        decoration: const InputDecoration(labelText: 'Nomor CS'),
+                        validator: (v) => v == null || v.isEmpty ? 'Nomor CS wajib diisi' : null,
+                      ),
+                      const SizedBox(height: 32),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                          ),
+                          onPressed: _isSubmitting ? null : _save,
+                          child: _isSubmitting
+                              ? const SizedBox(
                             width: 20,
                             height: 20,
                             child: CircularProgressIndicator(
@@ -166,13 +170,18 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
                               valueColor: AlwaysStoppedAnimation(Colors.white),
                             ),
                           )
-                        : const Text('Simpan'),
+                              : const Text('Simpan'),
+                        ),
+                      ),
+                      // Tambahkan padding bottom untuk space di bawah
+                      const SizedBox(height: 24),
+                    ],
                   ),
                 ),
-              ],
+              ),
             ),
           ),
-        ),
+        ],
       ),
     );
   }
@@ -216,4 +225,3 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
     );
   }
 }
-
