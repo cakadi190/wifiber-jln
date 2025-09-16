@@ -43,12 +43,12 @@ class EmployeeProvider extends SafeChangeNotifier {
 
   void _debugLog(String message, {Object? error, StackTrace? stackTrace}) {
     if (kDebugMode) {
-      print('[EmployeeProvider] $message');
+      debugPrint('[EmployeeProvider] $message');
       if (error != null) {
-        print('[EmployeeProvider] Error: $error');
+        debugPrint('[EmployeeProvider] Error: $error');
       }
       if (stackTrace != null) {
-        print('[EmployeeProvider] StackTrace: $stackTrace');
+        debugPrint('[EmployeeProvider] StackTrace: $stackTrace');
       }
     }
 
@@ -62,7 +62,7 @@ class EmployeeProvider extends SafeChangeNotifier {
 
   void _debugPrintResponse(dynamic response, String operation) {
     if (kDebugMode) {
-      print('[EmployeeProvider] $operation Response Details:');
+      debugPrint('[EmployeeProvider] $operation Response Details:');
       if (response != null) {
         try {
           if (response is String) {
@@ -70,15 +70,15 @@ class EmployeeProvider extends SafeChangeNotifier {
             final prettyJson = const JsonEncoder.withIndent(
               '  ',
             ).convert(decoded);
-            print('[EmployeeProvider] Response Body: $prettyJson');
+            debugPrint('[EmployeeProvider] Response Body: $prettyJson');
           } else {
             final prettyJson = const JsonEncoder.withIndent(
               '  ',
             ).convert(response);
-            print('[EmployeeProvider] Response Object: $prettyJson');
+            debugPrint('[EmployeeProvider] Response Object: $prettyJson');
           }
         } catch (e) {
-          print('[EmployeeProvider] Raw Response: $response');
+          debugPrint('[EmployeeProvider] Raw Response: $response');
         }
       }
     }
@@ -102,12 +102,12 @@ class EmployeeProvider extends SafeChangeNotifier {
       _debugLog('Failed to load employees', error: e, stackTrace: stackTrace);
 
       if (kDebugMode) {
-        print('[EmployeeProvider] =================================');
-        print('[EmployeeProvider] LOAD EMPLOYEES ERROR DETAILS:');
-        print('[EmployeeProvider] Error Type: ${e.runtimeType}');
-        print('[EmployeeProvider] Error String: ${e.toString()}');
-        print('[EmployeeProvider] Parsed Message: $errorMessage');
-        print('[EmployeeProvider] =================================');
+        debugPrint('[EmployeeProvider] =================================');
+        debugPrint('[EmployeeProvider] LOAD EMPLOYEES ERROR DETAILS:');
+        debugPrint('[EmployeeProvider] Error Type: ${e.runtimeType}');
+        debugPrint('[EmployeeProvider] Error String: ${e.toString()}');
+        debugPrint('[EmployeeProvider] Parsed Message: $errorMessage');
+        debugPrint('[EmployeeProvider] =================================');
       }
     } finally {
       _setLoading(false);
@@ -144,22 +144,22 @@ class EmployeeProvider extends SafeChangeNotifier {
       _debugLog('Failed to create employee', error: e, stackTrace: stackTrace);
 
       if (kDebugMode) {
-        print('[EmployeeProvider] =================================');
-        print('[EmployeeProvider] CREATE EMPLOYEE ERROR DETAILS:');
-        print('[EmployeeProvider] Request Data: ${jsonEncode(data)}');
-        print('[EmployeeProvider] Error Type: ${e.runtimeType}');
-        print('[EmployeeProvider] Error String: ${e.toString()}');
-        print('[EmployeeProvider] Parsed Message: ${errorData['message']}');
-        print(
+        debugPrint('[EmployeeProvider] =================================');
+        debugPrint('[EmployeeProvider] CREATE EMPLOYEE ERROR DETAILS:');
+        debugPrint('[EmployeeProvider] Request Data: ${jsonEncode(data)}');
+        debugPrint('[EmployeeProvider] Error Type: ${e.runtimeType}');
+        debugPrint('[EmployeeProvider] Error String: ${e.toString()}');
+        debugPrint('[EmployeeProvider] Parsed Message: ${errorData['message']}');
+        debugPrint(
           '[EmployeeProvider] Validation Errors: ${errorData['validationErrors']}',
         );
 
         if (e is ValidationException) {
-          print('[EmployeeProvider] ValidationException Details:');
-          print('[EmployeeProvider] - Message: ${e.message}');
-          print('[EmployeeProvider] - Errors: ${jsonEncode(e.errors)}');
+          debugPrint('[EmployeeProvider] ValidationException Details:');
+          debugPrint('[EmployeeProvider] - Message: ${e.message}');
+          debugPrint('[EmployeeProvider] - Errors: ${jsonEncode(e.errors)}');
         }
-        print('[EmployeeProvider] =================================');
+        debugPrint('[EmployeeProvider] =================================');
       }
 
       return false;
@@ -197,23 +197,23 @@ class EmployeeProvider extends SafeChangeNotifier {
       _debugLog('Failed to update employee', error: e, stackTrace: stackTrace);
 
       if (kDebugMode) {
-        print('[EmployeeProvider] =================================');
-        print('[EmployeeProvider] UPDATE EMPLOYEE ERROR DETAILS:');
-        print('[EmployeeProvider] Employee ID: $id');
-        print('[EmployeeProvider] Request Data: ${jsonEncode(data)}');
-        print('[EmployeeProvider] Error Type: ${e.runtimeType}');
-        print('[EmployeeProvider] Error String: ${e.toString()}');
-        print('[EmployeeProvider] Parsed Message: ${errorData['message']}');
-        print(
+        debugPrint('[EmployeeProvider] =================================');
+        debugPrint('[EmployeeProvider] UPDATE EMPLOYEE ERROR DETAILS:');
+        debugPrint('[EmployeeProvider] Employee ID: $id');
+        debugPrint('[EmployeeProvider] Request Data: ${jsonEncode(data)}');
+        debugPrint('[EmployeeProvider] Error Type: ${e.runtimeType}');
+        debugPrint('[EmployeeProvider] Error String: ${e.toString()}');
+        debugPrint('[EmployeeProvider] Parsed Message: ${errorData['message']}');
+        debugPrint(
           '[EmployeeProvider] Validation Errors: ${errorData['validationErrors']}',
         );
 
         if (e is ValidationException) {
-          print('[EmployeeProvider] ValidationException Details:');
-          print('[EmployeeProvider] - Message: ${e.message}');
-          print('[EmployeeProvider] - Errors: ${jsonEncode(e.errors)}');
+          debugPrint('[EmployeeProvider] ValidationException Details:');
+          debugPrint('[EmployeeProvider] - Message: ${e.message}');
+          debugPrint('[EmployeeProvider] - Errors: ${jsonEncode(e.errors)}');
         }
-        print('[EmployeeProvider] =================================');
+        debugPrint('[EmployeeProvider] =================================');
       }
 
       return false;
@@ -248,13 +248,13 @@ class EmployeeProvider extends SafeChangeNotifier {
       _debugLog('Failed to delete employee', error: e, stackTrace: stackTrace);
 
       if (kDebugMode) {
-        print('[EmployeeProvider] =================================');
-        print('[EmployeeProvider] DELETE EMPLOYEE ERROR DETAILS:');
-        print('[EmployeeProvider] Employee ID: $id');
-        print('[EmployeeProvider] Error Type: ${e.runtimeType}');
-        print('[EmployeeProvider] Error String: ${e.toString()}');
-        print('[EmployeeProvider] Parsed Message: $errorMessage');
-        print('[EmployeeProvider] =================================');
+        debugPrint('[EmployeeProvider] =================================');
+        debugPrint('[EmployeeProvider] DELETE EMPLOYEE ERROR DETAILS:');
+        debugPrint('[EmployeeProvider] Employee ID: $id');
+        debugPrint('[EmployeeProvider] Error Type: ${e.runtimeType}');
+        debugPrint('[EmployeeProvider] Error String: ${e.toString()}');
+        debugPrint('[EmployeeProvider] Parsed Message: $errorMessage');
+        debugPrint('[EmployeeProvider] =================================');
       }
 
       return false;

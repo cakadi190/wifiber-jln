@@ -369,13 +369,14 @@ class _PackageListScreenState extends State<PackageListScreen> {
   }
 
   void _openForm(BuildContext context, {PackageModel? package}) {
+    final provider = context.read<PackageProvider>();
     Navigator.of(context)
         .push(
           MaterialPageRoute(
             builder: (_) => PackageFormScreen(package: package),
           ),
         )
-        .then((_) => context.read<PackageProvider>().loadPackages());
+        .then((_) => provider.loadPackages());
   }
 
   void _showDeleteConfirmation(String id) {

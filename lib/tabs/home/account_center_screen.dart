@@ -316,7 +316,6 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
                   ),
                   onPressed: () async {
                     final navigator = Navigator.of(dialogContext);
-                    final mainContext = context;
 
                     try {
                       await authProvider.logout();
@@ -325,12 +324,12 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
                         navigator.pop();
                       }
 
-                      if (mounted) {
-                        SnackBars.success(
-                          mainContext,
-                          "Berhasil mengeluarkan anda dari sesi saat ini. Sampai jumpa di lain waktu!",
-                        ).clearSnackBars();
-                      }
+                      if (!mounted) return;
+
+                      SnackBars.success(
+                        context,
+                        "Berhasil mengeluarkan anda dari sesi saat ini. Sampai jumpa di lain waktu!",
+                      ).clearSnackBars();
 
                       widget.onLogoutTap?.call();
                     } catch (e) {
@@ -338,12 +337,12 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
                         navigator.pop();
                       }
 
-                      if (mounted) {
-                        SnackBars.error(
-                          mainContext,
-                          "Gagal mengeluarkan anda dari sesi saat ini. Silahkan coba lagi.",
-                        ).clearSnackBars();
-                      }
+                      if (!mounted) return;
+
+                      SnackBars.error(
+                        context,
+                        "Gagal mengeluarkan anda dari sesi saat ini. Silahkan coba lagi.",
+                      ).clearSnackBars();
                     }
                   },
                   child: const Text("Keluar Sekarang"),

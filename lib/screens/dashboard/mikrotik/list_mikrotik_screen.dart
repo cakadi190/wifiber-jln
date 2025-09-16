@@ -45,13 +45,14 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
             child: FloatingActionButton(
               backgroundColor: AppColors.primary,
               onPressed: () async {
+                final provider = context.read<RouterProvider>();
                 await Navigator.of(context).push(
                   MaterialPageRoute(
                     builder: (context) => const CreateMikrotikScreen(),
                   ),
                 );
 
-                await context.read<RouterProvider>().refresh();
+                await provider.refresh();
               },
               child: const Icon(Icons.add),
             ),

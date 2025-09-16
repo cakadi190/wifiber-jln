@@ -10,12 +10,12 @@ class EmployeeService {
 
   static void _debugLog(String message, {Object? error, StackTrace? stackTrace}) {
     if (kDebugMode) {
-      print('[EmployeeService] $message');
+      debugPrint('[EmployeeService] $message');
       if (error != null) {
-        print('[EmployeeService] Error: $error');
+        debugPrint('[EmployeeService] Error: $error');
       }
       if (stackTrace != null) {
-        print('[EmployeeService] StackTrace: $stackTrace');
+        debugPrint('[EmployeeService] StackTrace: $stackTrace');
       }
     }
     developer.log(
@@ -28,37 +28,37 @@ class EmployeeService {
 
   static void _debugPrintHttpResponse(dynamic response, String operation) {
     if (kDebugMode && response != null) {
-      print('[EmployeeService] =================================');
-      print('[EmployeeService] $operation HTTP RESPONSE:');
+      debugPrint('[EmployeeService] =================================');
+      debugPrint('[EmployeeService] $operation HTTP RESPONSE:');
 
       try {
         // Jika response memiliki statusCode (http.Response)
         if (response.statusCode != null) {
-          print('[EmployeeService] Status Code: ${response.statusCode}');
-          print('[EmployeeService] Headers: ${response.headers}');
-          print('[EmployeeService] Content Length: ${response.contentLength}');
+          debugPrint('[EmployeeService] Status Code: ${response.statusCode}');
+          debugPrint('[EmployeeService] Headers: ${response.headers}');
+          debugPrint('[EmployeeService] Content Length: ${response.contentLength}');
 
           // Parse dan print body dengan indentasi
           try {
             final decoded = jsonDecode(response.body);
             final prettyJson = const JsonEncoder.withIndent('  ').convert(decoded);
-            print('[EmployeeService] Response Body:');
-            print(prettyJson);
+            debugPrint('[EmployeeService] Response Body:');
+            debugPrint(prettyJson);
           } catch (e) {
-            print('[EmployeeService] Raw Response Body: ${response.body}');
+            debugPrint('[EmployeeService] Raw Response Body: ${response.body}');
           }
         } else {
           // Jika response adalah object biasa
           final prettyJson = const JsonEncoder.withIndent('  ').convert(response);
-          print('[EmployeeService] Response Object:');
-          print(prettyJson);
+          debugPrint('[EmployeeService] Response Object:');
+          debugPrint(prettyJson);
         }
       } catch (e) {
-        print('[EmployeeService] Error printing response: $e');
-        print('[EmployeeService] Raw Response: $response');
+        debugPrint('[EmployeeService] Error printing response: $e');
+        debugPrint('[EmployeeService] Raw Response: $response');
       }
 
-      print('[EmployeeService] =================================');
+      debugPrint('[EmployeeService] =================================');
     }
   }
 
@@ -95,12 +95,12 @@ class EmployeeService {
       _debugLog('getEmployees failed', error: e, stackTrace: stackTrace);
 
       if (kDebugMode) {
-        print('[EmployeeService] =================================');
-        print('[EmployeeService] GET EMPLOYEES ERROR DETAILS:');
-        print('[EmployeeService] Error Type: ${e.runtimeType}');
-        print('[EmployeeService] Error Message: ${e.toString()}');
-        print('[EmployeeService] Search Parameter: $search');
-        print('[EmployeeService] =================================');
+        debugPrint('[EmployeeService] =================================');
+        debugPrint('[EmployeeService] GET EMPLOYEES ERROR DETAILS:');
+        debugPrint('[EmployeeService] Error Type: ${e.runtimeType}');
+        debugPrint('[EmployeeService] Error Message: ${e.toString()}');
+        debugPrint('[EmployeeService] Search Parameter: $search');
+        debugPrint('[EmployeeService] =================================');
       }
 
       rethrow;
@@ -127,10 +127,10 @@ class EmployeeService {
         _debugLog('createEmployee result: $success');
 
         if (kDebugMode) {
-          print('[EmployeeService] Create Employee Success Response:');
-          print('[EmployeeService] - Success: $success');
-          print('[EmployeeService] - Message: ${jsonData['message']}');
-          print('[EmployeeService] - Data: ${jsonData['data']}');
+          debugPrint('[EmployeeService] Create Employee Success Response:');
+          debugPrint('[EmployeeService] - Success: $success');
+          debugPrint('[EmployeeService] - Message: ${jsonData['message']}');
+          debugPrint('[EmployeeService] - Data: ${jsonData['data']}');
         }
 
         return success;
@@ -140,9 +140,9 @@ class EmployeeService {
 
         // Print response body untuk error
         if (kDebugMode) {
-          print('[EmployeeService] Create Employee Error Response:');
-          print('[EmployeeService] - Status: ${response.statusCode}');
-          print('[EmployeeService] - Body: ${response.body}');
+          debugPrint('[EmployeeService] Create Employee Error Response:');
+          debugPrint('[EmployeeService] - Status: ${response.statusCode}');
+          debugPrint('[EmployeeService] - Body: ${response.body}');
         }
 
         throw Exception(errorMessage);
@@ -151,12 +151,12 @@ class EmployeeService {
       _debugLog('createEmployee failed', error: e, stackTrace: stackTrace);
 
       if (kDebugMode) {
-        print('[EmployeeService] =================================');
-        print('[EmployeeService] CREATE EMPLOYEE ERROR DETAILS:');
-        print('[EmployeeService] Request Data: ${jsonEncode(data)}');
-        print('[EmployeeService] Error Type: ${e.runtimeType}');
-        print('[EmployeeService] Error Message: ${e.toString()}');
-        print('[EmployeeService] =================================');
+        debugPrint('[EmployeeService] =================================');
+        debugPrint('[EmployeeService] CREATE EMPLOYEE ERROR DETAILS:');
+        debugPrint('[EmployeeService] Request Data: ${jsonEncode(data)}');
+        debugPrint('[EmployeeService] Error Type: ${e.runtimeType}');
+        debugPrint('[EmployeeService] Error Message: ${e.toString()}');
+        debugPrint('[EmployeeService] =================================');
       }
 
       rethrow;
@@ -186,10 +186,10 @@ class EmployeeService {
           _debugLog('updateEmployee successful for id: $id');
 
           if (kDebugMode) {
-            print('[EmployeeService] Update Employee Success Response:');
-            print('[EmployeeService] - Success: ${jsonData['success']}');
-            print('[EmployeeService] - Message: ${jsonData['message']}');
-            print('[EmployeeService] - Updated Employee: ${jsonEncode(employee.toJson())}');
+            debugPrint('[EmployeeService] Update Employee Success Response:');
+            debugPrint('[EmployeeService] - Success: ${jsonData['success']}');
+            debugPrint('[EmployeeService] - Message: ${jsonData['message']}');
+            debugPrint('[EmployeeService] - Updated Employee: ${jsonEncode(employee.toJson())}');
           }
 
           return employee;
@@ -198,10 +198,10 @@ class EmployeeService {
           _debugLog(errorMessage);
 
           if (kDebugMode) {
-            print('[EmployeeService] Update Employee Failed Response:');
-            print('[EmployeeService] - Success: ${jsonData['success']}');
-            print('[EmployeeService] - Message: ${jsonData['message']}');
-            print('[EmployeeService] - Errors: ${jsonData['errors']}');
+            debugPrint('[EmployeeService] Update Employee Failed Response:');
+            debugPrint('[EmployeeService] - Success: ${jsonData['success']}');
+            debugPrint('[EmployeeService] - Message: ${jsonData['message']}');
+            debugPrint('[EmployeeService] - Errors: ${jsonData['errors']}');
           }
 
           throw Exception(errorMessage);
@@ -212,9 +212,9 @@ class EmployeeService {
 
         // Print response body untuk error
         if (kDebugMode) {
-          print('[EmployeeService] Update Employee Error Response:');
-          print('[EmployeeService] - Status: ${response.statusCode}');
-          print('[EmployeeService] - Body: ${response.body}');
+          debugPrint('[EmployeeService] Update Employee Error Response:');
+          debugPrint('[EmployeeService] - Status: ${response.statusCode}');
+          debugPrint('[EmployeeService] - Body: ${response.body}');
         }
 
         throw Exception(errorMessage);
@@ -223,13 +223,13 @@ class EmployeeService {
       _debugLog('updateEmployee failed', error: e, stackTrace: stackTrace);
 
       if (kDebugMode) {
-        print('[EmployeeService] =================================');
-        print('[EmployeeService] UPDATE EMPLOYEE ERROR DETAILS:');
-        print('[EmployeeService] Employee ID: $id');
-        print('[EmployeeService] Request Data: ${jsonEncode(data)}');
-        print('[EmployeeService] Error Type: ${e.runtimeType}');
-        print('[EmployeeService] Error Message: ${e.toString()}');
-        print('[EmployeeService] =================================');
+        debugPrint('[EmployeeService] =================================');
+        debugPrint('[EmployeeService] UPDATE EMPLOYEE ERROR DETAILS:');
+        debugPrint('[EmployeeService] Employee ID: $id');
+        debugPrint('[EmployeeService] Request Data: ${jsonEncode(data)}');
+        debugPrint('[EmployeeService] Error Type: ${e.runtimeType}');
+        debugPrint('[EmployeeService] Error Message: ${e.toString()}');
+        debugPrint('[EmployeeService] =================================');
       }
 
       rethrow;
@@ -256,9 +256,9 @@ class EmployeeService {
         _debugLog('deleteEmployee result: $success');
 
         if (kDebugMode) {
-          print('[EmployeeService] Delete Employee Response:');
-          print('[EmployeeService] - Success: $success');
-          print('[EmployeeService] - Message: ${jsonData['message']}');
+          debugPrint('[EmployeeService] Delete Employee Response:');
+          debugPrint('[EmployeeService] - Success: $success');
+          debugPrint('[EmployeeService] - Message: ${jsonData['message']}');
         }
 
         return success;
@@ -268,9 +268,9 @@ class EmployeeService {
 
         // Print response body untuk error
         if (kDebugMode) {
-          print('[EmployeeService] Delete Employee Error Response:');
-          print('[EmployeeService] - Status: ${response.statusCode}');
-          print('[EmployeeService] - Body: ${response.body}');
+          debugPrint('[EmployeeService] Delete Employee Error Response:');
+          debugPrint('[EmployeeService] - Status: ${response.statusCode}');
+          debugPrint('[EmployeeService] - Body: ${response.body}');
         }
 
         throw Exception(errorMessage);
@@ -279,12 +279,12 @@ class EmployeeService {
       _debugLog('deleteEmployee failed', error: e, stackTrace: stackTrace);
 
       if (kDebugMode) {
-        print('[EmployeeService] =================================');
-        print('[EmployeeService] DELETE EMPLOYEE ERROR DETAILS:');
-        print('[EmployeeService] Employee ID: $id');
-        print('[EmployeeService] Error Type: ${e.runtimeType}');
-        print('[EmployeeService] Error Message: ${e.toString()}');
-        print('[EmployeeService] =================================');
+        debugPrint('[EmployeeService] =================================');
+        debugPrint('[EmployeeService] DELETE EMPLOYEE ERROR DETAILS:');
+        debugPrint('[EmployeeService] Employee ID: $id');
+        debugPrint('[EmployeeService] Error Type: ${e.runtimeType}');
+        debugPrint('[EmployeeService] Error Message: ${e.toString()}');
+        debugPrint('[EmployeeService] =================================');
       }
 
       rethrow;

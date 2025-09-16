@@ -288,7 +288,7 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
               final provider = _customerProvider;
               try {
                 final message = await provider?.importCustomers(selectedFile!);
-                if (!mounted) return;
+                if (!context.mounted) return;
                 Navigator.of(context).pop();
                 if (message != null) {
                   SnackBars.success(context, message).clearSnackBars();
@@ -297,11 +297,11 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                   SnackBars.error(context, provider!.error!).clearSnackBars();
                 }
               } catch (e) {
-                if (mounted) {
+                if (context.mounted) {
                   SnackBars.error(context, e.toString()).clearSnackBars();
                 }
               } finally {
-                if (mounted) {
+                if (context.mounted) {
                   setState(() {
                     isLoading = false;
                   });

@@ -114,6 +114,7 @@ class _BillsScreenState extends State<BillsScreen> {
               backgroundColor: AppColors.primary,
               child: const Icon(Icons.add),
               onPressed: () async {
+                final provider = context.read<BillsProvider>();
                 await Navigator.push(
                   context,
                   MaterialPageRoute(
@@ -121,7 +122,7 @@ class _BillsScreenState extends State<BillsScreen> {
                   ),
                 );
 
-                await context.read<BillsProvider>().refresh();
+                await provider.refresh();
               },
             ),
           ),
@@ -698,20 +699,27 @@ class _BillsScreenState extends State<BillsScreen> {
         body: jsonEncode({}),
       );
 
+      if (!mounted) return;
       Navigator.pop(context);
 
+      if (!mounted) return;
       final json = jsonDecode(response.body);
       final message = json['message'] ?? 'Tagihan bulanan berhasil dibuat.';
 
+      if (!mounted) return;
       _showModalMessage(message, type: 'success');
     } on StringException catch (_) {
+      if (!mounted) return;
       Navigator.pop(context);
+      if (!mounted) return;
       _showModalMessage(
         "Tidak ada tagihan yang dibuat. Semua tagihan pada pelanggan yang aktif sudah ada.",
         type: 'info',
       );
     } catch (e) {
+      if (!mounted) return;
       Navigator.pop(context);
+      if (!mounted) return;
       _showModalMessage('Gagal membuat tagihan bulanan.');
     }
   }

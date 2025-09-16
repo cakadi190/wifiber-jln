@@ -6,16 +6,19 @@ import 'package:wifiber/services/http_service.dart';
 
 class CompanyService {
   static final HttpService _http = HttpService();
-  static const String getPath = 'company';
   static const String profilePath = 'company-profile';
 
-  Future<CompanyProfile> getCompany() async {
+  Future<CompanyProfile?> getCompany() async {
     try {
-      final response = await _http.get(getPath, requiresAuth: true);
+      final response = await _http.get(profilePath, requiresAuth: true);
       if (response.statusCode == 200) {
         final jsonData = json.decode(response.body);
         if (jsonData['success'] == true) {
-          return CompanyProfile.fromJson(jsonData['data']);
+          final data = jsonData['data'];
+          if (data is Map<String, dynamic>) {
+            return CompanyProfile.fromJson(data);
+          }
+          return null;
         } else {
           throw Exception(jsonData['message'] ?? 'Failed to load company');
         }

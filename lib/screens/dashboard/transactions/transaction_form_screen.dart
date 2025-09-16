@@ -135,6 +135,8 @@ class _TransactionFormScreenState extends State<TransactionFormScreen>
     clearBackendErrors();
     setState(() => _isLoading = true);
     final provider = context.read<TransactionProvider>();
+    final navigator = Navigator.of(context);
+    final messenger = ScaffoldMessenger.of(context);
 
     try {
       final nominal = int.parse(_nominalController.text.trim());
@@ -163,22 +165,22 @@ class _TransactionFormScreenState extends State<TransactionFormScreen>
         );
       }
 
-      if (mounted) Navigator.pop(context, true);
+      if (!mounted) return;
+      navigator.pop(true);
     } on ValidationException catch (e) {
+      if (!mounted) return;
       setBackendErrors(e.errors);
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(e.message), backgroundColor: Colors.red),
-        );
-      }
+      messenger.showSnackBar(
+        SnackBar(content: Text(e.message), backgroundColor: Colors.red),
+      );
     } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Gagal menyimpan transaksi: $e')),
-        );
-      }
+      if (!mounted) return;
+      messenger.showSnackBar(
+        SnackBar(content: Text('Gagal menyimpan transaksi: $e')),
+      );
     } finally {
-      if (mounted) setState(() => _isLoading = false);
+      if (!mounted) return;
+      setState(() => _isLoading = false);
     }
   }
 
