@@ -122,8 +122,7 @@ class CustomerFormController extends SafeChangeNotifier {
         if (selectedOdpId != null && selectedOdpId!.isNotEmpty)
           _fetchOdpName(selectedOdpId!),
       ]);
-    } catch (e) {
-      debugPrint('Error initializing edit data: $e');
+    } catch (_) {
     } finally {
       isInitializing = false;
       notifyListeners();
@@ -147,9 +146,7 @@ class CustomerFormController extends SafeChangeNotifier {
           notifyListeners();
         }
       }
-    } catch (e) {
-      debugPrint('Error fetching package name: $e');
-    }
+    } catch (_) {}
   }
 
   Future<void> _fetchRouterName(String routerId) async {
@@ -169,9 +166,7 @@ class CustomerFormController extends SafeChangeNotifier {
           notifyListeners();
         }
       }
-    } catch (e) {
-      debugPrint('Error fetching router name: $e');
-    }
+    } catch (_) {}
   }
 
   Future<void> _fetchOdpName(String odpId) async {
@@ -191,9 +186,7 @@ class CustomerFormController extends SafeChangeNotifier {
           notifyListeners();
         }
       }
-    } catch (e) {
-      debugPrint('Error fetching ODP name: $e');
-    }
+    } catch (_) {}
   }
 
   void onPackageSelected(dynamic package) {
@@ -283,7 +276,6 @@ class CustomerFormController extends SafeChangeNotifier {
         Navigator.pop(context);
       }
     } catch (e) {
-      debugPrint("Failed to pick image: $e");
       if (!context.mounted) return;
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
@@ -436,7 +428,6 @@ class CustomerFormController extends SafeChangeNotifier {
       ).clearSnackBars();
       return true;
     } else {
-      debugPrint(provider.error);
       SnackBars.error(
         context,
         provider.error ??

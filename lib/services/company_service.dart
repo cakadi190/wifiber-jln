@@ -83,9 +83,6 @@ class CompanyService {
       final statusCode = streamedResponse.statusCode;
       String responseBody = await streamedResponse.stream.bytesToString();
 
-      print('Response Status: $statusCode');
-      print('Response Body: $responseBody');
-
       final jsonData = json.decode(responseBody);
 
       if ((statusCode == 200 || statusCode == 201) &&
@@ -101,7 +98,6 @@ class CompanyService {
         throw Exception(errorMessage);
       }
     } catch (e) {
-      print('Error in _submitCompany: $e');
       throw Exception('Error submitting company: $e');
     }
   }

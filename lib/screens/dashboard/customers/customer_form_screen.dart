@@ -174,7 +174,6 @@ class _CustomerFormScreenState extends State<CustomerFormScreen>
                               );
                             },
                             errorBuilder: (context, error, stackTrace) {
-                              debugPrint('Error loading image: $error');
                               return Container(
                                 height: 120,
                                 width: double.infinity,

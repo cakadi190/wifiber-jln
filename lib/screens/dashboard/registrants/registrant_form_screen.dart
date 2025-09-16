@@ -174,7 +174,6 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen>
                               );
                             },
                             errorBuilder: (context, error, stackTrace) {
-                              debugPrint('Error loading image: $error');
                               return Container(
                                 height: 120,
                                 width: double.infinity,

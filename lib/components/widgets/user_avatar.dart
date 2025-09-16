@@ -44,11 +44,8 @@ class UserAvatar extends StatelessWidget {
         backgroundColor: backgroundColor ?? theme.colorScheme.primary,
         backgroundImage: backgroundImage,
 
-        onBackgroundImageError: backgroundImage != null
-            ? (exception, stackTrace) {
-                debugPrint('Avatar image failed to load: $exception');
-              }
-            : null,
+        onBackgroundImageError:
+            backgroundImage != null ? (exception, stackTrace) {} : null,
         child: backgroundImage == null ? _buildInitialsWidget(context) : null,
       ),
     );
@@ -72,8 +69,7 @@ class UserAvatar extends StatelessWidget {
         height: cacheHeight ?? (radius * 2 * 2).toInt(),
         allowUpscaling: false,
       );
-    } catch (e) {
-      debugPrint('Error creating background image: $e');
+    } catch (_) {
       return null;
     }
   }
