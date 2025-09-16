@@ -128,6 +128,7 @@ class _AreaFormScreenState extends State<AreaFormScreen> {
       'status': _status,
     };
     final provider = context.read<AreaProvider>();
+    final navigator = Navigator.of(context);
     bool success;
     setState(() => _isSubmitting = true);
     if (widget.area == null) {
@@ -135,9 +136,10 @@ class _AreaFormScreenState extends State<AreaFormScreen> {
     } else {
       success = await provider.updateArea(widget.area!.id, data);
     }
-    if (mounted) setState(() => _isSubmitting = false);
-    if (success && mounted) {
-      Navigator.pop(context);
+    if (!mounted) return;
+    setState(() => _isSubmitting = false);
+    if (success) {
+      navigator.pop();
     }
   }
 

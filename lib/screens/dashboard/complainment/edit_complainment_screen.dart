@@ -71,6 +71,8 @@ class _EditComplaintScreenState extends State<EditComplaintScreen>
           ),
         );
 
+        if (!mounted) return;
+
         if (response) {
           SnackBars.success(
             context,
@@ -83,22 +85,27 @@ class _EditComplaintScreenState extends State<EditComplaintScreen>
             "Gagal menindaklanjuti laporan #${widget.complaint.number}! Coba lagi beberapa saat.",
           ).clearSnackBars();
 
+          if (!mounted) return;
           setState(() {
             _isLoading = false;
           });
         }
       } on ValidationException catch (e) {
+        if (!mounted) return;
         setBackendErrors(e.errors);
         SnackBars.error(context, e.message).clearSnackBars();
+        if (!mounted) return;
         setState(() {
           _isLoading = false;
         });
       } catch (e) {
+        if (!mounted) return;
         SnackBars.error(
           context,
           "Gagal menindaklanjuti laporan #${widget.complaint.number}! Coba lagi beberapa saat.",
         ).clearSnackBars();
 
+        if (!mounted) return;
         setState(() {
           _isLoading = false;
         });

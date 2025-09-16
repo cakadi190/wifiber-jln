@@ -87,7 +87,10 @@ class InfrastructureController {
     try {
       final permission = await LocationService.requestLocationPermission();
 
+      if (!context.mounted) return false;
+
       if (permission == LocationPermission.denied) {
+        if (!context.mounted) return false;
         _showLocationDialog(
           context,
           'Location Permission Required',
@@ -104,6 +107,7 @@ class InfrastructureController {
         );
         return false;
       } else if (permission == LocationPermission.deniedForever) {
+        if (!context.mounted) return false;
         _showLocationDialog(
           context,
           'Location Permission Permanently Denied',
@@ -116,6 +120,7 @@ class InfrastructureController {
 
       return true;
     } catch (e) {
+      if (!context.mounted) return false;
       _showLocationDialog(
         context,
         'Location Error',

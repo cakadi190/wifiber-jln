@@ -90,6 +90,8 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen>
         date: selectedDate!,
       );
 
+      if (!mounted) return;
+
       if (success) {
         _complaintController.showSuccessMessage(
           'Pengaduan untuk ${selectedCustomer!.name} berhasil dibuat!',
@@ -99,13 +101,16 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen>
         _complaintController.showErrorMessage('Gagal membuat pengaduan!');
       }
     } on ValidationException catch (e) {
+      if (!mounted) return;
       setBackendErrors(e.errors);
       _complaintController.showErrorMessage(e.message);
     } catch (e) {
+      if (!mounted) return;
       _complaintController.showErrorMessage(
         'Terjadi kesalahan: ${e.toString()}',
       );
     } finally {
+      if (!mounted) return;
       setState(() {
         _isLoading = false;
       });

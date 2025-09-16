@@ -248,8 +248,6 @@ class _MainProfileScreenState extends State<MainProfileScreen> {
                   final user = authProvider.user!;
                   final token = authProvider.user!.accessToken;
 
-                  print(user.groupName);
-
                   return Container(
                     width: double.infinity,
                     height: double.infinity,

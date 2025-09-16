@@ -251,6 +251,7 @@ class CustomerFormController extends SafeChangeNotifier {
     if (source == ImageSource.camera) {
       bool granted = await _requestCameraPermission();
       if (!granted) {
+        if (!context.mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Izin kamera diperlukan untuk mengambil foto'),
@@ -269,6 +270,8 @@ class CustomerFormController extends SafeChangeNotifier {
         maxHeight: 1024,
       );
 
+      if (!context.mounted) return;
+
       if (image != null) {
         if (forKtp) {
           ktpPhotoFile = image;
@@ -281,6 +284,7 @@ class CustomerFormController extends SafeChangeNotifier {
       }
     } catch (e) {
       debugPrint("Failed to pick image: $e");
+      if (!context.mounted) return;
       Navigator.pop(context);
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -353,6 +357,7 @@ class CustomerFormController extends SafeChangeNotifier {
       } catch (e) {
         isLoading = false;
         notifyListeners();
+        if (!context.mounted) return false;
         SnackBars.error(
           context,
           'Izin lokasi diperlukan untuk menambahkan data',
@@ -411,12 +416,15 @@ class CustomerFormController extends SafeChangeNotifier {
       isLoading = false;
       notifyListeners();
       onValidationError?.call(e.errors);
+      if (!context.mounted) return false;
       SnackBars.error(context, e.message).clearSnackBars();
       return false;
     }
 
     isLoading = false;
     notifyListeners();
+
+    if (!context.mounted) return false;
 
     if (success) {
       Navigator.of(context).pop(true);

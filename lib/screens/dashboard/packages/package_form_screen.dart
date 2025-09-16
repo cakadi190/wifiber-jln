@@ -148,6 +148,7 @@ class _PackageFormScreenState extends State<PackageFormScreen> {
       'status': _status,
     };
     final provider = context.read<PackageProvider>();
+    final navigator = Navigator.of(context);
     bool success;
     setState(() => _isSubmitting = true);
     if (widget.package == null) {
@@ -155,9 +156,10 @@ class _PackageFormScreenState extends State<PackageFormScreen> {
     } else {
       success = await provider.updatePackage(widget.package!.id, data);
     }
-    if (mounted) setState(() => _isSubmitting = false);
-    if (success && mounted) {
-      Navigator.pop(context);
+    if (!mounted) return;
+    setState(() => _isSubmitting = false);
+    if (success) {
+      navigator.pop();
     }
   }
 

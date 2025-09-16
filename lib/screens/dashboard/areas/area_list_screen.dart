@@ -359,9 +359,10 @@ class _AreaListScreenState extends State<AreaListScreen> {
   }
 
   void _openForm(BuildContext context, {AreaModel? area}) {
+    final provider = context.read<AreaProvider>();
     Navigator.of(context)
         .push(MaterialPageRoute(builder: (_) => AreaFormScreen(area: area)))
-        .then((_) => context.read<AreaProvider>().loadAreas());
+        .then((_) => provider.loadAreas());
   }
 
   void _showDeleteConfirmation(String id) {
