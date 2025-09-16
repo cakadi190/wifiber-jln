@@ -28,9 +28,8 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
 
   bool _isLoading = false;
   String? _selectedRoleValue;
-  final Map<String, String> _fieldErrors = {}; // Untuk menyimpan error per field
+  final Map<String, String> _fieldErrors = {};
 
-  // Mapping role untuk konversi
   final Map<String, String> _roleMapping = {
     '1': 'Super Administrator',
     '2': 'Admin',
@@ -51,7 +50,6 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
       _emailController.text = widget.employee!.email ?? '';
       _usernameController.text = widget.employee!.username ?? '';
 
-      // Handle role initialization
       final employeeRole = widget.employee!.role ?? '';
       if (_roleMapping.containsKey(employeeRole)) {
         _selectedRoleValue = employeeRole;
@@ -84,9 +82,7 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
   void _parseErrorMessage(String errorMessage) {
     _fieldErrors.clear();
 
-    // Contoh parsing untuk berbagai format error
     if (errorMessage.contains('validation')) {
-      // Format: "Validation failed: field_name is required"
       final regex = RegExp(r'(\w+)\s+(is\s+\w+|sudah\s+\w+|wajib\s+\w+|tidak\s+\w+)');
       final matches = regex.allMatches(errorMessage.toLowerCase());
 
@@ -105,7 +101,6 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
       _fieldErrors['name'] = 'Nama tidak valid';
     }
 
-    // Jika tidak ada field error yang spesifik, tampilkan error umum
     if (_fieldErrors.isEmpty) {
       _fieldErrors['general'] = errorMessage;
     }
@@ -116,14 +111,13 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
   }
 
   Future<void> _submit() async {
-    // Clear previous errors
     _clearFieldErrors();
 
     if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
     final provider = context.read<EmployeeProvider>();
-    final data = {
+    final fields = <String, String>{
       'name': _nameController.text.trim(),
       'email': _emailController.text.trim(),
       'username': _usernameController.text.trim(),
@@ -131,14 +125,14 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
     };
 
     if (_passwordController.text.trim().isNotEmpty) {
-      data['password'] = _passwordController.text.trim();
+      fields['password'] = _passwordController.text.trim();
     }
 
     bool success = false;
     if (widget.isEdit && widget.employee != null) {
-      success = await provider.updateEmployee(widget.employee!.id, data);
+      success = await provider.updateEmployeeForm(widget.employee!.id, fields);
     } else {
-      success = await provider.createEmployee(data);
+      success = await provider.createEmployeeForm(fields);
     }
 
     if (!mounted) return;
@@ -150,11 +144,9 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
       );
       Navigator.pop(context, true);
     } else {
-      // Parse error untuk menampilkan detail error
       final errorMessage = provider.error ?? 'Terjadi kesalahan yang tidak diketahui';
       _parseErrorMessage(errorMessage);
 
-      // Tampilkan snackbar dengan error umum
       SnackBars.error(
         context,
         _fieldErrors['general'] ?? (widget.isEdit
@@ -162,7 +154,6 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
             : 'Gagal menambahkan karyawan'),
       );
 
-      // Trigger form validation ulang untuk menampilkan field errors
       _formKey.currentState!.validate();
     }
 
@@ -187,7 +178,7 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
             setState(() {
               _selectedRoleValue = '1';
               _roleController.text = 'Super Administrator';
-              _fieldErrors.remove('role'); // Clear role error
+              _fieldErrors.remove('role');
             });
             Navigator.pop(context);
           },
@@ -199,7 +190,7 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
             setState(() {
               _selectedRoleValue = '2';
               _roleController.text = 'Admin';
-              _fieldErrors.remove('role'); // Clear role error
+              _fieldErrors.remove('role');
             });
             Navigator.pop(context);
           },
@@ -211,7 +202,7 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
             setState(() {
               _selectedRoleValue = '3';
               _roleController.text = 'Teknisi';
-              _fieldErrors.remove('role'); // Clear role error
+              _fieldErrors.remove('role');
             });
             Navigator.pop(context);
           },
@@ -409,7 +400,6 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
       readOnly: readOnly,
       onTap: onTap,
       onChanged: (value) {
-        // Clear field error saat user mengetik
         if (_fieldErrors.containsKey(fieldName)) {
           setState(() {
             _fieldErrors.remove(fieldName);

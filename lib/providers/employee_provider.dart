@@ -116,6 +116,58 @@ class EmployeeProvider extends SafeChangeNotifier {
 
   Future<void> refresh() => loadEmployees();
 
+  Future<bool> createEmployeeForm(Map<String, String> fields) async {
+    _debugLog('Creating employee with form fields: ${jsonEncode(fields)}');
+    _setLoading(true);
+    _setError(null);
+
+    try {
+      final success = await _employeeService.createEmployeeForm(fields);
+      _debugLog('Create employee result: $success');
+
+      if (success) {
+        await loadEmployees();
+        _debugLog('Employee created successfully');
+        return true;
+      }
+
+      final errorMessage = 'Gagal menambahkan karyawan';
+      _setError(errorMessage);
+      _debugLog('Create employee failed: $errorMessage');
+      return false;
+    } catch (e, stackTrace) {
+      final errorData = _parseError(e);
+      _setError(
+        errorData['message'],
+        validationErrors: errorData['validationErrors'],
+      );
+      _debugLog('Failed to create employee', error: e, stackTrace: stackTrace);
+
+      if (kDebugMode) {
+        debugPrint('[EmployeeProvider] =================================');
+        debugPrint('[EmployeeProvider] CREATE EMPLOYEE ERROR DETAILS:');
+        debugPrint('[EmployeeProvider] Request Data: ${jsonEncode(fields)}');
+        debugPrint('[EmployeeProvider] Error Type: ${e.runtimeType}');
+        debugPrint('[EmployeeProvider] Error String: ${e.toString()}');
+        debugPrint('[EmployeeProvider] Parsed Message: ${errorData['message']}');
+        debugPrint(
+          '[EmployeeProvider] Validation Errors: ${errorData['validationErrors']}',
+        );
+
+        if (e is ValidationException) {
+          debugPrint('[EmployeeProvider] ValidationException Details:');
+          debugPrint('[EmployeeProvider] - Message: ${e.message}');
+          debugPrint('[EmployeeProvider] - Errors: ${jsonEncode(e.errors)}');
+        }
+        debugPrint('[EmployeeProvider] =================================');
+      }
+
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
   Future<bool> createEmployee(Map<String, dynamic> data) async {
     _debugLog('Creating employee with data: ${jsonEncode(data)}');
     _setLoading(true);
@@ -147,6 +199,60 @@ class EmployeeProvider extends SafeChangeNotifier {
         debugPrint('[EmployeeProvider] =================================');
         debugPrint('[EmployeeProvider] CREATE EMPLOYEE ERROR DETAILS:');
         debugPrint('[EmployeeProvider] Request Data: ${jsonEncode(data)}');
+        debugPrint('[EmployeeProvider] Error Type: ${e.runtimeType}');
+        debugPrint('[EmployeeProvider] Error String: ${e.toString()}');
+        debugPrint('[EmployeeProvider] Parsed Message: ${errorData['message']}');
+        debugPrint(
+          '[EmployeeProvider] Validation Errors: ${errorData['validationErrors']}',
+        );
+
+        if (e is ValidationException) {
+          debugPrint('[EmployeeProvider] ValidationException Details:');
+          debugPrint('[EmployeeProvider] - Message: ${e.message}');
+          debugPrint('[EmployeeProvider] - Errors: ${jsonEncode(e.errors)}');
+        }
+        debugPrint('[EmployeeProvider] =================================');
+      }
+
+      return false;
+    } finally {
+      _setLoading(false);
+    }
+  }
+
+  Future<bool> updateEmployeeForm(String id, Map<String, String> fields) async {
+    _debugLog('Updating employee $id with form fields: ${jsonEncode(fields)}');
+    _setLoading(true);
+    _setError(null);
+
+    try {
+      final employee = await _employeeService.updateEmployeeForm(id, fields);
+      _debugPrintResponse(employee.toJson(), 'updateEmployeeForm');
+
+      final index = _employees.indexWhere((e) => e.id == id);
+      if (index != -1) {
+        _employees[index] = employee;
+        _debugLog('Employee updated at index $index');
+      } else {
+        _debugLog('Warning: Updated employee not found in local list');
+      }
+
+      notifyListeners();
+      _debugLog('Employee updated successfully');
+      return true;
+    } catch (e, stackTrace) {
+      final errorData = _parseError(e);
+      _setError(
+        errorData['message'],
+        validationErrors: errorData['validationErrors'],
+      );
+      _debugLog('Failed to update employee', error: e, stackTrace: stackTrace);
+
+      if (kDebugMode) {
+        debugPrint('[EmployeeProvider] =================================');
+        debugPrint('[EmployeeProvider] UPDATE EMPLOYEE ERROR DETAILS:');
+        debugPrint('[EmployeeProvider] Employee ID: $id');
+        debugPrint('[EmployeeProvider] Request Data: ${jsonEncode(fields)}');
         debugPrint('[EmployeeProvider] Error Type: ${e.runtimeType}');
         debugPrint('[EmployeeProvider] Error String: ${e.toString()}');
         debugPrint('[EmployeeProvider] Parsed Message: ${errorData['message']}');
