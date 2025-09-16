@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:wifiber/exceptions/auth_exceptions.dart';
 import 'package:wifiber/exceptions/secure_storage_exceptions.dart';
 import 'package:wifiber/exceptions/user_exceptions.dart';
@@ -29,12 +28,6 @@ class AuthService {
         }
 
         final timeUntilExpiry = user.tokenExpiryDate.difference(DateTime.now());
-        if (timeUntilExpiry.inMinutes <= 10 && timeUntilExpiry.inMinutes > 0) {
-          debugPrint(
-            'Token will expire in ${timeUntilExpiry.inMinutes} minutes',
-          );
-        }
-
         if (force) {
           final updatedUser = await _getProfile(user.userId, user);
           if (updatedUser != null) {

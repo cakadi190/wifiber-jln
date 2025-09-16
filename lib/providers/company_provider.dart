@@ -31,7 +31,6 @@ class CompanyProvider extends SafeChangeNotifier {
     } catch (e) {
       _error = e.toString();
       _setState(CompanyState.error);
-      print('Error loading company: $e');
     }
   }
 
@@ -56,7 +55,6 @@ class CompanyProvider extends SafeChangeNotifier {
 
       _error = e.toString();
       _setState(CompanyState.error);
-      print('Error creating company: $e');
       return false;
     }
   }
@@ -82,7 +80,6 @@ class CompanyProvider extends SafeChangeNotifier {
 
       _error = e.toString();
       _setState(CompanyState.error);
-      print('Error updating company: $e');
       return false;
     }
   }

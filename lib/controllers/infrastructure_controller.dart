@@ -78,7 +78,6 @@ class InfrastructureController {
         animateMapToShowUserAndItems();
       }
     } catch (e) {
-      debugPrint('Error getting user location: $e');
       provider.setError("Gagal mendapatkan lokasi pengguna: ${e.toString()}");
     }
   }

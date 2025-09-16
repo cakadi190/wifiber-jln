@@ -78,9 +78,7 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         try {
           _mapController!.move(location, zoom);
-        } catch (e) {
-          debugPrint('Error moving map: $e');
-        }
+        } catch (_) {}
       });
     }
   }

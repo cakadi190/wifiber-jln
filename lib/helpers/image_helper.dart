@@ -42,9 +42,7 @@ class ImageHelper {
       }
 
       return compressedBytes;
-    } catch (e) {
-      debugPrint('Error compressing image: $e');
-
+    } catch (_) {
       try {
         final bytes = await imageFile.readAsBytes();
 
@@ -60,8 +58,7 @@ class ImageHelper {
         }
 
         return bytes;
-      } catch (fallbackError) {
-        debugPrint('Fallback compression also failed: $fallbackError');
+      } catch (_) {
         return null;
       }
     }
@@ -75,8 +72,7 @@ class ImageHelper {
       final ui.Image image = frameInfo.image;
 
       return Size(image.width.toDouble(), image.height.toDouble());
-    } catch (e) {
-      debugPrint('Error getting image size: $e');
+    } catch (_) {
       return null;
     }
   }
@@ -88,8 +84,7 @@ class ImageHelper {
     try {
       final length = await imageFile.length();
       return length > maxSizeBytes;
-    } catch (e) {
-      debugPrint('Error checking file size: $e');
+    } catch (_) {
       return false;
     }
   }
@@ -115,8 +110,7 @@ class ImageHelper {
       );
 
       return byteData?.buffer.asUint8List();
-    } catch (e) {
-      debugPrint('Error creating thumbnail: $e');
+    } catch (_) {
       return null;
     }
   }

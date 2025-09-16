@@ -1,5 +1,4 @@
 import 'dart:io';
-import 'package:flutter/cupertino.dart';
 import 'package:http/http.dart' as http;
 
 class NetworkHelper {
@@ -9,9 +8,7 @@ class NetworkHelper {
       if (response.statusCode == 200) {
         return response.body;
       }
-    } catch (e) {
-      debugPrint('Error getting public IP: $e');
-    }
+    } catch (_) {}
     return null;
   }
 
@@ -25,9 +22,7 @@ class NetworkHelper {
           }
         }
       }
-    } catch (e) {
-      debugPrint('Error getting local IP: $e');
-    }
+    } catch (_) {}
     return null;
   }
 }

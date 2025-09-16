@@ -73,9 +73,7 @@ class _MapPickerState extends State<MapPicker> {
           userAgentPackageName: 'id.kodinus.wifiber',
           maxZoom: 18,
           subdomains: const ['a', 'b', 'c'],
-          errorTileCallback: (tile, error, stackTrace) {
-            debugPrint('Tile loading error: $error');
-          },
+          errorTileCallback: (tile, error, stackTrace) {},
         ),
         if (_selected != null)
           MarkerLayer(
