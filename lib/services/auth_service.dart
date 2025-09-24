@@ -27,7 +27,6 @@ class AuthService {
           throw TokenExpiredException('Token has expired');
         }
 
-        final timeUntilExpiry = user.tokenExpiryDate.difference(DateTime.now());
         if (force) {
           final updatedUser = await _getProfile(user.userId, user);
           if (updatedUser != null) {
