@@ -430,6 +430,8 @@ class RegistrantFormController extends SafeChangeNotifier {
       registrantData['location-photo'] = locationPhotoFile;
     }
 
+    if (!context.mounted) return false;
+
     final provider = Provider.of<RegistrantProvider>(context, listen: false);
     bool success;
 

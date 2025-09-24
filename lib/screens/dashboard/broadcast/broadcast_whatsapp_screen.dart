@@ -237,7 +237,7 @@ class _BroadcastWhatsappScreenState extends State<BroadcastWhatsappScreen> {
             ),
             const SizedBox(height: 16),
             DropdownButtonFormField<String>(
-              value: _customerStatus,
+              initialValue: _customerStatus,
               decoration: const InputDecoration(
                 labelText: 'Status Pelanggan',
                 helperText:

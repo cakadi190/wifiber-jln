@@ -110,10 +110,11 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen>
         'Terjadi kesalahan: ${e.toString()}',
       );
     } finally {
-      if (!mounted) return;
-      setState(() {
-        _isLoading = false;
-      });
+      if (mounted) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
     }
   }
 

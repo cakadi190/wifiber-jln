@@ -395,6 +395,8 @@ class CustomerFormController extends SafeChangeNotifier {
       customerData['location-photo'] = locationPhotoFile;
     }
 
+    if (!context.mounted) return false;
+
     final provider = Provider.of<CustomerProvider>(context, listen: false);
     bool success;
 

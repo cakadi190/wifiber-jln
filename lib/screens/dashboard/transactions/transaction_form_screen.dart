@@ -70,11 +70,13 @@ class _TransactionFormScreenState extends State<TransactionFormScreen>
       lastDate: DateTime(2100),
     );
     if (date == null) return;
+    if (!mounted) return;
     final time = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.fromDateTime(_createdAt),
     );
     if (time == null) return;
+    if (!mounted) return;
     final selected = DateTime(
       date.year,
       date.month,
@@ -179,8 +181,9 @@ class _TransactionFormScreenState extends State<TransactionFormScreen>
         SnackBar(content: Text('Gagal menyimpan transaksi: $e')),
       );
     } finally {
-      if (!mounted) return;
-      setState(() => _isLoading = false);
+      if (mounted) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 
