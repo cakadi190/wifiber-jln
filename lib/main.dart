@@ -4,6 +4,7 @@ import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/config/app_font.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/providers/bills_provider.dart';
+import 'package:wifiber/providers/broadcast_whatsapp_provider.dart';
 import 'package:wifiber/providers/complaint_provider.dart';
 import 'package:wifiber/providers/customer_provider.dart';
 import 'package:wifiber/providers/employee_provider.dart';
@@ -26,6 +27,7 @@ import 'package:wifiber/services/navigation_service.dart';
 import 'package:wifiber/services/area_service.dart';
 import 'package:wifiber/services/package_service.dart';
 import 'package:wifiber/services/company_service.dart';
+import 'package:wifiber/services/broadcast_service.dart';
 
 void main() {
   runApp(
@@ -49,6 +51,9 @@ void main() {
         ),
         ChangeNotifierProvider(create: (_) => BillsProvider(BillsService())),
         ChangeNotifierProvider(create: (_) => RouterProvider(RouterService())),
+        ChangeNotifierProvider(
+          create: (_) => BroadcastWhatsappProvider(BroadcastService()),
+        ),
         ChangeNotifierProvider(create: (_) => AreaProvider(AreaService())),
         ChangeNotifierProvider(create: (_) => PackageProvider(PackageService())),
         ChangeNotifierProvider(create: (_) => InfrastructureProvider()),
