@@ -342,11 +342,11 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
                     try {
                       await authProvider.logout();
 
-                      if (dialogContext.mounted) {
-                        navigator.pop();
+                      if (!mounted || !dialogContext.mounted) {
+                        return;
                       }
 
-                      if (!mounted) return;
+                      navigator.pop();
 
                       SnackBars.success(
                         context,
@@ -355,9 +355,11 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
 
                       widget.onLogoutTap?.call();
                     } catch (e) {
-                      if (dialogContext.mounted) {
-                        navigator.pop();
+                      if (!dialogContext.mounted) {
+                        return;
                       }
+
+                      navigator.pop();
 
                       if (!mounted) return;
 

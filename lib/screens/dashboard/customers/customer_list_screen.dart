@@ -272,6 +272,7 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                   });
                 }
               } catch (e) {
+                if (!context.mounted) return;
                 SnackBars.error(
                   context,
                   'Gagal memilih berkas: ${e.toString()}',
