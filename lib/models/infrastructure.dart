@@ -1,6 +1,9 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 
 class InfrastructureItem {
+  final String? id;
+  final String? oltId;
+  final String? odcId;
   final String? kodeOlt;
   final String? kodeOdp;
   final String? kodeOdc;
@@ -14,8 +17,11 @@ class InfrastructureItem {
   final String? odcName;
 
   InfrastructureItem({
+    this.id,
+    this.oltId,
     this.kodeOlt,
     this.kodeOdp,
+    this.odcId,
     this.kodeOdc,
     this.name,
     this.description,
@@ -29,6 +35,9 @@ class InfrastructureItem {
 
   factory InfrastructureItem.fromJson(Map<String, dynamic> json) {
     return InfrastructureItem(
+      id: json['id']?.toString(),
+      oltId: json['olt_id']?.toString(),
+      odcId: json['odc_id']?.toString(),
       kodeOlt: json['kode_olt'],
       kodeOdp: json['kode_odp'],
       kodeOdc: json['kode_odc'],

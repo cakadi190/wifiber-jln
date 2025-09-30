@@ -136,3 +136,44 @@ class CustomerResponse {
     );
   }
 }
+
+extension CustomerExtension on Customer {
+  bool hasValidCoordinates() {
+    final lat = double.tryParse(latitude ?? '');
+    final lng = double.tryParse(longitude ?? '');
+    return lat != null && lng != null;
+  }
+
+  double? get lat => double.tryParse(latitude ?? '');
+  double? get lng => double.tryParse(longitude ?? '');
+
+  String get statusDisplay {
+    switch (status) {
+      case 'customer':
+        return 'Pelanggan';
+      case 'registrant':
+        return 'Pendaftar';
+      case 'active':
+        return 'Aktif';
+      case 'inactive':
+        return 'Tidak Aktif';
+      case 'suspended':
+        return 'Suspend';
+      default:
+        return status;
+    }
+  }
+
+  String get formattedPrice {
+    final price = int.tryParse(packagePrice) ?? 0;
+    final disc = int.tryParse(discount) ?? 0;
+    final total = price - disc;
+    return 'Rp ${total.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}';
+  }
+
+  String get formattedDiscount {
+    final disc = int.tryParse(discount) ?? 0;
+    if (disc == 0) return '-';
+    return 'Rp ${disc.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}';
+  }
+}

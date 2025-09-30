@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:latlong2/latlong.dart';
+import 'package:wifiber/models/customer.dart';
 import 'package:wifiber/models/infrastructure.dart';
 import 'package:wifiber/services/http_service.dart';
 import 'package:wifiber/services/location_service.dart';
@@ -18,14 +19,23 @@ class InfrastructureProvider extends SafeChangeNotifier {
   String? _locationError;
 
   List<InfrastructureItem> get items => _items;
+
   bool get isLoading => _isLoading;
+
   String? get error => _error;
+
   InfrastructureType get activeType => _activeType;
+
   bool get hasData => _items.isNotEmpty;
+
   bool get hasError => _error != null;
+
   LatLng? get userLocation => _userLocation;
+
   bool get isLocationLoading => _isLocationLoading;
+
   String? get locationError => _locationError;
+
   bool get hasUserLocation => _userLocation != null;
 
   Future<void> loadData(InfrastructureType type) async {
@@ -195,9 +205,84 @@ class InfrastructureProvider extends SafeChangeNotifier {
     _locationError = null;
     notifyListeners();
   }
+
+  Future<List<InfrastructureItem>> loadOdpsByOdcId(String odcId) async {
+    try {
+      final response = await _httpService.get(
+        'odps',
+        requiresAuth: true,
+        parameters: {'odc_id': odcId},
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final List<dynamic> itemsData = data['data'] ?? [];
+
+        return itemsData
+            .map((item) => InfrastructureItem.fromJson(item))
+            .toList();
+      } else if (response.statusCode == 404) {
+        return [];
+      } else {
+        throw Exception('Failed to load ODPs: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error loading ODPs: ${e.toString()}');
+    }
+  }
+
+  Future<List<InfrastructureItem>> loadOdcsByOltId(String oltId) async {
+    try {
+      final response = await _httpService.get(
+        'odcs',
+        requiresAuth: true,
+        parameters: {'olt_id': oltId},
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final List<dynamic> itemsData = data['data'] ?? [];
+
+        return itemsData
+            .map((item) => InfrastructureItem.fromJson(item))
+            .toList();
+      } else if (response.statusCode == 404) {
+        return [];
+      } else {
+        throw Exception('Failed to load ODCs: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error loading ODCs: $e');
+      throw Exception('Error loading ODCs: ${e.toString()}');
+    }
+  }
+
+  Future<List<Customer>> loadCustomersByOdpId(String odpId) async {
+    try {
+      final response = await _httpService.get(
+        'odp-customers/$odpId',
+        requiresAuth: true,
+      );
+
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final List<dynamic> customersData = data['data'] ?? [];
+
+        return customersData
+            .map((item) => Customer.fromJson(item))
+            .toList();
+      } else if (response.statusCode == 404) {
+        return [];
+      } else {
+        throw Exception('Failed to load customers: ${response.statusCode}');
+      }
+    } catch (e) {
+      print('Error loading customers: $e');
+      throw Exception('Error loading customers: ${e.toString()}');
+    }
+  }
 }
 
-/// Helper class to combine infrastructure item with distance
 class InfrastructureItemWithDistance {
   final InfrastructureItem item;
   final double? distance;
