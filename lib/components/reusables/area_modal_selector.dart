@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
@@ -25,9 +26,9 @@ class Area {
       id: json['id'] as String,
       code: json['code'] as String,
       name: json['name'] as String,
-      description: json['description'] as String,
-      status: json['status'] as String,
-      createdAt: json['created_at'] as String,
+      description: (json['description'] ?? '').toString(),
+      status: (json['status'] ?? '').toString(),
+      createdAt: (json['created_at'] ?? '').toString(),
     );
   }
 }
@@ -56,20 +57,43 @@ class _AreaButtonSelectorState extends State<AreaButtonSelector> {
   List<Area> _areas = [];
   bool _loading = false;
   String? _error;
+  final TextEditingController _searchController = TextEditingController();
+  Timer? _debounce;
 
   @override
   void initState() {
     super.initState();
     _fetchAreas();
+    _searchController.addListener(_onSearchChanged);
   }
 
-  Future<void> _fetchAreas() async {
+  @override
+  void dispose() {
+    _debounce?.cancel();
+    _searchController.removeListener(_onSearchChanged);
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  void _onSearchChanged() {
+    _debounce?.cancel();
+    _debounce = Timer(const Duration(milliseconds: 350), () {
+      if (!mounted) return;
+      _fetchAreas(search: _searchController.text.trim());
+    });
+  }
+
+  Future<void> _fetchAreas({String? search}) async {
     setState(() {
       _loading = true;
       _error = null;
     });
     try {
-      final response = await _http.get('/areas', requiresAuth: true);
+      final response = await _http.get(
+        '/areas',
+        requiresAuth: true,
+        parameters: search?.isNotEmpty == true ? {'search': search} : null,
+      );
       final jsonResponse = jsonDecode(response.body);
       if (jsonResponse['success'] == true && jsonResponse['data'] is List) {
         final List list = jsonResponse['data'];
@@ -80,13 +104,19 @@ class _AreaButtonSelectorState extends State<AreaButtonSelector> {
     } catch (e) {
       _error = 'Error: $e';
     }
+    if (!mounted) return;
     setState(() {
       _loading = false;
     });
   }
 
   void _showAreaPicker() {
-    if (_loading) return;
+    if (_searchController.text.isNotEmpty) {
+      _searchController.removeListener(_onSearchChanged);
+      _searchController.clear();
+      _searchController.addListener(_onSearchChanged);
+      _fetchAreas();
+    }
 
     showModalBottomSheet(
       context: context,
@@ -143,6 +173,31 @@ class _AreaButtonSelectorState extends State<AreaButtonSelector> {
                       ],
                     ),
                   ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 16,
+                      vertical: 0,
+                    ),
+                    child: TextField(
+                      controller: _searchController,
+                      decoration: InputDecoration(
+                        hintText: 'Cari area berdasarkan nama atau kode',
+                        prefixIcon: const Icon(Icons.search),
+                        border: const OutlineInputBorder(),
+                        isDense: true,
+                        suffixIcon: _searchController.text.isNotEmpty
+                            ? IconButton(
+                                onPressed: () {
+                                  _searchController.clear();
+                                  _fetchAreas();
+                                },
+                                icon: const Icon(Icons.close),
+                              )
+                            : null,
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 8),
                   Divider(height: 1, color: Colors.grey.shade300),
                   Expanded(child: _buildContent(scrollController)),
                 ],
@@ -155,7 +210,7 @@ class _AreaButtonSelectorState extends State<AreaButtonSelector> {
   }
 
   Widget _buildContent(ScrollController scrollController) {
-    if (_loading) {
+    if (_loading && _areas.isEmpty) {
       return const Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
@@ -167,12 +222,12 @@ class _AreaButtonSelectorState extends State<AreaButtonSelector> {
         ),
       );
     }
-    if (_error != null) {
+    if (_error != null && _areas.isEmpty) {
       return Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.error_outline, color: Colors.red[400], size: 48),
+            Icon(Icons.error_outline, color: Colors.red, size: 48),
             const SizedBox(height: 16),
             Text(
               _error!,
@@ -204,116 +259,141 @@ class _AreaButtonSelectorState extends State<AreaButtonSelector> {
         ),
       );
     }
-    return ListView.separated(
-      controller: scrollController,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-      itemCount: _areas.length,
-      separatorBuilder: (context, index) => const SizedBox(height: 8),
-      itemBuilder: (context, index) {
-        final area = _areas[index];
-        final isSelected = area.id == widget.selectedAreaId;
-        return AnimatedContainer(
-          duration: const Duration(milliseconds: 200),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(
-              color: isSelected ? Colors.green : Colors.grey[300]!,
-              width: isSelected ? 2 : 1,
-            ),
-            color: isSelected
-                ? Colors.green.withValues(alpha: 0.05)
-                : Colors.white,
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withValues(alpha: 0.05),
-                blurRadius: 4,
-                offset: const Offset(0, 2),
+    return Stack(
+      children: [
+        ListView.separated(
+          controller: scrollController,
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          itemCount: _areas.length,
+          separatorBuilder: (context, index) => const SizedBox(height: 8),
+          itemBuilder: (context, index) {
+            final area = _areas[index];
+            final isSelected = area.id == widget.selectedAreaId;
+            return AnimatedContainer(
+              duration: const Duration(milliseconds: 200),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(
+                  color: isSelected ? Colors.green : Colors.grey[300]!,
+                  width: isSelected ? 2 : 1,
+                ),
+                color: isSelected
+                    ? Colors.green.withValues(alpha: 0.05)
+                    : Colors.white,
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 0.05),
+                    blurRadius: 4,
+                    offset: const Offset(0, 2),
+                  ),
+                ],
               ),
-            ],
-          ),
-          child: Material(
-            color: Colors.transparent,
-            child: InkWell(
-              borderRadius: BorderRadius.circular(12),
-              onTap: () {
-                Navigator.pop(context);
-                widget.onAreaSelected(area);
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? Colors.green.withValues(alpha: 0.1)
-                            : Colors.grey[100],
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Icon(
-                        Icons.map,
-                        color: isSelected ? Colors.green : Colors.grey[600],
-                        size: 24,
-                      ),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            area.name,
-                            style: TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                              color: isSelected
-                                  ? Colors.green[700]
-                                  : Colors.black87,
-                            ),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(12),
+                  onTap: () {
+                    Navigator.pop(context);
+                    widget.onAreaSelected(area);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Row(
+                      children: [
+                        Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? Colors.green.withValues(alpha: 0.1)
+                                : Colors.grey[100],
+                            borderRadius: BorderRadius.circular(12),
                           ),
-                          const SizedBox(height: 4),
-                          Text(
-                            area.code,
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: isSelected
-                                  ? Colors.green[600]
-                                  : Colors.grey[600],
-                            ),
+                          child: Icon(
+                            Icons.map,
+                            color: isSelected ? Colors.green : Colors.grey[600],
+                            size: 24,
                           ),
-                        ],
-                      ),
-                    ),
-                    AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      width: 24,
-                      height: 24,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: isSelected ? Colors.green : Colors.transparent,
-                        border: Border.all(
-                          color:
-                              isSelected ? Colors.green : Colors.grey[400]!,
-                          width: 2,
                         ),
-                      ),
-                      child: isSelected
-                          ? const Icon(
-                              Icons.check,
-                              color: Colors.white,
-                              size: 16,
-                            )
-                          : null,
+                        const SizedBox(width: 16),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                area.name,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                  color: isSelected
+                                      ? Colors.green[700]
+                                      : Colors.black87,
+                                ),
+                              ),
+                              const SizedBox(height: 4),
+                              Text(
+                                area.code,
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: isSelected
+                                      ? Colors.green[600]
+                                      : Colors.grey[600],
+                                ),
+                              ),
+                              if (area.description.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.only(top: 4),
+                                  child: Text(
+                                    area.description,
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ),
+                            ],
+                          ),
+                        ),
+                        AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          width: 24,
+                          height: 24,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: isSelected
+                                ? Colors.green
+                                : Colors.transparent,
+                            border: Border.all(
+                              color: isSelected
+                                  ? Colors.green
+                                  : Colors.grey[400]!,
+                              width: 2,
+                            ),
+                          ),
+                          child: isSelected
+                              ? const Icon(
+                                  Icons.check,
+                                  color: Colors.white,
+                                  size: 16,
+                                )
+                              : null,
+                        ),
+                      ],
                     ),
-                  ],
+                  ),
                 ),
               ),
-            ),
+            );
+          },
+        ),
+        if (_loading)
+          const Positioned(
+            top: 0,
+            left: 0,
+            right: 0,
+            child: LinearProgressIndicator(minHeight: 2),
           ),
-        );
-      },
+      ],
     );
   }
 
@@ -350,4 +430,3 @@ class _AreaButtonSelectorState extends State<AreaButtonSelector> {
     );
   }
 }
-

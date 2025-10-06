@@ -20,7 +20,9 @@ mixin BackendValidationMixin<T extends StatefulWidget> on State<T> {
   void setBackendErrors(Map<String, dynamic> errors) {
     _backendErrors
       ..clear()
-      ..addAll(errors.map((key, value) => MapEntry(key, _parseFirstError(value))));
+      ..addAll(
+        errors.map((key, value) => MapEntry(key, _parseFirstError(value))),
+      );
     setState(() {});
     formKey.currentState?.validate();
   }
