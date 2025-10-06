@@ -9,6 +9,7 @@ import 'package:wifiber/components/forms/backend_validation_mixin.dart';
 import 'package:wifiber/components/reusables/image_preview.dart';
 import 'package:wifiber/components/reusables/location_picker_widget.dart';
 import 'package:wifiber/components/reusables/odp_modal_selector.dart';
+import 'package:wifiber/components/reusables/area_modal_selector.dart';
 import 'package:wifiber/components/reusables/package_modal_action.dart';
 import 'package:wifiber/components/reusables/router_modal_selector.dart';
 import 'package:wifiber/config/app_colors.dart';
@@ -334,6 +335,7 @@ class _CustomerFormScreenState extends State<CustomerFormScreen>
         value: _controller,
         child: Consumer<CustomerFormController>(
           builder: (context, controller, child) {
+            final areaBackendError = backendErrorFor('area');
             return Scaffold(
               backgroundColor: AppColors.primary,
               appBar: AppBar(
@@ -362,6 +364,11 @@ class _CustomerFormScreenState extends State<CustomerFormScreen>
                       onPressed: () async {
                         if (_formKey.currentState!.validate()) {
                           clearBackendErrors();
+                          final areaError = controller.validateAreaSelection();
+                          if (areaError != null) {
+                            setState(() {});
+                            return;
+                          }
                           await controller.submitForm(
                             context,
                             isEdit: widget.isEdit,
@@ -572,22 +579,35 @@ class _CustomerFormScreenState extends State<CustomerFormScreen>
                                       ),
                                     ),
                                   const SizedBox(height: 16),
-                                  TextFormField(
-                                    controller: controller.areaIdController,
-                                    decoration: const InputDecoration(
-                                      labelText: 'ID Area',
-                                      border: OutlineInputBorder(),
-                                      prefixIcon: Icon(Icons.map),
-                                    ),
-                                    keyboardType: TextInputType.number,
-                                    validator: validator(
-                                      'area',
-                                      (value) => controller.validateRequired(
-                                        value,
-                                        'ID Area',
+                                  AreaButtonSelector(
+                                    selectedAreaId: controller.selectedAreaId,
+                                    selectedAreaName:
+                                        controller.selectedAreaName,
+                                    onAreaSelected: controller.onAreaSelected,
+                                  ),
+                                  if (controller.validateAreaSelection() !=
+                                      null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8),
+                                      child: Text(
+                                        controller.validateAreaSelection()!,
+                                        style: TextStyle(
+                                          color: Colors.red.shade600,
+                                          fontSize: 12,
+                                        ),
                                       ),
                                     ),
-                                  ),
+                                  if (areaBackendError != null)
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 8),
+                                      child: Text(
+                                        areaBackendError,
+                                        style: TextStyle(
+                                          color: Colors.red.shade600,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                    ),
                                   const SizedBox(height: 16),
                                   RouterButtonSelector(
                                     selectedRouterId:

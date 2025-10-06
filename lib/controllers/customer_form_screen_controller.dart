@@ -23,7 +23,6 @@ class CustomerFormController extends SafeChangeNotifier {
   late TextEditingController identityNumberController;
   late TextEditingController addressController;
   late TextEditingController packageIdController;
-  late TextEditingController areaIdController;
   late TextEditingController routerIdController;
   late TextEditingController pppoeSecretController;
   late TextEditingController dueDateController;
@@ -37,6 +36,8 @@ class CustomerFormController extends SafeChangeNotifier {
 
   String? selectedPackageId;
   String? selectedPackageName;
+  String? selectedAreaId;
+  String? selectedAreaName;
   String? selectedRouterId;
   String? selectedRouterName;
   String? selectedOdpId;
@@ -60,7 +61,6 @@ class CustomerFormController extends SafeChangeNotifier {
     identityNumberController = TextEditingController();
     addressController = TextEditingController();
     packageIdController = TextEditingController();
-    areaIdController = TextEditingController();
     routerIdController = TextEditingController();
     pppoeSecretController = TextEditingController();
     dueDateController = TextEditingController();
@@ -79,7 +79,6 @@ class CustomerFormController extends SafeChangeNotifier {
     identityNumberController.text = customer.identityNumber;
     addressController.text = customer.address;
     packageIdController.text = customer.packageId;
-    areaIdController.text = customer.areaId;
     routerIdController.text = customer.routerId ?? '';
     pppoeSecretController.text = customer.pppoeSecret;
     dueDateController.text = customer.dueDate;
@@ -97,6 +96,7 @@ class CustomerFormController extends SafeChangeNotifier {
 
     selectedStatus = _getStatusFromString(customer.status);
     selectedPackageId = customer.packageId;
+    selectedAreaId = customer.areaId;
     selectedRouterId = customer.routerId;
     selectedOdpId = customer.odpId;
 
@@ -105,6 +105,7 @@ class CustomerFormController extends SafeChangeNotifier {
 
   Future<void> initializeEditData() async {
     if (selectedPackageId == null &&
+        selectedAreaId == null &&
         selectedRouterId == null &&
         selectedOdpId == null) {
       return;
@@ -117,6 +118,8 @@ class CustomerFormController extends SafeChangeNotifier {
       await Future.wait([
         if (selectedPackageId != null && selectedPackageId!.isNotEmpty)
           _fetchPackageName(selectedPackageId!),
+        if (selectedAreaId != null && selectedAreaId!.isNotEmpty)
+          _fetchAreaName(selectedAreaId!),
         if (selectedRouterId != null && selectedRouterId!.isNotEmpty)
           _fetchRouterName(selectedRouterId!),
         if (selectedOdpId != null && selectedOdpId!.isNotEmpty)
@@ -143,6 +146,26 @@ class CustomerFormController extends SafeChangeNotifier {
 
         if (package != null) {
           selectedPackageName = package['name'];
+          notifyListeners();
+        }
+      }
+    } catch (_) {}
+  }
+
+  Future<void> _fetchAreaName(String areaId) async {
+    try {
+      final response = await _http.get('/areas', requiresAuth: true);
+      final jsonResponse = jsonDecode(response.body);
+
+      if (jsonResponse['success'] == true && jsonResponse['data'] is List) {
+        final List areas = jsonResponse['data'];
+        final area = areas.firstWhere(
+          (a) => a['id'] == areaId,
+          orElse: () => null,
+        );
+
+        if (area != null) {
+          selectedAreaName = area['name'];
           notifyListeners();
         }
       }
@@ -193,6 +216,12 @@ class CustomerFormController extends SafeChangeNotifier {
     selectedPackageId = package.id;
     selectedPackageName = package.name;
     packageIdController.text = package.id;
+    notifyListeners();
+  }
+
+  void onAreaSelected(dynamic area) {
+    selectedAreaId = area.id;
+    selectedAreaName = area.name;
     notifyListeners();
   }
 
@@ -370,9 +399,7 @@ class CustomerFormController extends SafeChangeNotifier {
       'package': (selectedPackageId?.isEmpty ?? true)
           ? null
           : selectedPackageId,
-      'area': areaIdController.text.trim().isEmpty
-          ? null
-          : areaIdController.text.trim(),
+      'area': (selectedAreaId?.isEmpty ?? true) ? null : selectedAreaId,
       'router': (selectedRouterId?.isEmpty ?? true) ? null : selectedRouterId,
       'pppoe_secret': pppoeSecretController.text.trim(),
       'due-date': dueDateController.text.trim(),
@@ -468,6 +495,13 @@ class CustomerFormController extends SafeChangeNotifier {
     return null;
   }
 
+  String? validateAreaSelection() {
+    if (selectedAreaId == null || selectedAreaId!.isEmpty) {
+      return 'Area wajib dipilih';
+    }
+    return null;
+  }
+
   String? validateRouterSelection() {
     if (selectedRouterId == null || selectedRouterId!.isEmpty) {
       return 'Router wajib dipilih';
@@ -509,7 +543,6 @@ class CustomerFormController extends SafeChangeNotifier {
     identityNumberController.dispose();
     addressController.dispose();
     packageIdController.dispose();
-    areaIdController.dispose();
     routerIdController.dispose();
     pppoeSecretController.dispose();
     dueDateController.dispose();

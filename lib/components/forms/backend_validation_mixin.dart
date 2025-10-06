@@ -37,6 +37,9 @@ mixin BackendValidationMixin<T extends StatefulWidget> on State<T> {
     };
   }
 
+  /// Retrieves backend error message for a specific field without running validation.
+  String? backendErrorFor(String field) => _backendErrors[field];
+
   String? _parseFirstError(dynamic value) {
     if (value is List && value.isNotEmpty) return value.first.toString();
     return value?.toString();

@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:wifiber/models/customer.dart';
 import 'package:wifiber/models/infrastructure.dart';
@@ -386,7 +387,7 @@ class InfrastructureProvider extends SafeChangeNotifier {
         throw Exception('Failed to load ODCs: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error loading ODCs: $e');
+      debugPrint('Error loading ODCs: $e');
       throw Exception('Error loading ODCs: ${e.toString()}');
     }
   }
@@ -411,7 +412,7 @@ class InfrastructureProvider extends SafeChangeNotifier {
         throw Exception('Failed to load customers: ${response.statusCode}');
       }
     } catch (e) {
-      print('Error loading customers: $e');
+      debugPrint('Error loading customers: $e');
       throw Exception('Error loading customers: ${e.toString()}');
     }
   }
