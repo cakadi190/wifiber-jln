@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:wifiber/models/router.dart';
+import 'package:wifiber/models/router_pppoe.dart';
 import 'package:wifiber/services/http_service.dart';
 import 'package:wifiber/exceptions/validation_exceptions.dart';
 
@@ -142,6 +143,42 @@ class RouterService {
       }
     } catch (e) {
       throw Exception('Error toggling auto isolate: $e');
+    }
+  }
+
+  Future<RouterPppoeSecrets> getRouterPppoes(int routerId) async {
+    try {
+      final response = await _http.get(
+        'router-pppoes/$routerId',
+        requiresAuth: true,
+      );
+
+      if (response.statusCode == 200) {
+        final Map<String, dynamic> data = json.decode(response.body);
+        final dynamic payload = data['data'] ?? data;
+
+        if (payload is Map<String, dynamic>) {
+          return RouterPppoeSecrets.fromJson(payload);
+        }
+
+        throw Exception('Data PPPoE tidak valid.');
+      }
+
+      final Map<String, dynamic>? errorBody = response.body.isNotEmpty
+          ? json.decode(response.body) as Map<String, dynamic>?
+          : null;
+
+      final message = errorBody != null
+          ? errorBody['message']?.toString() ?? errorBody['error']?.toString()
+          : null;
+
+      if (response.statusCode == 404) {
+        throw Exception(message ?? 'Router tidak ditemukan.');
+      }
+
+      throw Exception(message ?? 'Gagal memuat data PPPoE: ${response.statusCode}');
+    } catch (e) {
+      throw Exception('Error fetching router PPPoE: $e');
     }
   }
 }

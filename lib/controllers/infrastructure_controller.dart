@@ -19,13 +19,7 @@ class InfrastructureController {
   });
 
   void animateMapToDataCenter() {
-    final items = provider.getItemsWithValidCoordinates();
-    if (items.isEmpty) return;
-
-    final coordinates = items
-        .map((item) => LatLng(item.lat!, item.lng!))
-        .toList();
-
+    final coordinates = provider.getActiveCoordinates();
     if (coordinates.isEmpty) return;
 
     final bounds = _calculateBounds(coordinates);
@@ -48,21 +42,21 @@ class InfrastructureController {
 
   void animateMapToShowUserAndItems() {
     final userLocation = provider.userLocation;
-    final items = provider.getItemsWithValidCoordinates();
+    final coordinates = provider.getActiveCoordinates();
 
-    if (userLocation == null && items.isEmpty) return;
+    if (userLocation == null && coordinates.isEmpty) return;
 
-    List<LatLng> coordinates = [];
+    List<LatLng> points = [];
 
     if (userLocation != null) {
-      coordinates.add(userLocation);
+      points.add(userLocation);
     }
 
-    coordinates.addAll(items.map((item) => LatLng(item.lat!, item.lng!)));
+    points.addAll(coordinates);
 
-    if (coordinates.isEmpty) return;
+    if (points.isEmpty) return;
 
-    final bounds = _calculateBounds(coordinates);
+    final bounds = _calculateBounds(points);
     final center = _calculateCenter(bounds);
     final zoomLevel = _calculateZoomLevel(bounds);
 

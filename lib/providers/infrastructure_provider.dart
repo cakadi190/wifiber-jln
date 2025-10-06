@@ -11,6 +11,7 @@ class InfrastructureProvider extends SafeChangeNotifier {
   final HttpService _httpService = HttpService();
 
   List<InfrastructureItem> _items = [];
+  List<Customer> _customers = [];
   bool _isLoading = false;
   String? _error;
   InfrastructureType _activeType = InfrastructureType.olt;
@@ -19,6 +20,7 @@ class InfrastructureProvider extends SafeChangeNotifier {
   String? _locationError;
 
   List<InfrastructureItem> get items => _items;
+  List<Customer> get customers => _customers;
 
   bool get isLoading => _isLoading;
 
@@ -26,7 +28,9 @@ class InfrastructureProvider extends SafeChangeNotifier {
 
   InfrastructureType get activeType => _activeType;
 
-  bool get hasData => _items.isNotEmpty;
+  bool get hasData => _activeType == InfrastructureType.customer
+      ? _customers.isNotEmpty
+      : _items.isNotEmpty;
 
   bool get hasError => _error != null;
 
@@ -39,33 +43,73 @@ class InfrastructureProvider extends SafeChangeNotifier {
   bool get hasUserLocation => _userLocation != null;
 
   Future<void> loadData(InfrastructureType type) async {
-    if (_activeType == type && !hasError) return;
+    if (_activeType == type && !hasError && hasData) return;
 
     _setLoading(true);
     _clearError();
     _activeType = type;
 
     try {
-      final response = await _httpService.get(
-        type.endpoint,
-        requiresAuth: true,
-      );
+      if (type == InfrastructureType.customer) {
+        final response = await _httpService.get(
+          type.endpoint,
+          requiresAuth: true,
+          parameters: {'status': 'customer'},
+        );
 
-      if (response.statusCode == 200) {
-        final data = jsonDecode(response.body);
-        final List<dynamic> itemsData = data['data'] ?? [];
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          final dynamic raw =
+              data['data'] ?? data['customers'] ?? data['items'] ?? data;
+          final List<dynamic> itemsData;
 
-        _items = itemsData
-            .map((item) => InfrastructureItem.fromJson(item))
-            .toList();
+          if (raw is List) {
+            itemsData = raw;
+          } else if (raw is Map<String, dynamic>) {
+            final dynamic nested =
+                raw['data'] ?? raw['customers'] ?? raw['items'] ?? [];
+            itemsData = nested is List ? nested : [];
+          } else {
+            itemsData = [];
+          }
 
-        if (_userLocation != null) {
-          _sortItemsByDistance();
+          _customers = itemsData
+              .map((item) => Customer.fromJson(item))
+              .toList();
+
+          if (_userLocation != null && _customers.isNotEmpty) {
+            _sortCustomersByDistance();
+          }
+        } else {
+          throw Exception('Failed to load data: ${response.statusCode}');
         }
       } else {
-        throw Exception('Failed to load data: ${response.statusCode}');
+        final response = await _httpService.get(
+          type.endpoint,
+          requiresAuth: true,
+        );
+
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          final List<dynamic> itemsData = data['data'] ?? [];
+
+          _items = itemsData
+              .map((item) => InfrastructureItem.fromJson(item))
+              .toList();
+
+          if (_userLocation != null && _items.isNotEmpty) {
+            _sortItemsByDistance();
+          }
+        } else {
+          throw Exception('Failed to load data: ${response.statusCode}');
+        }
       }
     } catch (e) {
+      if (type == InfrastructureType.customer) {
+        _customers = [];
+      } else {
+        _items = [];
+      }
       setError(e.toString());
     } finally {
       _setLoading(false);
@@ -83,6 +127,9 @@ class InfrastructureProvider extends SafeChangeNotifier {
       if (_items.isNotEmpty) {
         _sortItemsByDistance();
       }
+      if (_customers.isNotEmpty) {
+        _sortCustomersByDistance();
+      }
     } catch (e) {
       _setLocationError(e.toString());
     } finally {
@@ -97,6 +144,32 @@ class InfrastructureProvider extends SafeChangeNotifier {
       if (!a.hasValidCoordinates() && !b.hasValidCoordinates()) return 0;
       if (!a.hasValidCoordinates()) return 1;
       if (!b.hasValidCoordinates()) return -1;
+
+      final distanceA = LocationService.calculateDistance(
+        _userLocation!,
+        LatLng(a.lat!, a.lng!),
+      );
+      final distanceB = LocationService.calculateDistance(
+        _userLocation!,
+        LatLng(b.lat!, b.lng!),
+      );
+
+      return distanceA.compareTo(distanceB);
+    });
+
+    notifyListeners();
+  }
+
+  void _sortCustomersByDistance() {
+    if (_userLocation == null) return;
+
+    _customers.sort((a, b) {
+      final aValid = a.hasValidCoordinates();
+      final bValid = b.hasValidCoordinates();
+
+      if (!aValid && !bValid) return 0;
+      if (!aValid) return 1;
+      if (!bValid) return -1;
 
       final distanceA = LocationService.calculateDistance(
         _userLocation!,
@@ -132,6 +205,25 @@ class InfrastructureProvider extends SafeChangeNotifier {
     }).toList();
   }
 
+  List<CustomerWithDistance> getCustomersWithDistance() {
+    if (_userLocation == null) {
+      return _customers
+          .map((customer) => CustomerWithDistance(customer, null))
+          .toList();
+    }
+
+    return _customers.map((customer) {
+      double? distance;
+      if (customer.hasValidCoordinates()) {
+        distance = LocationService.calculateDistance(
+          _userLocation!,
+          LatLng(customer.lat!, customer.lng!),
+        );
+      }
+      return CustomerWithDistance(customer, distance);
+    }).toList();
+  }
+
   InfrastructureItem? getNearestItem() {
     if (_userLocation == null || _items.isEmpty) return null;
 
@@ -156,6 +248,32 @@ class InfrastructureProvider extends SafeChangeNotifier {
     return nearestItem;
   }
 
+  Customer? getNearestCustomer() {
+    if (_userLocation == null || _customers.isEmpty) return null;
+
+    final validCustomers =
+        _customers.where((customer) => customer.hasValidCoordinates()).toList();
+
+    if (validCustomers.isEmpty) return null;
+
+    Customer? nearestCustomer;
+    double? minDistance;
+
+    for (final customer in validCustomers) {
+      final distance = LocationService.calculateDistance(
+        _userLocation!,
+        LatLng(customer.lat!, customer.lng!),
+      );
+
+      if (minDistance == null || distance < minDistance) {
+        minDistance = distance;
+        nearestCustomer = customer;
+      }
+    }
+
+    return nearestCustomer;
+  }
+
   void clearUserLocation() {
     _userLocation = null;
     _clearLocationError();
@@ -174,6 +292,22 @@ class InfrastructureProvider extends SafeChangeNotifier {
 
   List<InfrastructureItem> getItemsWithValidCoordinates() {
     return _items.where((item) => item.hasValidCoordinates()).toList();
+  }
+
+  List<Customer> getCustomersWithValidCoordinates() {
+    return _customers.where((customer) => customer.hasValidCoordinates()).toList();
+  }
+
+  List<LatLng> getActiveCoordinates() {
+    if (_activeType == InfrastructureType.customer) {
+      return getCustomersWithValidCoordinates()
+          .map((customer) => LatLng(customer.lat!, customer.lng!))
+          .toList();
+    }
+
+    return getItemsWithValidCoordinates()
+        .map((item) => LatLng(item.lat!, item.lng!))
+        .toList();
   }
 
   void _setLoading(bool loading) {
@@ -288,6 +422,22 @@ class InfrastructureItemWithDistance {
   final double? distance;
 
   InfrastructureItemWithDistance(this.item, this.distance);
+
+  String get formattedDistance {
+    if (distance == null) return 'Unknown';
+    if (distance! < 1000) {
+      return '${distance!.round()} m';
+    } else {
+      return '${(distance! / 1000).toStringAsFixed(1)} km';
+    }
+  }
+}
+
+class CustomerWithDistance {
+  final Customer customer;
+  final double? distance;
+
+  CustomerWithDistance(this.customer, this.distance);
 
   String get formattedDistance {
     if (distance == null) return 'Unknown';

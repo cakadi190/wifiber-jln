@@ -13,6 +13,7 @@ import 'package:wifiber/controllers/infrastructure_controller.dart';
 import 'package:wifiber/components/widgets/infrastructure_widget.dart';
 import 'package:wifiber/components/widgets/location_widgets.dart';
 import 'package:wifiber/services/location_service.dart';
+import 'package:wifiber/screens/dashboard/customers/customer_detail_modal.dart';
 
 class InfrastructureHome extends StatefulWidget {
   const InfrastructureHome({super.key});
@@ -155,16 +156,56 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
               if (provider.hasUserLocation)
                 LocationWidgets.buildUserLocationMarker(provider.userLocation!),
 
-              ...InfrastructureWidgets.buildMapMarkers(
-                provider.items,
-                provider.activeType,
-                (item) => _showMarkerInfo(item, provider.activeType),
-              ),
+              if (provider.activeType == InfrastructureType.customer)
+                ..._buildCustomerMarkers(provider.customers)
+              else
+                ...InfrastructureWidgets.buildMapMarkers(
+                  provider.items,
+                  provider.activeType,
+                  (item) => _showMarkerInfo(item, provider.activeType),
+                ),
             ],
           ),
         ],
       ),
     );
+  }
+
+  List<Marker> _buildCustomerMarkers(List<Customer> customers) {
+    return customers
+        .where((customer) => customer.hasValidCoordinates())
+        .map(
+          (customer) => Marker(
+            point: LatLng(customer.lat!, customer.lng!),
+            width: 40,
+            height: 40,
+            child: GestureDetector(
+              onTap: () =>
+                  _showMarkerInfo(customer, InfrastructureType.customer),
+              child: Container(
+                decoration: BoxDecoration(
+                  color: _getCustomerStatusColor(customer.status)
+                      .withValues(alpha: 0.9),
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                  boxShadow: const [
+                    BoxShadow(
+                      color: Colors.black26,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
+                ),
+                child: const Icon(
+                  Icons.person_pin_circle,
+                  color: Colors.white,
+                  size: 20,
+                ),
+              ),
+            ),
+          ),
+        )
+        .toList();
   }
 
   Widget _buildBackButton(BuildContext context) {
@@ -294,12 +335,108 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
             provider.activeType == InfrastructureType.odp,
             () => _controller?.onFilterTap(InfrastructureType.odp),
           ),
+          const SizedBox(width: 8),
+          InfrastructureWidgets.buildFilterButton(
+            'Pelanggan',
+            provider.activeType == InfrastructureType.customer,
+            () => _controller?.onFilterTap(InfrastructureType.customer),
+          ),
         ],
       ),
     );
   }
 
   Widget _buildNearestItemInfo(InfrastructureProvider provider) {
+    if (provider.activeType == InfrastructureType.customer) {
+      final nearestCustomer = provider.getNearestCustomer();
+      if (nearestCustomer == null) {
+        return const SizedBox.shrink();
+      }
+
+      final distance = provider.userLocation != null &&
+              nearestCustomer.hasValidCoordinates()
+          ? LocationService.calculateDistance(
+              provider.userLocation!,
+              LatLng(nearestCustomer.lat!, nearestCustomer.lng!),
+            )
+          : null;
+
+      return Container(
+        margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: AppColors.primary.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(8),
+          border: Border.all(color: AppColors.primary.withValues(alpha: 0.2)),
+        ),
+        child: Row(
+          children: [
+            Icon(Icons.person_pin_circle, color: _getCustomerStatusColor(nearestCustomer.status)),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Pelanggan Terdekat',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                    ),
+                  ),
+                  Text(
+                    nearestCustomer.name,
+                    style: const TextStyle(fontSize: 12),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  if (nearestCustomer.address.isNotEmpty)
+                    Text(
+                      nearestCustomer.address,
+                      style: const TextStyle(fontSize: 11, color: Colors.grey),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: _getCustomerStatusColor(nearestCustomer.status)
+                        .withValues(alpha: 0.15),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    nearestCustomer.statusDisplay,
+                    style: TextStyle(
+                      fontSize: 11,
+                      fontWeight: FontWeight.w500,
+                      color: _getCustomerStatusColor(nearestCustomer.status),
+                    ),
+                  ),
+                ),
+                if (distance != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: 6),
+                    child: LocationWidgets.buildDistanceChip(
+                      distance < 1000
+                          ? '${distance.round()} m'
+                          : '${(distance / 1000).toStringAsFixed(1)} km',
+                    ),
+                  ),
+              ],
+            ),
+          ],
+        ),
+      );
+    }
+
     final nearestItem = provider.getNearestItem();
     if (nearestItem == null) return const SizedBox.shrink();
 
@@ -372,6 +509,10 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
         scrollController,
         provider.activeType.displayName,
       );
+    }
+
+    if (provider.activeType == InfrastructureType.customer) {
+      return _buildCustomerList(scrollController, provider);
     }
 
     final itemsWithDistance = provider.getItemsWithDistance();
@@ -454,7 +595,136 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
     );
   }
 
-  void _showMarkerInfo(InfrastructureItem item, InfrastructureType type) {
+  Widget _buildCustomerList(
+    ScrollController scrollController,
+    InfrastructureProvider provider,
+  ) {
+    final customersWithDistance = provider.getCustomersWithDistance();
+    final nearestCustomer = provider.getNearestCustomer();
+
+    return ListView.builder(
+      controller: scrollController,
+      physics: const AlwaysScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(16),
+      itemCount: customersWithDistance.length,
+      itemBuilder: (context, index) {
+        final customerWithDistance = customersWithDistance[index];
+        final customer = customerWithDistance.customer;
+        final isNearest =
+            nearestCustomer != null && nearestCustomer.id == customer.id;
+
+        return _buildCustomerListTile(
+          customerWithDistance,
+          isNearest,
+          () => _showMarkerInfo(customer, InfrastructureType.customer),
+        );
+      },
+    );
+  }
+
+  Widget _buildCustomerListTile(
+    CustomerWithDistance customerWithDistance,
+    bool isNearest,
+    VoidCallback onTap,
+  ) {
+    final customer = customerWithDistance.customer;
+    final statusColor = _getCustomerStatusColor(customer.status);
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 8),
+      decoration: BoxDecoration(
+        border: Border.all(color: Colors.grey[300]!),
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: ListTile(
+        leading: CircleAvatar(
+          backgroundColor: statusColor,
+          child: Text(
+            customer.name.isNotEmpty
+                ? customer.name[0].toUpperCase()
+                : '?',
+            style: const TextStyle(color: Colors.white),
+          ),
+        ),
+        title: Text(customer.name),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const SizedBox(height: 4),
+            Text(
+              customer.phone,
+              style: const TextStyle(fontSize: 12),
+            ),
+            const SizedBox(height: 4),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+              decoration: BoxDecoration(
+                color: statusColor.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(12),
+              ),
+              child: Text(
+                customer.statusDisplay,
+                style: TextStyle(
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: statusColor,
+                ),
+              ),
+            ),
+            if (customer.address.isNotEmpty) ...[
+              const SizedBox(height: 4),
+              Text(
+                customer.address,
+                style: TextStyle(fontSize: 11, color: Colors.grey[600]),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+            ],
+          ],
+        ),
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            if (isNearest) LocationWidgets.buildNearestItemIndicator(),
+            if (customerWithDistance.distance != null)
+              LocationWidgets.buildDistanceChip(
+                customerWithDistance.formattedDistance,
+              ),
+          ],
+        ),
+        onTap: onTap,
+      ),
+    );
+  }
+
+  Color _getCustomerStatusColor(String status) {
+    switch (status.toLowerCase()) {
+      case 'customer':
+      case 'active':
+        return Colors.green;
+      case 'inactive':
+      case 'isolir':
+      case 'suspended':
+        return Colors.red;
+      case 'free':
+        return Colors.blue;
+      default:
+        return AppColors.primary;
+    }
+  }
+
+  void _showMarkerInfo(dynamic item, InfrastructureType type) {
+    if (type == InfrastructureType.customer) {
+      if (item is Customer) {
+        CustomerDetailModal.show(context, item);
+      }
+      return;
+    }
+
+    if (item is! InfrastructureItem) return;
+    final infrastructureItem = item;
+
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.white,
@@ -474,30 +744,33 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
               child: ListView(
                 controller: scrollController,
                 children: [
-                  _buildInfoSection(item, type),
-                  if (item.hasValidCoordinates()) ...[
+                  _buildInfoSection(infrastructureItem, type),
+                  if (infrastructureItem.hasValidCoordinates()) ...[
                     const SizedBox(height: 16),
-                    _buildMapSection(item),
+                    _buildMapSection(infrastructureItem),
                   ],
 
-                  if (type == InfrastructureType.olt && item.id != null) ...[
+                  if (type == InfrastructureType.olt &&
+                      infrastructureItem.id != null) ...[
                     const SizedBox(height: 16),
-                    _buildRelatedOdcSection(item.id!),
+                    _buildRelatedOdcSection(infrastructureItem.id!),
                   ],
 
-                  if (type == InfrastructureType.odc && item.id != null) ...[
+                  if (type == InfrastructureType.odc &&
+                      infrastructureItem.id != null) ...[
                     const SizedBox(height: 16),
-                    _buildRelatedOdpSection(item.id!),
+                    _buildRelatedOdpSection(infrastructureItem.id!),
                   ],
 
-                  if (type == InfrastructureType.odp && item.id != null) ...[
+                  if (type == InfrastructureType.odp &&
+                      infrastructureItem.id != null) ...[
                     const SizedBox(height: 16),
-                    _buildRelatedCustomersSection(item.id!),
+                    _buildRelatedCustomersSection(infrastructureItem.id!),
                   ],
 
-                  if (item.hasValidCoordinates()) ...[
+                  if (infrastructureItem.hasValidCoordinates()) ...[
                     const SizedBox(height: 16),
-                    _buildActionButtons(item),
+                    _buildActionButtons(infrastructureItem),
                   ],
                 ],
               ),

@@ -7,6 +7,7 @@ import 'package:wifiber/components/reusables/options_bottom_sheet.dart';
 import 'package:wifiber/helpers/datetime_helper.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/models/router.dart';
+import 'package:wifiber/models/router_pppoe.dart';
 import 'package:wifiber/providers/router_provider.dart';
 import 'package:wifiber/screens/dashboard/mikrotik/create_mikrotik_screen.dart';
 import 'package:wifiber/screens/dashboard/mikrotik/edit_mikrotik_screen.dart';
@@ -606,6 +607,22 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
                       ),
                     ]),
 
+                    const SizedBox(height: 24),
+
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () => _showPppoeData(router),
+                        icon: const Icon(Icons.list_alt),
+                        label: const Text('Lihat Data PPPoE Terhubung'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 14),
+                        ),
+                      ),
+                    ),
+
                     const SizedBox(height: 32),
 
                     Row(
@@ -657,6 +674,424 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
         ),
       ),
     );
+  }
+
+  void _showPppoeData(RouterModel router) {
+    final pppoeFuture =
+        context.read<RouterProvider>().fetchRouterPppoes(router.id);
+
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: DraggableScrollableSheet(
+          initialChildSize: 0.8,
+          minChildSize: 0.5,
+          maxChildSize: 0.95,
+          expand: false,
+          builder: (context, scrollController) {
+            return FutureBuilder<RouterPppoeSecrets>(
+              future: pppoeFuture,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(
+                    child: CircularProgressIndicator(color: AppColors.primary),
+                  );
+                }
+
+                if (snapshot.hasError) {
+                  return _buildPppoeError(
+                    context,
+                    scrollController,
+                    snapshot.error.toString(),
+                    router,
+                  );
+                }
+
+                final data = snapshot.data;
+                if (data == null) {
+                  return _buildPppoeError(
+                    context,
+                    scrollController,
+                    'Data PPPoE tidak tersedia.',
+                    router,
+                  );
+                }
+
+                return _buildPppoeContent(
+                  context,
+                  scrollController,
+                  router,
+                  data,
+                );
+              },
+            );
+          },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPppoeContent(
+    BuildContext sheetContext,
+    ScrollController scrollController,
+    RouterModel router,
+    RouterPppoeSecrets data,
+  ) {
+    return SingleChildScrollView(
+      controller: scrollController,
+      physics: const ClampingScrollPhysics(),
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: 24,
+          right: 24,
+          top: 16,
+          bottom: 24 + MediaQuery.of(sheetContext).padding.bottom,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                width: 40,
+                height: 4,
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            Text(
+              'PPPoe Terhubung',
+              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+            const SizedBox(height: 4),
+            Text(
+              router.name,
+              style: Theme.of(context)
+                  .textTheme
+                  .titleMedium
+                  ?.copyWith(color: Colors.grey[600]),
+            ),
+            const SizedBox(height: 16),
+            _buildPppoeSummary(data),
+            const SizedBox(height: 24),
+            _buildPppoeSection(
+              title: 'PPPoe Aktif (${data.activeList.length})',
+              secrets: data.activeList,
+              isActive: true,
+            ),
+            const SizedBox(height: 24),
+            _buildPppoeSection(
+              title: 'PPPoe Tidak Aktif (${data.inactiveList.length})',
+              secrets: data.inactiveList,
+              isActive: false,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPppoeError(
+    BuildContext sheetContext,
+    ScrollController scrollController,
+    String message,
+    RouterModel router,
+  ) {
+    return SingleChildScrollView(
+      controller: scrollController,
+      child: Padding(
+        padding: EdgeInsets.only(
+          left: 24,
+          right: 24,
+          top: 40,
+          bottom: 24 + MediaQuery.of(sheetContext).padding.bottom,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.warning_amber_rounded,
+                size: 64, color: Colors.orange),
+            const SizedBox(height: 16),
+            Text(
+              'Gagal Memuat Data PPPoE',
+              style: Theme.of(context)
+                  .textTheme
+                  .titleLarge
+                  ?.copyWith(fontWeight: FontWeight.bold),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 8),
+            Text(
+              message,
+              style:
+                  Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 24),
+            SizedBox(
+              width: double.infinity,
+              child: ElevatedButton.icon(
+                onPressed: () {
+                  Navigator.of(sheetContext).pop();
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    _showPppoeData(router);
+                  });
+                },
+                icon: const Icon(Icons.refresh),
+                label: const Text('Coba Lagi'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppColors.primary,
+                  foregroundColor: Colors.white,
+                  padding: const EdgeInsets.symmetric(vertical: 14),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildPppoeSummary(RouterPppoeSecrets data) {
+    return Row(
+      children: [
+        Expanded(
+          child: _buildSummaryCard(
+            icon: Icons.link,
+            color: Colors.green,
+            title: 'Aktif',
+            value: data.activeList.length.toString(),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Expanded(
+          child: _buildSummaryCard(
+            icon: Icons.link_off,
+            color: Colors.orange,
+            title: 'Tidak Aktif',
+            value: data.inactiveList.length.toString(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSummaryCard({
+    required IconData icon,
+    required Color color,
+    required String title,
+    required String value,
+  }) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: color.withValues(alpha: 0.4)),
+        color: color.withValues(alpha: 0.08),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.all(10),
+            decoration: BoxDecoration(
+              color: color.withValues(alpha: 0.15),
+              shape: BoxShape.circle,
+            ),
+            child: Icon(icon, color: color),
+          ),
+          const SizedBox(width: 12),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: Colors.black54,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+              Text(
+                value,
+                style: TextStyle(
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPppoeSection({
+    required String title,
+    required List<RouterPppoeSecret> secrets,
+    required bool isActive,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          title,
+          style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                fontWeight: FontWeight.w600,
+              ),
+        ),
+        const SizedBox(height: 12),
+        if (secrets.isEmpty)
+          _buildPppoeEmptyState(
+            isActive
+                ? 'Tidak ada PPPoE aktif saat ini.'
+                : 'Tidak ada PPPoE nonaktif.',
+          )
+        else
+          ...secrets.map(
+            (secret) => _buildPppoeCard(secret, isActive: isActive),
+          ),
+      ],
+    );
+  }
+
+  Widget _buildPppoeEmptyState(String message) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: Colors.grey[100],
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[300]!),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.info_outline, color: Colors.grey),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(color: Colors.grey),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPppoeCard(
+    RouterPppoeSecret secret, {
+    required bool isActive,
+  }) {
+    final statusColor = isActive ? Colors.green : Colors.orange;
+
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: Colors.grey[300]!),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text(
+                  secret.name,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+              ),
+              Container(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: statusColor.withValues(alpha: 0.15),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  isActive ? 'Aktif' : 'Nonaktif',
+                  style: TextStyle(
+                    color: statusColor,
+                    fontWeight: FontWeight.w600,
+                    fontSize: 12,
+                  ),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 8),
+          _buildPppoeInfoRow('Profil', secret.profile),
+          _buildPppoeInfoRow('Password', secret.password),
+          _buildPppoeInfoRow('Caller ID', secret.callerId),
+          if (isActive)
+            _buildPppoeInfoRow('Uptime', secret.uptime)
+          else
+            _buildPppoeInfoRow('Terakhir Keluar', secret.lastLoggedOut),
+          _buildPppoeInfoRow('Alasan Disconnect', secret.lastDisconnectReason),
+          _buildPppoeInfoRow('Terakhir Caller', secret.lastCallerId),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildPppoeInfoRow(String label, String? value) {
+    if (!_isValueAvailable(value)) return const SizedBox.shrink();
+
+    return Padding(
+      padding: const EdgeInsets.only(top: 6),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          SizedBox(
+            width: 120,
+            child: Text(
+              label,
+              style: TextStyle(
+                fontSize: 12,
+                color: Colors.grey[600],
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Text(
+              value!,
+              style: const TextStyle(fontSize: 13),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  bool _isValueAvailable(String? value) {
+    if (value == null) return false;
+    final trimmed = value.trim();
+    if (trimmed.isEmpty) return false;
+    if (trimmed == '0') return false;
+    if (trimmed == '1970-01-01 00:00:00') return false;
+    return true;
   }
 
   Widget _buildDetailSection(String title, List<Widget> items) {

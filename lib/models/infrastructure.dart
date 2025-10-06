@@ -60,6 +60,8 @@ class InfrastructureItem {
         return kodeOdp ?? 'N/A';
       case InfrastructureType.odc:
         return kodeOdc ?? 'N/A';
+      case InfrastructureType.customer:
+        return name ?? 'N/A';
     }
   }
 
@@ -73,7 +75,7 @@ class InfrastructureItem {
   double? get lng => double.tryParse(longitude ?? '');
 }
 
-enum InfrastructureType { olt, odp, odc }
+enum InfrastructureType { olt, odp, odc, customer }
 
 extension InfrastructureTypeExtension on InfrastructureType {
   String get displayName {
@@ -84,6 +86,8 @@ extension InfrastructureTypeExtension on InfrastructureType {
         return 'ODP';
       case InfrastructureType.odc:
         return 'ODC';
+      case InfrastructureType.customer:
+        return 'Pelanggan';
     }
   }
 
@@ -95,6 +99,8 @@ extension InfrastructureTypeExtension on InfrastructureType {
         return 'odps';
       case InfrastructureType.odc:
         return 'odcs';
+      case InfrastructureType.customer:
+        return 'customers';
     }
   }
 
@@ -106,6 +112,8 @@ extension InfrastructureTypeExtension on InfrastructureType {
         return Icons.cable;
       case InfrastructureType.odc:
         return Icons.hub;
+      case InfrastructureType.customer:
+        return Icons.people;
     }
   }
 }

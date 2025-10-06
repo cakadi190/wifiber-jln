@@ -1,4 +1,5 @@
 import 'package:wifiber/models/router.dart';
+import 'package:wifiber/models/router_pppoe.dart';
 import 'package:wifiber/services/router_service.dart';
 import 'package:wifiber/utils/safe_change_notifier.dart';
 import 'package:wifiber/exceptions/validation_exceptions.dart';
@@ -191,6 +192,10 @@ class RouterProvider extends SafeChangeNotifier {
     } catch (e) {
       _setError(e.toString());
     }
+  }
+
+  Future<RouterPppoeSecrets> fetchRouterPppoes(int routerId) {
+    return _routerService.getRouterPppoes(routerId);
   }
 
   void clearSelectedRouter() {
