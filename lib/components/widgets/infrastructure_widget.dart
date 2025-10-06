@@ -298,6 +298,8 @@ class InfrastructureWidgets {
         return MarkerStyle(Colors.blue, Icons.router);
       case InfrastructureType.odc:
         return MarkerStyle(Colors.green, Icons.hub);
+      case InfrastructureType.customer:
+        return MarkerStyle(Colors.orange, Icons.location_pin);
     }
   }
 
