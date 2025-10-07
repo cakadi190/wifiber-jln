@@ -25,16 +25,16 @@ class HttpService {
     Map<String, dynamic>? parameters,
   }) async {
     final uri = HttpHelper.buildUri(path, parameters);
-    final completeHeaders = await _buildHeaders(headers, requiresAuth);
-
-    final response = await _client.post(
-      uri,
-      headers: completeHeaders,
-      body: body,
+    return _sendRequestWithRetry(
+      _buildHeaders,
+      headers,
+      requiresAuth,
+      (completeHeaders) => _client.post(
+        uri,
+        headers: completeHeaders,
+        body: body,
+      ),
     );
-
-    _handleResponseErrors(response);
-    return response;
   }
 
   Future<http.Response> patch(
@@ -45,16 +45,16 @@ class HttpService {
     Map<String, dynamic>? parameters,
   }) async {
     final uri = HttpHelper.buildUri(path, parameters);
-    final completeHeaders = await _buildHeaders(headers, requiresAuth);
-
-    final response = await _client.patch(
-      uri,
-      headers: completeHeaders,
-      body: body,
+    return _sendRequestWithRetry(
+      _buildHeaders,
+      headers,
+      requiresAuth,
+      (completeHeaders) => _client.patch(
+        uri,
+        headers: completeHeaders,
+        body: body,
+      ),
     );
-
-    _handleResponseErrors(response);
-    return response;
   }
 
   Future<http.Response> put(
@@ -65,16 +65,16 @@ class HttpService {
     Map<String, dynamic>? parameters,
   }) async {
     final uri = HttpHelper.buildUri(path, parameters);
-    final completeHeaders = await _buildHeaders(headers, requiresAuth);
-
-    final response = await _client.put(
-      uri,
-      headers: completeHeaders,
-      body: body,
+    return _sendRequestWithRetry(
+      _buildHeaders,
+      headers,
+      requiresAuth,
+      (completeHeaders) => _client.put(
+        uri,
+        headers: completeHeaders,
+        body: body,
+      ),
     );
-
-    _handleResponseErrors(response);
-    return response;
   }
 
   Future<http.Response> delete(
@@ -85,16 +85,16 @@ class HttpService {
     Map<String, dynamic>? parameters,
   }) async {
     final uri = HttpHelper.buildUri(path, parameters);
-    final completeHeaders = await _buildHeaders(headers, requiresAuth);
-
-    final response = await _client.delete(
-      uri,
-      headers: completeHeaders,
-      body: body,
+    return _sendRequestWithRetry(
+      _buildHeaders,
+      headers,
+      requiresAuth,
+      (completeHeaders) => _client.delete(
+        uri,
+        headers: completeHeaders,
+        body: body,
+      ),
     );
-
-    _handleResponseErrors(response);
-    return response;
   }
 
   Future<http.Response> get(
@@ -103,17 +103,16 @@ class HttpService {
     bool requiresAuth = false,
     Map<String, dynamic>? parameters,
   }) async {
-    try {
-      final uri = HttpHelper.buildUri(path, parameters);
-      final completeHeaders = await _buildHeaders(headers, requiresAuth);
-
-      final response = await _client.get(uri, headers: completeHeaders);
-
-      _handleResponseErrors(response);
-      return response;
-    } catch (e) {
-      rethrow;
-    }
+    final uri = HttpHelper.buildUri(path, parameters);
+    return _sendRequestWithRetry(
+      _buildHeaders,
+      headers,
+      requiresAuth,
+      (completeHeaders) => _client.get(
+        uri,
+        headers: completeHeaders,
+      ),
+    );
   }
 
   Future<http.Response> postForm(
@@ -124,16 +123,16 @@ class HttpService {
     Map<String, dynamic>? parameters,
   }) async {
     final uri = HttpHelper.buildUri(path, parameters);
-    final completeHeaders = await _buildFormHeaders(headers, requiresAuth);
-
-    final response = await _client.post(
-      uri,
-      headers: completeHeaders,
-      body: fields != null ? _encodeFormData(fields) : null,
+    return _sendRequestWithRetry(
+      _buildFormHeaders,
+      headers,
+      requiresAuth,
+      (completeHeaders) => _client.post(
+        uri,
+        headers: completeHeaders,
+        body: fields != null ? _encodeFormData(fields) : null,
+      ),
     );
-
-    _handleResponseErrors(response);
-    return response;
   }
 
   Future<http.Response> patchForm(
@@ -144,16 +143,16 @@ class HttpService {
     Map<String, dynamic>? parameters,
   }) async {
     final uri = HttpHelper.buildUri(path, parameters);
-    final completeHeaders = await _buildFormHeaders(headers, requiresAuth);
-
-    final response = await _client.patch(
-      uri,
-      headers: completeHeaders,
-      body: fields != null ? _encodeFormData(fields) : null,
+    return _sendRequestWithRetry(
+      _buildFormHeaders,
+      headers,
+      requiresAuth,
+      (completeHeaders) => _client.patch(
+        uri,
+        headers: completeHeaders,
+        body: fields != null ? _encodeFormData(fields) : null,
+      ),
     );
-
-    _handleResponseErrors(response);
-    return response;
   }
 
   Future<http.Response> putForm(
@@ -164,16 +163,16 @@ class HttpService {
     Map<String, dynamic>? parameters,
   }) async {
     final uri = HttpHelper.buildUri(path, parameters);
-    final completeHeaders = await _buildFormHeaders(headers, requiresAuth);
-
-    final response = await _client.put(
-      uri,
-      headers: completeHeaders,
-      body: fields != null ? _encodeFormData(fields) : null,
+    return _sendRequestWithRetry(
+      _buildFormHeaders,
+      headers,
+      requiresAuth,
+      (completeHeaders) => _client.put(
+        uri,
+        headers: completeHeaders,
+        body: fields != null ? _encodeFormData(fields) : null,
+      ),
     );
-
-    _handleResponseErrors(response);
-    return response;
   }
 
   Future<http.Response> deleteForm(
@@ -184,16 +183,16 @@ class HttpService {
     Map<String, dynamic>? parameters,
   }) async {
     final uri = HttpHelper.buildUri(path, parameters);
-    final completeHeaders = await _buildFormHeaders(headers, requiresAuth);
-
-    final response = await _client.delete(
-      uri,
-      headers: completeHeaders,
-      body: fields != null ? _encodeFormData(fields) : null,
+    return _sendRequestWithRetry(
+      _buildFormHeaders,
+      headers,
+      requiresAuth,
+      (completeHeaders) => _client.delete(
+        uri,
+        headers: completeHeaders,
+        body: fields != null ? _encodeFormData(fields) : null,
+      ),
     );
-
-    _handleResponseErrors(response);
-    return response;
   }
 
   Future<http.StreamedResponse> postUpload(
@@ -368,6 +367,33 @@ class HttpService {
       requiresAuth: requiresAuth,
       parameters: parameters,
     );
+  }
+
+  Future<http.Response> _sendRequestWithRetry(
+    Future<Map<String, String>> Function(Map<String, String>?, bool)
+        headerBuilder,
+    Map<String, String>? headers,
+    bool requiresAuth,
+    Future<http.Response> Function(Map<String, String> completeHeaders) request,
+  ) async {
+    var completeHeaders = await headerBuilder(headers, requiresAuth);
+    var response = await request(completeHeaders);
+
+    if (requiresAuth && response.statusCode == 401) {
+      final refreshed = await _tryRefreshToken();
+      if (refreshed) {
+        completeHeaders = await headerBuilder(headers, requiresAuth);
+        response = await request(completeHeaders);
+      }
+    }
+
+    _handleResponseErrors(response);
+    return response;
+  }
+
+  Future<bool> _tryRefreshToken() async {
+    final refreshedUser = await AuthService.refreshSession();
+    return refreshedUser != null;
   }
 
   Future<http.Response> streamedResponseToResponse(

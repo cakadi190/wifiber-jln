@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:wifiber/exceptions/auth_exceptions.dart';
@@ -10,7 +11,10 @@ import 'package:wifiber/services/secure_storage_service.dart';
 class AuthService {
   static const String loginPath = '/login';
   static const String profilePath = '/profiles';
+  static const String refreshTokenPath = '/refresh-token';
   static final HttpService _http = HttpService();
+  static AuthUser? _cachedUser;
+  static Completer<bool>? _refreshCompleter;
 
   static Future<AuthUser> loadUser({bool force = false}) async {
     final json = await SecureStorageService.storage.read(
@@ -21,8 +25,13 @@ class AuthService {
       try {
         final userData = jsonDecode(json);
         final user = AuthUser.fromJson(userData);
+        _cachedUser = user;
 
         if (user.isTokenExpired) {
+          final refreshedUser = await refreshSession(currentUser: user);
+          if (refreshedUser != null) {
+            return refreshedUser;
+          }
           await logout();
           throw TokenExpiredException('Token has expired');
         }
@@ -35,6 +44,7 @@ class AuthService {
           }
         }
 
+        _cachedUser = user;
         return user;
       } catch (e) {
         await logout();
@@ -49,6 +59,7 @@ class AuthService {
   }
 
   static Future<void> saveUser(AuthUser user) async {
+    _cachedUser = user;
     await SecureStorageService.storage.write(
       key: SecureStorageService.userKey,
       value: user.toJson(),
@@ -67,8 +78,19 @@ class AuthService {
 
       final json = jsonDecode(response.body);
 
-      final token = json['data']['token'];
-      final user = AuthUser.fromToken(token);
+      final data = json['data'] as Map<String, dynamic>?;
+
+      final accessToken = data?['access_token'] ?? data?['token'];
+      final refreshToken = data?['refresh_token'];
+
+      if (accessToken is! String || accessToken.isEmpty) {
+        throw LoginException('Token tidak ditemukan pada respons login');
+      }
+
+      final user = AuthUser.fromToken(
+        accessToken,
+        refreshToken: refreshToken is String ? refreshToken : '',
+      );
 
       final userWithProfile = await _getProfile(user.userId, user);
 
@@ -88,6 +110,79 @@ class AuthService {
     await SecureStorageService.storage.delete(
       key: SecureStorageService.userKey,
     );
+    _cachedUser = null;
+  }
+
+  static Future<AuthUser?> refreshSession({AuthUser? currentUser}) async {
+    if (_refreshCompleter != null) {
+      final success = await _refreshCompleter!.future;
+      return success ? _cachedUser : null;
+    }
+
+    final completer = Completer<bool>();
+    _refreshCompleter = completer;
+
+    try {
+      final storedJson = await SecureStorageService.storage.read(
+        key: SecureStorageService.userKey,
+      );
+
+      if (storedJson == null) {
+        completer.complete(false);
+        return null;
+      }
+
+      final storedData = jsonDecode(storedJson);
+      final user = currentUser ??
+          _cachedUser ??
+          AuthUser.fromJson(Map<String, dynamic>.from(storedData));
+
+      if (!user.hasRefreshToken) {
+        throw RefreshTokenException('Refresh token not found');
+      }
+
+      final response = await _http.post(
+        refreshTokenPath,
+        headers: {
+          'Authorization': 'Bearer ${user.refreshToken}',
+          'Accept': 'application/json',
+          'Content-Type': 'application/json',
+        },
+      );
+
+      if (response.statusCode != 200) {
+        throw RefreshTokenException('Failed to refresh token');
+      }
+
+      final responseJson = jsonDecode(response.body);
+      final responseData = responseJson['data'] as Map<String, dynamic>?;
+
+      final newAccessToken =
+          responseData?['access_token'] ?? responseData?['token'];
+      final newRefreshToken = responseData?['refresh_token'];
+
+      if (newAccessToken is! String || newAccessToken.isEmpty) {
+        throw RefreshTokenException('Access token missing');
+      }
+
+      user.accessToken = newAccessToken;
+      if (newRefreshToken is String && newRefreshToken.isNotEmpty) {
+        user.refreshToken = newRefreshToken;
+      }
+
+      await saveUser(user);
+
+      completer.complete(true);
+      return user;
+    } catch (e) {
+      await logout();
+      if (!completer.isCompleted) {
+        completer.complete(false);
+      }
+      return null;
+    } finally {
+      _refreshCompleter = null;
+    }
   }
 
   static Future<AuthUser?> _getProfile(int userId, AuthUser? userCache) async {

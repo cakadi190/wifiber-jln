@@ -10,6 +10,7 @@ class AuthUser {
   final String name;
   final List<String> permissions;
   String accessToken;
+  String refreshToken;
   int? groupId;
   String? picture;
   DateTime? createdAt;
@@ -22,13 +23,17 @@ class AuthUser {
     required this.name,
     required this.permissions,
     required this.accessToken,
+    required this.refreshToken,
     this.groupId,
     this.picture,
     this.createdAt,
     this.groupName,
   });
 
-  factory AuthUser.fromToken(String token) {
+  factory AuthUser.fromToken(
+    String token, {
+    String? refreshToken,
+  }) {
     if (JwtDecoder.isExpired(token)) {
       throw InvalidUserException();
     }
@@ -42,6 +47,7 @@ class AuthUser {
       name: decoded['name'] ?? '',
       permissions: List<String>.from(decoded['permissions'] ?? []),
       accessToken: token,
+      refreshToken: refreshToken ?? '',
       groupId: int.tryParse(decoded['groupId'].toString()) ?? 0,
       groupName: decoded['groupName'] ?? '',
       picture: decoded['picture'] ?? '',
@@ -63,6 +69,7 @@ class AuthUser {
       "name": name,
       "permissions": permissions,
       "access": accessToken,
+      "refresh": refreshToken,
       "groupId": groupId,
       "groupName": groupName,
       "picture": picture,
@@ -82,6 +89,7 @@ class AuthUser {
       name: json['name'] ?? '',
       permissions: List<String>.from(json['permissions'] ?? []),
       accessToken: json['access'] ?? '',
+      refreshToken: json['refresh'] ?? json['refresh_token'] ?? '',
       groupId: json['groupId'] ?? json['group_id'],
       groupName: json['GroupName'] ?? json['group_name'],
       picture: json['picture'],
@@ -94,4 +102,6 @@ class AuthUser {
   bool get isTokenExpired => JwtDecoder.isExpired(accessToken);
 
   DateTime get tokenExpiryDate => JwtDecoder.getExpirationDate(accessToken);
+
+  bool get hasRefreshToken => refreshToken.isNotEmpty;
 }
