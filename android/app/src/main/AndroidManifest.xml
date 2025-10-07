@@ -55,7 +55,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
                 <data
-                    android:host="mywifi.biz.id"
+                    android:host="wifiber.web.id"
                     android:scheme="https" />
             </intent-filter>
         </activity>

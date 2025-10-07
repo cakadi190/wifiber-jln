@@ -101,7 +101,7 @@ class AboutAppScreen extends StatelessWidget {
                   "Email",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                subtitle: Text("superadmin@mywifi.biz.id"),
+                subtitle: Text("superadmin@wifiber.web.id"),
               ),
 
               ListTile(
@@ -110,9 +110,9 @@ class AboutAppScreen extends StatelessWidget {
                   "Website",
                   style: TextStyle(fontWeight: FontWeight.bold),
                 ),
-                subtitle: Text("https://mywifi.biz.id"),
+                subtitle: Text("https://wifiber.web.id"),
                 onTap: () async {
-                  final url = Uri.parse('https://mywifi.biz.id');
+                  final url = Uri.parse('https://wifiber.web.id');
                   try {
                     if (await canLaunchUrl(url)) {
                       await launchUrl(
