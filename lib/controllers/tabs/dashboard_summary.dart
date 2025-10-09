@@ -1,4 +1,5 @@
 import 'package:wifiber/helpers/currency_helper.dart';
+import 'package:wifiber/models/dashboard.dart';
 import 'package:wifiber/services/dashboard_service.dart';
 import 'package:wifiber/utils/safe_change_notifier.dart';
 
@@ -13,6 +14,7 @@ class DashboardSummaryController extends SafeChangeNotifier {
   num _totalIncome = 0;
   num _totalExpense = 0;
   num _unpaidInvoiceCount = 0;
+  CustomerInfo? _customerInfo;
 
   bool _isLoading = false;
   String? _error;
@@ -29,6 +31,8 @@ class DashboardSummaryController extends SafeChangeNotifier {
 
   String? get error => _error;
 
+  CustomerInfo? get customerInfo => _customerInfo;
+
   Future<void> loadDashboardData() async {
     _isLoading = true;
     _error = null;
@@ -41,6 +45,7 @@ class DashboardSummaryController extends SafeChangeNotifier {
         _totalIncome = dashboardData.data.currentMonth.finance.income;
         _totalExpense = dashboardData.data.currentMonth.finance.expense;
         _unpaidInvoiceCount = dashboardData.data.currentMonth.unpaidBills;
+        _customerInfo = dashboardData.data.totalCustomer;
 
         _totalCashFlow = _totalIncome - _totalExpense;
 

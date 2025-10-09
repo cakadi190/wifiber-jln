@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:wifiber/components/widgets/home/customer_summary.dart';
 import 'package:wifiber/components/widgets/home/dashboard_summary.dart';
 import 'package:wifiber/components/widgets/home/main_menu.dart';
 import 'package:wifiber/components/widgets/home/tickets_summary.dart';
 import 'package:wifiber/components/widgets/home/finance_summary.dart';
 import 'package:wifiber/components/widgets/user_avatar.dart';
 import 'package:wifiber/config/app_colors.dart';
+import 'package:wifiber/controllers/tabs/dashboard_summary.dart';
 import 'package:wifiber/controllers/tabs/home_tab.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 
@@ -68,14 +70,26 @@ class _HomeTabState extends State<HomeTab> {
               child: Column(
                 children: [
                   if (hasFinancePermission)
-                    SizedBox(
-                      width: double.infinity,
-                      child: DashboardSummary(
-                        onTransactionTap: widget.onTransactionTap,
+                    ChangeNotifierProvider(
+                      create: (_) =>
+                          DashboardSummaryController()..loadDashboardData(),
+                      child: Column(
+                        children: [
+                          SizedBox(
+                            width: double.infinity,
+                            child: DashboardSummary(
+                              onTransactionTap: widget.onTransactionTap,
+                            ),
+                          ),
+                          SizedBox(
+                            width: double.infinity,
+                            child: const CustomerSummary(),
+                          ),
+                        ],
                       ),
                     ),
 
-                  if (!hasFinancePermission) SizedBox(height: 24),
+                  if (!hasFinancePermission) const SizedBox(height: 24),
 
                   MainMenu(
                     onTicketMenuTapped: widget.onTicketTap,
