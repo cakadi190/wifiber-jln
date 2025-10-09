@@ -56,6 +56,6 @@ flutter:
   assets:
     - assets/logo.png
     - assets/summary-image.png
-    - assets/logo-wifiber-svg/
-    - assets/logo-wifiber-png/
+    - assets/logo/
+    - assets/logo/
     - assets/onboardings/

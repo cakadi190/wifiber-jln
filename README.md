@@ -1,4 +1,4 @@
-![Wifiber](./assets/logo-wifiber-png/logo-colorxxxhdpi.png)
+![Wifiber](./assets/logo/logo-color.png)
 
 # Wifiber Billing Apps
 

@@ -45,13 +45,13 @@ class _AppLogoState extends State<AppLogo> {
 
     switch (widget.logoType ?? LogoType.color) {
       case LogoType.color:
-        _assetPath = 'assets/logo-wifiber-png/logo-colorxxxhdpi.png';
+        _assetPath = 'assets/logo/logo-color.png';
         break;
       case LogoType.white:
-        _assetPath = 'assets/logo-wifiber-png/logo-whitexxxhdpi.png';
+        _assetPath = 'assets/logo/logo-white.png';
         break;
       case LogoType.black:
-        _assetPath = 'assets/logo-wifiber-png/logo-blackxxxhdpi.png';
+        _assetPath = 'assets/logo/logo-black.png';
         break;
     }
   }

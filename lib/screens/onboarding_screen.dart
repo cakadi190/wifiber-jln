@@ -41,7 +41,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   ];
 
   final List<String> _onboardingImage = [
-    "assets/logo-wifiber-png/logo-colorxxxhdpi.png",
+    "assets/logo-wifiber-png/logo-color.png",
     "assets/onboardings/payment.png",
     "assets/onboardings/customer.png",
     "assets/onboardings/monitoring.png",
