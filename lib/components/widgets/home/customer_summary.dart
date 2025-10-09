@@ -108,7 +108,7 @@ class _CustomerStatTile extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
-        color: stat.color.withOpacity(0.12),
+        color: stat.color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(12),
       ),
       child: Row(
@@ -116,7 +116,7 @@ class _CustomerStatTile extends StatelessWidget {
           Container(
             padding: const EdgeInsets.all(10),
             decoration: BoxDecoration(
-              color: stat.color.withOpacity(0.18),
+              color: stat.color.withValues(alpha: 0.18),
               shape: BoxShape.circle,
             ),
             child: PhosphorIcon(

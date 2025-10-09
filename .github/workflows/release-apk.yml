@@ -39,7 +39,7 @@ jobs:
 
       # Build APK split per-ABI
       - name: Build APK (per-ABI)
-        run: flutter build apk --release --split-per-abi
+        run: flutter build apk --release --split-per-abi --no-tree-shake-icons
 
       # Build AAB (Play Store)
       - name: Build AppBundle (AAB)

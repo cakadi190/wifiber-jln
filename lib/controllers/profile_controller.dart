@@ -86,7 +86,7 @@ class ProfileController extends SafeChangeNotifier {
             initAspectRatio: CropAspectRatioPreset.square,
             lockAspectRatio: true,
             aspectRatioPresets: [CropAspectRatioPreset.square],
-            statusBarColor: AppColors.primary,
+            statusBarLight: true,
             backgroundColor: Colors.white,
             activeControlsWidgetColor: AppColors.primary,
             dimmedLayerColor: Colors.black.withValues(alpha: 0.8),

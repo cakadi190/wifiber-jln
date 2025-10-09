@@ -11,8 +11,12 @@ class DashboardSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final existingController =
-        Provider.maybeOf<DashboardSummaryController>(context, listen: false);
+    DashboardSummaryController? existingController;
+    try {
+      existingController = context.read<DashboardSummaryController>();
+    } catch (_) {
+      existingController = null;
+    }
 
     if (existingController != null) {
       return _DashboardSummaryView(onTransactionTap: onTransactionTap);
