@@ -17,18 +17,9 @@ import 'package:wifiber/tabs/home/complaints_tab.dart';
 import 'package:wifiber/tabs/home/home_tab.dart';
 import 'package:wifiber/tabs/home/transaction_tab.dart';
 import 'package:wifiber/helpers/role.dart';
-
-class _TabItem {
-  final String key;
-  final Widget widget;
-  final BottomNavigationBarItem item;
-
-  const _TabItem({
-    required this.key,
-    required this.widget,
-    required this.item,
-  });
-}
+import 'package:wifiber/partials/dashboard/home_dashboard_bottom_navigation.dart';
+import 'package:wifiber/partials/dashboard/home_dashboard_exit_message.dart';
+import 'package:wifiber/partials/dashboard/home_dashboard_tab_item.dart';
 
 class HomeDashboardScreen extends StatefulWidget {
   const HomeDashboardScreen({super.key});
@@ -59,11 +50,11 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     _complaintController = ComplaintTabController(context);
   }
 
-  List<_TabItem> _buildTabs(AuthProvider authProvider) {
-    final tabs = <_TabItem>[];
+  List<HomeDashboardTabItem> _buildTabs(AuthProvider authProvider) {
+    final tabs = <HomeDashboardTabItem>[];
 
     tabs.add(
-      _TabItem(
+      HomeDashboardTabItem(
         key: 'home',
         widget: HomeTab(
           onTransactionTap: () => _onTabSelected('finance'),
@@ -80,11 +71,13 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
 
     if (authProvider.user?.permissions.contains('finance') ?? false) {
       tabs.add(
-        _TabItem(
+        HomeDashboardTabItem(
           key: 'finance',
           widget: TransactionTab(controller: _transactionTabController),
           item: BottomNavigationBarItem(
-            icon: PhosphorIcon(PhosphorIcons.wallet(PhosphorIconsStyle.duotone)),
+            icon: PhosphorIcon(
+              PhosphorIcons.wallet(PhosphorIconsStyle.duotone),
+            ),
             label: 'Keuangan',
           ),
         ),
@@ -92,7 +85,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
 
       if (authProvider.user?.permissions.contains('bill') ?? false) {
         tabs.add(
-          _TabItem(
+          HomeDashboardTabItem(
             key: 'bills',
             widget: Container(),
             item: BottomNavigationBarItem(
@@ -108,7 +101,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
 
     if (authProvider.user?.permissions.contains('ticket') ?? false) {
       tabs.add(
-        _TabItem(
+        HomeDashboardTabItem(
           key: 'ticket',
           widget: ComplaintsTab(controller: _complaintController),
           item: BottomNavigationBarItem(
@@ -122,7 +115,7 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
     }
 
     tabs.add(
-      _TabItem(
+      HomeDashboardTabItem(
         key: 'account',
         widget: AccountCenterScreen(),
         item: BottomNavigationBarItem(
@@ -236,8 +229,9 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
           child: Consumer<AuthProvider>(
             builder: (context, authProvider, child) {
               final tabs = _buildTabs(authProvider);
-              final currentIndex =
-                  tabs.indexWhere((t) => t.key == _selectedTab);
+              final currentIndex = tabs.indexWhere(
+                (t) => t.key == _selectedTab,
+              );
               final safeIndex = currentIndex < 0 ? 0 : currentIndex;
 
               return Scaffold(
@@ -245,50 +239,13 @@ class _HomeDashboardScreenState extends State<HomeDashboardScreen> {
                   children: [
                     tabs[safeIndex].widget,
 
-                    if (_showExitMessage)
-                      Positioned(
-                        bottom: 100,
-                        left: 16,
-                        right: 16,
-                        child: Material(
-                          color: Colors.transparent,
-                          child: Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 16,
-                              vertical: 12,
-                            ),
-                            decoration: BoxDecoration(
-                              color: Colors.black87,
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: const Text(
-                              'Tekan tombol kembali sekali lagi untuk keluar dari aplikasi',
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 14,
-                              ),
-                              textAlign: TextAlign.center,
-                            ),
-                          ),
-                        ),
-                      ),
+                    HomeDashboardExitMessage(visible: _showExitMessage),
                   ],
                 ),
-                bottomNavigationBar: Theme(
-                  data: ThemeData(
-                    splashColor: Colors.transparent,
-                    highlightColor: Colors.transparent,
-                  ),
-                  child: BottomNavigationBar(
-                    backgroundColor: AppColor.violet50,
-                    currentIndex: safeIndex,
-                    onTap: (index) => _onTabSelected(tabs[index].key),
-                    selectedItemColor: AppColors.primary,
-                    unselectedItemColor: Colors.grey,
-                    showUnselectedLabels: true,
-                    type: BottomNavigationBarType.fixed,
-                    items: tabs.map((t) => t.item).toList(),
-                  ),
+                bottomNavigationBar: HomeDashboardBottomNavigation(
+                  tabs: tabs,
+                  currentIndex: safeIndex,
+                  onTap: (index) => _onTabSelected(tabs[index].key),
                 ),
               );
             },

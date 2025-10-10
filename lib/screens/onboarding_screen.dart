@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:skeletonizer/skeletonizer.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/helpers/network_helper.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/screens/login_screen.dart';
 import 'package:wifiber/services/first_launch_service.dart';
+import 'package:wifiber/partials/onboarding/onboarding_page_content.dart';
+import 'package:wifiber/partials/onboarding/onboarding_page_indicator.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -94,95 +95,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     });
   }
 
-  Widget _buildPageIndicator() {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: List.generate(
-        _onboardingTitle.length,
-        (index) => AnimatedContainer(
-          duration: const Duration(milliseconds: 300),
-          margin: const EdgeInsets.symmetric(horizontal: 4.0),
-          height: 8.0,
-          width: _currentIndex == index ? 24.0 : 8.0,
-          decoration: BoxDecoration(
-            color: _currentIndex == index
-                ? Theme.of(context).primaryColor
-                : Colors.grey.shade400,
-            borderRadius: BorderRadius.circular(4.0),
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildOnboardingPage(int index) {
-    return Padding(
-      padding: const EdgeInsets.all(20.0),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Expanded(
-            flex: 3,
-            child: Container(
-              padding: const EdgeInsets.all(20.0),
-              child: Image.asset(
-                _onboardingImage[index],
-                height: 200,
-                fit: BoxFit.contain,
-                errorBuilder: (context, error, stackTrace) {
-                  return Container(
-                    height: 250,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(12.0),
-                    ),
-                    child: const Icon(
-                      Icons.admin_panel_settings,
-                      size: 80,
-                      color: Colors.grey,
-                    ),
-                  );
-                },
-              ),
-            ),
-          ),
-          Expanded(
-            flex: 2,
-            child: Column(
-              children: [
-                Text(
-                  _onboardingTitle[index],
-                  style: const TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  _onboardingDescription[index],
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.grey.shade600,
-                    height: 1.5,
-                  ),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 20),
-                Skeletonizer(
-                  enabled: _loadingIpAddress,
-                  child: Text(
-                    "Diakses dari $_ipAddress",
-                    style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return SystemUiWrapper(
@@ -221,7 +133,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   onPageChanged: _onPageChanged,
                   itemCount: _onboardingTitle.length,
                   itemBuilder: (context, index) {
-                    return _buildOnboardingPage(index);
+                    return OnboardingPageContent(
+                      title: _onboardingTitle[index],
+                      description: _onboardingDescription[index],
+                      imagePath: _onboardingImage[index],
+                      ipAddress: _ipAddress,
+                      loadingIpAddress: _loadingIpAddress,
+                    );
                   },
                 ),
               ),
@@ -230,7 +148,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    _buildPageIndicator(),
+                    OnboardingPageIndicator(
+                      length: _onboardingTitle.length,
+                      currentIndex: _currentIndex,
+                    ),
                     Center(
                       child: Row(
                         children: [

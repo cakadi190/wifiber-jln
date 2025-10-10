@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:remixicon/remixicon.dart';
-import 'package:skeletonizer/skeletonizer.dart';
-import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/controllers/forgot_password_controller.dart';
 import 'package:wifiber/helpers/network_helper.dart';
 import 'package:wifiber/layouts/auth_layout.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/components/forms/backend_validation_mixin.dart';
+import 'package:wifiber/partials/forgot_password/forgot_password_body.dart';
+import 'package:wifiber/partials/forgot_password/forgot_password_footer.dart';
+import 'package:wifiber/partials/forgot_password/forgot_password_header.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -49,89 +49,17 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
   @override
   Widget build(BuildContext context) {
     return AuthLayout(
-      header: _buildHeader(context),
-      footer: _buildFooter(),
-      child: _buildBody(),
-    );
-  }
-
-  Widget _buildBody() {
-    return Column(
-      children: [
-        AutofillGroup(
-          child: Form(
-            key: _controller.formKey,
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 16, bottom: 16),
-                  child: TextFormField(
-                    controller: _controller.emailController,
-                    textInputAction: TextInputAction.done,
-                    keyboardType: TextInputType.emailAddress,
-                    enabled: !_controller.formLoading,
-                    autofillHints: const [
-                      AutofillHints.email,
-                    ],
-                    decoration: InputDecoration(
-                      labelText: 'Surel',
-                      hintText: 'Masukkan surel anda',
-                      prefixIcon: Icon(
-                        RemixIcons.mail_fill,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                    validator: validator('email', _controller.validateEmail),
-                    onFieldSubmitted: (_) => _handleSubmit(),
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
-        SizedBox(
-          width: double.infinity,
-          height: 48,
-          child: ElevatedButton(
-            onPressed: _controller.formLoading ? null : _handleSubmit,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: _controller.formLoading
-                ? const CircularProgressIndicator(color: AppColors.primary)
-                : const Text(
-              "Kirim Instruksinya!",
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 18,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        ),
-        SizedBox(
-          width: double.infinity,
-          child: TextButton(
-            onPressed: _controller.formLoading
-                ? null
-                : () {
-              Navigator.of(context).pop();
-            },
-            child: Text(
-              "Kembali ke Login",
-              style: TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.bold,
-                decoration: TextDecoration.underline,
-              ),
-            ),
-          ),
-        ),
-        _buildInfoFooter(),
-      ],
+      header: const ForgotPasswordHeader(),
+      footer: ForgotPasswordFooter(
+        ipAddress: _ipAddress,
+        loading: _loadingIpAddress,
+      ),
+      child: ForgotPasswordBody(
+        controller: _controller,
+        onSubmit: _handleSubmit,
+        emailValidator: validator('email', _controller.validateEmail),
+        onBackToLogin: () => Navigator.of(context).pop(),
+      ),
     );
   }
 
@@ -147,65 +75,6 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen>
       },
       authProvider: authProvider,
       onValidationError: setBackendErrors,
-    );
-  }
-
-  Widget _buildHeader(BuildContext context) {
-    final appTheme = Theme.of(context);
-
-    return Align(
-      alignment: Alignment.center,
-      child: Column(
-        children: [
-          Text(
-            "Lupa Kata Sandi?",
-            style: appTheme.textTheme.bodyLarge?.copyWith(
-              fontSize: 24,
-              fontWeight: FontWeight.bold,
-              color: AppColors.primary,
-            ),
-            textAlign: TextAlign.center,
-          ),
-          const SizedBox(height: 4),
-          Text(
-            "Masukkan email Anda dan kami akan mengirimkan instruksi reset kata sandi ke email Anda.",
-            style: appTheme.textTheme.bodySmall,
-            textAlign: TextAlign.center,
-          ),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildFooter() {
-    return Skeletonizer(
-      enabled: _loadingIpAddress,
-      child: Text("Diakses dari $_ipAddress", textAlign: TextAlign.center),
-    );
-  }
-
-  Widget _buildInfoFooter() {
-    return Container(
-      padding: const EdgeInsets.only(top: 16),
-      decoration: BoxDecoration(
-        border: Border(top: BorderSide(color: Colors.grey.shade100)),
-      ),
-      width: double.infinity,
-      child: Text.rich(
-        TextSpan(
-          children: [
-            const TextSpan(text: "Butuh bantuan?"),
-            TextSpan(
-              text: " Silahkan Hubungi Kami di WhatsApp.",
-              style: TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ],
-        ),
-        textAlign: TextAlign.center,
-      ),
     );
   }
 }

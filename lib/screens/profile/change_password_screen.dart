@@ -1,16 +1,14 @@
-import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
-import 'package:wifiber/components/ui/alert.dart';
-import 'package:wifiber/components/widgets/password_meter.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/controllers/change_password_controller.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
-import 'package:remixicon/remixicon.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/screens/forgot_password_screen.dart';
 import 'package:wifiber/components/forms/backend_validation_mixin.dart';
+import 'package:wifiber/partials/profile/change_password_form.dart';
+import 'package:wifiber/partials/profile/change_password_info.dart';
 
 class ChangePasswordScreen extends StatefulWidget {
   const ChangePasswordScreen({super.key});
@@ -40,8 +38,6 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen>
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-
     return SystemUiWrapper(
       style: SystemUiHelper.duotone(
         statusBarColor: AppColors.primary,
@@ -70,222 +66,31 @@ class _ChangePasswordScreenState extends State<ChangePasswordScreen>
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
-                  Alert.opaque(
-                    fullWidth: true,
-                    type: AlertType.info,
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Icon(
-                          Icons.info_rounded,
-                          color: Colors.blue,
-                          size: 32,
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.start,
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                'Ubah Kata Sandi',
-                                style: theme.textTheme.headlineSmall?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.blue,
-                                ),
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                'Kata sandi minimal 8 karakter, termasuk huruf besar, huruf kecil, angka, dan simbol. Dan pastikan kata sandi yang anda buat dapat anda dapat diingat dengan baik.',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  color: Colors.blue.withValues(alpha: 0.75),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                  const ChangePasswordInfo(),
 
                   const SizedBox(height: 32),
 
-                  Form(
-                    key: _controller.formKey,
-                    child: Column(
-                      children: [
-                        AnimatedBuilder(
-                          animation: _controller,
-                          builder: (context, child) {
-                            return TextFormField(
-                              controller: _controller.currentPasswordController,
-                              textInputAction: TextInputAction.next,
-                              obscureText: _controller.obscureCurrentPassword,
-                              decoration: InputDecoration(
-                                labelText: 'Kata Sandi Sekarang',
-                                suffixIcon: GestureDetector(
-                                  onTap: _controller
-                                      .toggleCurrentPasswordVisibility,
-                                  child: Icon(
-                                    _controller.obscureCurrentPassword
-                                        ? RemixIcons.eye_fill
-                                        : RemixIcons.eye_close_fill,
-                                    color: AppColors.primary,
-                                  ),
-                                ),
-                              ),
-                              validator: validator(
-                                'existing_password',
-                                _controller.validateCurrentPassword,
-                              ),
-                            );
-                          },
+                  ChangePasswordForm(
+                    controller: _controller,
+                    onSubmit: _handleSubmit,
+                    onForgotPassword: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => const ForgotPasswordScreen(),
                         ),
-                        const SizedBox(height: 8),
-                        RichText(
-                          text: TextSpan(
-                            text: 'Wah, lupa sandinya nih? ',
-                            style: theme.textTheme.bodySmall,
-                            children: [
-                              TextSpan(
-                                text: 'Klik disini',
-                                style: theme.textTheme.bodySmall?.copyWith(
-                                  decoration: TextDecoration.underline,
-                                  color: AppColors.primary,
-                                ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    Navigator.of(context).push(
-                                      MaterialPageRoute(
-                                        builder: (context) => const ForgotPasswordScreen(),
-                                      ),
-                                    );
-                                  },
-                              ),
-                              TextSpan(
-                                text: ' untuk memulihkan kata sandi anda yang terlupa.'
-                              )
-                            ],
-                          ),
-                          textAlign: TextAlign.start,
-                        ),
-                        const SizedBox(height: 16),
-
-                        AnimatedBuilder(
-                          animation: _controller,
-                          builder: (context, child) {
-                            return Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                TextFormField(
-                                  controller: _controller.passwordController,
-                                  textInputAction: TextInputAction.next,
-                                  obscureText: _controller.obscurePassword,
-                                  decoration: InputDecoration(
-                                    labelText: 'Kata Sandi Baru',
-                                    suffixIcon: GestureDetector(
-                                      onTap:
-                                          _controller.togglePasswordVisibility,
-                                      child: Icon(
-                                        _controller.obscurePassword
-                                            ? RemixIcons.eye_fill
-                                            : RemixIcons.eye_close_fill,
-                                        color: AppColors.primary,
-                                      ),
-                                    ),
-                              ),
-                              validator: validator(
-                                'new_password',
-                                _controller.validateNewPassword,
-                              ),
-                                ),
-
-                                PasswordMeterWidget(
-                                  passwordMeter: _controller.passwordMeter,
-                                  password: _controller.passwordController.text,
-                                ),
-                              ],
-                            );
-                          },
-                        ),
-                        const SizedBox(height: 16),
-
-                        AnimatedBuilder(
-                          animation: _controller,
-                          builder: (context, child) {
-                            return TextFormField(
-                              controller: _controller.confirmPasswordController,
-                              textInputAction: TextInputAction.done,
-                              obscureText: _controller.obscureConfirmPassword,
-                              decoration: InputDecoration(
-                                labelText: 'Konfirmasi Kata Sandi Baru',
-                                suffixIcon: GestureDetector(
-                                  onTap: _controller
-                                      .toggleConfirmPasswordVisibility,
-                                  child: Icon(
-                                    _controller.obscureConfirmPassword
-                                        ? RemixIcons.eye_fill
-                                        : RemixIcons.eye_close_fill,
-                                    color: AppColors.primary,
-                                  ),
-                                ),
-                              ),
-                              validator: validator(
-                                'new_password_confirmation',
-                                _controller.validateConfirmPassword,
-                              ),
-                              onFieldSubmitted: (_) => _handleSubmit(),
-                            );
-                          },
-                        ),
-
-                        const SizedBox(height: 32),
-
-                        SizedBox(
-                          width: double.infinity,
-                          child: AnimatedBuilder(
-                            animation: _controller,
-                            builder: (context, child) {
-                              return ElevatedButton(
-                                onPressed: _controller.isLoading
-                                    ? null
-                                    : _handleSubmit,
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: AppColors.primary,
-                                  foregroundColor: Colors.white,
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 16,
-                                  ),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                ),
-                                child: _controller.isLoading
-                                    ? const SizedBox(
-                                        height: 20,
-                                        width: 20,
-                                        child: CircularProgressIndicator(
-                                          strokeWidth: 2,
-                                          valueColor:
-                                              AlwaysStoppedAnimation<Color>(
-                                                Colors.white,
-                                              ),
-                                        ),
-                                      )
-                                    : const Text(
-                                        'Ubah Kata Sandi',
-                                        style: TextStyle(
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                        ),
-                                      ),
-                              );
-                            },
-                          ),
-                        ),
-                        const SizedBox(height: 16),
-                      ],
+                      );
+                    },
+                    currentPasswordValidator: validator(
+                      'existing_password',
+                      _controller.validateCurrentPassword,
+                    ),
+                    newPasswordValidator: validator(
+                      'new_password',
+                      _controller.validateNewPassword,
+                    ),
+                    confirmPasswordValidator: validator(
+                      'new_password_confirmation',
+                      _controller.validateConfirmPassword,
                     ),
                   ),
                 ],

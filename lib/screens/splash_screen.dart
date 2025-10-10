@@ -1,10 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:wifiber/components/app_logo.dart';
 import 'package:wifiber/components/system_ui_wrapper.dart';
 import 'package:wifiber/controllers/splash_screen_controller.dart';
 import 'package:wifiber/helpers/system_ui_helper.dart';
-import 'package:wifiber/config/app_colors.dart';
+import 'package:wifiber/partials/splash/splash_screen_body.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -42,26 +41,7 @@ class _SplashScreenState extends State<SplashScreen> {
           body: SafeArea(
             child: SizedBox(
               width: double.infinity,
-              child: Column(
-                children: [
-                  const Expanded(child: SizedBox()),
-                  const AppLogo(),
-                  const Expanded(child: SizedBox()),
-                  const CircularProgressIndicator(color: AppColors.primary),
-                  const SizedBox(height: 16),
-                  Consumer<SplashScreenController>(
-                    builder: (context, controller, child) {
-                      return Text(
-                        controller.splashText,
-                        style: const TextStyle(
-                          color: Colors.black,
-                        ),
-                      );
-                    },
-                  ),
-                  const SizedBox(height: 24),
-                ],
-              ),
+              child: const SplashScreenBody(),
             ),
           ),
         ),
