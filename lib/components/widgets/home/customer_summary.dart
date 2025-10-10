@@ -15,7 +15,7 @@ class CustomerSummary extends StatelessWidget {
         return SummaryCard(
           title: 'Data Pengguna Wifi',
           margin: const EdgeInsets.only(
-            top: 0,
+            top: 16,
             left: 16,
             right: 16,
             bottom: 16,
@@ -34,9 +34,8 @@ class CustomerSummary extends StatelessWidget {
               message: 'Data pengguna tidak tersedia',
               icon: PhosphorIcons.users(PhosphorIconsStyle.duotone),
             ),
-            dataBuilder: (controller) => _CustomerStatsList(
-              customerInfo: controller.customerInfo!,
-            ),
+            dataBuilder: (controller) =>
+                _CustomerStatsList(customerInfo: controller.customerInfo!),
             isEmpty: (controller) => controller?.customerInfo == null,
           ),
         );
@@ -60,7 +59,7 @@ class _CustomerStatsList extends StatelessWidget {
         color: Colors.green,
       ),
       _CustomerStatData(
-        label: 'Pengguna Baru',
+        label: 'Calon',
         value: customerInfo.newCustomer,
         icon: PhosphorIcons.userPlus(PhosphorIconsStyle.fill),
         color: Colors.blue,
@@ -68,7 +67,7 @@ class _CustomerStatsList extends StatelessWidget {
       _CustomerStatData(
         label: 'Tidak Aktif',
         value: customerInfo.inactive,
-        icon: PhosphorIcons.userMinus(PhosphorIconsStyle.fill),
+        icon: PhosphorIcons.notEquals(PhosphorIconsStyle.fill),
         color: Colors.grey,
       ),
       _CustomerStatData(
@@ -87,10 +86,31 @@ class _CustomerStatsList extends StatelessWidget {
 
     return Column(
       children: [
-        for (final stat in stats) ...[
-          _CustomerStatTile(stat: stat),
-          if (stat != stats.last) const SizedBox(height: 12),
-        ],
+        Row(
+          children: [
+            Expanded(child: _CustomerStatTile(stat: stats[0])),
+            const SizedBox(width: 12),
+            Expanded(child: _CustomerStatTile(stat: stats[1])),
+          ],
+        ),
+        const SizedBox(height: 12),
+
+        Row(
+          children: [
+            Expanded(child: _CustomerStatTile(stat: stats[2])),
+            const SizedBox(width: 12),
+            Expanded(child: _CustomerStatTile(stat: stats[3])),
+          ],
+        ),
+        const SizedBox(height: 12),
+
+        Row(
+          children: [
+            Expanded(child: _CustomerStatTile(stat: stats[4])),
+            const SizedBox(width: 12),
+            const Spacer(),
+          ],
+        ),
       ],
     );
   }
@@ -106,7 +126,7 @@ class _CustomerStatTile extends StatelessWidget {
     final theme = Theme.of(context);
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
       decoration: BoxDecoration(
         color: stat.color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(12),
@@ -119,11 +139,7 @@ class _CustomerStatTile extends StatelessWidget {
               color: stat.color.withValues(alpha: 0.18),
               shape: BoxShape.circle,
             ),
-            child: PhosphorIcon(
-              stat.icon,
-              color: stat.color,
-              size: 20,
-            ),
+            child: PhosphorIcon(stat.icon, color: stat.color, size: 20),
           ),
           const SizedBox(width: 12),
           Expanded(

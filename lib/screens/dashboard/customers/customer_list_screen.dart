@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:wifiber/components/reusables/options_bottom_sheet.dart';
 import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/models/customer.dart';
@@ -185,60 +186,52 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
   }
 
   void _showOptionsMenu(Customer customer) {
-    showModalBottomSheet<void>(
+    showOptionModalBottomSheet<void>(
       context: context,
-      builder: (context) => SafeArea(
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: EdgeInsets.all(16),
-              child: Card(
-                elevation: 0,
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: _getStatusColor(customer.status),
-                      child: const Icon(Icons.person, color: Colors.white),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            customer.name,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(customer.phone),
-                        ],
-                      ),
-                    ),
-                  ],
+      header: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: _getStatusColor(customer.status),
+            child: const Icon(Icons.verified_user, color: Colors.white),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  customer.name,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
+              ],
             ),
-
-            ListTile(
-              leading: const Icon(Icons.edit),
-              title: const Text('Edit'),
-              onTap: () {
-                Navigator.of(context).pop();
-                _navigateToForm(customer: customer);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.delete, color: Colors.red),
-              title: const Text('Hapus', style: TextStyle(color: Colors.red)),
-              onTap: () {
-                Navigator.of(context).pop();
-                CustomerDeleteModal.show(context, customer);
-              },
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
+      items: [
+        OptionMenuItem(
+          icon: Icons.edit,
+          title: 'Ubah Data',
+          subtitle: 'Ubah data pelanggan',
+          onTap: () {
+            Navigator.pop(context);
+            _navigateToForm(customer: customer);
+          },
+        ),
+        OptionMenuItem(
+          icon: Icons.delete,
+          title: 'Hapus Data',
+          subtitle: 'Hapus data dari daftar',
+          isDestructive: true,
+          onTap: () {
+            Navigator.pop(context);
+            CustomerDeleteModal.show(context, customer);
+          },
+        ),
+      ],
     );
   }
 

@@ -41,7 +41,7 @@ class SummaryCard extends StatelessWidget {
 
   Widget _buildHeader(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(left: 16, right: 0, top: 4),
+      padding: const EdgeInsets.only(left: 16, right: 0, top: 16, bottom: 8),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [

@@ -60,66 +60,66 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
           ),
           appBar: AppBar(
             title: const Text('MikroTik'),
-          actions: [
-            Consumer<RouterProvider>(
+            actions: [
+              Consumer<RouterProvider>(
+                builder: (context, provider, child) {
+                  return PopupMenuButton<String>(
+                    itemBuilder: (context) {
+                      return [
+                        PopupMenuItem<String>(
+                          onTap: () => _toggleAllAutoIsolate(true),
+                          child: Row(
+                            children: const [
+                              Icon(
+                                Icons.power_settings_new,
+                                size: 20,
+                                color: AppColors.primary,
+                              ),
+                              SizedBox(width: 8),
+                              Text('Aktivasi Auto-Isolir'),
+                            ],
+                          ),
+                        ),
+                        PopupMenuItem<String>(
+                          onTap: () => _toggleAllAutoIsolate(false),
+                          child: Row(
+                            children: const [
+                              Icon(
+                                Icons.power_off,
+                                size: 20,
+                                color: AppColors.primary,
+                              ),
+                              SizedBox(width: 8),
+                              Text('Deaktivasi Auto-Isolir'),
+                            ],
+                          ),
+                        ),
+                      ];
+                    },
+                  );
+                },
+              ),
+            ],
+          ),
+          body: Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
+              ),
+            ),
+            child: Consumer<RouterProvider>(
               builder: (context, provider, child) {
-                return PopupMenuButton<String>(
-                  itemBuilder: (context) {
-                    return [
-                      PopupMenuItem<String>(
-                        onTap: () => _toggleAllAutoIsolate(true),
-                        child: Row(
-                          children: const [
-                            Icon(
-                              Icons.power_settings_new,
-                              size: 20,
-                              color: AppColors.primary,
-                            ),
-                            SizedBox(width: 8),
-                            Text('Aktivasi Auto-Isolir'),
-                          ],
-                        ),
-                      ),
-                      PopupMenuItem<String>(
-                        onTap: () => _toggleAllAutoIsolate(false),
-                        child: Row(
-                          children: const [
-                            Icon(
-                              Icons.power_off,
-                              size: 20,
-                              color: AppColors.primary,
-                            ),
-                            SizedBox(width: 8),
-                            Text('Deaktivasi Auto-Isolir'),
-                          ],
-                        ),
-                      ),
-                    ];
-                  },
+                return RefreshIndicator(
+                  onRefresh: () => provider.refresh(),
+                  child: _buildBody(provider),
                 );
               },
             ),
-          ],
-        ),
-        body: Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(24),
-              topRight: Radius.circular(24),
-            ),
-          ),
-          child: Consumer<RouterProvider>(
-            builder: (context, provider, child) {
-              return RefreshIndicator(
-                onRefresh: () => provider.refresh(),
-                child: _buildBody(provider),
-              );
-            },
           ),
         ),
       ),
-    ),
     );
   }
 
@@ -249,7 +249,10 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
                   ],
                 ),
               ),
-              Icon(Icons.more_vert, color: Colors.grey[400]),
+              IconButton(
+                onPressed: () => _showActionBottomSheet(router, provider),
+                icon: const Icon(Icons.more_vert),
+              ),
             ],
           ),
         ),
@@ -677,8 +680,9 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
   }
 
   void _showPppoeData(RouterModel router) {
-    final pppoeFuture =
-        context.read<RouterProvider>().fetchRouterPppoes(router.id);
+    final pppoeFuture = context.read<RouterProvider>().fetchRouterPppoes(
+      router.id,
+    );
 
     showModalBottomSheet(
       context: context,
@@ -772,17 +776,16 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
             ),
             Text(
               'PPPoe Terhubung',
-              style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineSmall?.copyWith(fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 4),
             Text(
               router.name,
-              style: Theme.of(context)
-                  .textTheme
-                  .titleMedium
-                  ?.copyWith(color: Colors.grey[600]),
+              style: Theme.of(
+                context,
+              ).textTheme.titleMedium?.copyWith(color: Colors.grey[600]),
             ),
             const SizedBox(height: 16),
             _buildPppoeSummary(data),
@@ -822,22 +825,25 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Icon(Icons.warning_amber_rounded,
-                size: 64, color: Colors.orange),
+            const Icon(
+              Icons.warning_amber_rounded,
+              size: 64,
+              color: Colors.orange,
+            ),
             const SizedBox(height: 16),
             Text(
               'Gagal Memuat Data PPPoE',
-              style: Theme.of(context)
-                  .textTheme
-                  .titleLarge
-                  ?.copyWith(fontWeight: FontWeight.bold),
+              style: Theme.of(
+                context,
+              ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 8),
             Text(
               message,
-              style:
-                  Theme.of(context).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: 24),
@@ -949,9 +955,9 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
       children: [
         Text(
           title,
-          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                fontWeight: FontWeight.w600,
-              ),
+          style: Theme.of(
+            context,
+          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w600),
         ),
         const SizedBox(height: 12),
         if (secrets.isEmpty)
@@ -982,20 +988,14 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
           const Icon(Icons.info_outline, color: Colors.grey),
           const SizedBox(width: 12),
           Expanded(
-            child: Text(
-              message,
-              style: const TextStyle(color: Colors.grey),
-            ),
+            child: Text(message, style: const TextStyle(color: Colors.grey)),
           ),
         ],
       ),
     );
   }
 
-  Widget _buildPppoeCard(
-    RouterPppoeSecret secret, {
-    required bool isActive,
-  }) {
+  Widget _buildPppoeCard(RouterPppoeSecret secret, {required bool isActive}) {
     final statusColor = isActive ? Colors.green : Colors.orange;
 
     return Container(
@@ -1022,8 +1022,10 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
                 ),
               ),
               Container(
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 4,
+                ),
                 decoration: BoxDecoration(
                   color: statusColor.withValues(alpha: 0.15),
                   borderRadius: BorderRadius.circular(12),
@@ -1074,12 +1076,7 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
             ),
           ),
           const SizedBox(width: 12),
-          Expanded(
-            child: Text(
-              value!,
-              style: const TextStyle(fontSize: 13),
-            ),
-          ),
+          Expanded(child: Text(value!, style: const TextStyle(fontSize: 13))),
         ],
       ),
     );
@@ -1199,6 +1196,24 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
           onTap: () {
             Navigator.pop(context);
             _editRouter(router);
+          },
+        ),
+        OptionMenuItem(
+          icon: Icons.router,
+          title: 'Koneksi PPPoE',
+          subtitle: 'Lihat data PPPoE yang terhubung',
+          onTap: () {
+            Navigator.pop(context);
+            _showPppoeData(router);
+          },
+        ),
+        OptionMenuItem(
+          icon: Icons.wifi,
+          title: 'Monitor Jaringan',
+          subtitle: 'Pantau jaringan router ini',
+          onTap: () {
+            Navigator.pop(context);
+            // _showPppoeData(router);
           },
         ),
         OptionMenuItem(

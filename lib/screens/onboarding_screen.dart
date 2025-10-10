@@ -41,7 +41,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   ];
 
   final List<String> _onboardingImage = [
-    "assets/logo-wifiber-png/logo-color.png",
+    "assets/logo/logo-color.png",
     "assets/onboardings/payment.png",
     "assets/onboardings/customer.png",
     "assets/onboardings/monitoring.png",
@@ -99,21 +99,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       mainAxisAlignment: MainAxisAlignment.center,
       children: List.generate(
         _onboardingTitle.length,
-            (index) =>
-            AnimatedContainer(
-              duration: const Duration(milliseconds: 300),
-              margin: const EdgeInsets.symmetric(horizontal: 4.0),
-              height: 8.0,
-              width: _currentIndex == index ? 24.0 : 8.0,
-              decoration: BoxDecoration(
-                color: _currentIndex == index
-                    ? Theme
-                    .of(context)
-                    .primaryColor
-                    : Colors.grey.shade400,
-                borderRadius: BorderRadius.circular(4.0),
-              ),
-            ),
+        (index) => AnimatedContainer(
+          duration: const Duration(milliseconds: 300),
+          margin: const EdgeInsets.symmetric(horizontal: 4.0),
+          height: 8.0,
+          width: _currentIndex == index ? 24.0 : 8.0,
+          decoration: BoxDecoration(
+            color: _currentIndex == index
+                ? Theme.of(context).primaryColor
+                : Colors.grey.shade400,
+            borderRadius: BorderRadius.circular(4.0),
+          ),
+        ),
       ),
     );
   }
@@ -175,10 +172,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   enabled: _loadingIpAddress,
                   child: Text(
                     "Diakses dari $_ipAddress",
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey.shade500,
-                    ),
+                    style: TextStyle(fontSize: 12, color: Colors.grey.shade500),
                   ),
                 ),
               ],
@@ -242,39 +236,39 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         children: [
                           _currentIndex > 0
                               ? IconButton(
-                            onPressed: _prevPage,
-                            icon: const Icon(Icons.arrow_back_ios),
-                            style: IconButton.styleFrom(
-                              backgroundColor: Colors.grey.shade200,
-                              foregroundColor: Colors.grey.shade600,
-                              padding: const EdgeInsets.all(12),
-                            ),
-                          )
+                                  onPressed: _prevPage,
+                                  icon: const Icon(Icons.arrow_back_ios),
+                                  style: IconButton.styleFrom(
+                                    backgroundColor: Colors.grey.shade200,
+                                    foregroundColor: Colors.grey.shade600,
+                                    padding: const EdgeInsets.all(12),
+                                  ),
+                                )
                               : const SizedBox(width: 48),
                           const SizedBox(width: 12),
                           _currentIndex < _onboardingTitle.length - 1
                               ? IconButton(
-                            onPressed: _nextPage,
-                            icon: const Icon(Icons.arrow_forward_ios),
-                            style: IconButton.styleFrom(
-                              backgroundColor: Theme
-                                  .of(context)
-                                  .primaryColor,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.all(12),
-                            ),
-                          )
+                                  onPressed: _nextPage,
+                                  icon: const Icon(Icons.arrow_forward_ios),
+                                  style: IconButton.styleFrom(
+                                    backgroundColor: Theme.of(
+                                      context,
+                                    ).primaryColor,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.all(12),
+                                  ),
+                                )
                               : IconButton(
-                            onPressed: _onCompleteAction,
-                            icon: const Icon(Icons.check),
-                            style: IconButton.styleFrom(
-                              foregroundColor: Colors.white,
-                              backgroundColor: Theme
-                                  .of(context)
-                                  .primaryColor,
-                              padding: const EdgeInsets.all(12),
-                            ),
-                          ),
+                                  onPressed: _onCompleteAction,
+                                  icon: const Icon(Icons.check),
+                                  style: IconButton.styleFrom(
+                                    foregroundColor: Colors.white,
+                                    backgroundColor: Theme.of(
+                                      context,
+                                    ).primaryColor,
+                                    padding: const EdgeInsets.all(12),
+                                  ),
+                                ),
                         ],
                       ),
                     ),
@@ -292,7 +286,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     FirstLaunchService.setFirstLaunchStatus(false);
 
     Navigator.pushAndRemoveUntil(
-        context, MaterialPageRoute(builder: (context) => const LoginScreen()), (
-        _) => false);
+      context,
+      MaterialPageRoute(builder: (context) => const LoginScreen()),
+      (_) => false,
+    );
   }
 }

@@ -46,10 +46,7 @@ class AboutAppScreen extends StatelessWidget {
               Center(
                 child: Column(
                   children: [
-                    Image.asset(
-                      'assets/logo-wifiber-png/logo-color.png',
-                      width: 200,
-                    ),
+                    Image.asset('assets/logo/logo-color.png', width: 200),
                     const SizedBox(height: 8),
                     FutureBuilder<String>(
                       future: AppInfo.getAppVersion(),
