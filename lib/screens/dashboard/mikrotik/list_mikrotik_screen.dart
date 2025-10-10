@@ -1043,14 +1043,14 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
           ),
           const SizedBox(height: 8),
           _buildPppoeInfoRow('Profil', secret.profile),
-          _buildPppoeInfoRow('Password', secret.password),
+          _buildPppoeInfoRow('Kata Sandi', secret.password),
           _buildPppoeInfoRow('Caller ID', secret.callerId),
           if (isActive)
             _buildPppoeInfoRow('Uptime', secret.uptime)
           else
             _buildPppoeInfoRow('Terakhir Keluar', secret.lastLoggedOut),
-          _buildPppoeInfoRow('Alasan Disconnect', secret.lastDisconnectReason),
-          _buildPppoeInfoRow('Terakhir Caller', secret.lastCallerId),
+          _buildPppoeInfoRow('Alasan Terputus', secret.lastDisconnectReason),
+          _buildPppoeInfoRow('Identitas Koneksi Terakhir', secret.lastCallerId),
         ],
       ),
     );

@@ -15,7 +15,7 @@ class CustomerSummary extends StatelessWidget {
         return SummaryCard(
           title: 'Data Pengguna Wifi',
           margin: const EdgeInsets.only(
-            top: 16,
+            top: 8,
             left: 16,
             right: 16,
             bottom: 16,

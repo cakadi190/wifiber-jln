@@ -4,8 +4,6 @@ import 'package:provider/provider.dart';
 import 'package:wifiber/components/widgets/home/customer_summary.dart';
 import 'package:wifiber/components/widgets/home/dashboard_summary.dart';
 import 'package:wifiber/components/widgets/home/main_menu.dart';
-import 'package:wifiber/components/widgets/home/tickets_summary.dart';
-import 'package:wifiber/components/widgets/home/finance_summary.dart';
 import 'package:wifiber/components/widgets/user_avatar.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/controllers/tabs/dashboard_summary.dart';
@@ -44,8 +42,6 @@ class _HomeTabState extends State<HomeTab> {
 
         final hasFinancePermission =
             authProvider.user?.permissions.contains('finance') == true;
-        final hasTicketPermission =
-            authProvider.user?.permissions.contains('ticket') == true;
 
         return Scaffold(
           backgroundColor: AppColors.background,
@@ -81,34 +77,21 @@ class _HomeTabState extends State<HomeTab> {
                               onTransactionTap: widget.onTransactionTap,
                             ),
                           ),
+
+                          if (!hasFinancePermission) const SizedBox(height: 32),
+
+                          MainMenu(
+                            onTicketMenuTapped: widget.onTicketTap,
+                            onTransactionMenuTapped: widget.onTransactionTap,
+                            onBillMenuTapped: widget.onBookKeepingTap,
+                          ),
+
                           SizedBox(
                             width: double.infinity,
                             child: const CustomerSummary(),
                           ),
                         ],
                       ),
-                    ),
-
-                  if (!hasFinancePermission) const SizedBox(height: 24),
-
-                  MainMenu(
-                    onTicketMenuTapped: widget.onTicketTap,
-                    onTransactionMenuTapped: widget.onTransactionTap,
-                    onBillMenuTapped: widget.onBookKeepingTap,
-                  ),
-
-                  if (hasFinancePermission)
-                    SizedBox(
-                      width: double.infinity,
-                      child: FinanceSummary(
-                        onFinanceTap: widget.onTransactionTap,
-                      ),
-                    ),
-
-                  if (hasTicketPermission)
-                    SizedBox(
-                      width: double.infinity,
-                      child: TicketSummary(onTicketTap: widget.onTicketTap),
                     ),
                 ],
               ),
