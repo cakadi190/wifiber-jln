@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/models/router.dart';
@@ -174,6 +175,37 @@ class _MonitorLoginSheetState extends State<MonitorLoginSheet> {
                             }
                             return null;
                           },
+                        ),
+                        const SizedBox(height: 4),
+                        RichText(
+                          text: TextSpan(
+                            children: <TextSpan>[
+                              TextSpan(
+                                text:
+                                    'Silakan periksa ke dalam router dengan mengetikkan ',
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 12,
+                                ),
+                              ),
+                              TextSpan(
+                                text: '/ip service print',
+                                style: GoogleFonts.jetBrainsMono(
+                                  color: Theme.of(context).primaryColor,
+                                  fontSize: 12,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              TextSpan(
+                                text:
+                                    ' dan lihat pada bagian API itu port berapa.',
+                                style: const TextStyle(
+                                  color: Colors.grey,
+                                  fontSize: 12,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                         const SizedBox(height: 12),
                         Container(
