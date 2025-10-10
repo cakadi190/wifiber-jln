@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-import 'package:remixicon/remixicon.dart';
 import 'package:skeletonizer/skeletonizer.dart';
 import 'package:wifiber/config/app_colors.dart';
+import 'package:wifiber/components/forms/login_form_fields.dart';
 import 'package:wifiber/controllers/auth_screen_controller.dart';
 import 'package:wifiber/helpers/network_helper.dart';
 import 'package:wifiber/layouts/auth_layout.dart';
@@ -78,116 +78,28 @@ class _LoginScreenState extends State<LoginScreen> with BackendValidationMixin {
   Widget _buildBody() {
     return Column(
       children: [
-        AutofillGroup(
-          child: Form(
-            key: _controller.formKey,
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(top: 16, bottom: 8),
-                  child: TextFormField(
-                    controller: _controller.usernameController,
-                    textInputAction: TextInputAction.next,
-                    keyboardType: TextInputType.text,
-                    enabled: !_controller.formLoading,
-
-                    autofillHints: const [
-                      AutofillHints.username,
-                      AutofillHints.email,
-                    ],
-                    decoration: InputDecoration(
-                      labelText: 'Nama Pengguna',
-                      hintText: 'Masukkan nama pengguna anda',
-                      prefixIcon: Icon(
-                        RemixIcons.user_fill,
-                        color: AppColors.primary,
-                      ),
-                    ),
-                    validator: validator(
-                      'username',
-                      _controller.validateUsername,
-                    ),
-                    onFieldSubmitted: (_) => _handleSubmit(),
-                  ),
-                ),
-                Padding(
-                  padding: const EdgeInsets.only(top: 8, bottom: 16),
-                  child: TextFormField(
-                    controller: _controller.passwordController,
-                    obscureText: _controller.obscurePassword,
-                    textInputAction: TextInputAction.done,
-                    enabled: !_controller.formLoading,
-
-                    autofillHints: const [AutofillHints.password],
-                    decoration: InputDecoration(
-                      labelText: 'Kata Sandi',
-                      hintText: 'Masukkan kata sandi anda',
-                      prefixIcon: Icon(
-                        RemixIcons.lock_2_fill,
-                        color: AppColors.primary,
-                      ),
-                      suffixIcon: InkWell(
-                        onTap: () {
-                          setState(() {
-                            _controller.obscurePassword =
-                                !_controller.obscurePassword;
-                          });
-                        },
-                        child: Icon(
-                          _controller.obscurePassword
-                              ? RemixIcons.eye_fill
-                              : RemixIcons.eye_close_fill,
-                          color: AppColors.primary,
-                        ),
-                      ),
-                    ),
-                    validator: validator(
-                      'password',
-                      _controller.validatePassword,
-                    ),
-                    onFieldSubmitted: (_) => _handleSubmit(),
-                  ),
-                ),
-              ],
-            ),
+        LoginFormFields(
+          controller: _controller,
+          onSubmit: _handleSubmit,
+          usernameValidator: validator(
+            'username',
+            _controller.validateUsername,
           ),
+          passwordValidator: validator(
+            'password',
+            _controller.validatePassword,
+          ),
+          obscurePassword: _controller.obscurePassword,
+          onTogglePasswordVisibility: () {
+            setState(() {
+              _controller.obscurePassword = !_controller.obscurePassword;
+            });
+          },
         ),
-        SizedBox(
-          width: double.infinity,
-          height: 48,
-          child: ElevatedButton(
-            onPressed: _controller.formLoading ? null : _handleSubmit,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppColors.primary,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-            ),
-            child: _controller.formLoading
-                ? const CircularProgressIndicator(color: AppColors.primary)
-                : const Text(
-                    "Masuk Sekarang",
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-          ),
-        ),
-        SizedBox(
-          width: double.infinity,
-          child: TextButton(
-            onPressed: () => _controller.navigateToForgotPassword(),
-            child: Text(
-              "Lupa Kata Sandi",
-              style: TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.bold,
-                decoration: TextDecoration.underline,
-              ),
-            ),
-          ),
+        LoginFormActions(
+          isLoading: _controller.formLoading,
+          onSubmit: _handleSubmit,
+          onForgotPassword: () => _controller.navigateToForgotPassword(),
         ),
       ],
     );
