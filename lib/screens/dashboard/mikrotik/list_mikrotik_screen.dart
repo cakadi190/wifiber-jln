@@ -9,8 +9,9 @@ import 'package:wifiber/helpers/system_ui_helper.dart';
 import 'package:wifiber/models/router.dart';
 import 'package:wifiber/models/router_pppoe.dart';
 import 'package:wifiber/providers/router_provider.dart';
-import 'package:wifiber/screens/dashboard/mikrotik/create_mikrotik_screen.dart';
-import 'package:wifiber/screens/dashboard/mikrotik/edit_mikrotik_screen.dart';
+import 'package:wifiber/screens/dashboard/mikrotik/monitor_mikrotik_screen.dart';
+import 'package:wifiber/screens/dashboard/mikrotik/widgets/mikrotik_form_sheet.dart';
+import 'package:wifiber/screens/dashboard/mikrotik/widgets/monitor_login_sheet.dart';
 import 'package:wifiber/middlewares/auth_middleware.dart';
 
 class ListMikrotikScreen extends StatefulWidget {
@@ -46,14 +47,7 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
             child: FloatingActionButton(
               backgroundColor: AppColors.primary,
               onPressed: () async {
-                final provider = context.read<RouterProvider>();
-                await Navigator.of(context).push(
-                  MaterialPageRoute(
-                    builder: (context) => const CreateMikrotikScreen(),
-                  ),
-                );
-
-                await provider.refresh();
+                await _openMikrotikForm();
               },
               child: const Icon(Icons.add),
             ),
@@ -295,12 +289,7 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
   }
 
   void _editRouter(RouterModel router) {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => EditMikrotikScreen(router: router),
-      ),
-    );
+    _openMikrotikForm(router: router);
   }
 
   void _showDeleteConfirmation(RouterModel router, RouterProvider provider) {
@@ -1213,7 +1202,7 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
           subtitle: 'Pantau jaringan router ini',
           onTap: () {
             Navigator.pop(context);
-            // _showPppoeData(router);
+            _showLoginToMonitor(router);
           },
         ),
         OptionMenuItem(
@@ -1227,6 +1216,31 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
           },
         ),
       ],
+    );
+  }
+
+  Future<void> _showLoginToMonitor(RouterModel router) async {
+    final result = await showModalBottomSheet<MonitorLoginResult>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => MonitorLoginSheet(router: router),
+    );
+
+    if (!mounted || result == null) {
+      return;
+    }
+
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => MonitorMikrotikScreen(
+          router: router,
+          client: result.client,
+          username: result.username,
+          port: result.port,
+          useSsl: result.useSsl,
+        ),
+      ),
     );
   }
 
@@ -1400,5 +1414,19 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
         );
       },
     );
+  }
+
+  Future<void> _openMikrotikForm({RouterModel? router}) async {
+    final provider = context.read<RouterProvider>();
+    final result = await showModalBottomSheet<bool>(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => MikrotikFormSheet(router: router),
+    );
+
+    if (result == true) {
+      await provider.refresh();
+    }
   }
 }

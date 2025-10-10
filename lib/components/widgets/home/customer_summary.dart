@@ -104,13 +104,7 @@ class _CustomerStatsList extends StatelessWidget {
         ),
         const SizedBox(height: 12),
 
-        Row(
-          children: [
-            Expanded(child: _CustomerStatTile(stat: stats[4])),
-            const SizedBox(width: 12),
-            const Spacer(),
-          ],
-        ),
+        _CustomerStatTile(stat: stats[4]),
       ],
     );
   }
