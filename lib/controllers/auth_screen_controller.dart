@@ -48,9 +48,9 @@ class LoginScreenController {
   }
 
   Future<void> navigateToForgotPassword() async {
-    await Navigator.of(context).push(
-      MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()),
-    );
+    await Navigator.of(
+      context,
+    ).push(MaterialPageRoute(builder: (_) => const ForgotPasswordScreen()));
   }
 
   Future<void> submitForm({
@@ -73,7 +73,7 @@ class LoginScreenController {
       if (context.mounted) {
         SnackBars.success(
           context,
-          "Selamat datang kembali, ${authProvider.user?.username ?? username}.",
+          "Selamat datang kembali, ${authProvider.user?.name ?? username}.",
         ).clearSnackBars();
 
         await Future.delayed(const Duration(seconds: 2));
@@ -87,39 +87,24 @@ class LoginScreenController {
     } on ValidationException catch (e) {
       onValidationError?.call(e.errors);
       if (context.mounted) {
-        SnackBars.error(
-          context,
-          e.message,
-        ).clearSnackBars();
+        SnackBars.error(context, e.message).clearSnackBars();
       }
     } on StringException catch (e) {
       var message = e.toString();
       if (message.contains('422')) {
-        onValidationError?.call({
-          'username': message,
-          'password': message,
-        });
+        onValidationError?.call({'username': message, 'password': message});
       }
       if (context.mounted) {
-        SnackBars.error(
-          context,
-          message,
-        ).clearSnackBars();
+        SnackBars.error(context, message).clearSnackBars();
       }
     } catch (e) {
       String message = e.toString();
       if (message.contains("400")) {
         message = "Nama pengguna atau kata sandi salah.";
-        onValidationError?.call({
-          'username': message,
-          'password': message,
-        });
+        onValidationError?.call({'username': message, 'password': message});
       }
       if (context.mounted) {
-        SnackBars.error(
-          context,
-          message,
-        ).clearSnackBars();
+        SnackBars.error(context, message).clearSnackBars();
       }
     } finally {
       onComplete();

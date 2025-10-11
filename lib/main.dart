@@ -55,7 +55,9 @@ void main() {
           create: (_) => BroadcastWhatsappProvider(BroadcastService()),
         ),
         ChangeNotifierProvider(create: (_) => AreaProvider(AreaService())),
-        ChangeNotifierProvider(create: (_) => PackageProvider(PackageService())),
+        ChangeNotifierProvider(
+          create: (_) => PackageProvider(PackageService()),
+        ),
         ChangeNotifierProvider(create: (_) => InfrastructureProvider()),
         ChangeNotifierProvider(
           create: (_) => CompanyProvider(CompanyService()),

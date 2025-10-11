@@ -159,9 +159,7 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
 
           trafficMap[ifaceName] = ifaceTraffic;
           totalMbps += ifaceTraffic.totalMbps;
-        } catch (_) {
-          // Abaikan kegagalan pada interface tertentu agar polling tetap berjalan.
-        }
+        } catch (_) {}
       }
 
       if (mounted) {
@@ -183,7 +181,6 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
         });
       }
     } catch (_) {
-      // Biarkan sunyi untuk saat ini.
     } finally {
       _isFetchingTraffic = false;
     }

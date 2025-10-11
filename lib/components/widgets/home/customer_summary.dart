@@ -10,36 +10,47 @@ class CustomerSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Consumer<DashboardSummaryController>(
-      builder: (context, controller, _) {
-        return SummaryCard(
-          title: 'Data Pengguna Wifi',
-          margin: const EdgeInsets.only(
-            top: 8,
-            left: 16,
-            right: 16,
-            bottom: 16,
-          ),
-          padding: const EdgeInsets.all(16),
-          child: StateBuilder<DashboardSummaryController>(
-            isLoading: controller.isLoading,
-            error: controller.error,
-            data: controller,
-            loadingBuilder: () => DefaultStates.loading(),
-            errorBuilder: (error) => DefaultStates.error(
-              message: error,
-              onRetry: controller.refresh,
-            ),
-            emptyBuilder: () => DefaultStates.empty(
-              message: 'Data pengguna tidak tersedia',
-              icon: PhosphorIcons.users(PhosphorIconsStyle.duotone),
-            ),
-            dataBuilder: (controller) =>
-                _CustomerStatsList(customerInfo: controller.customerInfo!),
-            isEmpty: (controller) => controller?.customerInfo == null,
-          ),
-        );
-      },
+    DashboardSummaryController? controller;
+    try {
+      controller = context.watch<DashboardSummaryController>();
+    } on ProviderNotFoundException {
+      controller = null;
+    }
+
+    if (controller == null) {
+      return SummaryCard(
+        title: 'Data Pengguna Wifi',
+        margin: const EdgeInsets.only(top: 8, left: 16, right: 16, bottom: 16),
+        padding: const EdgeInsets.all(16),
+        child: DefaultStates.error(
+          message: 'Provider DashboardSummaryController tidak ditemukan.',
+          backgroundColor: Colors.orange.shade100,
+          textColor: Colors.orange.shade700,
+        ),
+      );
+    }
+
+    final DashboardSummaryController dashboard = controller;
+
+    return SummaryCard(
+      title: 'Data Pengguna Wifi',
+      margin: const EdgeInsets.only(top: 8, left: 16, right: 16, bottom: 16),
+      padding: const EdgeInsets.all(16),
+      child: StateBuilder<DashboardSummaryController>(
+        isLoading: dashboard.isLoading,
+        error: dashboard.error,
+        data: dashboard,
+        loadingBuilder: () => DefaultStates.loading(),
+        errorBuilder: (error) =>
+            DefaultStates.error(message: error, onRetry: dashboard.refresh),
+        emptyBuilder: () => DefaultStates.empty(
+          message: 'Data pengguna tidak tersedia',
+          icon: PhosphorIcons.users(PhosphorIconsStyle.duotone),
+        ),
+        dataBuilder: (controller) =>
+            _CustomerStatsList(customerInfo: controller.customerInfo!),
+        isEmpty: (controller) => controller?.customerInfo == null,
+      ),
     );
   }
 }

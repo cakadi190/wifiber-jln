@@ -77,22 +77,30 @@ class _HomeTabState extends State<HomeTab> {
                               onTransactionTap: widget.onTransactionTap,
                             ),
                           ),
-
-                          if (!hasFinancePermission) const SizedBox(height: 32),
-
-                          MainMenu(
-                            onTicketMenuTapped: widget.onTicketTap,
-                            onTransactionMenuTapped: widget.onTransactionTap,
-                            onBillMenuTapped: widget.onBookKeepingTap,
-                          ),
-
-                          SizedBox(
-                            width: double.infinity,
-                            child: const CustomerSummary(),
-                          ),
                         ],
                       ),
                     ),
+
+                  if (!hasFinancePermission) const SizedBox(height: 32),
+
+                  MainMenu(
+                    onTicketMenuTapped: widget.onTicketTap,
+                    onTransactionMenuTapped: widget.onTransactionTap,
+                    onBillMenuTapped: widget.onBookKeepingTap,
+                  ),
+
+                  ChangeNotifierProvider(
+                    create: (_) =>
+                        DashboardSummaryController()..loadDashboardData(),
+                    child: Column(
+                      children: [
+                        SizedBox(
+                          width: double.infinity,
+                          child: const CustomerSummary(),
+                        ),
+                      ],
+                    ),
+                  ),
                 ],
               ),
             ),

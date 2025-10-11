@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/models/router.dart';
 import 'package:wifiber/services/router_os_api_client.dart';
@@ -37,6 +36,7 @@ class _MonitorLoginSheetState extends State<MonitorLoginSheet> {
   bool _isPasswordVisible = false;
   bool _useSsl = false;
   bool _isLoading = false;
+  String? _formError;
 
   @override
   void dispose() {
@@ -113,7 +113,52 @@ class _MonitorLoginSheetState extends State<MonitorLoginSheet> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: 16),
+                  if (_formError != null) ...[
+                    Container(
+                      padding: const EdgeInsets.all(12),
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withValues(alpha: 0.08),
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(
+                          color: Colors.red.withValues(alpha: 0.2),
+                        ),
+                      ),
+                      child: Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Icon(
+                            Icons.error_outline,
+                            color: Colors.red,
+                            size: 20,
+                          ),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              _formError!,
+                              style: GoogleFonts.inter(
+                                fontSize: 13,
+                                color: Colors.red.shade700,
+                                height: 1.4,
+                              ),
+                            ),
+                          ),
+                          IconButton(
+                            icon: const Icon(Icons.close, size: 18),
+                            color: Colors.red.shade600,
+                            splashRadius: 16,
+                            onPressed: () {
+                              setState(() {
+                                _formError = null;
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ),
+                  ] else
+                    const SizedBox(height: 16),
                   Form(
                     key: _formKey,
                     child: Column(
@@ -293,11 +338,15 @@ class _MonitorLoginSheetState extends State<MonitorLoginSheet> {
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) {
+      setState(() {
+        _formError = 'Periksa kembali data login yang dimasukkan.';
+      });
       return;
     }
 
     setState(() {
       _isLoading = true;
+      _formError = null;
     });
 
     final username = _usernameController.text.trim();
@@ -339,15 +388,17 @@ class _MonitorLoginSheetState extends State<MonitorLoginSheet> {
         );
       } else {
         client.close();
-        SnackBars.error(context, 'Login ke RouterOS gagal.');
+        setState(() {
+          _formError =
+              'Login ke RouterOS gagal. Periksa username, password, dan port API.';
+        });
       }
     } catch (error) {
       client.close();
       if (mounted) {
-        SnackBars.error(
-          context,
-          'Gagal terhubung ke RouterOS: ${error.toString()}',
-        );
+        setState(() {
+          _formError = 'Tidak dapat terhubung ke RouterOS: ${error.toString()}';
+        });
       }
     } finally {
       if (!popInvoked && mounted) {
