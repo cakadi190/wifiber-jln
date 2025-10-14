@@ -117,7 +117,8 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
       }
 
       final trafficMap = <String, InterfaceTraffic>{};
-      double totalMbps = 0;
+      double totalDownloadMbps = 0;
+      double totalUploadMbps = 0;
 
       final targets = _interfacesCache
           .take(_maxInterfacesForTraffic)
@@ -139,6 +140,8 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
             },
           );
 
+          debugPrint("Result from $ifaceName: $result");
+
           if (result.isEmpty) {
             continue;
           }
@@ -149,8 +152,8 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
           final txBits =
               double.tryParse(data['tx-bits-per-second'] ?? '') ?? 0.0;
 
-          final rxMbps = rxBits / 8 / 1e6;
-          final txMbps = txBits / 8 / 1e6;
+          final rxMbps = rxBits / 1e6;
+          final txMbps = txBits / 1e6;
           final ifaceTraffic = InterfaceTraffic(
             name: ifaceName,
             downloadMbps: rxMbps,
@@ -158,7 +161,8 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
           );
 
           trafficMap[ifaceName] = ifaceTraffic;
-          totalMbps += ifaceTraffic.totalMbps;
+          totalDownloadMbps += rxMbps;
+          totalUploadMbps += txMbps;
         } catch (_) {}
       }
 
@@ -169,7 +173,11 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
             ..addAll(trafficMap);
 
           _trafficHistory.add(
-            TrafficSample(timestamp: DateTime.now(), totalMbps: totalMbps),
+            TrafficSample(
+              timestamp: DateTime.now(),
+              downloadMbps: totalDownloadMbps,
+              uploadMbps: totalUploadMbps,
+            ),
           );
 
           if (_trafficHistory.length > _trafficHistoryLimit) {
@@ -191,11 +199,12 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
     return SystemUiWrapper(
       style: SystemUiHelper.duotone(
         statusBarColor: AppColors.primary,
-        navigationBarColor: Colors.white,
+        navigationBarColor: AppColors.primary,
       ),
       child: AuthGuard(
         requiredPermissions: const ['integration'],
         child: Scaffold(
+          backgroundColor: AppColors.primary,
           appBar: AppBar(
             title: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -221,9 +230,9 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
             child: ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                _buildTrafficCard(),
+                _buildTrafficSection(),
                 const SizedBox(height: 16),
-                _buildConnectionCard(),
+                _buildConnectionSection(),
                 const SizedBox(height: 16),
                 _buildMetricsTabs(),
                 SizedBox(height: MediaQuery.of(context).padding.bottom + 8),
@@ -235,7 +244,7 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
     );
   }
 
-  Widget _buildConnectionCard() {
+  Widget _buildConnectionSection() {
     return Card(
       elevation: 2,
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -249,6 +258,7 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
             const SizedBox(height: 12),
+            _buildInfoRow('Nama Router', widget.router.name),
             _buildInfoRow('Alamat', widget.router.host),
             _buildInfoRow('Username', widget.username),
             _buildInfoRow('Port', widget.port.toString()),
@@ -259,7 +269,7 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
     );
   }
 
-  Widget _buildTrafficCard() {
+  Widget _buildTrafficSection() {
     final latest = _trafficHistory.isNotEmpty ? _trafficHistory.last : null;
     final latestValue = latest?.totalMbps ?? 0.0;
     final maxPortTraffic = _interfaceTraffic.values.fold<double>(
@@ -310,7 +320,7 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
                     borderRadius: BorderRadius.circular(999),
                   ),
                   child: Text(
-                    '${_formatMbps(latestValue)} MB/s',
+                    '${_formatMbps(latestValue)} Mb/s',
                     style: const TextStyle(
                       color: AppColors.primary,
                       fontWeight: FontWeight.w600,
@@ -320,11 +330,30 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
               ],
             ),
             const SizedBox(height: 16),
+            if (latest != null) ...[
+              Row(
+                children: [
+                  _buildTrafficLegend(
+                    color: Colors.red,
+                    label: 'Unduh',
+                    value: _formatMbps(latest.downloadMbps),
+                  ),
+                  const SizedBox(width: 12),
+                  _buildTrafficLegend(
+                    color: AppColors.primary,
+                    label: 'Unggah',
+                    value: _formatMbps(latest.uploadMbps),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+            ],
             SizedBox(
               height: 180,
               child: TrafficChart(
                 samples: List.unmodifiable(_trafficHistory),
-                lineColor: AppColors.primary,
+                downloadColor: Colors.red,
+                uploadColor: AppColors.primary,
               ),
             ),
             const SizedBox(height: 16),
@@ -358,7 +387,7 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
                               ),
                             ),
                             Text(
-                              'D ${_formatMbps(traffic.downloadMbps)} / U ${_formatMbps(traffic.uploadMbps)} MB/s',
+                              'D ${_formatMbps(traffic.downloadMbps)} / U ${_formatMbps(traffic.uploadMbps)} Mb/s',
                               style: TextStyle(
                                 fontSize: 12,
                                 color: Colors.grey.shade700,
@@ -383,6 +412,41 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
                   );
                 }).toList(),
               ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTrafficLegend({
+    required Color color,
+    required String label,
+    required String value,
+  }) {
+    return Expanded(
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+        decoration: BoxDecoration(
+          color: color.withValues(alpha: 0.08),
+          borderRadius: BorderRadius.circular(8),
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 10,
+              height: 10,
+              decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(
+                '$label: $value Mb/s',
+                style: const TextStyle(
+                  fontSize: 12,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
           ],
         ),
       ),
@@ -610,7 +674,7 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
       child: Row(
         children: [
           SizedBox(
-            width: 100,
+            width: 125,
             child: Text(
               label,
               style: TextStyle(
@@ -677,6 +741,8 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
   }
 
   String _formatMbps(double value) {
+    debugPrint(value.toString());
+
     if (value >= 100) {
       return value.toStringAsFixed(0);
     }
@@ -702,29 +768,38 @@ class InterfaceTraffic {
 }
 
 class TrafficSample {
-  TrafficSample({required this.timestamp, required this.totalMbps});
+  TrafficSample({
+    required this.timestamp,
+    required this.downloadMbps,
+    required this.uploadMbps,
+  });
 
   final DateTime timestamp;
-  final double totalMbps;
+  final double downloadMbps;
+  final double uploadMbps;
+
+  double get totalMbps => downloadMbps + uploadMbps;
 }
 
 class TrafficChart extends StatelessWidget {
   const TrafficChart({
     super.key,
     required this.samples,
-    required this.lineColor,
+    required this.downloadColor,
+    required this.uploadColor,
   });
 
   final List<TrafficSample> samples;
-  final Color lineColor;
+  final Color downloadColor;
+  final Color uploadColor;
 
   @override
   Widget build(BuildContext context) {
     return CustomPaint(
       painter: TrafficChartPainter(
         samples: samples,
-        lineColor: lineColor,
-        backgroundColor: lineColor.withValues(alpha: 0.08),
+        downloadColor: downloadColor,
+        uploadColor: uploadColor,
       ),
       child: const SizedBox.expand(),
     );
@@ -734,13 +809,13 @@ class TrafficChart extends StatelessWidget {
 class TrafficChartPainter extends CustomPainter {
   TrafficChartPainter({
     required this.samples,
-    required this.lineColor,
-    required this.backgroundColor,
+    required this.downloadColor,
+    required this.uploadColor,
   });
 
   final List<TrafficSample> samples;
-  final Color lineColor;
-  final Color backgroundColor;
+  final Color downloadColor;
+  final Color uploadColor;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -755,53 +830,90 @@ class TrafficChartPainter extends CustomPainter {
 
     final maxValue = samples.fold<double>(
       0,
-      (previousValue, sample) => math.max(previousValue, sample.totalMbps),
+      (previousValue, sample) => math.max(
+        previousValue,
+        math.max(sample.downloadMbps, sample.uploadMbps),
+      ),
     );
     final effectiveMax = maxValue <= 0 ? 1.0 : maxValue;
     final dx = chartWidth / math.max(1, samples.length - 1);
 
-    final linePath = Path();
-    final fillPath = Path();
+    final downloadLinePath = Path();
+    final uploadLinePath = Path();
+    final downloadFillPath = Path();
+    final uploadFillPath = Path();
 
     for (var i = 0; i < samples.length; i++) {
       final sample = samples[i];
       final x = horizontalPadding + (dx * i);
-      final normalized = (sample.totalMbps / effectiveMax).clamp(0.0, 1.0);
-      final y = verticalPadding + chartHeight * (1 - normalized);
+
+      final downloadNormalized = (sample.downloadMbps / effectiveMax).clamp(
+        0.0,
+        1.0,
+      );
+      final uploadNormalized = (sample.uploadMbps / effectiveMax).clamp(
+        0.0,
+        1.0,
+      );
+
+      final downloadY =
+          verticalPadding + chartHeight * (1 - downloadNormalized);
+      final uploadY = verticalPadding + chartHeight * (1 - uploadNormalized);
 
       if (i == 0) {
-        linePath.moveTo(x, y);
-        fillPath
+        downloadLinePath.moveTo(x, downloadY);
+        uploadLinePath.moveTo(x, uploadY);
+        downloadFillPath
           ..moveTo(x, chartHeight + verticalPadding)
-          ..lineTo(x, y);
+          ..lineTo(x, downloadY);
+        uploadFillPath
+          ..moveTo(x, chartHeight + verticalPadding)
+          ..lineTo(x, uploadY);
       } else {
-        linePath.lineTo(x, y);
-        fillPath.lineTo(x, y);
+        downloadLinePath.lineTo(x, downloadY);
+        uploadLinePath.lineTo(x, uploadY);
+        downloadFillPath.lineTo(x, downloadY);
+        uploadFillPath.lineTo(x, uploadY);
       }
     }
 
     final lastX = horizontalPadding + dx * (samples.length - 1);
-    fillPath
+    downloadFillPath
+      ..lineTo(lastX, chartHeight + verticalPadding)
+      ..close();
+    uploadFillPath
       ..lineTo(lastX, chartHeight + verticalPadding)
       ..close();
 
-    final fillPaint = Paint()
+    final downloadFillPaint = Paint()
       ..style = PaintingStyle.fill
-      ..color = backgroundColor;
-    canvas.drawPath(fillPath, fillPaint);
+      ..color = downloadColor.withValues(alpha: 0.08);
+    canvas.drawPath(downloadFillPath, downloadFillPaint);
 
-    final linePaint = Paint()
+    final uploadFillPaint = Paint()
+      ..style = PaintingStyle.fill
+      ..color = uploadColor.withValues(alpha: 0.08);
+    canvas.drawPath(uploadFillPath, uploadFillPaint);
+
+    final downloadLinePaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.5
       ..strokeCap = StrokeCap.round
-      ..color = lineColor;
-    canvas.drawPath(linePath, linePaint);
+      ..color = downloadColor;
+    canvas.drawPath(downloadLinePath, downloadLinePaint);
+
+    final uploadLinePaint = Paint()
+      ..style = PaintingStyle.stroke
+      ..strokeWidth = 2.5
+      ..strokeCap = StrokeCap.round
+      ..color = uploadColor;
+    canvas.drawPath(uploadLinePath, uploadLinePaint);
   }
 
   @override
   bool shouldRepaint(covariant TrafficChartPainter oldDelegate) {
     return oldDelegate.samples != samples ||
-        oldDelegate.lineColor != lineColor ||
-        oldDelegate.backgroundColor != backgroundColor;
+        oldDelegate.downloadColor != downloadColor ||
+        oldDelegate.uploadColor != uploadColor;
   }
 }
