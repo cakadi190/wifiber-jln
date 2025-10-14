@@ -197,7 +197,13 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
         requiredPermissions: const ['integration'],
         child: Scaffold(
           appBar: AppBar(
-            title: Text('Monitor ${widget.router.name}'),
+            title: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text('Monitor "${widget.router.name}"'),
+                Text(widget.client.host, style: const TextStyle(fontSize: 12)),
+              ],
+            ),
             actions: [
               IconButton(
                 onPressed: () {
@@ -215,9 +221,9 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
             child: ListView(
               padding: const EdgeInsets.all(16),
               children: [
-                _buildConnectionCard(),
-                const SizedBox(height: 16),
                 _buildTrafficCard(),
+                const SizedBox(height: 16),
+                _buildConnectionCard(),
                 const SizedBox(height: 16),
                 _buildMetricsTabs(),
                 SizedBox(height: MediaQuery.of(context).padding.bottom + 8),
@@ -278,7 +284,7 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       const Text(
-                        'Total Trafik Router',
+                        'Total Trafik',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,

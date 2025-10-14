@@ -10,39 +10,36 @@ class CustomerSummary extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    DashboardSummaryController? controller;
     try {
-      controller = context.watch<DashboardSummaryController>();
+      context.watch<DashboardSummaryController>();
+      return const _CustomerSummaryContent();
     } on ProviderNotFoundException {
-      controller = null;
-    }
-
-    if (controller == null) {
-      return SummaryCard(
-        title: 'Data Pengguna Wifi',
-        margin: const EdgeInsets.only(top: 8, left: 16, right: 16, bottom: 16),
-        padding: const EdgeInsets.all(16),
-        child: DefaultStates.error(
-          message: 'Provider DashboardSummaryController tidak ditemukan.',
-          backgroundColor: Colors.orange.shade100,
-          textColor: Colors.orange.shade700,
-        ),
+      return ChangeNotifierProvider(
+        create: (_) => DashboardSummaryController()..loadDashboardData(),
+        child: const _CustomerSummaryContent(),
       );
     }
+  }
+}
 
-    final DashboardSummaryController dashboard = controller;
+class _CustomerSummaryContent extends StatelessWidget {
+  const _CustomerSummaryContent();
+
+  @override
+  Widget build(BuildContext context) {
+    final controller = context.watch<DashboardSummaryController>();
 
     return SummaryCard(
       title: 'Data Pengguna Wifi',
       margin: const EdgeInsets.only(top: 8, left: 16, right: 16, bottom: 16),
       padding: const EdgeInsets.all(16),
       child: StateBuilder<DashboardSummaryController>(
-        isLoading: dashboard.isLoading,
-        error: dashboard.error,
-        data: dashboard,
+        isLoading: controller.isLoading,
+        error: controller.error,
+        data: controller,
         loadingBuilder: () => DefaultStates.loading(),
         errorBuilder: (error) =>
-            DefaultStates.error(message: error, onRetry: dashboard.refresh),
+            DefaultStates.error(message: error, onRetry: controller.refresh),
         emptyBuilder: () => DefaultStates.empty(
           message: 'Data pengguna tidak tersedia',
           icon: PhosphorIcons.users(PhosphorIconsStyle.duotone),
@@ -70,7 +67,7 @@ class _CustomerStatsList extends StatelessWidget {
         color: Colors.green,
       ),
       _CustomerStatData(
-        label: 'Calon',
+        label: 'Baru',
         value: customerInfo.newCustomer,
         icon: PhosphorIcons.userPlus(PhosphorIconsStyle.fill),
         color: Colors.blue,

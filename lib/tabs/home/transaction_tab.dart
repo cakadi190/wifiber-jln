@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:wifiber/components/reusables/options_bottom_sheet.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/controllers/tabs/transaction_tab.dart';
 import 'package:wifiber/helpers/currency_helper.dart';
@@ -578,7 +579,7 @@ class TransactionTab extends StatelessWidget {
             ),
           ),
           title: Text(
-            DateHelper.formatDate(tx.createdAt),
+            "#${tx.id.toString()} • ${DateHelper.formatDate(tx.createdAt)}",
             style: TextStyle(fontWeight: FontWeight.bold),
           ),
           subtitle: Text(
@@ -594,91 +595,151 @@ class TransactionTab extends StatelessWidget {
   }
 
   void _showTransactionOptions(BuildContext context, Transaction transaction) {
-    showModalBottomSheet(
+    showOptionModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return SafeArea(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              ListTile(
-                leading: const Icon(Icons.visibility),
-                title: const Text('Tampil Data'),
-                onTap: () {
-                  Navigator.pop(context);
-                  _showTransactionDetailModal(context, transaction);
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.edit),
-                title: const Text('Ubah Data'),
-                onTap: () async {
-                  Navigator.pop(context);
-                  final result = await Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (_) =>
-                          TransactionFormScreen(transaction: transaction),
-                    ),
-                  );
-                  if (result == true) {
-                    controller.refreshTransactions();
-                  }
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.delete, color: Colors.red),
-                title: const Text(
-                  'Hapus Data',
-                  style: TextStyle(color: Colors.red),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  _showDeleteConfirmation(context, transaction);
-                },
-              ),
-            ],
+      header: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: AppColors.primary,
+            child: const Icon(Icons.wallet, color: Colors.white),
           ),
-        );
-      },
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  "#${transaction.id.toString()} • ${DateHelper.formatDate(transaction.createdAt)}",
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
+                ),
+                Text(
+                  transaction.description,
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                ),
+              ],
+            ),
+          ),
+        ],
+      ),
+      items: [
+        OptionMenuItem(
+          title: 'Tampil Data',
+          subtitle: 'Tampilkan informasi transaksi',
+          icon: Icons.visibility,
+          onTap: () => _showTransactionDetailModal(context, transaction),
+        ),
+        OptionMenuItem(
+          title: 'Ubah Data',
+          subtitle: 'Ubah informasi transaksi',
+          icon: Icons.edit,
+          onTap: () async {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (_) => TransactionFormScreen(transaction: transaction),
+              ),
+            );
+            if (result == true) {
+              controller.refreshTransactions();
+            }
+          },
+        ),
+        OptionMenuItem(
+          title: 'Hapus Data',
+          subtitle: 'Hapus transaksi ini',
+          icon: Icons.delete,
+          isDestructive: true,
+          onTap: () {
+            Navigator.pop(context);
+            _showDeleteConfirmation(context, transaction);
+          },
+        ),
+      ],
     );
   }
 
   void _showDeleteConfirmation(BuildContext context, Transaction transaction) {
     showModalBottomSheet(
       context: context,
-      shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-      ),
-      builder: (context) {
-        return Padding(
-          padding: const EdgeInsets.all(16),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              const Text(
-                'Hapus transaksi ini?',
-                style: TextStyle(fontWeight: FontWeight.bold),
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+        ),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Container(
+              margin: const EdgeInsets.only(top: 12),
+              width: 40,
+              height: 4,
+              decoration: BoxDecoration(
+                color: Colors.grey[300],
+                borderRadius: BorderRadius.circular(2),
               ),
-              const SizedBox(height: 16),
-              Row(
+            ),
+
+            Padding(
+              padding: const EdgeInsets.all(24),
+              child: Column(
                 children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.pop(context),
-                      child: const Text('Batal'),
+                  Container(
+                    padding: const EdgeInsets.all(16),
+                    decoration: BoxDecoration(
+                      color: Colors.red.withValues(alpha: 0.1),
+                      borderRadius: BorderRadius.circular(50),
+                    ),
+                    child: const Icon(
+                      Icons.delete_outline,
+                      color: Colors.red,
+                      size: 32,
                     ),
                   ),
-                  const SizedBox(width: 16),
-                  Expanded(
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Hapus Transaksi',
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.black87,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Apakah Anda yakin ingin menghapus data transaksi "#${transaction.id}" ini?',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Tindakan ini tidak dapat dibatalkan.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Colors.red[400],
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24),
+              child: Column(
+                children: [
+                  SizedBox(
+                    width: double.infinity,
                     child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                      ),
                       onPressed: () async {
                         Navigator.pop(context);
                         final provider = context.read<TransactionProvider>();
@@ -695,15 +756,55 @@ class TransactionTab extends StatelessWidget {
                           }
                         }
                       },
-                      child: const Text('Hapus'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.red,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                        elevation: 0,
+                      ),
+                      child: const Text(
+                        'Ya, Hapus Transaksi',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 12),
+
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      style: OutlinedButton.styleFrom(
+                        foregroundColor: Colors.grey[700],
+                        side: BorderSide(color: Colors.grey[300]!),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text(
+                        'Batal',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
                     ),
                   ),
                 ],
               ),
-            ],
-          ),
-        );
-      },
+            ),
+
+            SizedBox(height: MediaQuery.of(context).padding.bottom + 24),
+          ],
+        ),
+      ),
     );
   }
 
