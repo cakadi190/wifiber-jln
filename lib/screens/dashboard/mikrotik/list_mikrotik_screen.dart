@@ -790,6 +790,7 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
               children: [
                 TabBar(
                   indicatorColor: AppColors.primary,
+                  dividerColor: Colors.grey.shade300,
                   tabs: const [
                     Tab(text: 'Aktif'),
                     Tab(text: 'Tidak Aktif'),
@@ -1066,14 +1067,50 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
           _buildPppoeInfoRow('Kata Sandi', secret.password),
           _buildPppoeInfoRow('Caller ID', secret.callerId),
           if (isActive)
-            _buildPppoeInfoRow('Uptime', secret.uptime)
+            _buildPppoeInfoRow('Uptime', _formatUptime(secret.uptime))
           else
             _buildPppoeInfoRow('Terakhir Keluar', secret.lastLoggedOut),
           _buildPppoeInfoRow('Alasan Terputus', secret.lastDisconnectReason),
-          _buildPppoeInfoRow('Identitas Koneksi Terakhir', secret.lastCallerId),
+          _buildPppoeInfoRow('Alamat Mac Terakhir', secret.lastCallerId),
         ],
       ),
     );
+  }
+
+  String? _formatUptime(String? uptime) {
+    if (uptime == null || uptime.isEmpty) return null;
+
+    // Parse format seperti "1w2d3h4m5s" dari MikroTik
+    final regex = RegExp(r'(\d+)([wdhms])');
+    final matches = regex.allMatches(uptime);
+
+    if (matches.isEmpty) return uptime;
+
+    final parts = <String>[];
+    for (final match in matches) {
+      final value = match.group(1)!;
+      final unit = match.group(2)!;
+
+      switch (unit) {
+        case 'w':
+          parts.add('$value minggu');
+          break;
+        case 'd':
+          parts.add('$value hari');
+          break;
+        case 'h':
+          parts.add('$value jam');
+          break;
+        case 'm':
+          parts.add('$value menit');
+          break;
+        case 's':
+          parts.add('$value detik');
+          break;
+      }
+    }
+
+    return parts.join(' ');
   }
 
   Widget _buildPppoeInfoRow(String label, String? value) {
