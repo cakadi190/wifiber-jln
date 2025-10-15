@@ -691,41 +691,46 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
           maxChildSize: 0.95,
           expand: false,
           builder: (context, scrollController) {
-            return FutureBuilder<RouterPppoeSecrets>(
-              future: pppoeFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
-                  return const Center(
-                    child: CircularProgressIndicator(color: AppColors.primary),
-                  );
-                }
+            return DefaultTabController(
+              length: 2,
+              child: FutureBuilder<RouterPppoeSecrets>(
+                future: pppoeFuture,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return const Center(
+                      child: CircularProgressIndicator(
+                        color: AppColors.primary,
+                      ),
+                    );
+                  }
 
-                if (snapshot.hasError) {
-                  return _buildPppoeError(
+                  if (snapshot.hasError) {
+                    return _buildPppoeError(
+                      context,
+                      scrollController,
+                      snapshot.error.toString(),
+                      router,
+                    );
+                  }
+
+                  final data = snapshot.data;
+                  if (data == null) {
+                    return _buildPppoeError(
+                      context,
+                      scrollController,
+                      'Data PPPoE tidak tersedia.',
+                      router,
+                    );
+                  }
+
+                  return _buildPppoeContent(
                     context,
                     scrollController,
-                    snapshot.error.toString(),
                     router,
+                    data,
                   );
-                }
-
-                final data = snapshot.data;
-                if (data == null) {
-                  return _buildPppoeError(
-                    context,
-                    scrollController,
-                    'Data PPPoE tidak tersedia.',
-                    router,
-                  );
-                }
-
-                return _buildPppoeContent(
-                  context,
-                  scrollController,
-                  router,
-                  data,
-                );
-              },
+                },
+              ),
             );
           },
         ),
@@ -739,87 +744,81 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
     RouterModel router,
     RouterPppoeSecrets data,
   ) {
-    return SingleChildScrollView(
-      controller: scrollController,
-      physics: const ClampingScrollPhysics(),
-      child: Column(
-        children: [
-          Padding(
-            padding: EdgeInsets.only(
-              left: 24,
-              right: 24,
-              top: 16,
-              bottom: 24 + MediaQuery.of(sheetContext).padding.bottom,
-            ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Center(
-                  child: Container(
-                    width: 40,
-                    height: 4,
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[300],
-                      borderRadius: BorderRadius.circular(2),
-                    ),
-                  ),
-                ),
-                Text(
-                  'PPPoe Terhubung',
-                  style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                const SizedBox(height: 4),
-                Text(
-                  router.name,
-                  style: Theme.of(
-                    context,
-                  ).textTheme.titleMedium?.copyWith(color: Colors.grey[600]),
-                ),
-                const SizedBox(height: 16),
-                _buildPppoeSummary(data),
-                // const SizedBox(height: 24),
-              ],
-            ),
+    return Column(
+      children: [
+        // Header section (non-scrollable)
+        Padding(
+          padding: const EdgeInsets.only(
+            left: 24,
+            right: 24,
+            top: 16,
+            bottom: 16,
           ),
-          DefaultTabController(
-            length: 2,
-            child: Column(
-              children: [
-                TabBar(
-                  indicatorColor: AppColors.primary,
-                  dividerColor: Colors.grey.shade300,
-                  tabs: const [
-                    Tab(text: 'Aktif'),
-                    Tab(text: 'Tidak Aktif'),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                SizedBox(
-                  height: 400, // Set a specific height here
-                  child: TabBarView(
-                    children: [
-                      _buildPppoeSection(
-                        title: 'PPPoe Aktif (${data.activeList.length})',
-                        secrets: data.activeList,
-                        isActive: true,
-                      ),
-                      _buildPppoeSection(
-                        title:
-                            'PPPoe Tidak Aktif (${data.inactiveList.length})',
-                        secrets: data.inactiveList,
-                        isActive: false,
-                      ),
-                    ],
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-              ],
-            ),
+              ),
+              Text(
+                'PPPoe Terhubung',
+                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                router.name,
+                style: Theme.of(
+                  context,
+                ).textTheme.titleMedium?.copyWith(color: Colors.grey[600]),
+              ),
+              const SizedBox(height: 16),
+              _buildPppoeSummary(data),
+            ],
           ),
-        ],
-      ),
+        ),
+
+        // TabBar (non-scrollable)
+        TabBar(
+          indicatorColor: AppColors.primary,
+          dividerColor: Colors.grey.shade300,
+          labelColor: AppColors.primary,
+          unselectedLabelColor: Colors.grey,
+          tabs: const [
+            Tab(text: 'Aktif'),
+            Tab(text: 'Tidak Aktif'),
+          ],
+        ),
+
+        const SizedBox(height: 12),
+
+        // Scrollable TabBarView
+        Expanded(
+          child: TabBarView(
+            children: [
+              _buildPppoeSection(
+                title: 'PPPoe Aktif (${data.activeList.length})',
+                secrets: data.activeList,
+                isActive: true,
+              ),
+              _buildPppoeSection(
+                title: 'PPPoe Tidak Aktif (${data.inactiveList.length})',
+                secrets: data.inactiveList,
+                isActive: false,
+              ),
+            ],
+          ),
+        ),
+      ],
     );
   }
 
@@ -1064,7 +1063,6 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
           ),
           const SizedBox(height: 8),
           _buildPppoeInfoRow('Profil', secret.profile),
-          _buildPppoeInfoRow('Kata Sandi', secret.password),
           _buildPppoeInfoRow('Caller ID', secret.callerId),
           if (isActive)
             _buildPppoeInfoRow('Uptime', _formatUptime(secret.uptime))
