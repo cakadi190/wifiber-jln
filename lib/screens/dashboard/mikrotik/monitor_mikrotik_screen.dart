@@ -120,9 +120,31 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
       double totalDownloadMbps = 0;
       double totalUploadMbps = 0;
 
-      final targets = _interfacesCache
-          .take(_maxInterfacesForTraffic)
+      final ispInterfaces = _interfacesCache
+          .where((iface) {
+            final name = iface['name'] ?? '';
+            return name.toUpperCase().startsWith('ISP');
+          })
           .toList(growable: false);
+
+      debugPrint("ISP interfaces: $ispInterfaces");
+
+      final availableSlots = math.max(
+        0,
+        _maxInterfacesForTraffic - ispInterfaces.length,
+      );
+      final otherInterfaces = _interfacesCache
+          .where((iface) {
+            final name = iface['name'] ?? '';
+            return name.isNotEmpty && !name.toUpperCase().startsWith('ISP');
+          })
+          .take(availableSlots)
+          .toList(growable: false);
+
+      final targets = <Map<String, String>>[
+        ...ispInterfaces,
+        ...otherInterfaces,
+      ];
 
       for (final iface in targets) {
         final ifaceName = iface['name'];
@@ -161,8 +183,10 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
           );
 
           trafficMap[ifaceName] = ifaceTraffic;
-          totalDownloadMbps += rxMbps;
-          totalUploadMbps += txMbps;
+          if (ifaceName.toUpperCase().startsWith('ISP')) {
+            totalDownloadMbps += rxMbps;
+            totalUploadMbps += txMbps;
+          }
         } catch (_) {}
       }
 
@@ -329,25 +353,6 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
                 ),
               ],
             ),
-            const SizedBox(height: 16),
-            if (latest != null) ...[
-              Row(
-                children: [
-                  _buildTrafficLegend(
-                    color: Colors.red,
-                    label: 'Unduh',
-                    value: _formatMbps(latest.downloadMbps),
-                  ),
-                  const SizedBox(width: 12),
-                  _buildTrafficLegend(
-                    color: AppColors.primary,
-                    label: 'Unggah',
-                    value: _formatMbps(latest.uploadMbps),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 12),
-            ],
             SizedBox(
               height: 180,
               child: TrafficChart(
@@ -356,6 +361,25 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
                 uploadColor: AppColors.primary,
               ),
             ),
+            const SizedBox(height: 16),
+            if (latest != null) ...[
+              Row(
+                children: [
+                  _buildTrafficLegend(
+                    color: AppColors.primary,
+                    label: 'Unggah',
+                    value: _formatMbps(latest.uploadMbps),
+                  ),
+                  const SizedBox(width: 12),
+                  _buildTrafficLegend(
+                    color: Colors.red,
+                    label: 'Unduh',
+                    value: _formatMbps(latest.downloadMbps),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 12),
+            ],
             const SizedBox(height: 16),
             if (_interfaceTraffic.isEmpty)
               Text(
@@ -819,9 +843,7 @@ class TrafficChartPainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    if (samples.isEmpty || size.isEmpty) {
-      return;
-    }
+    if (samples.isEmpty || size.isEmpty) return;
 
     final horizontalPadding = 0.0;
     final verticalPadding = 12.0;
@@ -830,90 +852,105 @@ class TrafficChartPainter extends CustomPainter {
 
     final maxValue = samples.fold<double>(
       0,
-      (previousValue, sample) => math.max(
-        previousValue,
-        math.max(sample.downloadMbps, sample.uploadMbps),
-      ),
+      (prev, s) => math.max(prev, math.max(s.downloadMbps, s.uploadMbps)),
     );
     final effectiveMax = maxValue <= 0 ? 1.0 : maxValue;
     final dx = chartWidth / math.max(1, samples.length - 1);
 
-    final downloadLinePath = Path();
-    final uploadLinePath = Path();
-    final downloadFillPath = Path();
-    final uploadFillPath = Path();
+    // Helper untuk menghasilkan path halus (Catmull-Rom spline)
+    Path smoothPath(List<double> values) {
+      final path = Path();
+      if (values.isEmpty) return path;
 
-    for (var i = 0; i < samples.length; i++) {
-      final sample = samples[i];
-      final x = horizontalPadding + (dx * i);
+      List<Offset> points = [
+        for (var i = 0; i < values.length; i++)
+          Offset(
+            horizontalPadding + dx * i,
+            verticalPadding +
+                chartHeight * (1 - (values[i] / effectiveMax).clamp(0.0, 1.0)),
+          ),
+      ];
 
-      final downloadNormalized = (sample.downloadMbps / effectiveMax).clamp(
-        0.0,
-        1.0,
-      );
-      final uploadNormalized = (sample.uploadMbps / effectiveMax).clamp(
-        0.0,
-        1.0,
-      );
+      if (points.length < 2) return path;
+      path.moveTo(points.first.dx, points.first.dy);
 
-      final downloadY =
-          verticalPadding + chartHeight * (1 - downloadNormalized);
-      final uploadY = verticalPadding + chartHeight * (1 - uploadNormalized);
+      for (int i = 0; i < points.length - 1; i++) {
+        final p0 = i > 0 ? points[i - 1] : points[i];
+        final p1 = points[i];
+        final p2 = points[i + 1];
+        final p3 = i != points.length - 2 ? points[i + 2] : p2;
 
-      if (i == 0) {
-        downloadLinePath.moveTo(x, downloadY);
-        uploadLinePath.moveTo(x, uploadY);
-        downloadFillPath
-          ..moveTo(x, chartHeight + verticalPadding)
-          ..lineTo(x, downloadY);
-        uploadFillPath
-          ..moveTo(x, chartHeight + verticalPadding)
-          ..lineTo(x, uploadY);
-      } else {
-        downloadLinePath.lineTo(x, downloadY);
-        uploadLinePath.lineTo(x, uploadY);
-        downloadFillPath.lineTo(x, downloadY);
-        uploadFillPath.lineTo(x, uploadY);
+        final cp1 = Offset(
+          p1.dx + (p2.dx - p0.dx) / 6,
+          p1.dy + (p2.dy - p0.dy) / 6,
+        );
+        final cp2 = Offset(
+          p2.dx - (p3.dx - p1.dx) / 6,
+          p2.dy - (p3.dy - p1.dy) / 6,
+        );
+        path.cubicTo(cp1.dx, cp1.dy, cp2.dx, cp2.dy, p2.dx, p2.dy);
       }
+
+      return path;
     }
 
-    final lastX = horizontalPadding + dx * (samples.length - 1);
-    downloadFillPath
-      ..lineTo(lastX, chartHeight + verticalPadding)
-      ..close();
-    uploadFillPath
-      ..lineTo(lastX, chartHeight + verticalPadding)
+    final downloadValues = samples.map((e) => e.downloadMbps).toList();
+    final uploadValues = samples.map((e) => e.uploadMbps).toList();
+
+    final downloadPath = smoothPath(downloadValues);
+    final uploadPath = smoothPath(uploadValues);
+
+    // Fill (area bawah garis)
+    final downloadFill = Path.from(downloadPath)
+      ..lineTo(
+        horizontalPadding + dx * (samples.length - 1),
+        chartHeight + verticalPadding,
+      )
+      ..lineTo(horizontalPadding, chartHeight + verticalPadding)
       ..close();
 
+    final uploadFill = Path.from(uploadPath)
+      ..lineTo(
+        horizontalPadding + dx * (samples.length - 1),
+        chartHeight + verticalPadding,
+      )
+      ..lineTo(horizontalPadding, chartHeight + verticalPadding)
+      ..close();
+
+    // Warna fill transparan
     final downloadFillPaint = Paint()
       ..style = PaintingStyle.fill
-      ..color = downloadColor.withValues(alpha: 0.08);
-    canvas.drawPath(downloadFillPath, downloadFillPaint);
-
+      ..color = downloadColor.withOpacity(0.1)
+      ..isAntiAlias = true;
     final uploadFillPaint = Paint()
       ..style = PaintingStyle.fill
-      ..color = uploadColor.withValues(alpha: 0.08);
-    canvas.drawPath(uploadFillPath, uploadFillPaint);
+      ..color = uploadColor.withOpacity(0.1)
+      ..isAntiAlias = true;
 
+    canvas.drawPath(downloadFill, downloadFillPaint);
+    canvas.drawPath(uploadFill, uploadFillPaint);
+
+    // Garis utama
     final downloadLinePaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.5
+      ..color = downloadColor
       ..strokeCap = StrokeCap.round
-      ..color = downloadColor;
-    canvas.drawPath(downloadLinePath, downloadLinePaint);
-
+      ..isAntiAlias = true;
     final uploadLinePaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.5
+      ..color = uploadColor
       ..strokeCap = StrokeCap.round
-      ..color = uploadColor;
-    canvas.drawPath(uploadLinePath, uploadLinePaint);
+      ..isAntiAlias = true;
+
+    canvas.drawPath(downloadPath, downloadLinePaint);
+    canvas.drawPath(uploadPath, uploadLinePaint);
   }
 
   @override
-  bool shouldRepaint(covariant TrafficChartPainter oldDelegate) {
-    return oldDelegate.samples != samples ||
-        oldDelegate.downloadColor != downloadColor ||
-        oldDelegate.uploadColor != uploadColor;
-  }
+  bool shouldRepaint(covariant TrafficChartPainter old) =>
+      old.samples != samples ||
+      old.downloadColor != downloadColor ||
+      old.uploadColor != uploadColor;
 }
