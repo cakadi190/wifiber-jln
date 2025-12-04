@@ -5,6 +5,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:http_parser/http_parser.dart';
+import 'package:wifiber/exceptions/auth_exceptions.dart';
 import 'package:wifiber/exceptions/secure_storage_exceptions.dart';
 import 'package:wifiber/exceptions/string_exceptions.dart';
 import 'package:wifiber/exceptions/validation_exceptions.dart';
@@ -13,6 +14,8 @@ import 'package:wifiber/services/auth_service.dart';
 import 'package:wifiber/services/navigation_service.dart';
 import 'package:wifiber/services/secure_storage_service.dart';
 import 'package:wifiber/screens/login_screen.dart';
+
+enum _RefreshResult { success, invalidToken, failed }
 
 class HttpService {
   final http.Client _client = http.Client();
@@ -380,10 +383,27 @@ class HttpService {
     var response = await request(completeHeaders);
 
     if (requiresAuth && response.statusCode == 401) {
-      final refreshed = await _tryRefreshToken();
-      if (refreshed) {
+      final refreshResult = await _tryRefreshToken();
+      if (refreshResult == _RefreshResult.success) {
         completeHeaders = await headerBuilder(headers, requiresAuth);
         response = await request(completeHeaders);
+      } else if (refreshResult == _RefreshResult.invalidToken) {
+        unawaited(AuthService.logout());
+        NavigationService.navigatorKey.currentState?.pushAndRemoveUntil(
+          MaterialPageRoute(
+            builder: (_) => const LoginScreen(),
+            settings:
+                const RouteSettings(arguments: {'showLogoutMessage': true}),
+          ),
+          (route) => false,
+        );
+        throw StringException(
+          'Sesi Anda telah berakhir. Silakan login kembali. ERR_401_UNAUTHORIZED',
+        );
+      } else {
+        throw StringException(
+          'Sesi tidak dapat diperbarui. Periksa koneksi dan coba lagi. ERR_401_UNAUTHORIZED',
+        );
       }
     }
 
@@ -391,9 +411,17 @@ class HttpService {
     return response;
   }
 
-  Future<bool> _tryRefreshToken() async {
-    final refreshedUser = await AuthService.refreshSession();
-    return refreshedUser != null;
+  Future<_RefreshResult> _tryRefreshToken() async {
+    try {
+      final refreshedUser = await AuthService.refreshSession();
+      return refreshedUser != null
+          ? _RefreshResult.success
+          : _RefreshResult.failed;
+    } on InvalidRefreshTokenException {
+      return _RefreshResult.invalidToken;
+    } on RefreshTokenException {
+      return _RefreshResult.failed;
+    }
   }
 
   Future<http.Response> streamedResponseToResponse(

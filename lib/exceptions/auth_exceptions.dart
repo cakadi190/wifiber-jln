@@ -14,6 +14,11 @@ class RefreshTokenException implements Exception {
   String toString() => message;
 }
 
+class InvalidRefreshTokenException extends RefreshTokenException {
+  InvalidRefreshTokenException(
+      [super.message = 'Refresh token is invalid or expired']);
+}
+
 class LoginException implements Exception {
   final String message;
   LoginException([this.message = 'Login failed']);

@@ -920,11 +920,11 @@ class TrafficChartPainter extends CustomPainter {
     // Warna fill transparan
     final downloadFillPaint = Paint()
       ..style = PaintingStyle.fill
-      ..color = downloadColor.withOpacity(0.1)
+      ..color = downloadColor.withValues(alpha: 10)
       ..isAntiAlias = true;
     final uploadFillPaint = Paint()
       ..style = PaintingStyle.fill
-      ..color = uploadColor.withOpacity(0.1)
+      ..color = uploadColor.withValues(alpha: 10)
       ..isAntiAlias = true;
 
     canvas.drawPath(downloadFill, downloadFillPaint);

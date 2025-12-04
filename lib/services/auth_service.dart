@@ -28,12 +28,15 @@ class AuthService {
         _cachedUser = user;
 
         if (user.isTokenExpired) {
-          final refreshedUser = await refreshSession(currentUser: user);
-          if (refreshedUser != null) {
-            return refreshedUser;
+          try {
+            final refreshedUser = await refreshSession(currentUser: user);
+            if (refreshedUser != null) {
+              return refreshedUser;
+            }
+          } on InvalidRefreshTokenException catch (e) {
+            await logout();
+            throw TokenExpiredException(e.message);
           }
-          await logout();
-          throw TokenExpiredException('Token has expired');
         }
 
         if (force) {
@@ -138,7 +141,7 @@ class AuthService {
           AuthUser.fromJson(Map<String, dynamic>.from(storedData));
 
       if (!user.hasRefreshToken) {
-        throw RefreshTokenException('Refresh token not found');
+        throw InvalidRefreshTokenException('Refresh token not found');
       }
 
       final response = await _http.post(
@@ -150,8 +153,12 @@ class AuthService {
         },
       );
 
-      if (response.statusCode != 200) {
-        throw RefreshTokenException('Failed to refresh token');
+      if (response.statusCode == 401 || response.statusCode == 403) {
+        throw InvalidRefreshTokenException('Refresh token expired or invalid');
+      } else if (response.statusCode != 200) {
+        throw RefreshTokenException(
+          'Failed to refresh token: ${response.statusCode}',
+        );
       }
 
       final responseJson = jsonDecode(response.body);
@@ -174,8 +181,18 @@ class AuthService {
 
       completer.complete(true);
       return user;
-    } catch (e) {
+    } on InvalidRefreshTokenException catch (e) {
       await logout();
+      if (!completer.isCompleted) {
+        completer.complete(false);
+      }
+      throw InvalidRefreshTokenException(e.message);
+    } on RefreshTokenException {
+      if (!completer.isCompleted) {
+        completer.complete(false);
+      }
+      return null;
+    } catch (_) {
       if (!completer.isCompleted) {
         completer.complete(false);
       }
