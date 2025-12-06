@@ -17,7 +17,12 @@ import 'package:wifiber/services/customer_service.dart';
 import 'package:wifiber/middlewares/auth_middleware.dart';
 
 class CustomerListScreen extends StatefulWidget {
-  const CustomerListScreen({super.key});
+  final CustomerStatus? initialStatus;
+
+  const CustomerListScreen({
+    super.key,
+    this.initialStatus,
+  });
 
   @override
   State<CustomerListScreen> createState() => _CustomerListScreenState();
@@ -38,9 +43,15 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
   @override
   void initState() {
     super.initState();
+
+    _selectedStatus = widget.initialStatus;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-        Provider.of<CustomerProvider>(context, listen: false).loadCustomers();
+
+        Provider.of<CustomerProvider>(context, listen: false).loadCustomers(
+          status: _selectedStatus,
+        );
       }
     });
   }
@@ -96,7 +107,6 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) {
-        // Gunakan temporary variables untuk menyimpan perubahan
         CustomerStatus? tempSelectedStatus = _selectedStatus;
         String? tempSelectedAreaId = _selectedAreaId;
         String? tempSelectedAreaName = _selectedAreaName;
@@ -211,7 +221,6 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                           ),
                           onPressed: () {
                             Navigator.of(context).pop();
-                            // Update state widget utama setelah dialog ditutup
                             setState(() {
                               _selectedStatus = tempSelectedStatus;
                               _selectedAreaId = tempSelectedAreaId;
@@ -718,21 +727,7 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                                   ),
                                 ],
                               ),
-                              subtitle: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                mainAxisSize: MainAxisSize.min,
-                                children: [
-                                  Text("(${customer.areaName})"),
-                                  const SizedBox(height: 8),
-                                  Row(
-                                    mainAxisSize: MainAxisSize.min,
-                                    children: [
-                                      Text(customer.phone),
-                                      const SizedBox(width: 8),
-                                    ],
-                                  )
-                                ],
-                              ),
+                              subtitle: Text("${customer.phone} - ${customer.areaName}"),
                               trailing: IconButton(
                                 icon: const Icon(Icons.more_vert),
                                 onPressed: () => _showOptionsMenu(customer),
