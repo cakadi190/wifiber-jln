@@ -3,7 +3,9 @@ import 'dart:io';
 import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:wifiber/components/reusables/area_modal_selector.dart';
 import 'package:wifiber/components/reusables/options_bottom_sheet.dart';
+import 'package:wifiber/components/reusables/router_modal_selector.dart' as router_selector;
 import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/models/customer.dart';
@@ -23,8 +25,14 @@ class CustomerListScreen extends StatefulWidget {
 
 class _CustomerListScreenState extends State<CustomerListScreen> {
   final TextEditingController _searchController = TextEditingController();
-  CustomerStatus? _selectedStatus;
 
+  String? _selectedAreaId;
+  String? _selectedAreaName;
+
+  String? _selectedRouterId;
+  String? _selectedRouterName;
+
+  CustomerStatus? _selectedStatus;
   CustomerProvider? _customerProvider;
 
   @override
@@ -81,17 +89,50 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
   }
 
   void _showFilterDialog() {
-    showDialog(
+    showModalBottomSheet(
       context: context,
+      isScrollControlled: true,
+      shape: const RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+      ),
       builder: (context) {
+        // Gunakan temporary variables untuk menyimpan perubahan
         CustomerStatus? tempSelectedStatus = _selectedStatus;
+        String? tempSelectedAreaId = _selectedAreaId;
+        String? tempSelectedAreaName = _selectedAreaName;
+        String? tempSelectedRouterId = _selectedRouterId;
+        String? tempSelectedRouterName = _selectedRouterName;
+
         return StatefulBuilder(
-          builder: (context, setState) {
-            return AlertDialog(
-              title: const Text('Filter Pelanggan'),
-              content: Column(
+          builder: (context, setModalState) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+                left: 16,
+                right: 16,
+                top: 16,
+              ),
+              child: Column(
                 mainAxisSize: MainAxisSize.min,
+                crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Text(
+                        'Filter Pelanggan',
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const Spacer(),
+                      IconButton(
+                        icon: const Icon(Icons.close),
+                        onPressed: () => Navigator.of(context).pop(),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
                   DropdownButtonFormField<CustomerStatus?>(
                     initialValue: tempSelectedStatus,
                     decoration: const InputDecoration(
@@ -126,29 +167,67 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                       }),
                     ],
                     onChanged: (value) {
-                      setState(() {
+                      setModalState(() {
                         tempSelectedStatus = value;
                       });
                     },
                   ),
+                  const SizedBox(height: 16),
+                  AreaButtonSelector(
+                    selectedAreaId: tempSelectedAreaId,
+                    selectedAreaName: tempSelectedAreaName,
+                    onAreaSelected: (Area area) {
+                      setModalState(() {
+                        tempSelectedAreaId = area.id;
+                        tempSelectedAreaName = area.name;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  router_selector.RouterButtonSelector(
+                    selectedRouterId: tempSelectedRouterId,
+                    selectedRouterName: tempSelectedRouterName,
+                    onRouterSelected: (router_selector.Router router) {
+                      setModalState(() {
+                        tempSelectedRouterId = router.id;
+                        tempSelectedRouterName = router.name;
+                      });
+                    },
+                  ),
+                  const SizedBox(height: 16),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: OutlinedButton(
+                          onPressed: () => Navigator.of(context).pop(),
+                          child: const Text('Batal'),
+                        ),
+                      ),
+                      const SizedBox(width: 12),
+                      Expanded(
+                        child: ElevatedButton(
+                          style: ButtonStyle(
+                            backgroundColor: WidgetStateProperty.all(AppColors.primary),
+                          ),
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                            // Update state widget utama setelah dialog ditutup
+                            setState(() {
+                              _selectedStatus = tempSelectedStatus;
+                              _selectedAreaId = tempSelectedAreaId;
+                              _selectedAreaName = tempSelectedAreaName;
+                              _selectedRouterId = tempSelectedRouterId;
+                              _selectedRouterName = tempSelectedRouterName;
+                            });
+                            _applyFilter();
+                          },
+                          child: const Text('Terapkan', style: TextStyle(color: Colors.white),),
+                        ),
+                      ),
+                    ],
+                  ),
                 ],
               ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.of(context).pop(),
-                  child: const Text('Batal'),
-                ),
-                ElevatedButton(
-                  onPressed: () {
-                    setState(() {
-                      _selectedStatus = tempSelectedStatus;
-                    });
-                    Navigator.of(context).pop();
-                    _applyFilter();
-                  },
-                  child: const Text('Terapkan'),
-                ),
-              ],
             );
           },
         );
@@ -158,7 +237,11 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
 
   void _applyFilter() {
     if (_customerProvider != null) {
-      _customerProvider!.loadCustomers(status: _selectedStatus);
+      _customerProvider!.loadCustomers(
+        status: _selectedStatus,
+        areaId: _selectedAreaId != null ? int.tryParse(_selectedAreaId!) : null,
+        routerId: _selectedRouterId != null ? int.tryParse(_selectedRouterId!) : null,
+      );
     }
   }
 
@@ -206,12 +289,28 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                     fontWeight: FontWeight.w600,
                   ),
                 ),
+                Text(
+                  customer.phone,
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                  ),
+                ),
               ],
             ),
           ),
         ],
       ),
       items: [
+        OptionMenuItem(
+          icon: Icons.visibility,
+          title: 'Lihat Data',
+          subtitle: 'Lihat data pelanggan',
+          onTap: () {
+            Navigator.pop(context);
+            _showCustomerDetail(customer);
+          },
+        ),
         OptionMenuItem(
           icon: Icons.edit,
           title: 'Ubah Data',
@@ -332,13 +431,13 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                         : null,
                     child: isLoading
                         ? const SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(
-                              strokeWidth: 2,
-                              color: Colors.white,
-                            ),
-                          )
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2,
+                        color: Colors.white,
+                      ),
+                    )
                         : const Text('Unggah'),
                   ),
                 ],
@@ -362,16 +461,6 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
           actions: [
             PopupMenuButton<String>(
               itemBuilder: (context) => [
-                PopupMenuItem(
-                  onTap: _showFilterDialog,
-                  child: Row(
-                    children: const [
-                      Icon(Icons.filter_list, color: AppColors.primary),
-                      SizedBox(width: 8),
-                      Text('Filter'),
-                    ],
-                  ),
-                ),
                 PopupMenuItem(
                   onTap: _showImportModal,
                   child: Row(
@@ -412,51 +501,115 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
             children: [
               Container(
                 padding: const EdgeInsets.all(16),
-                child: TextField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Cari pelanggan...',
-                    prefixIcon: const Icon(Icons.search),
-                    suffixIcon: _searchController.text.isNotEmpty
-                        ? IconButton(
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: TextField(
+                        controller: _searchController,
+                        decoration: InputDecoration(
+                          hintText: 'Cari pelanggan...',
+                          prefixIcon: const Icon(Icons.search),
+                          suffixIcon: _searchController.text.isNotEmpty
+                              ? IconButton(
                             onPressed: () {
                               _searchController.clear();
                               _onSearchChanged('');
                             },
                             icon: const Icon(Icons.clear),
                           )
-                        : null,
-                    border: const OutlineInputBorder(),
-                  ),
-                  onChanged: _onSearchChanged,
+                              : null,
+                          border: const OutlineInputBorder(),
+                        ),
+                        onChanged: _onSearchChanged,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    IconButton(
+                      onPressed: () {
+                        _showFilterDialog();
+                      },
+                      icon: const Icon(Icons.filter_list),
+                      tooltip: 'Filter',
+                      style: ButtonStyle(
+                        backgroundColor: WidgetStateProperty.all(Colors.grey.shade200),
+                      ),
+                    ),
+                  ],
                 ),
               ),
-              if (_selectedStatus != null)
+              if (_selectedStatus != null || _selectedAreaName != null || _selectedRouterName != null)
                 Container(
                   width: double.infinity,
                   margin: const EdgeInsets.symmetric(horizontal: 16),
-                  padding: const EdgeInsets.all(8),
-                  decoration: BoxDecoration(
-                    color: Colors.blue.shade50,
-                    borderRadius: BorderRadius.circular(8),
-                    border: Border.all(color: Colors.blue.shade200),
-                  ),
-                  child: Row(
-                    children: [
-                      Icon(
-                        Icons.filter_list,
-                        color: Colors.blue.shade700,
-                        size: 16,
-                      ),
-                      const SizedBox(width: 8),
-                      Text(
-                        'Filter: ${_getStatusDisplayName(_selectedStatus.toString().split('.').last)}',
-                        style: TextStyle(
-                          color: Colors.blue.shade700,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    ],
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: Row(
+                      children: [
+                        if (_selectedStatus != null)
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: Chip(
+                              labelPadding: const EdgeInsets.symmetric(horizontal: 12),
+                              padding: const EdgeInsets.symmetric(vertical: 0),
+                              label: Text(
+                                _getStatusDisplayName(_selectedStatus.toString().split('.').last),
+                                style: const TextStyle(fontSize: 12),
+                              ),
+                              shape: RoundedRectangleBorder(
+                                side: const BorderSide(color: Colors.grey, width: 1),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              deleteIcon: const Icon(Icons.close, size: 16),
+                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              onDeleted: () {
+                                setState(() => _selectedStatus = null);
+                                _applyFilter();
+                              },
+                            ),
+                          ),
+                        if (_selectedAreaName != null)
+                          Padding(
+                            padding: const EdgeInsets.only(right: 8),
+                            child: Chip(
+                              labelPadding: const EdgeInsets.symmetric(horizontal: 12),
+                              padding: const EdgeInsets.symmetric(vertical: 0),
+                              label: Text(_selectedAreaName!, style: const TextStyle(fontSize: 12)),
+                              shape: RoundedRectangleBorder(
+                                side: const BorderSide(color: Colors.grey, width: 1),
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              deleteIcon: const Icon(Icons.close, size: 16),
+                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              onDeleted: () {
+                                setState(() {
+                                  _selectedAreaId = null;
+                                  _selectedAreaName = null;
+                                });
+                                _applyFilter();
+                              },
+                            ),
+                          ),
+                        if (_selectedRouterName != null)
+                          Chip(
+                            labelPadding: const EdgeInsets.symmetric(horizontal: 12),
+                            padding: const EdgeInsets.symmetric(vertical: 0),
+                            label: Text(_selectedRouterName!, style: const TextStyle(fontSize: 12)),
+                            shape: RoundedRectangleBorder(
+                              side: const BorderSide(color: Colors.grey, width: 1),
+                              borderRadius: BorderRadius.circular(16),
+                            ),
+                            deleteIcon: const Icon(Icons.close, size: 16),
+                            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            onDeleted: () {
+                              setState(() {
+                                _selectedRouterId = null;
+                                _selectedRouterName = null;
+                              });
+                              _applyFilter();
+                            },
+                          ),
+                      ],
+                    ),
                   ),
                 ),
               Expanded(
@@ -536,30 +689,14 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                                 vertical: 8,
                                 horizontal: 16,
                               ),
-                              leading: CircleAvatar(
-                                backgroundColor: _getStatusColor(
-                                  customer.status,
-                                ),
-                                child: Text(
-                                  customer.name.isNotEmpty
-                                      ? customer.name[0].toUpperCase()
-                                      : 'N',
-                                  style: const TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                              title: Text(
-                                customer.name,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              subtitle: Row(
-                                mainAxisSize: MainAxisSize.min,
+                              title: Row(
                                 children: [
-                                  Text(customer.phone),
+                                  Text(
+                                    customer.name,
+                                    style: const TextStyle(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
                                   const SizedBox(width: 8),
                                   Container(
                                     padding: const EdgeInsets.symmetric(
@@ -579,6 +716,21 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                                       ),
                                     ),
                                   ),
+                                ],
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  Text("(${customer.areaName})"),
+                                  const SizedBox(height: 8),
+                                  Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(customer.phone),
+                                      const SizedBox(width: 8),
+                                    ],
+                                  )
                                 ],
                               ),
                               trailing: IconButton(

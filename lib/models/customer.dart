@@ -1,3 +1,5 @@
+import 'package:flutter/cupertino.dart';
+
 class Customer {
   final String id;
   final String customerId;
@@ -24,6 +26,7 @@ class Customer {
   final String packagePpn;
   final String? routerName;
   final String? routerHost;
+  final String? areaName;
 
   Customer({
     required this.id,
@@ -51,9 +54,12 @@ class Customer {
     required this.packagePpn,
     this.routerName,
     this.routerHost,
+    this.areaName,
   });
 
   factory Customer.fromJson(Map<String, dynamic> json) {
+    debugPrint(json.toString());
+
     return Customer(
       id: json['id'].toString(),
       customerId: json['customer_id'].toString(),
@@ -80,6 +86,7 @@ class Customer {
       packagePpn: json['package_ppn'].toString(),
       routerName: json['router_name'],
       routerHost: json['router_host'],
+      areaName: json['area_name'],
     );
   }
 
@@ -110,6 +117,7 @@ class Customer {
       'package_ppn': packagePpn,
       'router_name': routerName,
       'router_host': routerHost,
+      'area_name': areaName,
     };
   }
 }
