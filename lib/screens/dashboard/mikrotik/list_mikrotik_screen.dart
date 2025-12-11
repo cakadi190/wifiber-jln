@@ -104,12 +104,12 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
               ),
             ),
             child: Consumer<RouterProvider>(
-              builder: (context, provider, child) {
-                return RefreshIndicator(
+              builder: (context, provider, child) => SafeArea(
+                child: RefreshIndicator(
                   onRefresh: () => provider.refresh(),
                   child: _buildBody(provider),
-                );
-              },
+                ),
+              ),
             ),
           ),
         ),

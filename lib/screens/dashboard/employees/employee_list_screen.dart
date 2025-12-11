@@ -91,10 +91,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
           Expanded(
             child: Text(
               employee.name,
-              style: const TextStyle(
-                fontSize: 16,
-                fontWeight: FontWeight.w600,
-              ),
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
             ),
           ),
         ],
@@ -154,77 +151,82 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
             foregroundColor: Colors.white,
             elevation: 0,
           ),
-          body: Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(24),
-                topRight: Radius.circular(24),
+          body: SafeArea(
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
+                ),
               ),
-            ),
-            child: Column(
-              children: [
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: TextField(
-                    controller: _searchController,
-                    onChanged: _onSearchChanged,
-                    decoration: const InputDecoration(
-                      hintText: 'Cari karyawan',
-                      prefixIcon: Icon(Icons.search),
+              child: Column(
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: TextField(
+                      controller: _searchController,
+                      onChanged: _onSearchChanged,
+                      decoration: const InputDecoration(
+                        hintText: 'Cari karyawan',
+                        prefixIcon: Icon(Icons.search),
+                      ),
                     ),
                   ),
-                ),
-                Expanded(
-                  child: Consumer<EmployeeProvider>(
-                    builder: (context, provider, child) {
-                      if (provider.isLoading) {
-                        return const Center(
-                          child: CircularProgressIndicator(
-                            color: AppColors.primary,
+                  Expanded(
+                    child: Consumer<EmployeeProvider>(
+                      builder: (context, provider, child) {
+                        if (provider.isLoading) {
+                          return const Center(
+                            child: CircularProgressIndicator(
+                              color: AppColors.primary,
+                            ),
+                          );
+                        }
+
+                        if (provider.error != null) {
+                          return Center(child: Text(provider.error!));
+                        }
+
+                        if (provider.employees.isEmpty) {
+                          return const Center(
+                            child: Text('Belum ada karyawan'),
+                          );
+                        }
+
+                        return RefreshIndicator(
+                          onRefresh: () => provider.refresh(),
+                          child: ListView.builder(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 16,
+                              vertical: 8,
+                            ),
+                            itemCount: provider.employees.length,
+                            itemBuilder: (context, index) {
+                              final employee = provider.employees[index];
+                              return Card(
+                                elevation: 0,
+                                margin: const EdgeInsets.only(bottom: 12),
+                                child: ListTile(
+                                  title: Text(employee.name),
+                                  subtitle: Text(employee.username ?? ''),
+                                  trailing: const Icon(
+                                    Icons.more_vert,
+                                    color: Colors.grey,
+                                  ),
+                                  onTap: () => _showDetail(employee),
+                                  onLongPress: () =>
+                                      _showActionBottomSheet(employee),
+                                ),
+                              );
+                            },
                           ),
                         );
-                      }
-
-                      if (provider.error != null) {
-                        return Center(
-                          child: Text(provider.error!),
-                        );
-                      }
-
-                      if (provider.employees.isEmpty) {
-                        return const Center(
-                          child: Text('Belum ada karyawan'),
-                        );
-                      }
-
-                      return RefreshIndicator(
-                        onRefresh: () => provider.refresh(),
-                        child: ListView.builder(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 8),
-                          itemCount: provider.employees.length,
-                          itemBuilder: (context, index) {
-                            final employee = provider.employees[index];
-                            return Card(
-                              elevation: 0,
-                              margin: const EdgeInsets.only(bottom: 12),
-                              child: ListTile(
-                                title: Text(employee.name),
-                                subtitle: Text(employee.username ?? ''),
-                                trailing: const Icon(Icons.more_vert,
-                                    color: Colors.grey),
-                                onTap: () => _showDetail(employee),
-                                onLongPress: () => _showActionBottomSheet(employee),
-                              ),
-                            );
-                          },
-                        ),
-                      );
-                    },
+                      },
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

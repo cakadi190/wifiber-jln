@@ -247,20 +247,22 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
               ),
             ],
           ),
-          body: RefreshIndicator(
-            onRefresh: () async {
-              await Future.wait([_refreshData(), _refreshTraffic()]);
-            },
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                _buildTrafficSection(),
-                const SizedBox(height: 16),
-                _buildConnectionSection(),
-                const SizedBox(height: 16),
-                _buildMetricsTabs(),
-                SizedBox(height: MediaQuery.of(context).padding.bottom + 8),
-              ],
+          body: SafeArea(
+            child: RefreshIndicator(
+              onRefresh: () async {
+                await Future.wait([_refreshData(), _refreshTraffic()]);
+              },
+              child: ListView(
+                padding: const EdgeInsets.all(16),
+                children: [
+                  _buildTrafficSection(),
+                  const SizedBox(height: 16),
+                  _buildConnectionSection(),
+                  const SizedBox(height: 16),
+                  _buildMetricsTabs(),
+                  SizedBox(height: MediaQuery.of(context).padding.bottom + 8),
+                ],
+              ),
             ),
           ),
         ),

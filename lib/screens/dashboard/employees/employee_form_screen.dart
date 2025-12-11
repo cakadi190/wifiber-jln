@@ -83,7 +83,9 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
     _fieldErrors.clear();
 
     if (errorMessage.contains('validation')) {
-      final regex = RegExp(r'(\w+)\s+(is\s+\w+|sudah\s+\w+|wajib\s+\w+|tidak\s+\w+)');
+      final regex = RegExp(
+        r'(\w+)\s+(is\s+\w+|sudah\s+\w+|wajib\s+\w+|tidak\s+\w+)',
+      );
       final matches = regex.allMatches(errorMessage.toLowerCase());
 
       for (final match in matches) {
@@ -140,18 +142,22 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
     if (success) {
       SnackBars.success(
         context,
-        widget.isEdit ? 'Karyawan berhasil diperbarui' : 'Karyawan berhasil ditambahkan',
+        widget.isEdit
+            ? 'Karyawan berhasil diperbarui'
+            : 'Karyawan berhasil ditambahkan',
       );
       Navigator.pop(context, true);
     } else {
-      final errorMessage = provider.error ?? 'Terjadi kesalahan yang tidak diketahui';
+      final errorMessage =
+          provider.error ?? 'Terjadi kesalahan yang tidak diketahui';
       _parseErrorMessage(errorMessage);
 
       SnackBars.error(
         context,
-        _fieldErrors['general'] ?? (widget.isEdit
-            ? 'Gagal memperbarui karyawan'
-            : 'Gagal menambahkan karyawan'),
+        _fieldErrors['general'] ??
+            (widget.isEdit
+                ? 'Gagal memperbarui karyawan'
+                : 'Gagal menambahkan karyawan'),
       );
 
       _formKey.currentState!.validate();
@@ -165,10 +171,7 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
       context: context,
       header: const Text(
         'Pilih Role',
-        style: TextStyle(
-          fontSize: 18,
-          fontWeight: FontWeight.w600,
-        ),
+        style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
       ),
       items: [
         OptionMenuItem(
@@ -230,144 +233,159 @@ class _EmployeeFormScreenState extends State<EmployeeFormScreen> {
           ),
           body: LayoutBuilder(
             builder: (context, constraints) {
-              return SingleChildScrollView(
-                child: ConstrainedBox(
-                  constraints: BoxConstraints(minHeight: constraints.maxHeight),
-                  child: Container(
-                    width: double.infinity,
-                    padding: const EdgeInsets.all(16),
-                    decoration: const BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.only(
-                        topLeft: Radius.circular(20),
-                        topRight: Radius.circular(20),
-                      ),
+              return SafeArea(
+                child: SingleChildScrollView(
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      minHeight: constraints.maxHeight,
                     ),
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.stretch,
-                        children: [
-                          const SizedBox(height: 16),
-                          _buildTextField(
-                            controller: _nameController,
-                            label: 'Nama',
-                            hint: 'Masukkan nama karyawan',
-                            icon: Icons.person,
-                            fieldName: 'name',
-                            validator: (v) {
-                              if (v == null || v.trim().isEmpty) {
-                                return 'Nama wajib diisi';
-                              }
-                              if (v.trim().length < 2) {
-                                return 'Nama minimal 2 karakter';
-                              }
-                              return _getFieldError('name');
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          _buildTextField(
-                            controller: _emailController,
-                            label: 'Email',
-                            hint: 'Masukkan email',
-                            icon: Icons.email,
-                            fieldName: 'email',
-                            keyboardType: TextInputType.emailAddress,
-                            validator: (v) {
-                              if (v != null && v.trim().isNotEmpty) {
-                                final emailRegex = RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$');
-                                if (!emailRegex.hasMatch(v.trim())) {
-                                  return 'Format email tidak valid';
+                    child: Container(
+                      width: double.infinity,
+                      padding: const EdgeInsets.all(16),
+                      decoration: const BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.only(
+                          topLeft: Radius.circular(20),
+                          topRight: Radius.circular(20),
+                        ),
+                      ),
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            const SizedBox(height: 16),
+                            _buildTextField(
+                              controller: _nameController,
+                              label: 'Nama',
+                              hint: 'Masukkan nama karyawan',
+                              icon: Icons.person,
+                              fieldName: 'name',
+                              validator: (v) {
+                                if (v == null || v.trim().isEmpty) {
+                                  return 'Nama wajib diisi';
                                 }
-                              }
-                              return _getFieldError('email');
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          _buildTextField(
-                            controller: _usernameController,
-                            label: 'Username',
-                            hint: 'Masukkan username',
-                            icon: Icons.person_outline,
-                            fieldName: 'username',
-                            validator: (v) {
-                              if (v != null && v.trim().isNotEmpty) {
-                                if (v.trim().length < 3) {
-                                  return 'Username minimal 3 karakter';
+                                if (v.trim().length < 2) {
+                                  return 'Nama minimal 2 karakter';
                                 }
-                                if (!RegExp(r'^[a-zA-Z0-9_]+$').hasMatch(v.trim())) {
-                                  return 'Username hanya boleh mengandung huruf, angka, dan underscore';
-                                }
-                              }
-                              return _getFieldError('username');
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          _buildTextField(
-                            controller: _passwordController,
-                            label: widget.isEdit ? 'Password (kosongkan jika tidak ingin mengubah)' : 'Password',
-                            hint: 'Masukkan password',
-                            icon: Icons.lock,
-                            fieldName: 'password',
-                            obscureText: true,
-                            validator: (v) {
-                              if (!widget.isEdit && (v == null || v.trim().isEmpty)) {
-                                return 'Password wajib diisi';
-                              }
-                              if (v != null && v.trim().isNotEmpty && v.trim().length < 6) {
-                                return 'Password minimal 6 karakter';
-                              }
-                              return _getFieldError('password');
-                            },
-                          ),
-                          const SizedBox(height: 16),
-                          _buildTextField(
-                            controller: _roleController,
-                            label: 'Role / Grup Karyawan',
-                            hint: 'Pilih role',
-                            icon: Icons.badge,
-                            fieldName: 'role',
-                            readOnly: true,
-                            onTap: _showRolePicker,
-                            validator: (v) {
-                              if (v == null || v.trim().isEmpty) {
-                                return 'Role wajib dipilih';
-                              }
-                              return _getFieldError('role');
-                            },
-                          ),
-                          const SizedBox(height: 32),
-                          ElevatedButton(
-                            onPressed: _isLoading ? null : _submit,
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
-                              padding: const EdgeInsets.symmetric(vertical: 16),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8),
-                              ),
+                                return _getFieldError('name');
+                              },
                             ),
-                            child: _isLoading
-                                ? const SizedBox(
-                              height: 20,
-                              width: 20,
-                              child: CircularProgressIndicator(
-                                color: Colors.white,
-                                strokeWidth: 2,
-                              ),
-                            )
-                                : Text(
-                              widget.isEdit
-                                  ? 'Simpan Perubahan'
-                                  : 'Tambah Karyawan',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                                color: Colors.white,
-                              ),
+                            const SizedBox(height: 16),
+                            _buildTextField(
+                              controller: _emailController,
+                              label: 'Email',
+                              hint: 'Masukkan email',
+                              icon: Icons.email,
+                              fieldName: 'email',
+                              keyboardType: TextInputType.emailAddress,
+                              validator: (v) {
+                                if (v != null && v.trim().isNotEmpty) {
+                                  final emailRegex = RegExp(
+                                    r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                                  );
+                                  if (!emailRegex.hasMatch(v.trim())) {
+                                    return 'Format email tidak valid';
+                                  }
+                                }
+                                return _getFieldError('email');
+                              },
                             ),
-                          ),
-                          const SizedBox(height: 16),
-                        ],
+                            const SizedBox(height: 16),
+                            _buildTextField(
+                              controller: _usernameController,
+                              label: 'Username',
+                              hint: 'Masukkan username',
+                              icon: Icons.person_outline,
+                              fieldName: 'username',
+                              validator: (v) {
+                                if (v != null && v.trim().isNotEmpty) {
+                                  if (v.trim().length < 3) {
+                                    return 'Username minimal 3 karakter';
+                                  }
+                                  if (!RegExp(
+                                    r'^[a-zA-Z0-9_]+$',
+                                  ).hasMatch(v.trim())) {
+                                    return 'Username hanya boleh mengandung huruf, angka, dan underscore';
+                                  }
+                                }
+                                return _getFieldError('username');
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            _buildTextField(
+                              controller: _passwordController,
+                              label: widget.isEdit
+                                  ? 'Password (kosongkan jika tidak ingin mengubah)'
+                                  : 'Password',
+                              hint: 'Masukkan password',
+                              icon: Icons.lock,
+                              fieldName: 'password',
+                              obscureText: true,
+                              validator: (v) {
+                                if (!widget.isEdit &&
+                                    (v == null || v.trim().isEmpty)) {
+                                  return 'Password wajib diisi';
+                                }
+                                if (v != null &&
+                                    v.trim().isNotEmpty &&
+                                    v.trim().length < 6) {
+                                  return 'Password minimal 6 karakter';
+                                }
+                                return _getFieldError('password');
+                              },
+                            ),
+                            const SizedBox(height: 16),
+                            _buildTextField(
+                              controller: _roleController,
+                              label: 'Role / Grup Karyawan',
+                              hint: 'Pilih role',
+                              icon: Icons.badge,
+                              fieldName: 'role',
+                              readOnly: true,
+                              onTap: _showRolePicker,
+                              validator: (v) {
+                                if (v == null || v.trim().isEmpty) {
+                                  return 'Role wajib dipilih';
+                                }
+                                return _getFieldError('role');
+                              },
+                            ),
+                            const SizedBox(height: 32),
+                            ElevatedButton(
+                              onPressed: _isLoading ? null : _submit,
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                              ),
+                              child: _isLoading
+                                  ? const SizedBox(
+                                      height: 20,
+                                      width: 20,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.white,
+                                        strokeWidth: 2,
+                                      ),
+                                    )
+                                  : Text(
+                                      widget.isEdit
+                                          ? 'Simpan Perubahan'
+                                          : 'Tambah Karyawan',
+                                      style: const TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.w600,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                            ),
+                            const SizedBox(height: 16),
+                          ],
+                        ),
                       ),
                     ),
                   ),
