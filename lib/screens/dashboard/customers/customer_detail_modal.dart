@@ -376,7 +376,6 @@ class CustomerDetailModal extends StatelessWidget {
     );
   }
 
-  /// Static method to show the modal
   static void show(BuildContext context, Customer customer) {
     showModalBottomSheet(
       context: context,

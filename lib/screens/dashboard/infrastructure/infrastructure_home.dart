@@ -13,6 +13,7 @@ import 'package:wifiber/controllers/infrastructure_controller.dart';
 import 'package:wifiber/components/widgets/infrastructure_widget.dart';
 import 'package:wifiber/components/widgets/location_widgets.dart';
 import 'package:wifiber/services/location_service.dart';
+import 'package:wifiber/helpers/currency_helper.dart';
 import 'package:wifiber/screens/dashboard/customers/customer_detail_modal.dart';
 
 class InfrastructureHome extends StatefulWidget {
@@ -184,8 +185,9 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
                   _showMarkerInfo(customer, InfrastructureType.customer),
               child: Container(
                 decoration: BoxDecoration(
-                  color: _getCustomerStatusColor(customer.status)
-                      .withValues(alpha: 0.9),
+                  color: _getCustomerStatusColor(
+                    customer.status,
+                  ).withValues(alpha: 0.9),
                   shape: BoxShape.circle,
                   border: Border.all(color: Colors.white, width: 2),
                   boxShadow: const [
@@ -353,8 +355,8 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
         return const SizedBox.shrink();
       }
 
-      final distance = provider.userLocation != null &&
-              nearestCustomer.hasValidCoordinates()
+      final distance =
+          provider.userLocation != null && nearestCustomer.hasValidCoordinates()
           ? LocationService.calculateDistance(
               provider.userLocation!,
               LatLng(nearestCustomer.lat!, nearestCustomer.lng!),
@@ -371,7 +373,10 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
         ),
         child: Row(
           children: [
-            Icon(Icons.person_pin_circle, color: _getCustomerStatusColor(nearestCustomer.status)),
+            Icon(
+              Icons.person_pin_circle,
+              color: _getCustomerStatusColor(nearestCustomer.status),
+            ),
             const SizedBox(width: 8),
             Expanded(
               child: Column(
@@ -405,11 +410,14 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
               crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 8,
+                    vertical: 4,
+                  ),
                   decoration: BoxDecoration(
-                    color: _getCustomerStatusColor(nearestCustomer.status)
-                        .withValues(alpha: 0.15),
+                    color: _getCustomerStatusColor(
+                      nearestCustomer.status,
+                    ).withValues(alpha: 0.15),
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
@@ -640,9 +648,7 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
         leading: CircleAvatar(
           backgroundColor: statusColor,
           child: Text(
-            customer.name.isNotEmpty
-                ? customer.name[0].toUpperCase()
-                : '?',
+            customer.name.isNotEmpty ? customer.name[0].toUpperCase() : '?',
             style: const TextStyle(color: Colors.white),
           ),
         ),
@@ -651,10 +657,7 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 4),
-            Text(
-              customer.phone,
-              style: const TextStyle(fontSize: 12),
-            ),
+            Text(customer.phone, style: const TextStyle(fontSize: 12)),
             const SizedBox(height: 4),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
@@ -1504,7 +1507,6 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
               child: ListView(
                 controller: scrollController,
                 children: [
-                  // Header
                   Row(
                     children: [
                       Container(
@@ -1547,7 +1549,6 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
                   const Divider(),
                   const SizedBox(height: 16),
 
-                  // Info Pribadi
                   _buildDetailSection('Informasi Pribadi', [
                     _buildDetailRow(
                       Icons.person,
@@ -1599,7 +1600,6 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
                   ]),
                   const SizedBox(height: 16),
 
-                  // Paket & Layanan
                   _buildDetailSection('Paket & Layanan', [
                     _buildDetailRow(
                       Icons.wifi,
@@ -1642,7 +1642,6 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
                   ]),
                   const SizedBox(height: 16),
 
-                  // Lokasi
                   if (customer.hasValidCoordinates() || distance != null)
                     _buildDetailSection('Lokasi', [
                       if (distance != null)
@@ -1662,7 +1661,6 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
                     ]),
                   const SizedBox(height: 24),
 
-                  // Action Buttons
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton.icon(
@@ -1762,9 +1760,6 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
 
   String _formatCurrency(String amount) {
     final value = int.tryParse(amount) ?? 0;
-    return value.toString().replaceAllMapped(
-      RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
-      (Match m) => '${m[1]}.',
-    );
+    return CurrencyHelper.formatCurrencyWithoutRp(value);
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/cupertino.dart';
+import 'package:wifiber/helpers/currency_helper.dart';
 
 class Customer {
   final String id;
@@ -176,12 +177,12 @@ extension CustomerExtension on Customer {
     final price = int.tryParse(packagePrice) ?? 0;
     final disc = int.tryParse(discount) ?? 0;
     final total = price - disc;
-    return 'Rp ${total.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}';
+    return CurrencyHelper.formatCurrency(total);
   }
 
   String get formattedDiscount {
     final disc = int.tryParse(discount) ?? 0;
     if (disc == 0) return '-';
-    return 'Rp ${disc.toString().replaceAllMapped(RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'), (Match m) => '${m[1]}.')}';
+    return CurrencyHelper.formatCurrency(disc);
   }
 }

@@ -26,7 +26,7 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
   @override
   void initState() {
     super.initState();
-    // Load data after the first frame to avoid setState during build
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadCompanyData();
     });
@@ -100,7 +100,6 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
       'cs-phone': _csPhoneController.text.trim(),
     };
 
-    // Hanya tambahkan logo jika ada file baru yang dipilih
     if (_logoFile != null) {
       data['logo'] = _logoFile;
     }
@@ -147,7 +146,6 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
       ),
       body: Consumer<CompanyProvider>(
         builder: (context, provider, child) {
-          // Tampilkan loading indicator saat pertama kali load
           if (provider.state == CompanyState.loading &&
               provider.company == null) {
             return const Center(
@@ -304,7 +302,6 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
     Widget image;
 
     if (_logoFile != null) {
-      // Tampilkan gambar baru yang dipilih user
       image = Image.file(
         File(_logoFile!.path),
         width: 100,
@@ -313,7 +310,6 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
       );
     } else if (provider.company?.logo != null &&
         provider.company!.logo!.isNotEmpty) {
-      // Tampilkan logo existing dari server
       image = Image.network(
         provider.company!.logo!,
         width: 100,
@@ -346,7 +342,6 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
         },
       );
     } else {
-      // Placeholder jika belum ada logo
       image = Container(
         width: 100,
         height: 100,

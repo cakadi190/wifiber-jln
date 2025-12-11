@@ -1119,7 +1119,7 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
           else
             _buildPppoeInfoRow('Terakhir Keluar', secret.lastLoggedOut),
           _buildPppoeInfoRow(
-            'Alasan Terputus',
+            'Penyebab Terputus',
             pppoeDisconnectReasonMapping[secret.lastDisconnectReason] ??
                 secret.lastDisconnectReason,
           ),

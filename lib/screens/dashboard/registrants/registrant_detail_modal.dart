@@ -373,7 +373,6 @@ class RegistrantDetailModal extends StatelessWidget {
     );
   }
 
-  /// Static method to show the modal
   static void show(BuildContext context, Registrant registrant) {
     showModalBottomSheet(
       context: context,

@@ -857,7 +857,6 @@ class TrafficChartPainter extends CustomPainter {
     final effectiveMax = maxValue <= 0 ? 1.0 : maxValue;
     final dx = chartWidth / math.max(1, samples.length - 1);
 
-    // Helper untuk menghasilkan path halus (Catmull-Rom spline)
     Path smoothPath(List<double> values) {
       final path = Path();
       if (values.isEmpty) return path;
@@ -900,7 +899,6 @@ class TrafficChartPainter extends CustomPainter {
     final downloadPath = smoothPath(downloadValues);
     final uploadPath = smoothPath(uploadValues);
 
-    // Fill (area bawah garis)
     final downloadFill = Path.from(downloadPath)
       ..lineTo(
         horizontalPadding + dx * (samples.length - 1),
@@ -917,20 +915,18 @@ class TrafficChartPainter extends CustomPainter {
       ..lineTo(horizontalPadding, chartHeight + verticalPadding)
       ..close();
 
-    // Warna fill transparan
     final downloadFillPaint = Paint()
       ..style = PaintingStyle.fill
-      ..color = downloadColor.withValues(alpha: 10)
+      ..color = downloadColor.withValues(alpha: 0.1)
       ..isAntiAlias = true;
     final uploadFillPaint = Paint()
       ..style = PaintingStyle.fill
-      ..color = uploadColor.withValues(alpha: 10)
+      ..color = uploadColor.withValues(alpha: 0.1)
       ..isAntiAlias = true;
 
     canvas.drawPath(downloadFill, downloadFillPaint);
     canvas.drawPath(uploadFill, uploadFillPaint);
 
-    // Garis utama
     final downloadLinePaint = Paint()
       ..style = PaintingStyle.stroke
       ..strokeWidth = 2.5

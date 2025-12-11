@@ -4,11 +4,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:wifiber/models/company_profile.dart';
 import 'package:wifiber/services/http_service.dart';
 
-// Exception khusus untuk kasus data null tapi response success
-class _DataNullException implements Exception {
+class DataNullException implements Exception {
   final String message;
 
-  _DataNullException(this.message);
+  DataNullException(this.message);
 
   @override
   String toString() => message;
@@ -91,7 +90,7 @@ class CompanyService {
             jsonData['data'] is Map<String, dynamic>) {
           return CompanyProfile.fromJson(jsonData['data']);
         } else {
-          throw _DataNullException('Update successful but data is null');
+          throw DataNullException('Update successful but data is null');
         }
       } else {
         final errorMessage = jsonData['message'] ?? 'Failed to submit company';
