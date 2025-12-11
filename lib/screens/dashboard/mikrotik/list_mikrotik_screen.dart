@@ -470,9 +470,9 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
           ),
         ),
         child: DraggableScrollableSheet(
-          initialChildSize: 0.6,
-          minChildSize: 0.4,
-          maxChildSize: 0.8,
+          initialChildSize: 0.95,
+          minChildSize: 0.5,
+          maxChildSize: 0.95,
           expand: false,
 
           snap: true,
@@ -686,9 +686,9 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
           ),
         ),
         child: DraggableScrollableSheet(
-          initialChildSize: 0.8,
+          initialChildSize: 1,
           minChildSize: 0.5,
-          maxChildSize: 0.95,
+          maxChildSize: 1,
           expand: false,
           builder: (context, scrollController) {
             return DefaultTabController(
@@ -1048,6 +1048,28 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
 
   Widget _buildPppoeCard(RouterPppoeSecret secret, {required bool isActive}) {
     final statusColor = isActive ? Colors.green : Colors.orange;
+    final pppoeDisconnectReasonMapping = {
+      'hung-up': 'Terputus',
+      'lost-carrier': 'Carrier Hilang',
+      'loss-connection': 'Koneksi Hilang',
+      'peer-hung-up': 'Peer Memutus Koneksi',
+      'ppp-timeout': 'PPP Timeout',
+      'authentication-failure': 'Gagal Autentikasi',
+      'no-response': 'Tidak Ada Respons',
+      'terminated': 'Dihentikan',
+      'session-limit': 'Batas Sesi Tercapai',
+      'service-unavailable': 'Layanan Tidak Tersedia',
+      'peer-initiated': 'Diputus dari Client',
+      'server-initiated': 'Diputus dari Server',
+      'radius-timeout': 'RADIUS Timeout',
+      'radius-reject': 'RADIUS Menolak Login',
+      'disconnect-request': 'Diminta Disconnect',
+      'profile-change': 'Profil Berubah',
+      'idle-timeout': 'Idle Timeout',
+      'connect-failed': 'Koneksi Gagal',
+      'authentication-timeout': 'Timeout Autentikasi',
+      'unknown': 'Tidak Dikenali',
+    };
 
     return Container(
       width: double.infinity,
@@ -1094,12 +1116,16 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
           ),
           const SizedBox(height: 8),
           _buildPppoeInfoRow('Profil', secret.profile),
-          _buildPppoeInfoRow('Caller ID', secret.callerId),
+          _buildPppoeInfoRow('ID Pemanggil', secret.callerId),
           if (isActive)
             _buildPppoeInfoRow('Uptime', _formatUptime(secret.uptime))
           else
             _buildPppoeInfoRow('Terakhir Keluar', secret.lastLoggedOut),
-          _buildPppoeInfoRow('Alasan Terputus', secret.lastDisconnectReason),
+          _buildPppoeInfoRow(
+            'Alasan Terputus',
+            pppoeDisconnectReasonMapping[secret.lastDisconnectReason] ??
+                secret.lastDisconnectReason,
+          ),
           _buildPppoeInfoRow('Alamat Mac Terakhir', secret.lastCallerId),
         ],
       ),
