@@ -733,68 +733,73 @@ class _BillsScreenState extends State<BillsScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (modalContext) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-          left: 16,
-          right: 16,
-          top: 16,
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            _buildModalHandle(),
-            const SizedBox(height: 8),
-            const Text(
-              'Buatkan Tagihan Bulanan?',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            const Text(
-              'Aksi ini akan membuatkan tagihan untuk bulan ini kepada semua pelanggan aktif. Apabila pelanggan sudah memiliki atau melunaskan tagihan pada bulan ini, maka akan dilewatkan. Lanjutkan?',
-              textAlign: TextAlign.center,
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Expanded(
-                  child: OutlinedButton(
-                    onPressed: () => Navigator.pop(modalContext),
-                    style: OutlinedButton.styleFrom(
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: const BorderSide(color: AppColors.primary),
-                    ),
-                    child: const Text(
-                      'Tidak',
-                      style: TextStyle(color: AppColors.primary, fontSize: 16),
-                    ),
-                  ),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: TextButton(
-                    onPressed: () {
-                      _createMonthlyBill(modalContext);
-                    },
-                    style: TextButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: AppColors.primary,
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
-                    child: const Text(
-                      'Ya, Buatkan',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.bold,
+      builder: (modalContext) => SafeArea(
+        child: Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 16,
+            right: 16,
+            top: 16,
+          ),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              _buildModalHandle(),
+              const SizedBox(height: 8),
+              const Text(
+                'Buatkan Tagihan Bulanan?',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              const Text(
+                'Aksi ini akan membuatkan tagihan untuk bulan ini kepada semua pelanggan aktif. Apabila pelanggan sudah memiliki atau melunaskan tagihan pada bulan ini, maka akan dilewatkan. Lanjutkan?',
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: 16),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Expanded(
+                    child: OutlinedButton(
+                      onPressed: () => Navigator.pop(modalContext),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        side: const BorderSide(color: AppColors.primary),
+                      ),
+                      child: const Text(
+                        'Tidak',
+                        style: TextStyle(
+                          color: AppColors.primary,
+                          fontSize: 16,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
-            ),
-          ],
+                  const SizedBox(width: 16),
+                  Expanded(
+                    child: TextButton(
+                      onPressed: () {
+                        _createMonthlyBill(modalContext);
+                      },
+                      style: TextButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: AppColors.primary,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                      ),
+                      child: const Text(
+                        'Ya, Buatkan',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -813,8 +818,8 @@ class _BillsScreenState extends State<BillsScreen> {
         minChildSize: 0.2,
         maxChildSize: 1.0,
         expand: false,
-        builder: (context, scrollController) {
-          return Padding(
+        builder: (context, scrollController) => SafeArea(
+          child: Padding(
             padding: EdgeInsets.only(
               bottom: MediaQuery.of(context).viewInsets.bottom,
               left: 16,
@@ -1025,8 +1030,8 @@ class _BillsScreenState extends State<BillsScreen> {
                 ],
               ),
             ),
-          );
-        },
+          ),
+        ),
       ),
     );
   }

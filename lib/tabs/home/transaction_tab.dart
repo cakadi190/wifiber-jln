@@ -206,123 +206,124 @@ class TransactionTab extends StatelessWidget {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (context) => StatefulBuilder(
-        builder: (context, setState) => Padding(
-          padding: EdgeInsets.only(
-            bottom: MediaQuery.of(context).viewInsets.bottom,
-            left: 16,
-            right: 16,
-            top: 16,
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Filter Tanggal',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                      fontWeight: FontWeight.bold,
+        builder: (context, setState) => SafeArea(
+          child: Padding(
+            padding: EdgeInsets.only(
+              bottom: MediaQuery.of(context).viewInsets.bottom,
+              left: 16,
+              right: 16,
+              top: 16,
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Filter Tanggal',
+                      style: Theme.of(context).textTheme.headlineSmall
+                          ?.copyWith(fontWeight: FontWeight.bold),
                     ),
-                  ),
-                  IconButton(
-                    onPressed: () => Navigator.pop(context),
-                    icon: Icon(Icons.close),
-                  ),
-                ],
-              ),
-              SizedBox(height: 16),
-
-              _buildDatePickerTile(
-                context,
-                'Tanggal Mulai',
-                tempStartDate,
-                Icons.calendar_today,
-                () async {
-                  final date = await showDatePicker(
-                    context: context,
-                    initialDate: tempStartDate ?? DateTime.now(),
-                    firstDate: DateTime(2020),
-                    lastDate: DateTime.now(),
-                  );
-                  if (date != null) {
-                    setState(() {
-                      tempStartDate = date;
-                    });
-                  }
-                },
-              ),
-              SizedBox(height: 16),
-
-              _buildDatePickerTile(
-                context,
-                'Tanggal Akhir',
-                tempEndDate,
-                Icons.calendar_today,
-                () async {
-                  final date = await showDatePicker(
-                    context: context,
-                    initialDate: tempEndDate ?? DateTime.now(),
-                    firstDate: tempStartDate ?? DateTime(2020),
-                    lastDate: DateTime.now(),
-                  );
-                  if (date != null) {
-                    setState(() {
-                      tempEndDate = date;
-                    });
-                  }
-                },
-              ),
-              SizedBox(height: 32),
-
-              Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton(
-                      onPressed: () {
-                        provider.clearDateFilter();
-                        Navigator.pop(context);
-                      },
-                      style: OutlinedButton.styleFrom(
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                        side: BorderSide(color: AppColors.primary),
-                      ),
-                      child: Text(
-                        'Reset',
-                        style: TextStyle(color: AppColors.primary),
-                      ),
+                    IconButton(
+                      onPressed: () => Navigator.pop(context),
+                      icon: Icon(Icons.close),
                     ),
-                  ),
-                  SizedBox(width: 16),
-                  Expanded(
-                    child: ElevatedButton(
-                      onPressed: tempStartDate != null && tempEndDate != null
-                          ? () {
-                              provider.setDateFilter(
-                                tempStartDate,
-                                tempEndDate,
-                              );
-                              Navigator.pop(context);
-                            }
-                          : null,
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        padding: EdgeInsets.symmetric(vertical: 16),
-                      ),
-                      child: Text(
-                        'Terapkan',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
+                  ],
+                ),
+                SizedBox(height: 16),
+
+                _buildDatePickerTile(
+                  context,
+                  'Tanggal Mulai',
+                  tempStartDate,
+                  Icons.calendar_today,
+                  () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: tempStartDate ?? DateTime.now(),
+                      firstDate: DateTime(2020),
+                      lastDate: DateTime.now(),
+                    );
+                    if (date != null) {
+                      setState(() {
+                        tempStartDate = date;
+                      });
+                    }
+                  },
+                ),
+                SizedBox(height: 16),
+
+                _buildDatePickerTile(
+                  context,
+                  'Tanggal Akhir',
+                  tempEndDate,
+                  Icons.calendar_today,
+                  () async {
+                    final date = await showDatePicker(
+                      context: context,
+                      initialDate: tempEndDate ?? DateTime.now(),
+                      firstDate: tempStartDate ?? DateTime(2020),
+                      lastDate: DateTime.now(),
+                    );
+                    if (date != null) {
+                      setState(() {
+                        tempEndDate = date;
+                      });
+                    }
+                  },
+                ),
+                SizedBox(height: 32),
+
+                Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton(
+                        onPressed: () {
+                          provider.clearDateFilter();
+                          Navigator.pop(context);
+                        },
+                        style: OutlinedButton.styleFrom(
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                          side: BorderSide(color: AppColors.primary),
+                        ),
+                        child: Text(
+                          'Reset',
+                          style: TextStyle(color: AppColors.primary),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(height: 16),
-            ],
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: ElevatedButton(
+                        onPressed: tempStartDate != null && tempEndDate != null
+                            ? () {
+                                provider.setDateFilter(
+                                  tempStartDate,
+                                  tempEndDate,
+                                );
+                                Navigator.pop(context);
+                              }
+                            : null,
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          padding: EdgeInsets.symmetric(vertical: 16),
+                        ),
+                        child: Text(
+                          'Terapkan',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 16),
+              ],
+            ),
           ),
         ),
       ),
