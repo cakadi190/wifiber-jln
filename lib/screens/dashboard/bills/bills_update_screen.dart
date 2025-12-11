@@ -46,7 +46,7 @@ class _BillsUpdateScreenState extends State<BillsUpdateScreen>
   @override
   void initState() {
     super.initState();
-    // Initialize form dengan data existing jika ada
+
     if (widget.bill.paymentMethod != null &&
         widget.bill.paymentMethod!.isNotEmpty) {
       _paymentMethodController.text = widget.bill.paymentMethod!;
@@ -188,6 +188,38 @@ class _BillsUpdateScreenState extends State<BillsUpdateScreen>
 
   String _formatDateTime(DateTime dateTime) {
     return "${dateTime.day}/${dateTime.month}/${dateTime.year} ${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}";
+  }
+
+  String _formatPeriod(String period) {
+    const months = [
+      'Januari',
+      'Februari',
+      'Maret',
+      'April',
+      'Mei',
+      'Juni',
+      'Juli',
+      'Agustus',
+      'September',
+      'Oktober',
+      'November',
+      'Desember',
+    ];
+
+    try {
+      // Period format: YYYY-MM
+      final parts = period.split('-');
+      if (parts.length == 2) {
+        final year = parts[0];
+        final monthIndex = int.parse(parts[1]) - 1;
+        if (monthIndex >= 0 && monthIndex < 12) {
+          return 'bulan ${months[monthIndex]} $year';
+        }
+      }
+    } catch (e) {
+      // Fallback jika parsing gagal
+    }
+    return period;
   }
 
   void _scrollToFirstError(Map<String, dynamic> errors) {
@@ -368,40 +400,30 @@ class _BillsUpdateScreenState extends State<BillsUpdateScreen>
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      // Info Tagihan
                       Container(
                         width: double.infinity,
                         padding: const EdgeInsets.all(16),
                         decoration: BoxDecoration(
-                          color: AppColors.primary.withOpacity(0.1),
+                          color: AppColors.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(12),
                           border: Border.all(
-                            color: AppColors.primary.withOpacity(0.3),
+                            color: AppColors.primary.withValues(alpha: 0.3),
                           ),
                         ),
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text(
-                              'Info Tagihan',
-                              style: TextStyle(
-                                fontSize: 14,
-                                fontWeight: FontWeight.bold,
-                                color: AppColors.primary,
-                              ),
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              'Invoice: ${widget.bill.invoice}',
-                              style: const TextStyle(fontSize: 14),
+                              widget.bill.invoice,
+                              style: Theme.of(context).textTheme.bodyLarge
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                    color: AppColors.primary,
+                                  ),
                             ),
                             Text(
-                              'Pelanggan: ${widget.bill.name}',
-                              style: const TextStyle(fontSize: 14),
-                            ),
-                            Text(
-                              'Periode: ${widget.bill.period}',
-                              style: const TextStyle(fontSize: 14),
+                              "a/n ${widget.bill.name} periode ${_formatPeriod(widget.bill.period)}",
+                              style: Theme.of(context).textTheme.bodyMedium,
                             ),
                           ],
                         ),

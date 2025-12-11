@@ -104,6 +104,11 @@ class BillsService {
         if (normalResponse.statusCode == 200 ||
             normalResponse.statusCode == 201) {
           final Map<String, dynamic> data = json.decode(normalResponse.body);
+
+          if (data['data'] is Map) {
+            data['data'] = [data['data']];
+          }
+
           return BillResponse.fromJson(data);
         } else {
           throw Exception(
@@ -119,6 +124,12 @@ class BillsService {
 
         if (response.statusCode == 200 || response.statusCode == 201) {
           final Map<String, dynamic> data = json.decode(response.body);
+
+          // Backend returns single object in 'data', wrap it in array for BillResponse
+          if (data['data'] is Map) {
+            data['data'] = [data['data']];
+          }
+
           return BillResponse.fromJson(data);
         } else {
           throw Exception('Failed to update bill: ${response.statusCode}');

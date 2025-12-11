@@ -14,6 +14,7 @@ import 'package:wifiber/models/bills.dart';
 import 'package:wifiber/providers/bills_provider.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/screens/dashboard/bills/bills_create_screen.dart';
+import 'package:wifiber/screens/dashboard/bills/bills_update_screen.dart';
 import 'package:wifiber/services/http_service.dart';
 import 'package:wifiber/middlewares/auth_middleware.dart';
 
@@ -1161,6 +1162,41 @@ class _BillsScreenState extends State<BillsScreen> {
   Widget _buildActionButtons(BuildContext context, Bills bill) {
     return Column(
       children: [
+        if (bill.status == BillStatus.unpaid) ...[
+          SizedBox(
+            width: double.infinity,
+            child: ElevatedButton.icon(
+              onPressed: () async {
+                final billsProvider = context.read<BillsProvider>();
+
+                Navigator.pop(context);
+
+                final result = await Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => BillsUpdateScreen(bill: bill),
+                  ),
+                );
+
+                if (result == true && mounted) {
+                  await billsProvider.refresh();
+                }
+              },
+              icon: const Icon(Icons.edit),
+              label: const Text('Perbarui Tagihan'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+            ),
+          ),
+          const SizedBox(height: 12),
+        ],
+
         SizedBox(
           width: double.infinity,
           child: OutlinedButton.icon(
