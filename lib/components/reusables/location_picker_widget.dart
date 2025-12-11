@@ -48,22 +48,29 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
   void didUpdateWidget(LocationPickerWidget oldWidget) {
     super.didUpdateWidget(oldWidget);
 
-    if (oldWidget.initialLocation != widget.initialLocation) {
-      setState(() {
-        _selectedLocation = widget.initialLocation;
-        if (_selectedLocation != null && !_isMapLoading) {
-          // sudah ada peta, jangan loading ulang
-        } else if (_selectedLocation != null) {
-          _isMapLoading = false;
-        }
-      });
+    if (oldWidget.initialLocation == widget.initialLocation) return;
 
-      if (widget.initialLocation != null &&
-          _mapController != null &&
-          !_isMapLoading) {
-        _moveMapToLocation(widget.initialLocation!);
-      }
+    final newLocation = widget.initialLocation;
+
+    if (newLocation == null) {
+      setState(() {
+        _selectedLocation = null;
+      });
+      return;
     }
+
+    if (_mapController != null && !_isMapLoading) {
+      setState(() {
+        _selectedLocation = newLocation;
+      });
+      _moveMapToLocation(newLocation);
+      return;
+    }
+
+    setState(() {
+      _selectedLocation = newLocation;
+      _isMapLoading = false;
+    });
   }
 
   @override

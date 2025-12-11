@@ -746,7 +746,6 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
   ) {
     return Column(
       children: [
-        // Header section (non-scrollable)
         Padding(
           padding: const EdgeInsets.only(
             left: 24,
@@ -787,7 +786,6 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
           ),
         ),
 
-        // TabBar (non-scrollable)
         TabBar(
           indicatorColor: AppColors.primary,
           dividerColor: Colors.grey.shade300,
@@ -801,7 +799,6 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
 
         const SizedBox(height: 12),
 
-        // Scrollable TabBarView
         Expanded(
           child: TabBarView(
             children: [
@@ -1135,7 +1132,6 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
   String? _formatUptime(String? uptime) {
     if (uptime == null || uptime.isEmpty) return null;
 
-    // Parse format seperti "1w2d3h4m5s" dari MikroTik
     final regex = RegExp(r'(\d+)([wdhms])');
     final matches = regex.allMatches(uptime);
 
