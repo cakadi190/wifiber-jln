@@ -96,6 +96,34 @@ class BillsProvider extends SafeChangeNotifier {
     }
   }
 
+  Future<bool> updateBill(String billId, UpdateBill updateBill) async {
+    try {
+      _setState(BillsState.loading);
+
+      final billResponse = await _billsService.updateBill(billId, updateBill);
+
+      if (billResponse.success == true) {
+        if (billResponse.message.isNotEmpty) {
+          _errorMessage = billResponse.message;
+        }
+        await refresh();
+        return true;
+      } else {
+        _setError(billResponse.message);
+        return false;
+      }
+    } on ValidationException catch (e) {
+      _setError(e.message);
+      rethrow;
+    } on StringException catch (e) {
+      _setError(e.message);
+      return false;
+    } catch (e) {
+      _setError(e.toString());
+      return false;
+    }
+  }
+
   Future<void> fetchBillsByCustomerId(String customerId) async {
     await fetchBills(
       customerId: customerId,

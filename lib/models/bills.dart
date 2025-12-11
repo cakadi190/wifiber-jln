@@ -324,3 +324,74 @@ class CreateBill {
     return 'CreateBill(customerId: $customerId, period: $period, isPaid: $isPaid)';
   }
 }
+
+class UpdateBill {
+  final String paymentMethod;
+  final DateTime paymentAt;
+  final File? paymentProof;
+  final String? paymentNote;
+  final bool? openIsolir;
+
+  UpdateBill({
+    required this.paymentMethod,
+    required this.paymentAt,
+    this.paymentProof,
+    this.paymentNote,
+    this.openIsolir,
+  });
+
+  factory UpdateBill.fromJson(Map<String, dynamic> json) => UpdateBill(
+    paymentMethod: json['payment_method'].toString(),
+    paymentAt: DateTime.parse(json['payment_at'].toString()),
+    paymentProof: json['payment_proof'] != null
+        ? File(json['payment_proof'].toString())
+        : null,
+    paymentNote: json['payment_note']?.toString(),
+    openIsolir:
+        json['open_isolir'] == true ||
+        json['open_isolir'] == 'true' ||
+        json['open_isolir'] == '1',
+  );
+
+  Map<String, String> toFormFields() {
+    String formatPaymentAt(DateTime dateTime) {
+      return "${dateTime.year.toString().padLeft(4, '0')}-"
+          "${dateTime.month.toString().padLeft(2, '0')}-"
+          "${dateTime.day.toString().padLeft(2, '0')} "
+          "${dateTime.hour.toString().padLeft(2, '0')}:"
+          "${dateTime.minute.toString().padLeft(2, '0')}:"
+          "${dateTime.second.toString().padLeft(2, '0')}";
+    }
+
+    return {
+      'payment_method': paymentMethod,
+      'payment_at': formatPaymentAt(paymentAt),
+      if (paymentNote != null) 'payment_note': paymentNote!,
+      'open_isolir': openIsolir != null ? (openIsolir! ? 'yes' : 'no') : 'no',
+    };
+  }
+
+  Map<String, dynamic> toJson() {
+    String formatPaymentAt(DateTime dateTime) {
+      return "${dateTime.year.toString().padLeft(4, '0')}-"
+          "${dateTime.month.toString().padLeft(2, '0')}-"
+          "${dateTime.day.toString().padLeft(2, '0')} "
+          "${dateTime.hour.toString().padLeft(2, '0')}:"
+          "${dateTime.minute.toString().padLeft(2, '0')}:"
+          "${dateTime.second.toString().padLeft(2, '0')}";
+    }
+
+    return {
+      'payment_method': paymentMethod,
+      'payment_at': formatPaymentAt(paymentAt),
+      'payment_proof': paymentProof?.path,
+      'payment_note': paymentNote,
+      'open_isolir': openIsolir != null ? (openIsolir! ? 'yes' : 'no') : 'no',
+    };
+  }
+
+  @override
+  String toString() {
+    return 'UpdateBill(paymentMethod: $paymentMethod, paymentAt: $paymentAt)';
+  }
+}

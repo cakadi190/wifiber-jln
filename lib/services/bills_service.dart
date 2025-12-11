@@ -75,12 +75,61 @@ class BillsService {
           throw Exception('Failed to create bill: ${response.statusCode}');
         }
       }
-    } on ValidationException catch (_)  {
+    } on ValidationException catch (_) {
       rethrow;
     } on StringException catch (_) {
       rethrow;
     } catch (e) {
       throw Exception('Error creating bill: $e');
+    }
+  }
+
+  Future<BillResponse> updateBill(String billId, UpdateBill updateBill) async {
+    try {
+      if (updateBill.paymentProof != null) {
+        final multipartFile = await _http.createMultipartFile(
+          'payment_proof',
+          updateBill.paymentProof!,
+        );
+
+        final response = await _http.putUpload(
+          '$_baseUrl/$billId',
+          requiresAuth: true,
+          fields: updateBill.toFormFields(),
+          files: [multipartFile],
+        );
+
+        final normalResponse = await _http.streamedResponseToResponse(response);
+
+        if (normalResponse.statusCode == 200 ||
+            normalResponse.statusCode == 201) {
+          final Map<String, dynamic> data = json.decode(normalResponse.body);
+          return BillResponse.fromJson(data);
+        } else {
+          throw Exception(
+            'Failed to update bill: ${normalResponse.statusCode}',
+          );
+        }
+      } else {
+        final response = await _http.putForm(
+          '$_baseUrl/$billId',
+          requiresAuth: true,
+          fields: updateBill.toFormFields(),
+        );
+
+        if (response.statusCode == 200 || response.statusCode == 201) {
+          final Map<String, dynamic> data = json.decode(response.body);
+          return BillResponse.fromJson(data);
+        } else {
+          throw Exception('Failed to update bill: ${response.statusCode}');
+        }
+      }
+    } on ValidationException catch (_) {
+      rethrow;
+    } on StringException catch (_) {
+      rethrow;
+    } catch (e) {
+      throw Exception('Error updating bill: $e');
     }
   }
 }
