@@ -64,7 +64,7 @@ class RouterOsApiClient {
       _socket?.setOption(SocketOption.tcpNoDelay, true);
       _resetSocketState();
       if (verbose) {
-        print('Connected to $host:$port (${useSsl ? 'ssl' : 'tcp'})');
+        debugPrint('Connected to $host:$port (${useSsl ? 'ssl' : 'tcp'})');
       }
     } on SocketException catch (error) {
       await close();

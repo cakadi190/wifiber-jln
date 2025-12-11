@@ -75,6 +75,9 @@ class BillsProvider extends SafeChangeNotifier {
       final billResponse = await _billsService.createBill(createBill);
 
       if (billResponse.success == true) {
+        if (billResponse.message.isNotEmpty) {
+          _errorMessage = billResponse.message;
+        }
         await refresh();
         return true;
       } else {

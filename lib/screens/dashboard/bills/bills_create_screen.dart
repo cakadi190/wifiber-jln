@@ -30,6 +30,11 @@ class _BillsCreateScreenState extends State<BillsCreateScreen>
   final _paymentMethodController = TextEditingController();
   final _paymentNoteController = TextEditingController();
 
+  final _customerFieldKey = GlobalKey();
+  final _periodFieldKey = GlobalKey();
+  final _paymentMethodFieldKey = GlobalKey();
+  final _paymentNoteFieldKey = GlobalKey();
+
   Customer? selectedCustomer;
   File? selectedPaymentProof;
   String? paymentProofFileName;
@@ -200,6 +205,34 @@ class _BillsCreateScreenState extends State<BillsCreateScreen>
     return "${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}";
   }
 
+  void _scrollToFirstError(Map<String, dynamic> errors) {
+    final fieldKeys = {
+      'customer_id': _customerFieldKey,
+      'period': _periodFieldKey,
+      'payment_method': _paymentMethodFieldKey,
+      'payment_note': _paymentNoteFieldKey,
+    };
+
+    for (final fieldName in errors.keys) {
+      final key = fieldKeys[fieldName];
+      if (key != null && key.currentContext != null) {
+        final fieldContext = key.currentContext;
+        Future.delayed(const Duration(milliseconds: 100), () {
+          if (!mounted) return;
+          if (fieldContext != null && fieldContext.mounted) {
+            Scrollable.ensureVisible(
+              fieldContext,
+              duration: const Duration(milliseconds: 300),
+              curve: Curves.easeInOut,
+              alignment: 0.2,
+            );
+          }
+        });
+        break;
+      }
+    }
+  }
+
   String? _getFileExtension(String fileName) {
     return fileName.split('.').last.toLowerCase();
   }
@@ -257,17 +290,25 @@ class _BillsCreateScreenState extends State<BillsCreateScreen>
 
       if (success) {
         if (mounted) {
-          SnackBars.success(
-            context,
-            'Tagihan berhasil dibuat!',
-          ).clearSnackBars();
+          final errorMsg = billsProvider.errorMessage;
+          if (errorMsg.isNotEmpty && errorMsg.toLowerCase().contains('gagal')) {
+            SnackBars.error(context, errorMsg).clearSnackBars();
+          } else {
+            SnackBars.success(
+              context,
+              'Tagihan berhasil dibuat!',
+            ).clearSnackBars();
+          }
           Navigator.pop(context);
         }
       } else {
         if (mounted) {
+          final errorMsg = billsProvider.errorMessage;
           SnackBars.error(
             context,
-            'Wah, Ada kesalahan waktu membuat tagihan!',
+            errorMsg.isNotEmpty
+                ? errorMsg
+                : 'Wah, Ada kesalahan waktu membuat tagihan!',
           ).clearSnackBars();
         }
       }
@@ -280,14 +321,24 @@ class _BillsCreateScreenState extends State<BillsCreateScreen>
       }
     } on ValidationException catch (e) {
       setBackendErrors(e.errors);
+      _scrollToFirstError(e.errors);
       if (mounted) {
-        SnackBars.error(context, e.message).clearSnackBars();
+        if (e.message.contains("validation error")) {
+          SnackBars.error(
+            context,
+            "Terjadi kesalahan validasi. Silakan periksa form!",
+          ).clearSnackBars();
+        } else {
+          SnackBars.error(context, e.message).clearSnackBars();
+        }
       }
     } catch (e) {
       if (mounted) {
         SnackBars.error(
           context,
-          'Wah, Ada kesalahan waktu membuat tagihan!',
+          e.toString().contains('Internal server error')
+              ? 'Terjadi kesalahan pada server. Silakan coba lagi.'
+              : 'Wah, Ada kesalahan waktu membuat tagihan!',
         ).clearSnackBars();
       }
     } finally {
@@ -380,61 +431,88 @@ class _BillsCreateScreenState extends State<BillsCreateScreen>
                       ),
                       const SizedBox(height: 8),
                       InkWell(
+                        key: _customerFieldKey,
                         onTap: _isLoading ? null : _showCustomerSearchModal,
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 12,
-                            vertical: 16,
-                          ),
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: _isLoading
-                                  ? Colors.grey.shade400
-                                  : Colors.grey.shade300,
-                            ),
-                            borderRadius: BorderRadius.circular(8),
-                            color: _isLoading ? Colors.grey.shade50 : null,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Expanded(
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    Text(
-                                      selectedCustomer?.name ??
-                                          'Pilih Pelanggan',
-                                      style: TextStyle(
-                                        color: selectedCustomer != null
-                                            ? Colors.black
-                                            : Colors.grey.shade600,
-                                        fontSize: 16,
-                                        fontWeight: selectedCustomer != null
-                                            ? FontWeight.w500
-                                            : FontWeight.normal,
-                                      ),
-                                    ),
-                                    if (selectedCustomer != null)
-                                      Text(
-                                        selectedCustomer!.phone,
-                                        style: TextStyle(
-                                          color: Colors.grey.shade600,
-                                          fontSize: 14,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Container(
+                              width: double.infinity,
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 16,
+                              ),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: backendErrorFor('customer_id') != null
+                                      ? Colors.red
+                                      : _isLoading
+                                      ? Colors.grey.shade400
+                                      : Colors.grey.shade300,
+                                  width: backendErrorFor('customer_id') != null
+                                      ? 2
+                                      : 1,
+                                ),
+                                borderRadius: BorderRadius.circular(8),
+                                color: _isLoading ? Colors.grey.shade50 : null,
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: [
+                                  Expanded(
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          selectedCustomer?.name ??
+                                              'Pilih Pelanggan',
+                                          style: TextStyle(
+                                            color: selectedCustomer != null
+                                                ? Colors.black
+                                                : Colors.grey.shade600,
+                                            fontSize: 16,
+                                            fontWeight: selectedCustomer != null
+                                                ? FontWeight.w500
+                                                : FontWeight.normal,
+                                          ),
                                         ),
-                                      ),
-                                  ],
+                                        if (selectedCustomer != null)
+                                          Text(
+                                            selectedCustomer!.phone,
+                                            style: TextStyle(
+                                              color: Colors.grey.shade600,
+                                              fontSize: 14,
+                                            ),
+                                          ),
+                                      ],
+                                    ),
+                                  ),
+                                  Icon(
+                                    Icons.arrow_drop_down,
+                                    color: _isLoading
+                                        ? Colors.grey.shade400
+                                        : Colors.grey.shade600,
+                                  ),
+                                ],
+                              ),
+                            ),
+                            if (backendErrorFor('customer_id') != null)
+                              Padding(
+                                padding: const EdgeInsets.only(
+                                  top: 8,
+                                  left: 12,
+                                ),
+                                child: Text(
+                                  backendErrorFor('customer_id')!,
+                                  style: const TextStyle(
+                                    color: Colors.red,
+                                    fontSize: 12,
+                                  ),
                                 ),
                               ),
-                              Icon(
-                                Icons.arrow_drop_down,
-                                color: _isLoading
-                                    ? Colors.grey.shade400
-                                    : Colors.grey.shade600,
-                              ),
-                            ],
-                          ),
+                          ],
                         ),
                       ),
                       const SizedBox(height: 24),
@@ -448,31 +526,64 @@ class _BillsCreateScreenState extends State<BillsCreateScreen>
                         ),
                       ),
                       const SizedBox(height: 8),
-                      InkWell(
-                        onTap: _selectPeriod,
-                        child: Container(
-                          width: double.infinity,
-                          padding: const EdgeInsets.all(16),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey.shade300),
-                            borderRadius: BorderRadius.circular(12),
-                            color: Colors.grey.shade50,
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: [
-                              Text(
-                                _formatPeriod(_selectedPeriod),
-                                style: const TextStyle(color: Colors.black87),
-                              ),
-                              Icon(
-                                Icons.calendar_month,
-                                color: AppColors.primary,
-                                size: 20,
-                              ),
-                            ],
-                          ),
-                        ),
+                      Builder(
+                        key: _periodFieldKey,
+                        builder: (context) {
+                          final periodError = backendErrorFor('period');
+                          return InkWell(
+                            onTap: _selectPeriod,
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Container(
+                                  width: double.infinity,
+                                  padding: const EdgeInsets.all(16),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: periodError != null
+                                          ? Colors.red
+                                          : Colors.grey.shade300,
+                                      width: periodError != null ? 2 : 1,
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                    color: Colors.grey.shade50,
+                                  ),
+                                  child: Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        _formatPeriod(_selectedPeriod),
+                                        style: const TextStyle(
+                                          color: Colors.black87,
+                                        ),
+                                      ),
+                                      Icon(
+                                        Icons.calendar_month,
+                                        color: AppColors.primary,
+                                        size: 20,
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                                if (periodError != null)
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      top: 8,
+                                      left: 12,
+                                    ),
+                                    child: Text(
+                                      periodError,
+                                      style: const TextStyle(
+                                        color: Colors.red,
+                                        fontSize: 12,
+                                      ),
+                                    ),
+                                  ),
+                              ],
+                            ),
+                          );
+                        },
                       ),
 
                       const SizedBox(height: 24),
@@ -575,6 +686,7 @@ class _BillsCreateScreenState extends State<BillsCreateScreen>
                       ),
                       const SizedBox(height: 8),
                       TextFormField(
+                        key: _paymentMethodFieldKey,
                         controller: _paymentMethodController,
                         decoration: InputDecoration(
                           hintText: 'Contoh: Transfer Bank, Tunai, QRIS',
@@ -713,6 +825,7 @@ class _BillsCreateScreenState extends State<BillsCreateScreen>
                       ),
                       const SizedBox(height: 8),
                       TextFormField(
+                        key: _paymentNoteFieldKey,
                         controller: _paymentNoteController,
                         maxLines: 3,
                         decoration: InputDecoration(
