@@ -141,12 +141,10 @@ class _CustomerStatTile extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
 
-    debugPrint(stat.color.toString());
-
     return InkWell(
       onTap: () => _navigateToCustomerList(context),
       borderRadius: BorderRadius.circular(12),
-      child: Ink(
+      child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
         decoration: BoxDecoration(
           color: Colors.grey.shade200,
@@ -175,6 +173,8 @@ class _CustomerStatTile extends StatelessWidget {
                     style: theme.textTheme.bodyMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 1,
                   ),
                   const SizedBox(height: 4),
                   Text(

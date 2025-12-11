@@ -179,195 +179,197 @@ class CustomerDetailModal extends StatelessWidget {
       minChildSize: 0.4,
       maxChildSize: 0.95,
       builder: (context, scrollController) {
-        return Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-          ),
-          child: Column(
-            children: [
-              Container(
-                width: 40,
-                height: 5,
-                margin: const EdgeInsets.only(bottom: 12),
-                decoration: BoxDecoration(
-                  color: Colors.grey[300],
-                  borderRadius: BorderRadius.circular(10),
-                ),
-              ),
-
-              Expanded(
-                child: SingleChildScrollView(
-                  controller: scrollController,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Detail Pelanggan',
-                        style: Theme.of(context).textTheme.headlineSmall
-                            ?.copyWith(fontWeight: FontWeight.bold),
-                      ),
-                      const SizedBox(height: 16),
-
-                      _buildDetailRow(
-                        context,
-                        'Nama',
-                        customer.name,
-                        Icons.person,
-                      ),
-                      if (customer.nickname != null &&
-                          customer.nickname!.isNotEmpty)
-                        _buildDetailRow(
-                          context,
-                          'Nama Panggilan',
-                          customer.nickname!,
-                          Icons.person_outline,
-                        ),
-                      _buildDetailRow(
-                        context,
-                        'Telepon',
-                        customer.phone,
-                        Icons.phone,
-                      ),
-                      _buildDetailRow(
-                        context,
-                        'No. Identitas',
-                        customer.identityNumber,
-                        Icons.badge,
-                      ),
-                      _buildDetailRow(
-                        context,
-                        'Alamat',
-                        customer.address,
-                        Icons.location_on,
-                      ),
-                      _buildDetailRow(
-                        context,
-                        'Status',
-                        _getStatusDisplayName(customer.status),
-                        Icons.info,
-                        color: _getStatusColor(customer.status),
-                      ),
-                      const SizedBox(height: 8),
-
-                      if (customer.ktpPhoto != null)
-                        _buildPhotoSection('Foto KTP', customer.ktpPhoto!),
-                      if (customer.locationPhoto != null)
-                        _buildPhotoSection(
-                          'Foto Lokasi',
-                          customer.locationPhoto!,
-                        ),
-
-                      _buildDetailRow(
-                        context,
-                        'Paket',
-                        customer.packageName,
-                        Icons.wifi,
-                        color: AppColors.primary,
-                      ),
-                      _buildDetailRow(
-                        context,
-                        'Harga Paket',
-                        CurrencyHelper.formatCurrency(
-                          int.parse(customer.packagePrice),
-                        ),
-                        Icons.monetization_on,
-                        color: AppColors.primary,
-                      ),
-                      _buildDetailRow(
-                        context,
-                        'PPN Paket',
-                        '${customer.packagePpn}%',
-                        Icons.percent,
-                        color: AppColors.primary,
-                      ),
-                      _buildDetailRow(
-                        context,
-                        'Diskon',
-                        '${customer.discount}%',
-                        Icons.local_offer,
-                      ),
-                      _buildDetailRow(
-                        context,
-                        'Tanggal Tempo Tiap Bulannya',
-                        "Tanggal ${customer.dueDate}",
-                        Icons.calendar_month,
-                      ),
-                      _buildDetailRow(
-                        context,
-                        'Dibuat Pada',
-                        DateHelper.formatDate(
-                          DateTime.parse(customer.createdAt),
-                          format: 'full',
-                        ),
-                        Icons.schedule,
-                      ),
-
-                      if (customer.routerName != null)
-                        _buildDetailRow(
-                          context,
-                          'Router',
-                          customer.routerName!,
-                          Icons.router,
-                        ),
-                      if (customer.routerHost != null)
-                        _buildDetailRow(
-                          context,
-                          'Router Host',
-                          customer.routerHost!,
-                          Icons.dns,
-                        ),
-
-                      const SizedBox(height: 24),
-                    ],
+        return SafeArea(
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+            ),
+            child: Column(
+              children: [
+                Container(
+                  width: 40,
+                  height: 5,
+                  margin: const EdgeInsets.only(bottom: 12),
+                  decoration: BoxDecoration(
+                    color: Colors.grey[300],
+                    borderRadius: BorderRadius.circular(10),
                   ),
                 ),
-              ),
 
-              Column(
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: _openMaps,
-                      style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        foregroundColor: Colors.white,
-                        backgroundColor: AppColors.primary,
-                        padding: const EdgeInsets.symmetric(vertical: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                Expanded(
+                  child: SingleChildScrollView(
+                    controller: scrollController,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          'Detail Pelanggan',
+                          style: Theme.of(context).textTheme.headlineSmall
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
-                      ),
-                      child: const Text(
-                        'Buka Di Maps',
-                        style: TextStyle(fontSize: 18),
-                      ),
+                        const SizedBox(height: 16),
+
+                        _buildDetailRow(
+                          context,
+                          'Nama',
+                          customer.name,
+                          Icons.person,
+                        ),
+                        if (customer.nickname != null &&
+                            customer.nickname!.isNotEmpty)
+                          _buildDetailRow(
+                            context,
+                            'Nama Panggilan',
+                            customer.nickname!,
+                            Icons.person_outline,
+                          ),
+                        _buildDetailRow(
+                          context,
+                          'Telepon',
+                          customer.phone,
+                          Icons.phone,
+                        ),
+                        _buildDetailRow(
+                          context,
+                          'No. Identitas',
+                          customer.identityNumber,
+                          Icons.badge,
+                        ),
+                        _buildDetailRow(
+                          context,
+                          'Alamat',
+                          customer.address,
+                          Icons.location_on,
+                        ),
+                        _buildDetailRow(
+                          context,
+                          'Status',
+                          _getStatusDisplayName(customer.status),
+                          Icons.info,
+                          color: _getStatusColor(customer.status),
+                        ),
+                        const SizedBox(height: 8),
+
+                        if (customer.ktpPhoto != null)
+                          _buildPhotoSection('Foto KTP', customer.ktpPhoto!),
+                        if (customer.locationPhoto != null)
+                          _buildPhotoSection(
+                            'Foto Lokasi',
+                            customer.locationPhoto!,
+                          ),
+
+                        _buildDetailRow(
+                          context,
+                          'Paket',
+                          customer.packageName,
+                          Icons.wifi,
+                          color: AppColors.primary,
+                        ),
+                        _buildDetailRow(
+                          context,
+                          'Harga Paket',
+                          CurrencyHelper.formatCurrency(
+                            int.parse(customer.packagePrice),
+                          ),
+                          Icons.monetization_on,
+                          color: AppColors.primary,
+                        ),
+                        _buildDetailRow(
+                          context,
+                          'PPN Paket',
+                          '${customer.packagePpn}%',
+                          Icons.percent,
+                          color: AppColors.primary,
+                        ),
+                        _buildDetailRow(
+                          context,
+                          'Diskon',
+                          '${customer.discount}%',
+                          Icons.local_offer,
+                        ),
+                        _buildDetailRow(
+                          context,
+                          'Tanggal Tempo Tiap Bulannya',
+                          "Tanggal ${customer.dueDate}",
+                          Icons.calendar_month,
+                        ),
+                        _buildDetailRow(
+                          context,
+                          'Dibuat Pada',
+                          DateHelper.formatDate(
+                            DateTime.parse(customer.createdAt),
+                            format: 'full',
+                          ),
+                          Icons.schedule,
+                        ),
+
+                        if (customer.routerName != null)
+                          _buildDetailRow(
+                            context,
+                            'Router',
+                            customer.routerName!,
+                            Icons.router,
+                          ),
+                        if (customer.routerHost != null)
+                          _buildDetailRow(
+                            context,
+                            'Router Host',
+                            customer.routerHost!,
+                            Icons.dns,
+                          ),
+
+                        const SizedBox(height: 24),
+                      ],
                     ),
                   ),
-                  const SizedBox(height: 8),
+                ),
 
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      style: ElevatedButton.styleFrom(
-                        elevation: 0,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
+                Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: _openMaps,
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          foregroundColor: Colors.white,
+                          backgroundColor: AppColors.primary,
+                          padding: const EdgeInsets.symmetric(vertical: 8),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: const Text(
+                          'Buka Di Maps',
+                          style: TextStyle(fontSize: 18),
                         ),
                       ),
-                      child: const Text(
-                        'Tutup',
-                        style: TextStyle(fontSize: 18),
+                    ),
+                    const SizedBox(height: 8),
+
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: ElevatedButton.styleFrom(
+                          elevation: 0,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(10),
+                          ),
+                        ),
+                        child: const Text(
+                          'Tutup',
+                          style: TextStyle(fontSize: 18),
+                        ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-            ],
+                  ],
+                ),
+              ],
+            ),
           ),
         );
       },

@@ -5,7 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/reusables/area_modal_selector.dart';
 import 'package:wifiber/components/reusables/options_bottom_sheet.dart';
-import 'package:wifiber/components/reusables/router_modal_selector.dart' as router_selector;
+import 'package:wifiber/components/reusables/router_modal_selector.dart'
+    as router_selector;
 import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/models/customer.dart';
@@ -19,10 +20,7 @@ import 'package:wifiber/middlewares/auth_middleware.dart';
 class CustomerListScreen extends StatefulWidget {
   final CustomerStatus? initialStatus;
 
-  const CustomerListScreen({
-    super.key,
-    this.initialStatus,
-  });
+  const CustomerListScreen({super.key, this.initialStatus});
 
   @override
   State<CustomerListScreen> createState() => _CustomerListScreenState();
@@ -48,10 +46,10 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) {
-
-        Provider.of<CustomerProvider>(context, listen: false).loadCustomers(
-          status: _selectedStatus,
-        );
+        Provider.of<CustomerProvider>(
+          context,
+          listen: false,
+        ).loadCustomers(status: _selectedStatus);
       }
     });
   }
@@ -115,127 +113,133 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
 
         return StatefulBuilder(
           builder: (context, setModalState) {
-            return Padding(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-                left: 16,
-                right: 16,
-                top: 16,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Text(
-                        'Filter Pelanggan',
-                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
+            return SafeArea(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+                  left: 16,
+                  right: 16,
+                  top: 16,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Text(
+                          'Filter Pelanggan',
+                          style: Theme.of(context).textTheme.titleMedium
+                              ?.copyWith(fontWeight: FontWeight.bold),
                         ),
-                      ),
-                      const Spacer(),
-                      IconButton(
-                        icon: const Icon(Icons.close),
-                        onPressed: () => Navigator.of(context).pop(),
-                      ),
-                    ],
-                  ),
-                  const SizedBox(height: 24),
-                  DropdownButtonFormField<CustomerStatus?>(
-                    initialValue: tempSelectedStatus,
-                    decoration: const InputDecoration(
-                      labelText: 'Status',
-                      border: OutlineInputBorder(),
-                    ),
-                    items: [
-                      const DropdownMenuItem(
-                        value: null,
-                        child: Text('Semua Status'),
-                      ),
-                      ...CustomerStatus.values.map((status) {
-                        String displayName;
-                        switch (status) {
-                          case CustomerStatus.customer:
-                            displayName = 'Pelanggan';
-                            break;
-                          case CustomerStatus.inactive:
-                            displayName = 'Tidak Aktif';
-                            break;
-                          case CustomerStatus.free:
-                            displayName = 'Gratis';
-                            break;
-                          case CustomerStatus.isolir:
-                            displayName = 'Isolir';
-                            break;
-                        }
-                        return DropdownMenuItem(
-                          value: status,
-                          child: Text(displayName),
-                        );
-                      }),
-                    ],
-                    onChanged: (value) {
-                      setModalState(() {
-                        tempSelectedStatus = value;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  AreaButtonSelector(
-                    selectedAreaId: tempSelectedAreaId,
-                    selectedAreaName: tempSelectedAreaName,
-                    onAreaSelected: (Area area) {
-                      setModalState(() {
-                        tempSelectedAreaId = area.id;
-                        tempSelectedAreaName = area.name;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  router_selector.RouterButtonSelector(
-                    selectedRouterId: tempSelectedRouterId,
-                    selectedRouterName: tempSelectedRouterName,
-                    onRouterSelected: (router_selector.Router router) {
-                      setModalState(() {
-                        tempSelectedRouterId = router.id;
-                        tempSelectedRouterName = router.name;
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Expanded(
-                        child: OutlinedButton(
+                        const Spacer(),
+                        IconButton(
+                          icon: const Icon(Icons.close),
                           onPressed: () => Navigator.of(context).pop(),
-                          child: const Text('Batal'),
                         ),
+                      ],
+                    ),
+                    const SizedBox(height: 24),
+                    DropdownButtonFormField<CustomerStatus?>(
+                      initialValue: tempSelectedStatus,
+                      decoration: const InputDecoration(
+                        labelText: 'Status',
+                        border: OutlineInputBorder(),
                       ),
-                      const SizedBox(width: 12),
-                      Expanded(
-                        child: ElevatedButton(
-                          style: ButtonStyle(
-                            backgroundColor: WidgetStateProperty.all(AppColors.primary),
+                      items: [
+                        const DropdownMenuItem(
+                          value: null,
+                          child: Text('Semua Status'),
+                        ),
+                        ...CustomerStatus.values.map((status) {
+                          String displayName;
+                          switch (status) {
+                            case CustomerStatus.customer:
+                              displayName = 'Pelanggan';
+                              break;
+                            case CustomerStatus.inactive:
+                              displayName = 'Tidak Aktif';
+                              break;
+                            case CustomerStatus.free:
+                              displayName = 'Gratis';
+                              break;
+                            case CustomerStatus.isolir:
+                              displayName = 'Isolir';
+                              break;
+                          }
+                          return DropdownMenuItem(
+                            value: status,
+                            child: Text(displayName),
+                          );
+                        }),
+                      ],
+                      onChanged: (value) {
+                        setModalState(() {
+                          tempSelectedStatus = value;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    AreaButtonSelector(
+                      selectedAreaId: tempSelectedAreaId,
+                      selectedAreaName: tempSelectedAreaName,
+                      onAreaSelected: (Area area) {
+                        setModalState(() {
+                          tempSelectedAreaId = area.id;
+                          tempSelectedAreaName = area.name;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    router_selector.RouterButtonSelector(
+                      selectedRouterId: tempSelectedRouterId,
+                      selectedRouterName: tempSelectedRouterName,
+                      onRouterSelected: (router_selector.Router router) {
+                        setModalState(() {
+                          tempSelectedRouterId = router.id;
+                          tempSelectedRouterName = router.name;
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 16),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: OutlinedButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: const Text('Batal'),
                           ),
-                          onPressed: () {
-                            Navigator.of(context).pop();
-                            setState(() {
-                              _selectedStatus = tempSelectedStatus;
-                              _selectedAreaId = tempSelectedAreaId;
-                              _selectedAreaName = tempSelectedAreaName;
-                              _selectedRouterId = tempSelectedRouterId;
-                              _selectedRouterName = tempSelectedRouterName;
-                            });
-                            _applyFilter();
-                          },
-                          child: const Text('Terapkan', style: TextStyle(color: Colors.white),),
                         ),
-                      ),
-                    ],
-                  ),
-                ],
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: ElevatedButton(
+                            style: ButtonStyle(
+                              backgroundColor: WidgetStateProperty.all(
+                                AppColors.primary,
+                              ),
+                            ),
+                            onPressed: () {
+                              Navigator.of(context).pop();
+                              setState(() {
+                                _selectedStatus = tempSelectedStatus;
+                                _selectedAreaId = tempSelectedAreaId;
+                                _selectedAreaName = tempSelectedAreaName;
+                                _selectedRouterId = tempSelectedRouterId;
+                                _selectedRouterName = tempSelectedRouterName;
+                              });
+                              _applyFilter();
+                            },
+                            child: const Text(
+                              'Terapkan',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             );
           },
@@ -249,7 +253,9 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
       _customerProvider!.loadCustomers(
         status: _selectedStatus,
         areaId: _selectedAreaId != null ? int.tryParse(_selectedAreaId!) : null,
-        routerId: _selectedRouterId != null ? int.tryParse(_selectedRouterId!) : null,
+        routerId: _selectedRouterId != null
+            ? int.tryParse(_selectedRouterId!)
+            : null,
       );
     }
   }
@@ -300,10 +306,7 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                 ),
                 Text(
                   customer.phone,
-                  style: const TextStyle(
-                    fontSize: 14,
-                    color: Colors.grey,
-                  ),
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
                 ),
               ],
             ),
@@ -411,45 +414,47 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
               }
             }
 
-            return Padding(
-              padding: EdgeInsets.only(
-                bottom: MediaQuery.of(context).viewInsets.bottom + 16,
-                left: 16,
-                right: 16,
-                top: 16,
-              ),
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  Text(
-                    'Impor Data Pelanggan',
-                    style: Theme.of(context).textTheme.titleMedium,
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 16),
-                  OutlinedButton.icon(
-                    onPressed: pickFile,
-                    icon: const Icon(Icons.insert_drive_file),
-                    label: Text(fileName ?? 'Pilih File Excel'),
-                  ),
-                  const SizedBox(height: 16),
-                  ElevatedButton(
-                    onPressed: selectedFile != null && !isLoading
-                        ? upload
-                        : null,
-                    child: isLoading
-                        ? const SizedBox(
-                      width: 20,
-                      height: 20,
-                      child: CircularProgressIndicator(
-                        strokeWidth: 2,
-                        color: Colors.white,
-                      ),
-                    )
-                        : const Text('Unggah'),
-                  ),
-                ],
+            return SafeArea(
+              child: Padding(
+                padding: EdgeInsets.only(
+                  bottom: MediaQuery.of(context).viewInsets.bottom + 16,
+                  left: 16,
+                  right: 16,
+                  top: 16,
+                ),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Text(
+                      'Impor Data Pelanggan',
+                      style: Theme.of(context).textTheme.titleMedium,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 16),
+                    OutlinedButton.icon(
+                      onPressed: pickFile,
+                      icon: const Icon(Icons.insert_drive_file),
+                      label: Text(fileName ?? 'Pilih File Excel'),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton(
+                      onPressed: selectedFile != null && !isLoading
+                          ? upload
+                          : null,
+                      child: isLoading
+                          ? const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: Colors.white,
+                              ),
+                            )
+                          : const Text('Unggah'),
+                    ),
+                  ],
+                ),
               ),
             );
           },
@@ -520,12 +525,12 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                           prefixIcon: const Icon(Icons.search),
                           suffixIcon: _searchController.text.isNotEmpty
                               ? IconButton(
-                            onPressed: () {
-                              _searchController.clear();
-                              _onSearchChanged('');
-                            },
-                            icon: const Icon(Icons.clear),
-                          )
+                                  onPressed: () {
+                                    _searchController.clear();
+                                    _onSearchChanged('');
+                                  },
+                                  icon: const Icon(Icons.clear),
+                                )
                               : null,
                           border: const OutlineInputBorder(),
                         ),
@@ -540,13 +545,17 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                       icon: const Icon(Icons.filter_list),
                       tooltip: 'Filter',
                       style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.all(Colors.grey.shade200),
+                        backgroundColor: WidgetStateProperty.all(
+                          Colors.grey.shade200,
+                        ),
                       ),
                     ),
                   ],
                 ),
               ),
-              if (_selectedStatus != null || _selectedAreaName != null || _selectedRouterName != null)
+              if (_selectedStatus != null ||
+                  _selectedAreaName != null ||
+                  _selectedRouterName != null)
                 Container(
                   width: double.infinity,
                   margin: const EdgeInsets.symmetric(horizontal: 16),
@@ -558,18 +567,26 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                           Padding(
                             padding: const EdgeInsets.only(right: 8),
                             child: Chip(
-                              labelPadding: const EdgeInsets.symmetric(horizontal: 12),
+                              labelPadding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                              ),
                               padding: const EdgeInsets.symmetric(vertical: 0),
                               label: Text(
-                                _getStatusDisplayName(_selectedStatus.toString().split('.').last),
+                                _getStatusDisplayName(
+                                  _selectedStatus.toString().split('.').last,
+                                ),
                                 style: const TextStyle(fontSize: 12),
                               ),
                               shape: RoundedRectangleBorder(
-                                side: const BorderSide(color: Colors.grey, width: 1),
+                                side: const BorderSide(
+                                  color: Colors.grey,
+                                  width: 1,
+                                ),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               deleteIcon: const Icon(Icons.close, size: 16),
-                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
                               onDeleted: () {
                                 setState(() => _selectedStatus = null);
                                 _applyFilter();
@@ -580,15 +597,24 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                           Padding(
                             padding: const EdgeInsets.only(right: 8),
                             child: Chip(
-                              labelPadding: const EdgeInsets.symmetric(horizontal: 12),
+                              labelPadding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                              ),
                               padding: const EdgeInsets.symmetric(vertical: 0),
-                              label: Text(_selectedAreaName!, style: const TextStyle(fontSize: 12)),
+                              label: Text(
+                                _selectedAreaName!,
+                                style: const TextStyle(fontSize: 12),
+                              ),
                               shape: RoundedRectangleBorder(
-                                side: const BorderSide(color: Colors.grey, width: 1),
+                                side: const BorderSide(
+                                  color: Colors.grey,
+                                  width: 1,
+                                ),
                                 borderRadius: BorderRadius.circular(16),
                               ),
                               deleteIcon: const Icon(Icons.close, size: 16),
-                              materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
                               onDeleted: () {
                                 setState(() {
                                   _selectedAreaId = null;
@@ -600,15 +626,24 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                           ),
                         if (_selectedRouterName != null)
                           Chip(
-                            labelPadding: const EdgeInsets.symmetric(horizontal: 12),
+                            labelPadding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                            ),
                             padding: const EdgeInsets.symmetric(vertical: 0),
-                            label: Text(_selectedRouterName!, style: const TextStyle(fontSize: 12)),
+                            label: Text(
+                              _selectedRouterName!,
+                              style: const TextStyle(fontSize: 12),
+                            ),
                             shape: RoundedRectangleBorder(
-                              side: const BorderSide(color: Colors.grey, width: 1),
+                              side: const BorderSide(
+                                color: Colors.grey,
+                                width: 1,
+                              ),
                               borderRadius: BorderRadius.circular(16),
                             ),
                             deleteIcon: const Icon(Icons.close, size: 16),
-                            materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                            materialTapTargetSize:
+                                MaterialTapTargetSize.shrinkWrap,
                             onDeleted: () {
                               setState(() {
                                 _selectedRouterId = null;
@@ -727,7 +762,9 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                                   ),
                                 ],
                               ),
-                              subtitle: Text("${customer.phone} - ${customer.areaName}"),
+                              subtitle: Text(
+                                "${customer.phone} - ${customer.areaName}",
+                              ),
                               trailing: IconButton(
                                 icon: const Icon(Icons.more_vert),
                                 onPressed: () => _showOptionsMenu(customer),

@@ -828,6 +828,37 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
     String message,
     RouterModel router,
   ) {
+    String titleContainer = 'Gagal Memuat Data PPPoE';
+    String messageContainer = 'Gagal memuat data PPPoE';
+
+    if (message.contains('No route to host')) {
+      titleContainer = 'Gagal Memuat Data PPPoE';
+      messageContainer =
+          'Anda tidak terhubung ke internet. Pastikan koneksi internet Anda terhubung dengan benar.';
+    } else if (message.contains('Connection refused') ||
+        message.contains('Failed host lookup')) {
+      titleContainer = 'Koneksi Ditolak';
+      messageContainer =
+          'Koneksi ke Mikrotik ditolak atau host tidak dapat ditemukan. Pastikan Mikrotik menyala dan dapat diakses.';
+    } else if (message.contains('Timeout')) {
+      titleContainer = 'Waktu Habis';
+      messageContainer =
+          'Permintaan ke Mikrotik melebihi batas waktu. Periksa koneksi jaringan Anda atau status Mikrotik.';
+    } else if (message.contains('500')) {
+      titleContainer = 'Internal Server Error';
+      messageContainer =
+          'Terjadi kesalahan pada server. Silakan coba lagi nanti.';
+    } else if (message.contains('404')) {
+      titleContainer = 'Not Found';
+      messageContainer = 'Data yang Anda cari tidak ditemukan.';
+    } else if (message.contains('401')) {
+      titleContainer = 'Unauthorized';
+      messageContainer = 'Anda tidak memiliki izin untuk mengakses data ini.';
+    } else if (message.contains('403')) {
+      titleContainer = 'Forbidden';
+      messageContainer = 'Anda tidak memiliki izin untuk mengakses data ini.';
+    }
+
     return SingleChildScrollView(
       controller: scrollController,
       child: Padding(
@@ -847,7 +878,7 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'Gagal Memuat Data PPPoE',
+              titleContainer,
               style: Theme.of(
                 context,
               ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
@@ -855,7 +886,7 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              message,
+              messageContainer,
               style: Theme.of(
                 context,
               ).textTheme.bodyMedium?.copyWith(color: Colors.grey[600]),

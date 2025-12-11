@@ -20,11 +20,11 @@ class CustomerSearchModal extends StatefulWidget {
   });
 
   static Future<T?> showModal<T>(
-      BuildContext context, {
-        required Function(Customer) onCustomerSelected,
-        Customer? selectedCustomer,
-        String title = 'Pilih Pelanggan',
-      }) {
+    BuildContext context, {
+    required Function(Customer) onCustomerSelected,
+    Customer? selectedCustomer,
+    String title = 'Pilih Pelanggan',
+  }) {
     return showModalBottomSheet<T>(
       context: context,
       isScrollControlled: true,
@@ -120,232 +120,237 @@ class _CustomerSearchModalState extends State<CustomerSearchModal> {
       maxChildSize: 0.9,
       expand: false,
       builder: (context, scrollController) {
-        return Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
-          ),
-          child: Column(
-            children: [
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                height: 4,
-                width: 40,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: Text(
-                  widget.title,
-                  style: const TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.w600,
+        return SafeArea(
+          child: Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
+            ),
+            child: Column(
+              children: [
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  height: 4,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
                   ),
                 ),
-              ),
 
-              const SizedBox(height: 16),
-
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                child: TextFormField(
-                  controller: _searchController,
-                  decoration: InputDecoration(
-                    hintText: 'Masukkan nama atau email pelanggan',
-                    prefixIcon: const Icon(Icons.search),
-                    border: const OutlineInputBorder(),
-                    suffixIcon: _searchController.text.isNotEmpty
-                        ? IconButton(
-                      icon: const Icon(Icons.clear),
-                      onPressed: _onClearSearch,
-                    )
-                        : null,
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: Text(
+                    widget.title,
+                    style: const TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                    ),
                   ),
-                  onChanged: _onSearchChanged,
                 ),
-              ),
 
-              const SizedBox(height: 16),
+                const SizedBox(height: 16),
 
-              Expanded(
-                child: Consumer<CustomerProvider>(
-                  builder: (context, provider, child) {
-                    if (provider.isLoading) {
-                      return const Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            CircularProgressIndicator(),
-                            SizedBox(height: 16),
-                            Text('Memuat data pelanggan...'),
-                          ],
-                        ),
-                      );
-                    }
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  child: TextFormField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Masukkan nama atau email pelanggan',
+                      prefixIcon: const Icon(Icons.search),
+                      border: const OutlineInputBorder(),
+                      suffixIcon: _searchController.text.isNotEmpty
+                          ? IconButton(
+                              icon: const Icon(Icons.clear),
+                              onPressed: _onClearSearch,
+                            )
+                          : null,
+                    ),
+                    onChanged: _onSearchChanged,
+                  ),
+                ),
 
-                    if (provider.error != null) {
-                      return Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Center(
+                const SizedBox(height: 16),
+
+                Expanded(
+                  child: Consumer<CustomerProvider>(
+                    builder: (context, provider, child) {
+                      if (provider.isLoading) {
+                        return const Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              CircularProgressIndicator(),
+                              SizedBox(height: 16),
+                              Text('Memuat data pelanggan...'),
+                            ],
+                          ),
+                        );
+                      }
+
+                      if (provider.error != null) {
+                        return Padding(
+                          padding: const EdgeInsets.all(16),
+                          child: Center(
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                const Icon(
+                                  Icons.error_outline,
+                                  size: 48,
+                                  color: Colors.red,
+                                ),
+                                const SizedBox(height: 16),
+                                Text(
+                                  'Terjadi kesalahan',
+                                  style: TextStyle(
+                                    fontSize: 16,
+                                    fontWeight: FontWeight.w500,
+                                    color: Colors.grey.shade800,
+                                  ),
+                                ),
+                                const SizedBox(height: 8),
+                                Text(
+                                  provider.error!,
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(color: Colors.grey.shade600),
+                                ),
+                                const SizedBox(height: 16),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    if (_searchController.text.isNotEmpty) {
+                                      _customerController.searchCustomers(
+                                        _searchController.text,
+                                      );
+                                    } else {
+                                      _customerController.getAllCustomers(
+                                        showLoading: false,
+                                      );
+                                    }
+                                  },
+                                  child: const Text('Coba Lagi'),
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }
+
+                      if (provider.customers.isEmpty) {
+                        return Center(
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
                               const Icon(
-                                Icons.error_outline,
+                                Icons.person_search,
                                 size: 48,
-                                color: Colors.red,
+                                color: Colors.grey,
                               ),
                               const SizedBox(height: 16),
                               Text(
-                                'Terjadi kesalahan',
+                                _searchController.text.isNotEmpty
+                                    ? 'Tidak ditemukan apapun.'
+                                    : 'Belum ada data pelanggan',
                                 style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.w500,
-                                  color: Colors.grey.shade800,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.grey.shade600,
                                 ),
                               ),
-                              const SizedBox(height: 8),
-                              Text(
-                                provider.error!,
-                                textAlign: TextAlign.center,
-                                style: TextStyle(color: Colors.grey.shade600),
-                              ),
-                              const SizedBox(height: 16),
-                              ElevatedButton(
-                                onPressed: () {
-                                  if (_searchController.text.isNotEmpty) {
-                                    _customerController.searchCustomers(
-                                      _searchController.text,
-                                    );
-                                  } else {
-                                    _customerController.getAllCustomers(
-                                      showLoading: false,
-                                    );
-                                  }
-                                },
-                                child: const Text('Coba Lagi'),
-                              ),
+                              if (_searchController.text.isNotEmpty)
+                                Padding(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 16,
+                                    vertical: 4,
+                                  ),
+                                  child: Text(
+                                    'Mohon maaf, tidak ditemukan pelanggan untuk pencarian "${_searchController.text}". Coba cari nama pelanggan lainnya.',
+                                    textAlign: TextAlign.center,
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey.shade500,
+                                    ),
+                                  ),
+                                ),
                             ],
                           ),
-                        ),
-                      );
-                    }
-
-                    if (provider.customers.isEmpty) {
-                      return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.person_search,
-                              size: 48,
-                              color: Colors.grey,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              _searchController.text.isNotEmpty
-                                  ? 'Tidak ditemukan apapun.'
-                                  : 'Belum ada data pelanggan',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.grey.shade600,
-                              ),
-                            ),
-                            if (_searchController.text.isNotEmpty)
-                              Padding(
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 16,
-                                  vertical: 4,
-                                ),
-                                child: Text(
-                                  'Mohon maaf, tidak ditemukan pelanggan untuk pencarian "${_searchController.text}". Coba cari nama pelanggan lainnya.',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey.shade500,
-                                  ),
-                                ),
-                              ),
-                          ],
-                        ),
-                      );
-                    }
-
-                    return ListView.builder(
-                      controller: scrollController,
-                      padding: const EdgeInsets.symmetric(horizontal: 16),
-                      itemCount: provider.customers.length,
-                      itemBuilder: (context, index) {
-                        final customer = provider.customers[index];
-                        final isSelected =
-                            widget.selectedCustomer?.id == customer.id;
-
-                        return Card(
-                          elevation: 0,
-                          margin: const EdgeInsets.only(bottom: 8),
-                          color: isSelected
-                              ? AppColors.primary.withValues(alpha: 0.1)
-                              : null,
-                          child: ListTile(
-                            leading: CircleAvatar(
-                              backgroundColor: isSelected
-                                  ? AppColors.primary
-                                  : AppColors.primary.withValues(alpha: 0.8),
-                              child: Text(
-                                customer.name.isNotEmpty
-                                    ? customer.name
-                                    .substring(0, 1)
-                                    .toUpperCase()
-                                    : '?',
-                                style: const TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            title: Text(
-                              customer.name,
-                              style: TextStyle(
-                                fontWeight: isSelected
-                                    ? FontWeight.w600
-                                    : FontWeight.w500,
-                              ),
-                            ),
-                            subtitle: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  customer.phone,
-                                  style: TextStyle(
-                                    color: Colors.grey.shade600,
-                                    fontSize: 13,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            trailing: isSelected
-                                ? Icon(
-                              Icons.check_circle,
-                              color: AppColors.primary,
-                            )
-                                : const Icon(Icons.arrow_forward_ios, size: 16),
-                            onTap: () {
-                              widget.onCustomerSelected(customer);
-                              Navigator.pop(context);
-                            },
-                          ),
                         );
-                      },
-                    );
-                  },
+                      }
+
+                      return ListView.builder(
+                        controller: scrollController,
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        itemCount: provider.customers.length,
+                        itemBuilder: (context, index) {
+                          final customer = provider.customers[index];
+                          final isSelected =
+                              widget.selectedCustomer?.id == customer.id;
+
+                          return Card(
+                            elevation: 0,
+                            margin: const EdgeInsets.only(bottom: 8),
+                            color: isSelected
+                                ? AppColors.primary.withValues(alpha: 0.1)
+                                : null,
+                            child: ListTile(
+                              leading: CircleAvatar(
+                                backgroundColor: isSelected
+                                    ? AppColors.primary
+                                    : AppColors.primary.withValues(alpha: 0.8),
+                                child: Text(
+                                  customer.name.isNotEmpty
+                                      ? customer.name
+                                            .substring(0, 1)
+                                            .toUpperCase()
+                                      : '?',
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                              title: Text(
+                                customer.name,
+                                style: TextStyle(
+                                  fontWeight: isSelected
+                                      ? FontWeight.w600
+                                      : FontWeight.w500,
+                                ),
+                              ),
+                              subtitle: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    customer.phone,
+                                    style: TextStyle(
+                                      color: Colors.grey.shade600,
+                                      fontSize: 13,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              trailing: isSelected
+                                  ? Icon(
+                                      Icons.check_circle,
+                                      color: AppColors.primary,
+                                    )
+                                  : const Icon(
+                                      Icons.arrow_forward_ios,
+                                      size: 16,
+                                    ),
+                              onTap: () {
+                                widget.onCustomerSelected(customer);
+                                Navigator.pop(context);
+                              },
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },

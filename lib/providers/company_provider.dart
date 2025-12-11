@@ -93,9 +93,11 @@ class CompanyProvider extends SafeChangeNotifier {
   }
 
   void clearError() {
-    _error = null;
-    if (_state == CompanyState.error) {
-      _setState(CompanyState.loaded);
+    if (_error != null) {
+      _error = null;
+      if (_state == CompanyState.error) {
+        _setState(CompanyState.loaded);
+      }
     }
   }
 

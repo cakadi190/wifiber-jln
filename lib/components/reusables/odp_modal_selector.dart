@@ -129,55 +129,61 @@ class _OdpButtonSelectorState extends State<OdpButtonSelector> {
           maxChildSize: 0.9,
           expand: false,
           builder: (context, scrollController) {
-            return Container(
-              decoration: const BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
-              ),
-              child: Column(
-                children: [
-                  Container(
-                    margin: const EdgeInsets.only(top: 12, bottom: 8),
-                    height: 5,
-                    width: 40,
-                    decoration: BoxDecoration(
-                      borderRadius: BorderRadius.circular(10),
-                      color: Colors.grey[300],
+            return SafeArea(
+              child: Container(
+                decoration: const BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                ),
+                child: Column(
+                  children: [
+                    Container(
+                      margin: const EdgeInsets.only(top: 12, bottom: 8),
+                      height: 5,
+                      width: 40,
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(10),
+                        color: Colors.grey[300],
+                      ),
                     ),
-                  ),
 
-                  Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.start,
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.router, color: Colors.blue, size: 24),
-                        const SizedBox(width: 12),
-                        const Text(
-                          'Pilih ODP',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                    Padding(
+                      padding: const EdgeInsets.all(16.0),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const Icon(
+                            Icons.router,
+                            color: Colors.blue,
+                            size: 24,
                           ),
-                        ),
-                        const Spacer(),
-                        IconButton(
-                          onPressed: () => Navigator.pop(context),
-                          icon: const Icon(Icons.close),
-                          style: IconButton.styleFrom(
-                            backgroundColor: Colors.grey[100],
-                            shape: const CircleBorder(),
+                          const SizedBox(width: 12),
+                          const Text(
+                            'Pilih ODP',
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
                           ),
-                        ),
-                      ],
+                          const Spacer(),
+                          IconButton(
+                            onPressed: () => Navigator.pop(context),
+                            icon: const Icon(Icons.close),
+                            style: IconButton.styleFrom(
+                              backgroundColor: Colors.grey[100],
+                              shape: const CircleBorder(),
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
 
-                  Divider(height: 1, color: Colors.grey.shade300),
+                    Divider(height: 1, color: Colors.grey.shade300),
 
-                  Expanded(child: _buildContent(scrollController)),
-                ],
+                    Expanded(child: _buildContent(scrollController)),
+                  ],
+                ),
               ),
             );
           },

@@ -26,7 +26,10 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
   @override
   void initState() {
     super.initState();
-    _loadCompanyData();
+    // Load data after the first frame to avoid setState during build
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _loadCompanyData();
+    });
   }
 
   Future<void> _loadCompanyData() async {
@@ -86,9 +89,7 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
 
-    // Clear previous error
     final provider = context.read<CompanyProvider>();
-    provider.clearError();
 
     final data = <String, dynamic>{
       'name': _nameController.text.trim(),
@@ -128,10 +129,7 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
     } catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: $e'),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
         );
       }
     }
@@ -150,7 +148,8 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
       body: Consumer<CompanyProvider>(
         builder: (context, provider, child) {
           // Tampilkan loading indicator saat pertama kali load
-          if (provider.state == CompanyState.loading && provider.company == null) {
+          if (provider.state == CompanyState.loading &&
+              provider.company == null) {
             return const Center(
               child: CircularProgressIndicator(color: Colors.white),
             );
@@ -184,7 +183,8 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
                               border: OutlineInputBorder(),
                             ),
                             validator: (v) => v == null || v.trim().isEmpty
-                                ? 'Nama perusahaan wajib diisi' : null,
+                                ? 'Nama perusahaan wajib diisi'
+                                : null,
                           ),
                           const SizedBox(height: 16),
 
@@ -195,7 +195,8 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
                               border: OutlineInputBorder(),
                             ),
                             validator: (v) => v == null || v.trim().isEmpty
-                                ? 'Nama singkat wajib diisi' : null,
+                                ? 'Nama singkat wajib diisi'
+                                : null,
                           ),
                           const SizedBox(height: 16),
 
@@ -219,7 +220,9 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
                               if (v == null || v.trim().isEmpty) {
                                 return 'Email wajib diisi';
                               }
-                              if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(v)) {
+                              if (!RegExp(
+                                r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                              ).hasMatch(v)) {
                                 return 'Format email tidak valid';
                               }
                               return null;
@@ -246,7 +249,8 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
                               border: OutlineInputBorder(),
                             ),
                             validator: (v) => v == null || v.trim().isEmpty
-                                ? 'Nomor CS wajib diisi' : null,
+                                ? 'Nomor CS wajib diisi'
+                                : null,
                           ),
                           const SizedBox(height: 32),
 
@@ -256,7 +260,9 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppColors.primary,
                                 foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(vertical: 16),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 16,
+                                ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(12),
                                 ),
@@ -264,14 +270,20 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
                               onPressed: provider.isSubmitting ? null : _save,
                               child: provider.isSubmitting
                                   ? const SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  valueColor: AlwaysStoppedAnimation(Colors.white),
-                                ),
-                              )
-                                  : Text(provider.company == null ? 'Buat Profil' : 'Perbarui Profil'),
+                                      width: 20,
+                                      height: 20,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2,
+                                        valueColor: AlwaysStoppedAnimation(
+                                          Colors.white,
+                                        ),
+                                      ),
+                                    )
+                                  : Text(
+                                      provider.company == null
+                                          ? 'Buat Profil'
+                                          : 'Perbarui Profil',
+                                    ),
                             ),
                           ),
                           const SizedBox(height: 24),
@@ -299,7 +311,8 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
         height: 100,
         fit: BoxFit.cover,
       );
-    } else if (provider.company?.logo != null && provider.company!.logo!.isNotEmpty) {
+    } else if (provider.company?.logo != null &&
+        provider.company!.logo!.isNotEmpty) {
       // Tampilkan logo existing dari server
       image = Image.network(
         provider.company!.logo!,
@@ -347,10 +360,7 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
 
     return Column(
       children: [
-        ClipRRect(
-          borderRadius: BorderRadius.circular(8),
-          child: image,
-        ),
+        ClipRRect(borderRadius: BorderRadius.circular(8), child: image),
         const SizedBox(height: 8),
         TextButton.icon(
           onPressed: _pickLogo,
