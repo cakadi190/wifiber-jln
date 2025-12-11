@@ -326,31 +326,32 @@ class CreateBill {
 }
 
 class UpdateBill {
-  final String paymentMethod;
+  final String? paymentMethod;
   final DateTime paymentAt;
   final File? paymentProof;
-  final String? paymentNote;
+  final String? additionalNote;
   final bool? openIsolir;
 
   UpdateBill({
-    required this.paymentMethod,
+    this.paymentMethod,
     required this.paymentAt,
     this.paymentProof,
-    this.paymentNote,
+    this.additionalNote,
     this.openIsolir,
   });
 
   factory UpdateBill.fromJson(Map<String, dynamic> json) => UpdateBill(
-    paymentMethod: json['payment_method'].toString(),
+    paymentMethod: json['payment_method']?.toString(),
     paymentAt: DateTime.parse(json['payment_at'].toString()),
     paymentProof: json['payment_proof'] != null
         ? File(json['payment_proof'].toString())
         : null,
-    paymentNote: json['payment_note']?.toString(),
+    additionalNote: json['additional_note']?.toString(),
     openIsolir:
         json['open_isolir'] == true ||
         json['open_isolir'] == 'true' ||
-        json['open_isolir'] == '1',
+        json['open_isolir'] == '1' ||
+        json['open_isolir'] == 'yes',
   );
 
   Map<String, String> toFormFields() {
@@ -364,10 +365,12 @@ class UpdateBill {
     }
 
     return {
-      'payment_method': paymentMethod,
+      if (paymentMethod != null && paymentMethod!.isNotEmpty)
+        'payment_method': paymentMethod!,
       'payment_at': formatPaymentAt(paymentAt),
-      if (paymentNote != null) 'payment_note': paymentNote!,
-      'open_isolir': openIsolir != null ? (openIsolir! ? 'yes' : 'no') : 'no',
+      if (additionalNote != null && additionalNote!.isNotEmpty)
+        'payment_note': additionalNote!,
+      'open_isolir': openIsolir != null && openIsolir == true ? 'yes' : 'no',
     };
   }
 
@@ -385,8 +388,8 @@ class UpdateBill {
       'payment_method': paymentMethod,
       'payment_at': formatPaymentAt(paymentAt),
       'payment_proof': paymentProof?.path,
-      'payment_note': paymentNote,
-      'open_isolir': openIsolir != null ? (openIsolir! ? 'yes' : 'no') : 'no',
+      'additional_note': additionalNote,
+      'open_isolir': openIsolir != null && openIsolir == true ? 'yes' : 'no',
     };
   }
 

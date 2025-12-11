@@ -26,10 +26,10 @@ class _BillsUpdateScreenState extends State<BillsUpdateScreen>
     with BackendValidationMixin {
   final _formKey = GlobalKey<FormState>();
   final _paymentMethodController = TextEditingController();
-  final _paymentNoteController = TextEditingController();
+  final _additionalNoteController = TextEditingController();
 
   final _paymentMethodFieldKey = GlobalKey();
-  final _paymentNoteFieldKey = GlobalKey();
+  final _additionalNoteFieldKey = GlobalKey();
 
   File? selectedPaymentProof;
   String? paymentProofFileName;
@@ -47,21 +47,23 @@ class _BillsUpdateScreenState extends State<BillsUpdateScreen>
   void initState() {
     super.initState();
     // Initialize form dengan data existing jika ada
-    if (widget.bill.paymentMethod != null) {
+    if (widget.bill.paymentMethod != null &&
+        widget.bill.paymentMethod!.isNotEmpty) {
       _paymentMethodController.text = widget.bill.paymentMethod!;
     }
     if (widget.bill.paymentAt != null) {
       _paymentAt = widget.bill.paymentAt!;
     }
-    if (widget.bill.additionalInfo != null) {
-      _paymentNoteController.text = widget.bill.additionalInfo!;
+    if (widget.bill.additionalInfo != null &&
+        widget.bill.additionalInfo!.isNotEmpty) {
+      _additionalNoteController.text = widget.bill.additionalInfo!;
     }
   }
 
   @override
   void dispose() {
     _paymentMethodController.dispose();
-    _paymentNoteController.dispose();
+    _additionalNoteController.dispose();
     super.dispose();
   }
 
@@ -191,7 +193,7 @@ class _BillsUpdateScreenState extends State<BillsUpdateScreen>
   void _scrollToFirstError(Map<String, dynamic> errors) {
     final fieldKeys = {
       'payment_method': _paymentMethodFieldKey,
-      'payment_note': _paymentNoteFieldKey,
+      'payment_at': _additionalNoteFieldKey,
     };
 
     for (final fieldName in errors.keys) {
@@ -231,14 +233,6 @@ class _BillsUpdateScreenState extends State<BillsUpdateScreen>
 
     clearBackendErrors();
 
-    if (_paymentMethodController.text.trim().isEmpty) {
-      SnackBars.error(
-        context,
-        "Metode pembayaran wajib diisi",
-      ).clearSnackBars();
-      return;
-    }
-
     setState(() {
       _isLoading = true;
     });
@@ -246,11 +240,13 @@ class _BillsUpdateScreenState extends State<BillsUpdateScreen>
     final billsProvider = context.read<BillsProvider>();
 
     final updateBill = UpdateBill(
-      paymentMethod: _paymentMethodController.text.trim(),
+      paymentMethod: _paymentMethodController.text.trim().isNotEmpty
+          ? _paymentMethodController.text.trim()
+          : null,
       paymentAt: _paymentAt,
       paymentProof: selectedPaymentProof,
-      paymentNote: _paymentNoteController.text.trim().isNotEmpty
-          ? _paymentNoteController.text.trim()
+      additionalNote: _additionalNoteController.text.trim().isNotEmpty
+          ? _additionalNoteController.text.trim()
           : null,
       openIsolir: _openIsolir,
     );
@@ -414,7 +410,7 @@ class _BillsUpdateScreenState extends State<BillsUpdateScreen>
                       const SizedBox(height: 24),
 
                       const Text(
-                        'Metode Pembayaran',
+                        'Metode Pembayaran (Opsional)',
                         style: TextStyle(
                           fontSize: 16,
                           fontWeight: FontWeight.w600,
@@ -463,10 +459,8 @@ class _BillsUpdateScreenState extends State<BillsUpdateScreen>
                           final backendError = validator('payment_method')(
                             value,
                           );
-                          if (backendError != null) return backendError;
-
-                          if (value == null || value.trim().isEmpty) {
-                            return 'Metode pembayaran wajib diisi';
+                          if (backendError != null) {
+                            return 'Metode pembayaran: $backendError';
                           }
                           return null;
                         },
@@ -639,8 +633,8 @@ class _BillsUpdateScreenState extends State<BillsUpdateScreen>
                       ),
                       const SizedBox(height: 8),
                       TextFormField(
-                        key: _paymentNoteFieldKey,
-                        controller: _paymentNoteController,
+                        key: _additionalNoteFieldKey,
+                        controller: _additionalNoteController,
                         enabled: !_isLoading,
                         maxLines: 3,
                         decoration: InputDecoration(
@@ -662,7 +656,6 @@ class _BillsUpdateScreenState extends State<BillsUpdateScreen>
                               ? Colors.grey.shade50
                               : Colors.grey.shade50,
                         ),
-                        validator: validator('payment_note'),
                       ),
 
                       const SizedBox(height: 24),
