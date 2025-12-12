@@ -503,106 +503,140 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
             ),
           ],
         ),
-        body: Container(
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(20),
-              topRight: Radius.circular(20),
-            ),
-          ),
-          child: Column(
-            children: [
-              Container(
-                padding: const EdgeInsets.all(16),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: TextField(
-                        controller: _searchController,
-                        decoration: InputDecoration(
-                          hintText: 'Cari pelanggan...',
-                          prefixIcon: const Icon(Icons.search),
-                          suffixIcon: _searchController.text.isNotEmpty
-                              ? IconButton(
-                                  onPressed: () {
-                                    _searchController.clear();
-                                    _onSearchChanged('');
-                                  },
-                                  icon: const Icon(Icons.clear),
-                                )
-                              : null,
-                          border: const OutlineInputBorder(),
-                        ),
-                        onChanged: _onSearchChanged,
-                      ),
-                    ),
-                    const SizedBox(width: 8),
-                    IconButton(
-                      onPressed: () {
-                        _showFilterDialog();
-                      },
-                      icon: const Icon(Icons.filter_list),
-                      tooltip: 'Filter',
-                      style: ButtonStyle(
-                        backgroundColor: WidgetStateProperty.all(
-                          Colors.grey.shade200,
-                        ),
-                      ),
-                    ),
-                  ],
-                ),
+        body: SafeArea(
+          child: Container(
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(20),
+                topRight: Radius.circular(20),
               ),
-              if (_selectedStatus != null ||
-                  _selectedAreaName != null ||
-                  _selectedRouterName != null)
+            ),
+            child: Column(
+              children: [
                 Container(
-                  width: double.infinity,
-                  margin: const EdgeInsets.symmetric(horizontal: 16),
-                  child: SingleChildScrollView(
-                    scrollDirection: Axis.horizontal,
-                    child: Row(
-                      children: [
-                        if (_selectedStatus != null)
-                          Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: Chip(
-                              labelPadding: const EdgeInsets.symmetric(
-                                horizontal: 12,
-                              ),
-                              padding: const EdgeInsets.symmetric(vertical: 0),
-                              label: Text(
-                                _getStatusDisplayName(
-                                  _selectedStatus.toString().split('.').last,
-                                ),
-                                style: const TextStyle(fontSize: 12),
-                              ),
-                              shape: RoundedRectangleBorder(
-                                side: const BorderSide(
-                                  color: Colors.grey,
-                                  width: 1,
-                                ),
-                                borderRadius: BorderRadius.circular(16),
-                              ),
-                              deleteIcon: const Icon(Icons.close, size: 16),
-                              materialTapTargetSize:
-                                  MaterialTapTargetSize.shrinkWrap,
-                              onDeleted: () {
-                                setState(() => _selectedStatus = null);
-                                _applyFilter();
-                              },
-                            ),
+                  padding: const EdgeInsets.all(16),
+                  child: Row(
+                    children: [
+                      Expanded(
+                        child: TextField(
+                          controller: _searchController,
+                          decoration: InputDecoration(
+                            hintText: 'Cari pelanggan...',
+                            prefixIcon: const Icon(Icons.search),
+                            suffixIcon: _searchController.text.isNotEmpty
+                                ? IconButton(
+                                    onPressed: () {
+                                      _searchController.clear();
+                                      _onSearchChanged('');
+                                    },
+                                    icon: const Icon(Icons.clear),
+                                  )
+                                : null,
+                            border: const OutlineInputBorder(),
                           ),
-                        if (_selectedAreaName != null)
-                          Padding(
-                            padding: const EdgeInsets.only(right: 8),
-                            child: Chip(
+                          onChanged: _onSearchChanged,
+                        ),
+                      ),
+                      const SizedBox(width: 8),
+                      IconButton(
+                        onPressed: () {
+                          _showFilterDialog();
+                        },
+                        icon: const Icon(Icons.filter_list),
+                        tooltip: 'Filter',
+                        style: ButtonStyle(
+                          backgroundColor: WidgetStateProperty.all(
+                            Colors.grey.shade200,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                if (_selectedStatus != null ||
+                    _selectedAreaName != null ||
+                    _selectedRouterName != null)
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.symmetric(horizontal: 16),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          if (_selectedStatus != null)
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: Chip(
+                                labelPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 0,
+                                ),
+                                label: Text(
+                                  _getStatusDisplayName(
+                                    _selectedStatus.toString().split('.').last,
+                                  ),
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  side: const BorderSide(
+                                    color: Colors.grey,
+                                    width: 1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                deleteIcon: const Icon(Icons.close, size: 16),
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                                onDeleted: () {
+                                  setState(() => _selectedStatus = null);
+                                  _applyFilter();
+                                },
+                              ),
+                            ),
+                          if (_selectedAreaName != null)
+                            Padding(
+                              padding: const EdgeInsets.only(right: 8),
+                              child: Chip(
+                                labelPadding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 0,
+                                ),
+                                label: Text(
+                                  _selectedAreaName!,
+                                  style: const TextStyle(fontSize: 12),
+                                ),
+                                shape: RoundedRectangleBorder(
+                                  side: const BorderSide(
+                                    color: Colors.grey,
+                                    width: 1,
+                                  ),
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                deleteIcon: const Icon(Icons.close, size: 16),
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                                onDeleted: () {
+                                  setState(() {
+                                    _selectedAreaId = null;
+                                    _selectedAreaName = null;
+                                  });
+                                  _applyFilter();
+                                },
+                              ),
+                            ),
+                          if (_selectedRouterName != null)
+                            Chip(
                               labelPadding: const EdgeInsets.symmetric(
                                 horizontal: 12,
                               ),
                               padding: const EdgeInsets.symmetric(vertical: 0),
                               label: Text(
-                                _selectedAreaName!,
+                                _selectedRouterName!,
                                 style: const TextStyle(fontSize: 12),
                               ),
                               shape: RoundedRectangleBorder(
@@ -617,169 +651,145 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                                   MaterialTapTargetSize.shrinkWrap,
                               onDeleted: () {
                                 setState(() {
-                                  _selectedAreaId = null;
-                                  _selectedAreaName = null;
+                                  _selectedRouterId = null;
+                                  _selectedRouterName = null;
                                 });
                                 _applyFilter();
                               },
                             ),
-                          ),
-                        if (_selectedRouterName != null)
-                          Chip(
-                            labelPadding: const EdgeInsets.symmetric(
-                              horizontal: 12,
-                            ),
-                            padding: const EdgeInsets.symmetric(vertical: 0),
-                            label: Text(
-                              _selectedRouterName!,
-                              style: const TextStyle(fontSize: 12),
-                            ),
-                            shape: RoundedRectangleBorder(
-                              side: const BorderSide(
-                                color: Colors.grey,
-                                width: 1,
-                              ),
-                              borderRadius: BorderRadius.circular(16),
-                            ),
-                            deleteIcon: const Icon(Icons.close, size: 16),
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
-                            onDeleted: () {
-                              setState(() {
-                                _selectedRouterId = null;
-                                _selectedRouterName = null;
-                              });
-                              _applyFilter();
-                            },
-                          ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
-                ),
-              Expanded(
-                child: Consumer<CustomerProvider>(
-                  builder: (context, provider, child) {
-                    if (provider.isLoading) {
-                      return const Center(child: CircularProgressIndicator());
-                    }
+                Expanded(
+                  child: Consumer<CustomerProvider>(
+                    builder: (context, provider, child) {
+                      if (provider.isLoading) {
+                        return const Center(child: CircularProgressIndicator());
+                      }
 
-                    if (provider.error != null) {
-                      return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.error,
-                              size: 64,
-                              color: Colors.red,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'Terjadi Kesalahan',
-                              style: Theme.of(context).textTheme.headlineSmall,
-                            ),
-                            const SizedBox(height: 8),
-                            Text(
-                              provider.error!,
-                              textAlign: TextAlign.center,
-                              style: const TextStyle(color: Colors.grey),
-                            ),
-                            const SizedBox(height: 16),
-                            ElevatedButton(
-                              onPressed: provider.refresh,
-                              child: const Text('Coba Lagi'),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-
-                    if (provider.customers.isEmpty) {
-                      return Center(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            const Icon(
-                              Icons.people,
-                              size: 64,
-                              color: Colors.grey,
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              'Tidak Ada Data Pelanggan',
-                              style: Theme.of(context).textTheme.headlineSmall,
-                            ),
-                            const SizedBox(height: 8),
-                            const Text(
-                              'Belum ada data pelanggan yang tersedia',
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          ],
-                        ),
-                      );
-                    }
-
-                    return RefreshIndicator(
-                      onRefresh: provider.refresh,
-                      child: ListView.builder(
-                        itemCount: provider.customers.length,
-                        itemBuilder: (context, index) {
-                          final customer = provider.customers[index];
-                          return Card(
-                            elevation: 0,
-                            margin: const EdgeInsets.all(0),
-                            child: ListTile(
-                              contentPadding: const EdgeInsets.symmetric(
-                                vertical: 8,
-                                horizontal: 16,
+                      if (provider.error != null) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.error,
+                                size: 64,
+                                color: Colors.red,
                               ),
-                              title: Row(
-                                children: [
-                                  Text(
-                                    customer.name,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                  const SizedBox(width: 8),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 8,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: _getStatusColor(customer.status),
-                                      borderRadius: BorderRadius.circular(12),
-                                    ),
-                                    child: Text(
-                                      _getStatusDisplayName(customer.status),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Terjadi Kesalahan',
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.headlineSmall,
+                              ),
+                              const SizedBox(height: 8),
+                              Text(
+                                provider.error!,
+                                textAlign: TextAlign.center,
+                                style: const TextStyle(color: Colors.grey),
+                              ),
+                              const SizedBox(height: 16),
+                              ElevatedButton(
+                                onPressed: provider.refresh,
+                                child: const Text('Coba Lagi'),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
+                      if (provider.customers.isEmpty) {
+                        return Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              const Icon(
+                                Icons.people,
+                                size: 64,
+                                color: Colors.grey,
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                'Tidak Ada Data Pelanggan',
+                                style: Theme.of(
+                                  context,
+                                ).textTheme.headlineSmall,
+                              ),
+                              const SizedBox(height: 8),
+                              const Text(
+                                'Belum ada data pelanggan yang tersedia',
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            ],
+                          ),
+                        );
+                      }
+
+                      return RefreshIndicator(
+                        onRefresh: provider.refresh,
+                        child: ListView.builder(
+                          itemCount: provider.customers.length,
+                          itemBuilder: (context, index) {
+                            final customer = provider.customers[index];
+                            return Card(
+                              elevation: 0,
+                              margin: const EdgeInsets.all(0),
+                              child: ListTile(
+                                contentPadding: const EdgeInsets.symmetric(
+                                  vertical: 8,
+                                  horizontal: 16,
+                                ),
+                                title: Row(
+                                  children: [
+                                    Text(
+                                      customer.name,
                                       style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                        fontWeight: FontWeight.w500,
+                                        fontWeight: FontWeight.bold,
                                       ),
                                     ),
-                                  ),
-                                ],
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: _getStatusColor(customer.status),
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Text(
+                                        _getStatusDisplayName(customer.status),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                subtitle: Text(
+                                  "${customer.phone} - ${customer.areaName}",
+                                ),
+                                trailing: IconButton(
+                                  icon: const Icon(Icons.more_vert),
+                                  onPressed: () => _showOptionsMenu(customer),
+                                ),
+                                onLongPress: () => _showOptionsMenu(customer),
+                                onTap: () => _showCustomerDetail(customer),
                               ),
-                              subtitle: Text(
-                                "${customer.phone} - ${customer.areaName}",
-                              ),
-                              trailing: IconButton(
-                                icon: const Icon(Icons.more_vert),
-                                onPressed: () => _showOptionsMenu(customer),
-                              ),
-                              onLongPress: () => _showOptionsMenu(customer),
-                              onTap: () => _showCustomerDetail(customer),
-                            ),
-                          );
-                        },
-                      ),
-                    );
-                  },
+                            );
+                          },
+                        ),
+                      );
+                    },
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
         floatingActionButton: PermissionWidget(

@@ -221,86 +221,88 @@ class _EditProfileScreenState extends State<EditProfileScreen>
                   ),
           ],
         ),
-        body: Container(
-          width: double.infinity,
-          decoration: const BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.only(
-              topLeft: Radius.circular(24),
-              topRight: Radius.circular(24),
+        body: SafeArea(
+          child: Container(
+            width: double.infinity,
+            decoration: const BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.only(
+                topLeft: Radius.circular(24),
+                topRight: Radius.circular(24),
+              ),
             ),
-          ),
-          child: Padding(
-            padding: const EdgeInsets.all(16.0),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Alert.opaque(
-                    fullWidth: true,
-                    child: const Text(
-                      "Mohon isi formulir di bawah ini dengan lengkap dan benar untuk memperbarui data profil Anda.",
-                      style: TextStyle(fontSize: 14),
-                    ),
-                  ),
-                  const SizedBox(height: 32),
-                  TextFormField(
-                    controller: _controller,
-                    enabled: !_isLoading,
-                    decoration: InputDecoration(
-                      labelText: widget.formLabel,
-                      border: const OutlineInputBorder(),
-                      prefixIcon: _getFieldIcon(widget.formName),
-                    ),
-                    validator: validator(widget.formName, (value) {
-                      if (value == null || value.isEmpty) {
-                        return 'Harap isi ${widget.formLabel.toLowerCase()}';
-                      }
-                      return null;
-                    }),
-                  ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: _isLoading
-                            ? Colors.grey
-                            : AppColors.primary,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: <Widget>[
+                    Alert.opaque(
+                      fullWidth: true,
+                      child: const Text(
+                        "Mohon isi formulir di bawah ini dengan lengkap dan benar untuk memperbarui data profil Anda.",
+                        style: TextStyle(fontSize: 14),
                       ),
-                      onPressed: _isLoading ? null : _submitProfile,
-                      child: _isLoading
-                          ? const Row(
-                              mainAxisAlignment: MainAxisAlignment.center,
-                              children: [
-                                SizedBox(
-                                  width: 20,
-                                  height: 20,
-                                  child: CircularProgressIndicator(
-                                    color: Colors.white,
-                                    strokeWidth: 2,
-                                  ),
-                                ),
-                                SizedBox(width: 8),
-                                Text('Menyimpan...'),
-                              ],
-                            )
-                          : Text(
-                              'Simpan ${widget.formLabel}',
-                              style: const TextStyle(
-                                fontSize: 16,
-                                fontWeight: FontWeight.w600,
-                              ),
-                            ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 32),
+                    TextFormField(
+                      controller: _controller,
+                      enabled: !_isLoading,
+                      decoration: InputDecoration(
+                        labelText: widget.formLabel,
+                        border: const OutlineInputBorder(),
+                        prefixIcon: _getFieldIcon(widget.formName),
+                      ),
+                      validator: validator(widget.formName, (value) {
+                        if (value == null || value.isEmpty) {
+                          return 'Harap isi ${widget.formLabel.toLowerCase()}';
+                        }
+                        return null;
+                      }),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: _isLoading
+                              ? Colors.grey
+                              : AppColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: _isLoading ? null : _submitProfile,
+                        child: _isLoading
+                            ? const Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      color: Colors.white,
+                                      strokeWidth: 2,
+                                    ),
+                                  ),
+                                  SizedBox(width: 8),
+                                  Text('Menyimpan...'),
+                                ],
+                              )
+                            : Text(
+                                'Simpan ${widget.formLabel}',
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),

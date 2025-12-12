@@ -156,136 +156,138 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
           return Column(
             children: [
               Expanded(
-                child: Container(
-                  width: double.infinity,
-                  padding: const EdgeInsets.all(16),
-                  decoration: const BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.only(
-                      topLeft: Radius.circular(20),
-                      topRight: Radius.circular(20),
+                child: SafeArea(
+                  child: Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(16),
+                    decoration: const BoxDecoration(
+                      color: Colors.white,
+                      borderRadius: BorderRadius.only(
+                        topLeft: Radius.circular(20),
+                        topRight: Radius.circular(20),
+                      ),
                     ),
-                  ),
-                  child: SingleChildScrollView(
-                    child: Form(
-                      key: _formKey,
-                      child: Column(
-                        children: [
-                          _buildLogoWidget(provider),
-                          const SizedBox(height: 24),
+                    child: SingleChildScrollView(
+                      child: Form(
+                        key: _formKey,
+                        child: Column(
+                          children: [
+                            _buildLogoWidget(provider),
+                            const SizedBox(height: 24),
 
-                          TextFormField(
-                            controller: _nameController,
-                            decoration: const InputDecoration(
-                              labelText: 'Nama Perusahaan',
-                              border: OutlineInputBorder(),
-                            ),
-                            validator: (v) => v == null || v.trim().isEmpty
-                                ? 'Nama perusahaan wajib diisi'
-                                : null,
-                          ),
-                          const SizedBox(height: 16),
-
-                          TextFormField(
-                            controller: _shortNameController,
-                            decoration: const InputDecoration(
-                              labelText: 'Nama Singkat',
-                              border: OutlineInputBorder(),
-                            ),
-                            validator: (v) => v == null || v.trim().isEmpty
-                                ? 'Nama singkat wajib diisi'
-                                : null,
-                          ),
-                          const SizedBox(height: 16),
-
-                          TextFormField(
-                            controller: _sloganController,
-                            decoration: const InputDecoration(
-                              labelText: 'Slogan',
-                              border: OutlineInputBorder(),
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-
-                          TextFormField(
-                            controller: _emailController,
-                            keyboardType: TextInputType.emailAddress,
-                            decoration: const InputDecoration(
-                              labelText: 'Email',
-                              border: OutlineInputBorder(),
-                            ),
-                            validator: (v) {
-                              if (v == null || v.trim().isEmpty) {
-                                return 'Email wajib diisi';
-                              }
-                              if (!RegExp(
-                                r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
-                              ).hasMatch(v)) {
-                                return 'Format email tidak valid';
-                              }
-                              return null;
-                            },
-                          ),
-                          const SizedBox(height: 16),
-
-                          TextFormField(
-                            controller: _addressController,
-                            maxLines: 3,
-                            decoration: const InputDecoration(
-                              labelText: 'Alamat',
-                              border: OutlineInputBorder(),
-                              alignLabelWithHint: true,
-                            ),
-                          ),
-                          const SizedBox(height: 16),
-
-                          TextFormField(
-                            controller: _csPhoneController,
-                            keyboardType: TextInputType.phone,
-                            decoration: const InputDecoration(
-                              labelText: 'Nomor CS',
-                              border: OutlineInputBorder(),
-                            ),
-                            validator: (v) => v == null || v.trim().isEmpty
-                                ? 'Nomor CS wajib diisi'
-                                : null,
-                          ),
-                          const SizedBox(height: 32),
-
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: AppColors.primary,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 16,
-                                ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
+                            TextFormField(
+                              controller: _nameController,
+                              decoration: const InputDecoration(
+                                labelText: 'Nama Perusahaan',
+                                border: OutlineInputBorder(),
                               ),
-                              onPressed: provider.isSubmitting ? null : _save,
-                              child: provider.isSubmitting
-                                  ? const SizedBox(
-                                      width: 20,
-                                      height: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor: AlwaysStoppedAnimation(
-                                          Colors.white,
-                                        ),
-                                      ),
-                                    )
-                                  : Text(
-                                      provider.company == null
-                                          ? 'Buat Profil'
-                                          : 'Perbarui Profil',
-                                    ),
+                              validator: (v) => v == null || v.trim().isEmpty
+                                  ? 'Nama perusahaan wajib diisi'
+                                  : null,
                             ),
-                          ),
-                          const SizedBox(height: 24),
-                        ],
+                            const SizedBox(height: 16),
+
+                            TextFormField(
+                              controller: _shortNameController,
+                              decoration: const InputDecoration(
+                                labelText: 'Nama Singkat',
+                                border: OutlineInputBorder(),
+                              ),
+                              validator: (v) => v == null || v.trim().isEmpty
+                                  ? 'Nama singkat wajib diisi'
+                                  : null,
+                            ),
+                            const SizedBox(height: 16),
+
+                            TextFormField(
+                              controller: _sloganController,
+                              decoration: const InputDecoration(
+                                labelText: 'Slogan',
+                                border: OutlineInputBorder(),
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+
+                            TextFormField(
+                              controller: _emailController,
+                              keyboardType: TextInputType.emailAddress,
+                              decoration: const InputDecoration(
+                                labelText: 'Email',
+                                border: OutlineInputBorder(),
+                              ),
+                              validator: (v) {
+                                if (v == null || v.trim().isEmpty) {
+                                  return 'Email wajib diisi';
+                                }
+                                if (!RegExp(
+                                  r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                                ).hasMatch(v)) {
+                                  return 'Format email tidak valid';
+                                }
+                                return null;
+                              },
+                            ),
+                            const SizedBox(height: 16),
+
+                            TextFormField(
+                              controller: _addressController,
+                              maxLines: 3,
+                              decoration: const InputDecoration(
+                                labelText: 'Alamat',
+                                border: OutlineInputBorder(),
+                                alignLabelWithHint: true,
+                              ),
+                            ),
+                            const SizedBox(height: 16),
+
+                            TextFormField(
+                              controller: _csPhoneController,
+                              keyboardType: TextInputType.phone,
+                              decoration: const InputDecoration(
+                                labelText: 'Nomor CS',
+                                border: OutlineInputBorder(),
+                              ),
+                              validator: (v) => v == null || v.trim().isEmpty
+                                  ? 'Nomor CS wajib diisi'
+                                  : null,
+                            ),
+                            const SizedBox(height: 32),
+
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: AppColors.primary,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                ),
+                                onPressed: provider.isSubmitting ? null : _save,
+                                child: provider.isSubmitting
+                                    ? const SizedBox(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor: AlwaysStoppedAnimation(
+                                            Colors.white,
+                                          ),
+                                        ),
+                                      )
+                                    : Text(
+                                        provider.company == null
+                                            ? 'Buat Profil'
+                                            : 'Perbarui Profil',
+                                      ),
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                          ],
+                        ),
                       ),
                     ),
                   ),

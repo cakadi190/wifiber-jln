@@ -126,113 +126,112 @@ class _EditComplaintScreenState extends State<EditComplaintScreen>
               IconButton(icon: const Icon(Icons.save), onPressed: _onSubmit),
             ],
           ),
-          body: Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(24),
-                topRight: Radius.circular(24),
+          body: SafeArea(
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(24),
+                  topRight: Radius.circular(24),
+                ),
               ),
-            ),
-            child: Column(
-              children: [
-                Expanded(
-                  child: Form(
-                    key: _formKey,
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(
-                        vertical: 20,
-                        horizontal: 16,
-                      ),
-                      child: Column(
-                        children: [
-                          TextFormField(
-                            controller: detailController,
-                            decoration: const InputDecoration(
-                              hintText:
-                                  'Masukkan detail pembaruan tindak lanjut',
-                              border: OutlineInputBorder(),
-                              labelText: 'Detail tindak lanjut',
-                              floatingLabelBehavior:
-                                  FloatingLabelBehavior.always,
-                            ),
-                            maxLines: 8,
-                            minLines: 3,
-                            keyboardType: TextInputType.multiline,
-                            enabled: !_isLoading,
-                            validator: validator(
-                              'detail',
-                              (value) {
+              child: Column(
+                children: [
+                  Expanded(
+                    child: Form(
+                      key: _formKey,
+                      child: SingleChildScrollView(
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 20,
+                          horizontal: 16,
+                        ),
+                        child: Column(
+                          children: [
+                            TextFormField(
+                              controller: detailController,
+                              decoration: const InputDecoration(
+                                hintText:
+                                    'Masukkan detail pembaruan tindak lanjut',
+                                border: OutlineInputBorder(),
+                                labelText: 'Detail tindak lanjut',
+                                floatingLabelBehavior:
+                                    FloatingLabelBehavior.always,
+                              ),
+                              maxLines: 8,
+                              minLines: 3,
+                              keyboardType: TextInputType.multiline,
+                              enabled: !_isLoading,
+                              validator: validator('detail', (value) {
                                 if (value == null || value.trim().isEmpty) {
                                   return 'Deskripsi pengaduan tidak boleh kosong';
                                 }
                                 return null;
-                              },
+                              }),
                             ),
-                          ),
 
-                          const SizedBox(height: 16),
+                            const SizedBox(height: 16),
 
-                          Row(
-                            children: [
-                              Checkbox(
-                                value: _isDone,
-                                onChanged: _isLoading ? null : _onChanged,
-                              ),
-                              const Expanded(
-                                child: Text(
-                                  'Tandai penanganannya sudah selesai',
-                                  style: TextStyle(fontSize: 16),
+                            Row(
+                              children: [
+                                Checkbox(
+                                  value: _isDone,
+                                  onChanged: _isLoading ? null : _onChanged,
                                 ),
-                              ),
-                            ],
-                          ),
-
-                          const SizedBox(height: 16),
-
-                          SizedBox(
-                            width: double.infinity,
-                            child: ElevatedButton(
-                              onPressed: _isLoading ? null : _onSubmit,
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: _isLoading
-                                    ? Colors.grey.shade400
-                                    : AppColors.primary,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 16,
+                                const Expanded(
+                                  child: Text(
+                                    'Tandai penanganannya sudah selesai',
+                                    style: TextStyle(fontSize: 16),
+                                  ),
                                 ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: _isLoading
-                                  ? const SizedBox(
-                                      height: 20,
-                                      width: 20,
-                                      child: CircularProgressIndicator(
-                                        strokeWidth: 2,
-                                        valueColor:
-                                            AlwaysStoppedAnimation<Color>(
-                                              Colors.white,
-                                            ),
-                                      ),
-                                    )
-                                  : const Text(
-                                      'Buat Pengaduan',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        fontWeight: FontWeight.w600,
-                                      ),
-                                    ),
+                              ],
                             ),
-                          ),
-                        ],
+
+                            const SizedBox(height: 16),
+
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                onPressed: _isLoading ? null : _onSubmit,
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: _isLoading
+                                      ? Colors.grey.shade400
+                                      : AppColors.primary,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 16,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                child: _isLoading
+                                    ? const SizedBox(
+                                        height: 20,
+                                        width: 20,
+                                        child: CircularProgressIndicator(
+                                          strokeWidth: 2,
+                                          valueColor:
+                                              AlwaysStoppedAnimation<Color>(
+                                                Colors.white,
+                                              ),
+                                        ),
+                                      )
+                                    : const Text(
+                                        'Buat Pengaduan',
+                                        style: TextStyle(
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         ),

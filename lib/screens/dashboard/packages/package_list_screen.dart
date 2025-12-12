@@ -50,48 +50,50 @@ class _PackageListScreenState extends State<PackageListScreen> {
               child: const Icon(Icons.add),
             ),
           ),
-          body: Container(
-            decoration: const BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.only(
-                topLeft: Radius.circular(20),
-                topRight: Radius.circular(20),
+          body: SafeArea(
+            child: Container(
+              decoration: const BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20),
+                  topRight: Radius.circular(20),
+                ),
               ),
-            ),
-            child: Consumer<PackageProvider>(
-              builder: (context, provider, child) {
-                if (provider.state == PackageState.loading) {
-                  return const Center(child: CircularProgressIndicator());
-                }
+              child: Consumer<PackageProvider>(
+                builder: (context, provider, child) {
+                  if (provider.state == PackageState.loading) {
+                    return const Center(child: CircularProgressIndicator());
+                  }
 
-                if (provider.state == PackageState.error) {
-                  return Center(child: Text(provider.error ?? 'Error'));
-                }
+                  if (provider.state == PackageState.error) {
+                    return Center(child: Text(provider.error ?? 'Error'));
+                  }
 
-                final packages = provider.packages;
-                if (packages.isEmpty) {
-                  return const Center(child: Text('Tidak ada data'));
-                }
+                  final packages = provider.packages;
+                  if (packages.isEmpty) {
+                    return const Center(child: Text('Tidak ada data'));
+                  }
 
-                return RefreshIndicator(
-                  onRefresh: () => provider.loadPackages(),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: ListView.builder(
-                      itemCount: packages.length,
-                      itemBuilder: (context, index) {
-                        final PackageModel package = packages[index];
-                        return _PackageListItem(
-                          package: package,
-                          onTap: () => _showPackageDetail(package),
-                          onLongPress: () => _showActionBottomSheet(package),
-                          onMoreTap: () => _showActionBottomSheet(package),
-                        );
-                      },
+                  return RefreshIndicator(
+                    onRefresh: () => provider.loadPackages(),
+                    child: Padding(
+                      padding: const EdgeInsets.all(8),
+                      child: ListView.builder(
+                        itemCount: packages.length,
+                        itemBuilder: (context, index) {
+                          final PackageModel package = packages[index];
+                          return _PackageListItem(
+                            package: package,
+                            onTap: () => _showPackageDetail(package),
+                            onLongPress: () => _showActionBottomSheet(package),
+                            onMoreTap: () => _showActionBottomSheet(package),
+                          );
+                        },
+                      ),
                     ),
-                  ),
-                );
-              },
+                  );
+                },
+              ),
             ),
           ),
         ),

@@ -40,96 +40,100 @@ class _PackageFormScreenState extends State<PackageFormScreen> {
     return Scaffold(
       backgroundColor: AppColors.primary,
       appBar: AppBar(title: Text(isEdit ? 'Edit Paket' : 'Tambah Paket')),
-      body: Container(
-        padding: EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
-        ),
-        child: SingleChildScrollView(
-          child: ConstrainedBox(
-            constraints: BoxConstraints(
-              minHeight: MediaQuery.of(context).size.height,
+      body: SafeArea(
+        child: Container(
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
             ),
-            child: Form(
-              key: _formKey,
-              child: Column(
-                children: [
-                  const SizedBox(height: 8),
-                  TextFormField(
-                    controller: _nameController,
-                    decoration: const InputDecoration(labelText: 'Nama'),
-                    validator: (v) =>
-                        v == null || v.isEmpty ? 'Nama wajib diisi' : null,
-                  ),
-                  const SizedBox(height: 24),
-                  TextFormField(
-                    controller: _descController,
-                    decoration: const InputDecoration(labelText: 'Deskripsi'),
-                  ),
-                  const SizedBox(height: 24),
-                  TextFormField(
-                    controller: _priceController,
-                    decoration: const InputDecoration(labelText: 'Harga'),
-                    keyboardType: TextInputType.number,
-                    validator: (v) =>
-                        v == null || v.isEmpty ? 'Harga wajib diisi' : null,
-                  ),
-                  const SizedBox(height: 24),
-                  TextFormField(
-                    controller: _ppnController,
-                    decoration: const InputDecoration(labelText: 'PPN %'),
-                    keyboardType: TextInputType.number,
-                    validator: (v) =>
-                        v == null || v.isEmpty ? 'PPN wajib diisi' : null,
-                  ),
-                  const SizedBox(height: 24),
-                  DropdownButtonFormField<String>(
-                    initialValue: _status,
-                    decoration: const InputDecoration(labelText: 'Status'),
-                    items: const [
-                      DropdownMenuItem(value: 'active', child: Text('Aktif')),
-                      DropdownMenuItem(
-                        value: 'inactive',
-                        child: Text('Tidak Aktif'),
-                      ),
-                    ],
-                    onChanged: (v) {
-                      setState(() {
-                        _status = v ?? 'active';
-                      });
-                    },
-                  ),
-                  const SizedBox(height: 32),
-
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      onPressed: _isSubmitting ? null : () => _save(context),
-                      child: _isSubmitting
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                valueColor: AlwaysStoppedAnimation(Colors.white),
-                              ),
-                            )
-                          : Text(isEdit ? 'Perbarui' : 'Simpan'),
+          ),
+          child: SingleChildScrollView(
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height,
+              ),
+              child: Form(
+                key: _formKey,
+                child: Column(
+                  children: [
+                    const SizedBox(height: 8),
+                    TextFormField(
+                      controller: _nameController,
+                      decoration: const InputDecoration(labelText: 'Nama'),
+                      validator: (v) =>
+                          v == null || v.isEmpty ? 'Nama wajib diisi' : null,
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 24),
+                    TextFormField(
+                      controller: _descController,
+                      decoration: const InputDecoration(labelText: 'Deskripsi'),
+                    ),
+                    const SizedBox(height: 24),
+                    TextFormField(
+                      controller: _priceController,
+                      decoration: const InputDecoration(labelText: 'Harga'),
+                      keyboardType: TextInputType.number,
+                      validator: (v) =>
+                          v == null || v.isEmpty ? 'Harga wajib diisi' : null,
+                    ),
+                    const SizedBox(height: 24),
+                    TextFormField(
+                      controller: _ppnController,
+                      decoration: const InputDecoration(labelText: 'PPN %'),
+                      keyboardType: TextInputType.number,
+                      validator: (v) =>
+                          v == null || v.isEmpty ? 'PPN wajib diisi' : null,
+                    ),
+                    const SizedBox(height: 24),
+                    DropdownButtonFormField<String>(
+                      initialValue: _status,
+                      decoration: const InputDecoration(labelText: 'Status'),
+                      items: const [
+                        DropdownMenuItem(value: 'active', child: Text('Aktif')),
+                        DropdownMenuItem(
+                          value: 'inactive',
+                          child: Text('Tidak Aktif'),
+                        ),
+                      ],
+                      onChanged: (v) {
+                        setState(() {
+                          _status = v ?? 'active';
+                        });
+                      },
+                    ),
+                    const SizedBox(height: 32),
+
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        onPressed: _isSubmitting ? null : () => _save(context),
+                        child: _isSubmitting
+                            ? const SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  valueColor: AlwaysStoppedAnimation(
+                                    Colors.white,
+                                  ),
+                                ),
+                              )
+                            : Text(isEdit ? 'Perbarui' : 'Simpan'),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
