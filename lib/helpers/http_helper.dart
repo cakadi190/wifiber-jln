@@ -1,9 +1,11 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+
 class HttpHelper {
   static const String host = "wifiber.web.id";
   static const String scheme = "https";
-  static const String apiPath = "/api/v1/";
+  static const String apiPath = "api/v1/";
 
   static Uri buildUri(String path, Map<String, dynamic>? parameters) {
     try {
@@ -53,6 +55,8 @@ class HttpHelper {
             ? queryParameters
             : null,
       );
+
+      debugPrint(uri.toString());
 
       return uri;
     } catch (e) {
