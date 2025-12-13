@@ -125,25 +125,39 @@ class RegistrantProvider extends SafeChangeNotifier {
         return false;
       }
 
-      final updatedRegistrant = await _registrantService.updateRegistrant(
+      final success = await _registrantService.updateRegistrant(
         id,
         registrantData,
       );
 
-      final index = _registrants.indexWhere(
-        (registrant) => registrant.id == id,
-      );
-      if (index != -1) {
-        _registrants[index] = updatedRegistrant;
-      }
+      if (success) {
+        try {
+          final updatedRegistrant = await _registrantService.getRegistrantById(
+            id,
+          );
 
-      if (_selectedRegistrant?.id == id) {
-        _selectedRegistrant = updatedRegistrant;
+          final index = _registrants.indexWhere(
+            (registrant) => registrant.id == id,
+          );
+          if (index != -1) {
+            _registrants[index] = updatedRegistrant;
+          }
+
+          if (_selectedRegistrant?.id == id) {
+            _selectedRegistrant = updatedRegistrant;
+          }
+        } catch (e) {
+          await loadRegistrants(
+            status: _currentStatus,
+            routerId: _currentRouterId,
+            areaId: _currentAreaId,
+          );
+        }
       }
 
       _error = null;
       notifyListeners();
-      return true;
+      return success;
     } on ValidationException catch (e) {
       _setError(e.message);
       _setLoading(false);

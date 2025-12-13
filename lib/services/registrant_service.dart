@@ -156,7 +156,7 @@ class RegistrantService {
     }
   }
 
-  Future<Registrant> updateRegistrant(
+  Future<bool> updateRegistrant(
     String id,
     Map<String, dynamic> registrantData,
   ) async {
@@ -224,15 +224,24 @@ class RegistrantService {
 
       if (statusCode == 200) {
         final jsonData = json.decode(responseBody);
-        if (jsonData['success'] == true) {
-          return Registrant.fromJson(jsonData['data']);
+
+        if (jsonData is Map<String, dynamic>) {
+          if (jsonData['success'] == true) {
+            return true;
+          } else {
+            throw Exception(
+              'Failed to update registrant: ${jsonData['message'] ?? 'Unknown error'}',
+            );
+          }
         } else {
-          throw Exception(
-            'Failed to update registrant: ${jsonData['message'] ?? 'Unknown error'}',
-          );
+          throw Exception('Invalid JSON response format');
         }
       } else {
-        throw Exception('Failed to update registrant: $statusCode');
+        final jsonData = json.decode(responseBody);
+        final message = jsonData is Map<String, dynamic>
+            ? (jsonData['message'] ?? 'Unknown error')
+            : 'Failed to update registrant: $statusCode';
+        throw Exception(message);
       }
     } on ValidationException {
       rethrow;
