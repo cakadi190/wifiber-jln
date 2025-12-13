@@ -192,7 +192,7 @@ class RegistrantService {
             .map((entry) => MapEntry(entry.key, entry.value.toString())),
       );
 
-      final streamedResponse = await _http.putUpload(
+      final streamedResponse = await _http.postUpload(
         '$path/$id',
         fields: fields,
         files: files,
