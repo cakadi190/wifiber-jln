@@ -81,10 +81,15 @@ class _TicketSummaryView extends StatelessWidget {
           leading: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: _getStatusColor(complaint.statusEnum).withValues(alpha: 0.1),
+              color: _getStatusColor(
+                complaint.statusEnum,
+              ).withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(8),
             ),
-            child: Icon(_getTypeIcon(complaint.statusEnum), color: _getStatusColor(complaint.statusEnum)),
+            child: Icon(
+              _getTypeIcon(complaint.statusEnum),
+              color: _getStatusColor(complaint.statusEnum),
+            ),
           ),
           trailing: Text(
             DateHelper.formatDate(complaint.date),
