@@ -154,6 +154,8 @@ class _BillsUpdateScreenState extends State<BillsUpdateScreen>
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (ctx) => SafeArea(
+        top: false,
+        bottom: true,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

@@ -104,6 +104,8 @@ class _AreaListScreenState extends State<AreaListScreen> {
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
       builder: (context) => SafeArea(
+        top: false,
+        bottom: true,
         child: Container(
           decoration: const BoxDecoration(
             color: Colors.white,
@@ -374,6 +376,8 @@ class _AreaListScreenState extends State<AreaListScreen> {
       context: context,
       backgroundColor: Colors.transparent,
       builder: (context) => SafeArea(
+        top: false,
+        bottom: true,
         child: Container(
           decoration: const BoxDecoration(
             color: Colors.white,

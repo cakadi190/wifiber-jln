@@ -122,8 +122,10 @@ class _OdpButtonSelectorState extends State<OdpButtonSelector> {
       backgroundColor: Colors.transparent,
       enableDrag: true,
       isDismissible: true,
-      builder: (ctx) {
-        return DraggableScrollableSheet(
+      builder: (ctx) => SafeArea(
+        top: false,
+        bottom: true,
+        child: DraggableScrollableSheet(
           initialChildSize: 0.6,
           minChildSize: 0.3,
           maxChildSize: 0.9,
@@ -187,8 +189,8 @@ class _OdpButtonSelectorState extends State<OdpButtonSelector> {
               ),
             );
           },
-        );
-      },
+        ),
+      ),
     );
   }
 

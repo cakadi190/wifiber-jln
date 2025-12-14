@@ -477,8 +477,10 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) {
-        return Container(
+      builder: (context) => SafeArea(
+        top: false,
+        bottom: true,
+        child: Container(
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -525,8 +527,8 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
               const SizedBox(height: 16),
             ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -741,78 +743,82 @@ class _ComplaintsTabState extends State<ComplaintsTab> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (modalContext) => DraggableScrollableSheet(
-        initialChildSize: 0.9,
-        minChildSize: 0.2,
-        maxChildSize: 1.0,
-        expand: false,
-        builder: (context, scrollController) {
-          return Padding(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom,
-              left: 16,
-              right: 16,
-              top: 16,
-            ),
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              controller: scrollController,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  _buildModalHandle(),
-                  const SizedBox(height: 8),
-                  _buildDetailRow(
-                    context,
-                    'Nomor Pengaduan',
-                    '#${complaint.number.toString()}',
-                    Icons.tag,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildDetailRow(
-                    context,
-                    'Nama Pelanggan',
-                    complaint.name ?? "Anonim",
-                    Icons.subject,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildDetailRow(
-                    context,
-                    'Deskripsi',
-                    complaint.topic,
-                    Icons.topic,
-                  ),
-                  const SizedBox(height: 16),
-                  _buildDetailRow(
-                    context,
-                    'Status',
-                    _getStatusText(complaint.statusEnum),
-                    Icons.info_outline,
-                    color: _getStatusColor(complaint.statusEnum),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildDetailRow(
-                    context,
-                    'Tipe',
-                    _getTypeText(complaint.typeEnum),
-                    _getTypeIcon(complaint.statusEnum),
-                  ),
-                  const SizedBox(height: 16),
-                  _buildDetailRow(
-                    context,
-                    'Tanggal',
-                    DateHelper.formatDate(complaint.date, format: 'full'),
-                    Icons.calendar_month,
-                  ),
-                  const SizedBox(height: 32),
-                  _buildDetailModalActions(modalContext, complaint),
-                  const SizedBox(height: 16),
-                ],
+      builder: (modalContext) => SafeArea(
+        top: false,
+        bottom: true,
+        child: DraggableScrollableSheet(
+          initialChildSize: 0.9,
+          minChildSize: 0.2,
+          maxChildSize: 1.0,
+          expand: false,
+          builder: (context, scrollController) {
+            return Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+                left: 16,
+                right: 16,
+                top: 16,
               ),
-            ),
-          );
-        },
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                controller: scrollController,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _buildModalHandle(),
+                    const SizedBox(height: 8),
+                    _buildDetailRow(
+                      context,
+                      'Nomor Pengaduan',
+                      '#${complaint.number.toString()}',
+                      Icons.tag,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildDetailRow(
+                      context,
+                      'Nama Pelanggan',
+                      complaint.name ?? "Anonim",
+                      Icons.subject,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildDetailRow(
+                      context,
+                      'Deskripsi',
+                      complaint.topic,
+                      Icons.topic,
+                    ),
+                    const SizedBox(height: 16),
+                    _buildDetailRow(
+                      context,
+                      'Status',
+                      _getStatusText(complaint.statusEnum),
+                      Icons.info_outline,
+                      color: _getStatusColor(complaint.statusEnum),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildDetailRow(
+                      context,
+                      'Tipe',
+                      _getTypeText(complaint.typeEnum),
+                      _getTypeIcon(complaint.statusEnum),
+                    ),
+                    const SizedBox(height: 16),
+                    _buildDetailRow(
+                      context,
+                      'Tanggal',
+                      DateHelper.formatDate(complaint.date, format: 'full'),
+                      Icons.calendar_month,
+                    ),
+                    const SizedBox(height: 32),
+                    _buildDetailModalActions(modalContext, complaint),
+                    const SizedBox(height: 16),
+                  ],
+                ),
+              ),
+            );
+          },
+        ),
       ),
     );
   }

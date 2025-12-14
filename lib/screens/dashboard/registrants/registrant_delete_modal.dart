@@ -8,7 +8,10 @@ class RegistrantDeleteModal {
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => _RegistrantDeleteContent(registrant: registrant),
+      builder: (context) => SafeArea(
+        top: false,
+        child: _RegistrantDeleteContent(registrant: registrant),
+      ),
     );
   }
 }

@@ -566,28 +566,32 @@ class _BillsScreenState extends State<BillsScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (modalContext) {
-        return FractionallySizedBox(
-          widthFactor: 1,
-          child: Padding(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(modalContext).viewInsets.bottom,
-              left: 16,
-              right: 16,
-              top: 16,
-            ),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                const SizedBox(height: 16),
-                const CircularProgressIndicator(semanticsLabel: 'Loading...'),
-                const SizedBox(height: 16),
-                const Text(
-                  'Loading...',
-                  style: TextStyle(fontSize: 16),
-                  textAlign: TextAlign.center,
-                ),
-                const SizedBox(height: 24),
-              ],
+        return SafeArea(
+          top: false,
+          bottom: true,
+          child: FractionallySizedBox(
+            widthFactor: 1,
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(modalContext).viewInsets.bottom,
+                left: 16,
+                right: 16,
+                top: 16,
+              ),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const SizedBox(height: 16),
+                  const CircularProgressIndicator(semanticsLabel: 'Loading...'),
+                  const SizedBox(height: 16),
+                  const Text(
+                    'Loading...',
+                    style: TextStyle(fontSize: 16),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 24),
+                ],
+              ),
             ),
           ),
         );
@@ -610,52 +614,56 @@ class _BillsScreenState extends State<BillsScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (modalContext) {
-        return FractionallySizedBox(
-          widthFactor: 1,
-          child: Padding(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(modalContext).viewInsets.bottom,
-              left: 16,
-              right: 16,
-              top: 16,
-            ),
-            child: SingleChildScrollView(
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  _getIconByType(type),
-                  const SizedBox(height: 16),
-                  Text(
-                    _getTitleByType(type),
-                    style: const TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    message,
-                    style: const TextStyle(fontSize: 16),
-                    textAlign: TextAlign.center,
-                  ),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: AppColors.primary,
-                        foregroundColor: Colors.white,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
+        return SafeArea(
+          top: false,
+          bottom: true,
+          child: FractionallySizedBox(
+            widthFactor: 1,
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(modalContext).viewInsets.bottom,
+                left: 16,
+                right: 16,
+                top: 16,
+              ),
+              child: SingleChildScrollView(
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _getIconByType(type),
+                    const SizedBox(height: 16),
+                    Text(
+                      _getTitleByType(type),
+                      style: const TextStyle(
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
                       ),
-                      onPressed: () => Navigator.pop(modalContext),
-                      child: const Text('Tutup'),
+                      textAlign: TextAlign.center,
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 8),
+                    Text(
+                      message,
+                      style: const TextStyle(fontSize: 16),
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 24),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: AppColors.primary,
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                        ),
+                        onPressed: () => Navigator.pop(modalContext),
+                        child: const Text('Tutup'),
+                      ),
+                    ),
+                  ],
+                ),
               ),
             ),
           ),
@@ -740,6 +748,8 @@ class _BillsScreenState extends State<BillsScreen> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (modalContext) => SafeArea(
+        top: false,
+        bottom: true,
         child: Padding(
           padding: EdgeInsets.only(
             bottom: MediaQuery.of(context).viewInsets.bottom,
@@ -819,221 +829,228 @@ class _BillsScreenState extends State<BillsScreen> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (modalContext) => DraggableScrollableSheet(
-        initialChildSize: 0.9,
-        minChildSize: 0.2,
-        maxChildSize: 1.0,
-        expand: false,
-        builder: (context, scrollController) => SafeArea(
-          child: Padding(
-            padding: EdgeInsets.only(
-              bottom: MediaQuery.of(context).viewInsets.bottom,
-              left: 16,
-              right: 16,
-              top: 16,
-            ),
-            child: SingleChildScrollView(
-              physics: const BouncingScrollPhysics(),
-              controller: scrollController,
-              child: Column(
-                mainAxisSize: MainAxisSize.min,
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  _buildModalHandle(),
-                  const SizedBox(height: 8),
-
-                  _buildSectionTitle(context, 'Informasi Pelanggan'),
-                  const SizedBox(height: 12),
-                  _buildDetailRow(
-                    context,
-                    'Nama Pelanggan',
-                    bill.name,
-                    Icons.person,
-                  ),
-                  if (bill.nickname != null) ...[
+      builder: (modalContext) => SafeArea(
+        top: false,
+        bottom: true,
+        child: DraggableScrollableSheet(
+          initialChildSize: 0.9,
+          minChildSize: 0.2,
+          maxChildSize: 1.0,
+          expand: false,
+          builder: (context, scrollController) => SafeArea(
+            child: Padding(
+              padding: EdgeInsets.only(
+                bottom: MediaQuery.of(context).viewInsets.bottom,
+                left: 16,
+                right: 16,
+                top: 16,
+              ),
+              child: SingleChildScrollView(
+                physics: const BouncingScrollPhysics(),
+                controller: scrollController,
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    _buildModalHandle(),
                     const SizedBox(height: 8),
-                    _buildDetailRow(
-                      context,
-                      'Nama Panggilan',
-                      bill.nickname!,
-                      Icons.badge,
-                    ),
-                  ],
-                  if (bill.address != null) ...[
-                    const SizedBox(height: 8),
-                    _buildDetailRow(
-                      context,
-                      'Alamat',
-                      bill.address!,
-                      Icons.location_on,
-                    ),
-                  ],
-                  if (bill.phone != null) ...[
-                    const SizedBox(height: 8),
-                    _buildDetailRow(
-                      context,
-                      'Nomor Telepon',
-                      bill.phone!,
-                      Icons.phone,
-                    ),
-                  ],
 
-                  const SizedBox(height: 20),
-
-                  _buildSectionTitle(context, 'Informasi Tagihan'),
-                  const SizedBox(height: 12),
-                  _buildDetailRow(
-                    context,
-                    'Tagihan',
-                    bill.invoice,
-                    Icons.receipt,
-                  ),
-                  const SizedBox(height: 8),
-                  _buildDetailRow(
-                    context,
-                    'Periode',
-                    bill.period,
-                    Icons.calendar_month,
-                  ),
-                  const SizedBox(height: 8),
-                  _buildDetailRow(
-                    context,
-                    'Paket',
-                    bill.packageName,
-                    Icons.wifi,
-                  ),
-                  const SizedBox(height: 8),
-                  _buildDetailRow(
-                    context,
-                    'Status',
-                    bill.status.displayName,
-                    bill.isPaid ? Icons.check_circle : Icons.pending,
-                    color: bill.isPaid ? Colors.green : Colors.orange,
-                  ),
-                  const SizedBox(height: 8),
-                  _buildDetailRow(
-                    context,
-                    'Jatuh Tempo',
-                    DateHelper.formatDate(bill.dueDate, format: 'long'),
-                    Icons.schedule,
-                    color: bill.isOverdue ? Colors.red : null,
-                  ),
-
-                  const SizedBox(height: 20),
-
-                  _buildSectionTitle(context, 'Rincian Pembayaran'),
-                  const SizedBox(height: 12),
-                  _buildDetailRow(
-                    context,
-                    'Harga Dasar',
-                    _formatCurrency(bill.basePrice),
-                    Icons.money,
-                  ),
-                  const SizedBox(height: 8),
-                  _buildDetailRow(
-                    context,
-                    'Pajak',
-                    _formatCurrency(bill.tax),
-                    Icons.receipt_long,
-                  ),
-                  if (bill.discount != null && bill.discount! > 0) ...[
-                    const SizedBox(height: 8),
-                    _buildDetailRow(
-                      context,
-                      'Diskon',
-                      '-${_formatCurrency(bill.discount ?? 0)}',
-                      Icons.discount,
-                      color: Colors.green,
-                    ),
-                  ],
-                  const SizedBox(height: 8),
-                  _buildDetailRow(
-                    context,
-                    'Total Tagihan',
-                    _formatCurrency(bill.totalAmount),
-                    Icons.account_balance_wallet,
-                    color: AppColors.primary,
-                  ),
-
-                  if (bill.isPaid) ...[
-                    const SizedBox(height: 20),
-                    _buildSectionTitle(context, 'Detail Pembayaran'),
+                    _buildSectionTitle(context, 'Informasi Pelanggan'),
                     const SizedBox(height: 12),
-                    if (bill.paymentAt != null)
+                    _buildDetailRow(
+                      context,
+                      'Nama Pelanggan',
+                      bill.name,
+                      Icons.person,
+                    ),
+                    if (bill.nickname != null) ...[
+                      const SizedBox(height: 8),
                       _buildDetailRow(
                         context,
-                        'Tanggal Pembayaran',
-                        DateHelper.formatDate(bill.paymentAt!, format: 'long'),
-                        Icons.event_available,
+                        'Nama Panggilan',
+                        bill.nickname!,
+                        Icons.badge,
+                      ),
+                    ],
+                    if (bill.address != null) ...[
+                      const SizedBox(height: 8),
+                      _buildDetailRow(
+                        context,
+                        'Alamat',
+                        bill.address!,
+                        Icons.location_on,
+                      ),
+                    ],
+                    if (bill.phone != null) ...[
+                      const SizedBox(height: 8),
+                      _buildDetailRow(
+                        context,
+                        'Nomor Telepon',
+                        bill.phone!,
+                        Icons.phone,
+                      ),
+                    ],
+
+                    const SizedBox(height: 20),
+
+                    _buildSectionTitle(context, 'Informasi Tagihan'),
+                    const SizedBox(height: 12),
+                    _buildDetailRow(
+                      context,
+                      'Tagihan',
+                      bill.invoice,
+                      Icons.receipt,
+                    ),
+                    const SizedBox(height: 8),
+                    _buildDetailRow(
+                      context,
+                      'Periode',
+                      bill.period,
+                      Icons.calendar_month,
+                    ),
+                    const SizedBox(height: 8),
+                    _buildDetailRow(
+                      context,
+                      'Paket',
+                      bill.packageName,
+                      Icons.wifi,
+                    ),
+                    const SizedBox(height: 8),
+                    _buildDetailRow(
+                      context,
+                      'Status',
+                      bill.status.displayName,
+                      bill.isPaid ? Icons.check_circle : Icons.pending,
+                      color: bill.isPaid ? Colors.green : Colors.orange,
+                    ),
+                    const SizedBox(height: 8),
+                    _buildDetailRow(
+                      context,
+                      'Jatuh Tempo',
+                      DateHelper.formatDate(bill.dueDate, format: 'long'),
+                      Icons.schedule,
+                      color: bill.isOverdue ? Colors.red : null,
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    _buildSectionTitle(context, 'Rincian Pembayaran'),
+                    const SizedBox(height: 12),
+                    _buildDetailRow(
+                      context,
+                      'Harga Dasar',
+                      _formatCurrency(bill.basePrice),
+                      Icons.money,
+                    ),
+                    const SizedBox(height: 8),
+                    _buildDetailRow(
+                      context,
+                      'Pajak',
+                      _formatCurrency(bill.tax),
+                      Icons.receipt_long,
+                    ),
+                    if (bill.discount != null && bill.discount! > 0) ...[
+                      const SizedBox(height: 8),
+                      _buildDetailRow(
+                        context,
+                        'Diskon',
+                        '-${_formatCurrency(bill.discount ?? 0)}',
+                        Icons.discount,
                         color: Colors.green,
                       ),
-                    if (bill.paymentMethod != null) ...[
-                      const SizedBox(height: 8),
-                      _buildDetailRow(
-                        context,
-                        'Metode Pembayaran',
-                        bill.paymentMethod!,
-                        Icons.payment,
-                      ),
                     ],
-                    if (bill.paymentReceivedBy != null) ...[
-                      const SizedBox(height: 8),
-                      _buildDetailRow(
-                        context,
-                        'Diterima Oleh',
-                        bill.paymentReceivedBy!,
-                        Icons.person,
-                      ),
-                    ],
-                  ],
-
-                  if (bill.ppoeSecret != null || bill.routerId != null) ...[
-                    const SizedBox(height: 20),
-                    _buildSectionTitle(context, 'Informasi Teknis'),
-                    const SizedBox(height: 12),
-                    if (bill.ppoeSecret != null)
-                      _buildDetailRow(
-                        context,
-                        'PPPoE Secret',
-                        bill.ppoeSecret!,
-                        Icons.vpn_key,
-                      ),
-                    if (bill.routerId != null) ...[
-                      const SizedBox(height: 8),
-                      _buildDetailRow(
-                        context,
-                        'Router ID',
-                        bill.routerId.toString(),
-                        Icons.router,
-                      ),
-                    ],
-                  ],
-
-                  if (bill.additionalInfo != null) ...[
-                    const SizedBox(height: 20),
-                    _buildSectionTitle(context, 'Informasi Tambahan'),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 8),
                     _buildDetailRow(
                       context,
-                      'Catatan',
-                      bill.additionalInfo!,
-                      Icons.note,
+                      'Total Tagihan',
+                      _formatCurrency(bill.totalAmount),
+                      Icons.account_balance_wallet,
+                      color: AppColors.primary,
                     ),
-                  ],
 
-                  if (bill.locationPhoto != null) ...[
+                    if (bill.isPaid) ...[
+                      const SizedBox(height: 20),
+                      _buildSectionTitle(context, 'Detail Pembayaran'),
+                      const SizedBox(height: 12),
+                      if (bill.paymentAt != null)
+                        _buildDetailRow(
+                          context,
+                          'Tanggal Pembayaran',
+                          DateHelper.formatDate(
+                            bill.paymentAt!,
+                            format: 'long',
+                          ),
+                          Icons.event_available,
+                          color: Colors.green,
+                        ),
+                      if (bill.paymentMethod != null) ...[
+                        const SizedBox(height: 8),
+                        _buildDetailRow(
+                          context,
+                          'Metode Pembayaran',
+                          bill.paymentMethod!,
+                          Icons.payment,
+                        ),
+                      ],
+                      if (bill.paymentReceivedBy != null) ...[
+                        const SizedBox(height: 8),
+                        _buildDetailRow(
+                          context,
+                          'Diterima Oleh',
+                          bill.paymentReceivedBy!,
+                          Icons.person,
+                        ),
+                      ],
+                    ],
+
+                    if (bill.ppoeSecret != null || bill.routerId != null) ...[
+                      const SizedBox(height: 20),
+                      _buildSectionTitle(context, 'Informasi Teknis'),
+                      const SizedBox(height: 12),
+                      if (bill.ppoeSecret != null)
+                        _buildDetailRow(
+                          context,
+                          'PPPoE Secret',
+                          bill.ppoeSecret!,
+                          Icons.vpn_key,
+                        ),
+                      if (bill.routerId != null) ...[
+                        const SizedBox(height: 8),
+                        _buildDetailRow(
+                          context,
+                          'Router ID',
+                          bill.routerId.toString(),
+                          Icons.router,
+                        ),
+                      ],
+                    ],
+
+                    if (bill.additionalInfo != null) ...[
+                      const SizedBox(height: 20),
+                      _buildSectionTitle(context, 'Informasi Tambahan'),
+                      const SizedBox(height: 12),
+                      _buildDetailRow(
+                        context,
+                        'Catatan',
+                        bill.additionalInfo!,
+                        Icons.note,
+                      ),
+                    ],
+
+                    if (bill.locationPhoto != null) ...[
+                      const SizedBox(height: 20),
+                      _buildSectionTitle(context, 'Foto Lokasi'),
+                      const SizedBox(height: 12),
+                      _buildLocationPhoto(context, bill.locationPhoto!),
+                    ],
+
                     const SizedBox(height: 20),
-                    _buildSectionTitle(context, 'Foto Lokasi'),
-                    const SizedBox(height: 12),
-                    _buildLocationPhoto(context, bill.locationPhoto!),
+
+                    _buildActionButtons(context, bill),
+
+                    const SizedBox(height: 20),
                   ],
-
-                  const SizedBox(height: 20),
-
-                  _buildActionButtons(context, bill),
-
-                  const SizedBox(height: 20),
-                ],
+                ),
               ),
             ),
           ),

@@ -8,7 +8,10 @@ class EmployeeDeleteModal {
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => _EmployeeDeleteContent(employee: employee),
+      builder: (context) => SafeArea(
+        top: false,
+        child: _EmployeeDeleteContent(employee: employee),
+      ),
     );
   }
 }
@@ -34,8 +37,7 @@ class _EmployeeDeleteContent extends StatelessWidget {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content:
-              Text(provider.error ?? 'Gagal menghapus karyawan'),
+          content: Text(provider.error ?? 'Gagal menghapus karyawan'),
           backgroundColor: Colors.red,
         ),
       );

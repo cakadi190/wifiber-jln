@@ -32,9 +32,11 @@ Future<T?> showOptionModalBottomSheet<T>({
   return showModalBottomSheet<T>(
     context: context,
     backgroundColor: Colors.transparent,
-    builder: (context) {
-      return _OptionModalContent(header: header, items: items);
-    },
+    builder: (context) => SafeArea(
+      top: false,
+      bottom: true,
+      child: _OptionModalContent(header: header, items: items),
+    ),
   );
 }
 

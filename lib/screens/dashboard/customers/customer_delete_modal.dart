@@ -8,7 +8,11 @@ class CustomerDeleteModal {
     showModalBottomSheet<void>(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => _CustomerDeleteContent(customer: customer),
+      builder: (context) => SafeArea(
+        top: false,
+        bottom: true,
+        child: _CustomerDeleteContent(customer: customer),
+      ),
     );
   }
 }

@@ -106,6 +106,7 @@ class _TransactionFormScreenState extends State<TransactionFormScreen>
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (_) => SafeArea(
+        top: false,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

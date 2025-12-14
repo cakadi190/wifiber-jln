@@ -120,6 +120,7 @@ class _RegistrantListScreenState extends State<RegistrantListScreen> {
     showModalBottomSheet<void>(
       context: context,
       builder: (context) => SafeArea(
+        top: false,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [

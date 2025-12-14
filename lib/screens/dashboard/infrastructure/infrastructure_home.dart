@@ -736,49 +736,52 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
       builder: (BuildContext context) {
-        return DraggableScrollableSheet(
-          initialChildSize: 0.7,
-          minChildSize: 0.5,
-          maxChildSize: 0.95,
-          expand: false,
-          builder: (context, scrollController) {
-            return Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ListView(
-                controller: scrollController,
-                children: [
-                  _buildInfoSection(infrastructureItem, type),
-                  if (infrastructureItem.hasValidCoordinates()) ...[
-                    const SizedBox(height: 16),
-                    _buildMapSection(infrastructureItem),
-                  ],
+        return SafeArea(
+          top: false,
+          child: DraggableScrollableSheet(
+            initialChildSize: 0.7,
+            minChildSize: 0.5,
+            maxChildSize: 0.95,
+            expand: false,
+            builder: (context, scrollController) {
+              return Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: ListView(
+                  controller: scrollController,
+                  children: [
+                    _buildInfoSection(infrastructureItem, type),
+                    if (infrastructureItem.hasValidCoordinates()) ...[
+                      const SizedBox(height: 16),
+                      _buildMapSection(infrastructureItem),
+                    ],
 
-                  if (type == InfrastructureType.olt &&
-                      infrastructureItem.id != null) ...[
-                    const SizedBox(height: 16),
-                    _buildRelatedOdcSection(infrastructureItem.id!),
-                  ],
+                    if (type == InfrastructureType.olt &&
+                        infrastructureItem.id != null) ...[
+                      const SizedBox(height: 16),
+                      _buildRelatedOdcSection(infrastructureItem.id!),
+                    ],
 
-                  if (type == InfrastructureType.odc &&
-                      infrastructureItem.id != null) ...[
-                    const SizedBox(height: 16),
-                    _buildRelatedOdpSection(infrastructureItem.id!),
-                  ],
+                    if (type == InfrastructureType.odc &&
+                        infrastructureItem.id != null) ...[
+                      const SizedBox(height: 16),
+                      _buildRelatedOdpSection(infrastructureItem.id!),
+                    ],
 
-                  if (type == InfrastructureType.odp &&
-                      infrastructureItem.id != null) ...[
-                    const SizedBox(height: 16),
-                    _buildRelatedCustomersSection(infrastructureItem.id!),
-                  ],
+                    if (type == InfrastructureType.odp &&
+                        infrastructureItem.id != null) ...[
+                      const SizedBox(height: 16),
+                      _buildRelatedCustomersSection(infrastructureItem.id!),
+                    ],
 
-                  if (infrastructureItem.hasValidCoordinates()) ...[
-                    const SizedBox(height: 16),
-                    _buildActionButtons(infrastructureItem),
+                    if (infrastructureItem.hasValidCoordinates()) ...[
+                      const SizedBox(height: 16),
+                      _buildActionButtons(infrastructureItem),
+                    ],
                   ],
-                ],
-              ),
-            );
-          },
+                ),
+              );
+            },
+          ),
         );
       },
     );
@@ -1495,8 +1498,9 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (BuildContext context) {
-        return DraggableScrollableSheet(
+      builder: (BuildContext context) => SafeArea(
+        top: false,
+        child: DraggableScrollableSheet(
           initialChildSize: 0.8,
           minChildSize: 0.5,
           maxChildSize: 0.95,
@@ -1683,8 +1687,8 @@ class _InfrastructureHomeState extends State<InfrastructureHome> {
               ),
             );
           },
-        );
-      },
+        ),
+      ),
     );
   }
 

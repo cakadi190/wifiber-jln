@@ -230,57 +230,61 @@ class RegistrantController {
   void showStatusFilter() {
     showModalBottomSheet(
       context: context,
-      builder: (context) => Container(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            const Text(
-              'Filter Status',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 16),
-            ListTile(
-              leading: const Icon(Icons.all_inclusive),
-              title: const Text('Semua'),
-              onTap: () {
-                Navigator.pop(context);
-                getAllRegistrants();
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.person),
-              title: const Text('Registrant'),
-              onTap: () {
-                Navigator.pop(context);
-                getAllRegistrants(status: RegistrantStatus.registrant);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.person_off),
-              title: const Text('Inactive'),
-              onTap: () {
-                Navigator.pop(context);
-                getAllRegistrants(status: RegistrantStatus.inactive);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.free_breakfast),
-              title: const Text('Free'),
-              onTap: () {
-                Navigator.pop(context);
-                getAllRegistrants(status: RegistrantStatus.free);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.block),
-              title: const Text('Isolir'),
-              onTap: () {
-                Navigator.pop(context);
-                getAllRegistrants(status: RegistrantStatus.isolir);
-              },
-            ),
-          ],
+      builder: (context) => SafeArea(
+        top: false,
+        bottom: true,
+        child: Container(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const Text(
+                'Filter Status',
+                style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+              ListTile(
+                leading: const Icon(Icons.all_inclusive),
+                title: const Text('Semua'),
+                onTap: () {
+                  Navigator.pop(context);
+                  getAllRegistrants();
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.person),
+                title: const Text('Registrant'),
+                onTap: () {
+                  Navigator.pop(context);
+                  getAllRegistrants(status: RegistrantStatus.registrant);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.person_off),
+                title: const Text('Inactive'),
+                onTap: () {
+                  Navigator.pop(context);
+                  getAllRegistrants(status: RegistrantStatus.inactive);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.free_breakfast),
+                title: const Text('Free'),
+                onTap: () {
+                  Navigator.pop(context);
+                  getAllRegistrants(status: RegistrantStatus.free);
+                },
+              ),
+              ListTile(
+                leading: const Icon(Icons.block),
+                title: const Text('Isolir'),
+                onTap: () {
+                  Navigator.pop(context);
+                  getAllRegistrants(status: RegistrantStatus.isolir);
+                },
+              ),
+            ],
+          ),
         ),
       ),
     );

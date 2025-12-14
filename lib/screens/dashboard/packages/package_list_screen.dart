@@ -110,198 +110,201 @@ class _PackageListScreenState extends State<PackageListScreen> {
       context: context,
       backgroundColor: Colors.transparent,
       isScrollControlled: true,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+      builder: (context) => SafeArea(
+        top: false,
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
           ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 12),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                margin: const EdgeInsets.only(top: 12),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
-            ),
 
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: AppColors.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(50),
-                    ),
-                    child: Icon(
-                      Icons.inventory_2,
-                      color: AppColors.primary,
-                      size: 32,
-                    ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          package.name,
-                          style: const TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black87,
-                          ),
-                        ),
-                        const SizedBox(height: 4),
-                        Text(
-                          _formatPrice(package.price),
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: AppColors.primary,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  IconButton(
-                    onPressed: () => Navigator.of(context).pop(),
-                    icon: const Icon(Icons.close, color: Colors.grey),
-                  ),
-                ],
-              ),
-            ),
-
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (package.description != null &&
-                      package.description!.isNotEmpty) ...[
-                    const Text(
-                      'Deskripsi',
-                      style: TextStyle(
-                        fontSize: 16,
-                        fontWeight: FontWeight.w600,
-                        color: Colors.black87,
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: Icon(
+                        Icons.inventory_2,
+                        color: AppColors.primary,
+                        size: 32,
                       ),
                     ),
-                    const SizedBox(height: 8),
-                    Text(
-                      package.description!,
-                      style: TextStyle(
-                        fontSize: 14,
-                        color: Colors.grey[600],
-                        height: 1.5,
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            package.name,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black87,
+                            ),
+                          ),
+                          const SizedBox(height: 4),
+                          Text(
+                            _formatPrice(package.price),
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w600,
+                              color: AppColors.primary,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 24),
+                    IconButton(
+                      onPressed: () => Navigator.of(context).pop(),
+                      icon: const Icon(Icons.close, color: Colors.grey),
+                    ),
                   ],
+                ),
+              ),
 
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.grey[50],
-                      borderRadius: BorderRadius.circular(12),
-                      border: Border.all(color: Colors.grey[200]!),
-                    ),
-                    child: Column(
-                      children: [
-                        _DetailRow(
-                          icon: Icons.payment,
-                          label: 'Harga (Tanpa PPn)',
-                          value: _formatPrice(package.price),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    if (package.description != null &&
+                        package.description!.isNotEmpty) ...[
+                      const Text(
+                        'Deskripsi',
+                        style: TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.black87,
                         ),
-                        const SizedBox(height: 16),
-                        _DetailRow(
-                          icon: Icons.badge,
-                          label: 'PPn (Pajak Pertambahan Nilai)',
-                          value: package.ppnPercent > 0
-                              ? "${package.ppnPercent}%"
-                              : "Tidak Ada",
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        package.description!,
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.grey[600],
+                          height: 1.5,
                         ),
-                        const SizedBox(height: 16),
-                        _DetailRow(
-                          icon: Icons.payment,
-                          label: 'Harga (Dengan PPn)',
-                          value: _formatPrice(
-                            package.price +
-                                (package.price * package.ppnPercent / 100),
+                      ),
+                      const SizedBox(height: 24),
+                    ],
+
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.grey[50],
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: Colors.grey[200]!),
+                      ),
+                      child: Column(
+                        children: [
+                          _DetailRow(
+                            icon: Icons.payment,
+                            label: 'Harga (Tanpa PPn)',
+                            value: _formatPrice(package.price),
                           ),
-                          valueColor: AppColors.primary,
-                        ),
-                        const SizedBox(height: 16),
-                        _DetailRow(
-                          icon: Icons.check,
-                          label: 'Paket Aktif',
-                          value: package.status == 'active' ? "Ya" : "Tidak",
-                          valueColor: package.status == 'active'
-                              ? Colors.green
-                              : Colors.red,
-                        ),
-                      ],
+                          const SizedBox(height: 16),
+                          _DetailRow(
+                            icon: Icons.badge,
+                            label: 'PPn (Pajak Pertambahan Nilai)',
+                            value: package.ppnPercent > 0
+                                ? "${package.ppnPercent}%"
+                                : "Tidak Ada",
+                          ),
+                          const SizedBox(height: 16),
+                          _DetailRow(
+                            icon: Icons.payment,
+                            label: 'Harga (Dengan PPn)',
+                            value: _formatPrice(
+                              package.price +
+                                  (package.price * package.ppnPercent / 100),
+                            ),
+                            valueColor: AppColors.primary,
+                          ),
+                          const SizedBox(height: 16),
+                          _DetailRow(
+                            icon: Icons.check,
+                            label: 'Paket Aktif',
+                            value: package.status == 'active' ? "Ya" : "Tidak",
+                            valueColor: package.status == 'active'
+                                ? Colors.green
+                                : Colors.red,
+                          ),
+                        ],
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
 
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: OutlinedButton.icon(
-                      onPressed: () {
-                        _openForm(context, package: package);
-                      },
-                      icon: const Icon(Icons.edit),
-                      label: const Text('Edit'),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: AppColors.primary,
-                        side: BorderSide(color: AppColors.primary),
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: OutlinedButton.icon(
+                        onPressed: () {
+                          _openForm(context, package: package);
+                        },
+                        icon: const Icon(Icons.edit),
+                        label: const Text('Edit'),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: AppColors.primary,
+                          side: BorderSide(color: AppColors.primary),
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 16),
-                  Expanded(
-                    child: ElevatedButton.icon(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        _showDeleteConfirmation(package.id);
-                      },
-                      icon: const Icon(Icons.delete),
-                      label: const Text('Hapus'),
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 12),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                    const SizedBox(width: 16),
+                    Expanded(
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          _showDeleteConfirmation(package.id);
+                        },
+                        icon: const Icon(Icons.delete),
+                        label: const Text('Hapus'),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 12),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          elevation: 0,
                         ),
-                        elevation: 0,
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
 
-            SizedBox(height: MediaQuery.of(context).padding.bottom),
-          ],
+              SizedBox(height: MediaQuery.of(context).padding.bottom),
+            ],
+          ),
         ),
       ),
     );
@@ -385,126 +388,129 @@ class _PackageListScreenState extends State<PackageListScreen> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+      builder: (context) => SafeArea(
+        top: false,
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
           ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 12),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                margin: const EdgeInsets.only(top: 12),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.red.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(50),
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: const Icon(
+                        Icons.delete_outline,
+                        color: Colors.red,
+                        size: 32,
+                      ),
                     ),
-                    child: const Icon(
-                      Icons.delete_outline,
-                      color: Colors.red,
-                      size: 32,
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Hapus Paket',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Hapus Paket',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                    const SizedBox(height: 8),
+                    Text(
+                      'Apakah Anda yakin ingin menghapus paket ini?',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Apakah Anda yakin ingin menghapus paket ini?',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Tindakan ini tidak dapat dibatalkan.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.red[400],
-                      fontWeight: FontWeight.w500,
+                    const SizedBox(height: 8),
+                    Text(
+                      'Tindakan ini tidak dapat dibatalkan.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.red[400],
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        context.read<PackageProvider>().deletePackage(id);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          context.read<PackageProvider>().deletePackage(id);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
                         ),
-                        elevation: 0,
-                      ),
-                      child: const Text(
-                        'Ya, Hapus Paket',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.grey[700],
-                        side: BorderSide(color: Colors.grey[300]!),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text(
-                        'Batal',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                        child: const Text(
+                          'Ya, Hapus Paket',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                    const SizedBox(height: 12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.grey[700],
+                          side: BorderSide(color: Colors.grey[300]!),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                        ),
+                        child: const Text(
+                          'Batal',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ),
-            ),
-            SizedBox(height: MediaQuery.of(context).padding.bottom + 24),
-          ],
+              SizedBox(height: MediaQuery.of(context).padding.bottom + 24),
+            ],
+          ),
         ),
       ),
     );

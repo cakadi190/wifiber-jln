@@ -29,10 +29,14 @@ class CustomerSearchModal extends StatefulWidget {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => CustomerSearchModal(
-        onCustomerSelected: onCustomerSelected,
-        selectedCustomer: selectedCustomer,
-        title: title,
+      builder: (context) => SafeArea(
+        top: false,
+        bottom: true,
+        child: CustomerSearchModal(
+          onCustomerSelected: onCustomerSelected,
+          selectedCustomer: selectedCustomer,
+          title: title,
+        ),
       ),
     );
   }

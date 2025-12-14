@@ -296,130 +296,133 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+      builder: (context) => SafeArea(
+        top: false,
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
           ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 12),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                margin: const EdgeInsets.only(top: 12),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
-            ),
 
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.red.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(50),
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: const Icon(
+                        Icons.delete_outline,
+                        color: Colors.red,
+                        size: 32,
+                      ),
                     ),
-                    child: const Icon(
-                      Icons.delete_outline,
-                      color: Colors.red,
-                      size: 32,
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Hapus Router',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Hapus Router',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                    const SizedBox(height: 8),
+                    Text(
+                      'Apakah Anda yakin ingin menghapus router "${router.name}"?',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Apakah Anda yakin ingin menghapus router "${router.name}"?',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Tindakan ini tidak dapat dibatalkan.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.red[400],
-                      fontWeight: FontWeight.w500,
+                    const SizedBox(height: 8),
+                    Text(
+                      'Tindakan ini tidak dapat dibatalkan.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.red[400],
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () {
-                        Navigator.of(context).pop();
-                        _deleteRouter(router, provider);
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                          _deleteRouter(router, provider);
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
                         ),
-                        elevation: 0,
-                      ),
-                      child: const Text(
-                        'Ya, Hapus Router',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                        child: const Text(
+                          'Ya, Hapus Router',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
+                    const SizedBox(height: 12),
 
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.grey[700],
-                        side: BorderSide(color: Colors.grey[300]!),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.grey[700],
+                          side: BorderSide(color: Colors.grey[300]!),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
-                      ),
-                      child: const Text(
-                        'Batal',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                        child: const Text(
+                          'Batal',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
 
-            SizedBox(height: MediaQuery.of(context).padding.bottom + 24),
-          ],
+              SizedBox(height: MediaQuery.of(context).padding.bottom + 24),
+            ],
+          ),
         ),
       ),
     );
@@ -461,208 +464,217 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+      builder: (context) => SafeArea(
+        top: false,
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
           ),
-        ),
-        child: DraggableScrollableSheet(
-          initialChildSize: 0.95,
-          minChildSize: 0.5,
-          maxChildSize: 0.95,
-          expand: false,
+          child: DraggableScrollableSheet(
+            initialChildSize: 0.95,
+            minChildSize: 0.5,
+            maxChildSize: 0.95,
+            expand: false,
 
-          snap: true,
+            snap: true,
 
-          snapSizes: const [0.4, 0.6, 0.8],
+            snapSizes: const [0.4, 0.6, 0.8],
 
-          builder: (context, scrollController) {
-            WidgetsBinding.instance.addPostFrameCallback((_) {
-              if (scrollController.hasClients) {
-                scrollController.jumpTo(0);
-              }
-            });
+            builder: (context, scrollController) {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                if (scrollController.hasClients) {
+                  scrollController.jumpTo(0);
+                }
+              });
 
-            return SingleChildScrollView(
-              controller: scrollController,
-              physics: const ClampingScrollPhysics(),
+              return SingleChildScrollView(
+                controller: scrollController,
+                physics: const ClampingScrollPhysics(),
 
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Center(
-                      child: GestureDetector(
-                        onTap: () {},
+                child: Padding(
+                  padding: const EdgeInsets.all(24),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Center(
+                        child: GestureDetector(
+                          onTap: () {},
 
-                        child: Container(
-                          width: 40,
-                          height: 4,
-                          margin: const EdgeInsets.only(bottom: 8),
-                          decoration: BoxDecoration(
-                            color: Colors.grey[300],
-                            borderRadius: BorderRadius.circular(2),
+                          child: Container(
+                            width: 40,
+                            height: 4,
+                            margin: const EdgeInsets.only(bottom: 8),
+                            decoration: BoxDecoration(
+                              color: Colors.grey[300],
+                              borderRadius: BorderRadius.circular(2),
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                    const SizedBox(height: 16),
+                      const SizedBox(height: 16),
 
-                    Row(
-                      children: [
-                        CircleAvatar(
-                          radius: 24,
-                          backgroundColor: _getStatusColor(router.status),
-                          child: const Icon(
-                            Icons.router,
-                            color: Colors.white,
-                            size: 24,
+                      Row(
+                        children: [
+                          CircleAvatar(
+                            radius: 24,
+                            backgroundColor: _getStatusColor(router.status),
+                            child: const Icon(
+                              Icons.router,
+                              color: Colors.white,
+                              size: 24,
+                            ),
+                          ),
+                          const SizedBox(width: 16),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  router.name,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+
+                      const SizedBox(height: 32),
+
+                      _buildDetailSection('Informasi Dasar', [
+                        _buildDetailItem(
+                          Icons.computer,
+                          'Nama Router',
+                          router.name,
+                        ),
+                        _buildDetailItem(Icons.dns, 'Host', router.host),
+                        _buildDetailItem(
+                          Icons.access_time,
+                          'Toleransi Keterlambatan',
+                          '${router.toleranceDays} hari',
+                        ),
+                      ]),
+
+                      const SizedBox(height: 24),
+
+                      _buildDetailSection('Status & Konfigurasi', [
+                        _buildDetailItem(
+                          Icons.circle,
+                          'Status Auto-Isolir',
+                          _getStatusDisplayText(router.status),
+                          statusColor: _getStatusColor(router.status),
+                        ),
+                        _buildDetailItem(
+                          router.action == 'enable'
+                              ? Icons.security
+                              : Icons.visibility,
+                          'Auto-Isolir',
+                          router.action == 'enable' ? 'Aktif' : 'Nonaktif',
+                          statusColor: router.action == 'enable'
+                              ? Colors.blue
+                              : Colors.grey,
+                        ),
+                        if (router.isolirProfile.isNotEmpty)
+                          _buildDetailItem(
+                            Icons.shield,
+                            'Profil Isolir',
+                            router.isolirProfile,
+                          ),
+                      ]),
+
+                      const SizedBox(height: 24),
+
+                      _buildDetailSection('Informasi Sistem', [
+                        _buildDetailItem(
+                          Icons.tag,
+                          'Router ID',
+                          router.id.toString(),
+                        ),
+                        _buildDetailItem(
+                          Icons.calendar_today,
+                          'Dibuat',
+                          _formatDate(router.createdAt),
+                        ),
+                      ]),
+
+                      const SizedBox(height: 24),
+
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton.icon(
+                          onPressed: () => _showPppoeData(router),
+                          icon: const Icon(Icons.list_alt),
+                          label: const Text('Lihat Data PPPoE Terhubung'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppColors.primary,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(vertical: 14),
                           ),
                         ),
-                        const SizedBox(width: 16),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                router.name,
-                                style: const TextStyle(
-                                  fontSize: 20,
-                                  fontWeight: FontWeight.bold,
+                      ),
+
+                      const SizedBox(height: 32),
+
+                      Row(
+                        children: [
+                          Expanded(
+                            child: ElevatedButton.icon(
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                              icon: const Icon(Icons.close),
+                              label: const Text('Tutup'),
+                              style: ElevatedButton.styleFrom(
+                                backgroundColor: AppColors.primary,
+                                foregroundColor: Colors.white,
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
                                 ),
                               ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-
-                    const SizedBox(height: 32),
-
-                    _buildDetailSection('Informasi Dasar', [
-                      _buildDetailItem(
-                        Icons.computer,
-                        'Nama Router',
-                        router.name,
-                      ),
-                      _buildDetailItem(Icons.dns, 'Host', router.host),
-                      _buildDetailItem(
-                        Icons.access_time,
-                        'Toleransi Keterlambatan',
-                        '${router.toleranceDays} hari',
-                      ),
-                    ]),
-
-                    const SizedBox(height: 24),
-
-                    _buildDetailSection('Status & Konfigurasi', [
-                      _buildDetailItem(
-                        Icons.circle,
-                        'Status Auto-Isolir',
-                        _getStatusDisplayText(router.status),
-                        statusColor: _getStatusColor(router.status),
-                      ),
-                      _buildDetailItem(
-                        router.action == 'enable'
-                            ? Icons.security
-                            : Icons.visibility,
-                        'Auto-Isolir',
-                        router.action == 'enable' ? 'Aktif' : 'Nonaktif',
-                        statusColor: router.action == 'enable'
-                            ? Colors.blue
-                            : Colors.grey,
-                      ),
-                      if (router.isolirProfile.isNotEmpty)
-                        _buildDetailItem(
-                          Icons.shield,
-                          'Profil Isolir',
-                          router.isolirProfile,
-                        ),
-                    ]),
-
-                    const SizedBox(height: 24),
-
-                    _buildDetailSection('Informasi Sistem', [
-                      _buildDetailItem(
-                        Icons.tag,
-                        'Router ID',
-                        router.id.toString(),
-                      ),
-                      _buildDetailItem(
-                        Icons.calendar_today,
-                        'Dibuat',
-                        _formatDate(router.createdAt),
-                      ),
-                    ]),
-
-                    const SizedBox(height: 24),
-
-                    SizedBox(
-                      width: double.infinity,
-                      child: ElevatedButton.icon(
-                        onPressed: () => _showPppoeData(router),
-                        icon: const Icon(Icons.list_alt),
-                        label: const Text('Lihat Data PPPoE Terhubung'),
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.primary,
-                          foregroundColor: Colors.white,
-                          padding: const EdgeInsets.symmetric(vertical: 14),
-                        ),
-                      ),
-                    ),
-
-                    const SizedBox(height: 32),
-
-                    Row(
-                      children: [
-                        Expanded(
-                          child: ElevatedButton.icon(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            icon: const Icon(Icons.close),
-                            label: const Text('Tutup'),
-                            style: ElevatedButton.styleFrom(
-                              backgroundColor: AppColors.primary,
-                              foregroundColor: Colors.white,
-                              padding: const EdgeInsets.symmetric(vertical: 12),
                             ),
                           ),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: OutlinedButton.icon(
-                            onPressed: () {
-                              Navigator.pop(context);
-                              _showActionBottomSheet(
-                                router,
-                                context.read<RouterProvider>(),
-                              );
-                            },
-                            icon: const Icon(Icons.more_horiz),
-                            label: const Text('Aksi Lain'),
-                            style: OutlinedButton.styleFrom(
-                              foregroundColor: AppColors.primary,
-                              side: const BorderSide(color: AppColors.primary),
-                              padding: const EdgeInsets.symmetric(vertical: 12),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: OutlinedButton.icon(
+                              onPressed: () {
+                                Navigator.pop(context);
+                                _showActionBottomSheet(
+                                  router,
+                                  context.read<RouterProvider>(),
+                                );
+                              },
+                              icon: const Icon(Icons.more_horiz),
+                              label: const Text('Aksi Lain'),
+                              style: OutlinedButton.styleFrom(
+                                foregroundColor: AppColors.primary,
+                                side: const BorderSide(
+                                  color: AppColors.primary,
+                                ),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 12,
+                                ),
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
+                        ],
+                      ),
 
-                    SizedBox(
-                      height: MediaQuery.of(context).padding.bottom + 16,
-                    ),
-                  ],
+                      SizedBox(
+                        height: MediaQuery.of(context).padding.bottom + 16,
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         ),
       ),
     );
@@ -677,62 +689,65 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+      builder: (context) => SafeArea(
+        top: false,
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
           ),
-        ),
-        child: DraggableScrollableSheet(
-          initialChildSize: 1,
-          minChildSize: 0.5,
-          maxChildSize: 1,
-          expand: false,
-          builder: (context, scrollController) {
-            return DefaultTabController(
-              length: 2,
-              child: FutureBuilder<RouterPppoeSecrets>(
-                future: pppoeFuture,
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return const Center(
-                      child: CircularProgressIndicator(
-                        color: AppColors.primary,
-                      ),
-                    );
-                  }
+          child: DraggableScrollableSheet(
+            initialChildSize: 1,
+            minChildSize: 0.5,
+            maxChildSize: 1,
+            expand: false,
+            builder: (context, scrollController) {
+              return DefaultTabController(
+                length: 2,
+                child: FutureBuilder<RouterPppoeSecrets>(
+                  future: pppoeFuture,
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return const Center(
+                        child: CircularProgressIndicator(
+                          color: AppColors.primary,
+                        ),
+                      );
+                    }
 
-                  if (snapshot.hasError) {
-                    return _buildPppoeError(
+                    if (snapshot.hasError) {
+                      return _buildPppoeError(
+                        context,
+                        scrollController,
+                        snapshot.error.toString(),
+                        router,
+                      );
+                    }
+
+                    final data = snapshot.data;
+                    if (data == null) {
+                      return _buildPppoeError(
+                        context,
+                        scrollController,
+                        'Data PPPoE tidak tersedia.',
+                        router,
+                      );
+                    }
+
+                    return _buildPppoeContent(
                       context,
                       scrollController,
-                      snapshot.error.toString(),
                       router,
+                      data,
                     );
-                  }
-
-                  final data = snapshot.data;
-                  if (data == null) {
-                    return _buildPppoeError(
-                      context,
-                      scrollController,
-                      'Data PPPoE tidak tersedia.',
-                      router,
-                    );
-                  }
-
-                  return _buildPppoeContent(
-                    context,
-                    scrollController,
-                    router,
-                    data,
-                  );
-                },
-              ),
-            );
-          },
+                  },
+                ),
+              );
+            },
+          ),
         ),
       ),
     );
@@ -1343,7 +1358,8 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => MonitorLoginSheet(router: router),
+      builder: (context) =>
+          SafeArea(top: false, child: MonitorLoginSheet(router: router)),
     );
 
     if (!mounted || result == null) {
@@ -1371,8 +1387,9 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) {
-        return Container(
+      builder: (context) => SafeArea(
+        top: false,
+        child: Container(
           decoration: const BoxDecoration(
             color: Colors.white,
             borderRadius: BorderRadius.only(
@@ -1530,8 +1547,8 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
               SizedBox(height: MediaQuery.of(context).padding.bottom + 24),
             ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -1541,7 +1558,8 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
       context: context,
       isScrollControlled: true,
       backgroundColor: Colors.transparent,
-      builder: (context) => MikrotikFormSheet(router: router),
+      builder: (context) =>
+          SafeArea(top: false, child: MikrotikFormSheet(router: router)),
     );
 
     if (result == true) {

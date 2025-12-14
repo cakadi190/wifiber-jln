@@ -331,6 +331,8 @@ class RegistrantFormController extends SafeChangeNotifier {
       ),
       builder: (BuildContext ctx) {
         return SafeArea(
+          top: false,
+          bottom: true,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: Column(
@@ -437,7 +439,10 @@ class RegistrantFormController extends SafeChangeNotifier {
 
     try {
       if (isEdit && registrant != null) {
-        success = await provider.updateRegistrant(registrant.id, registrantData);
+        success = await provider.updateRegistrant(
+          registrant.id,
+          registrantData,
+        );
       } else {
         success = await provider.createRegistrant(registrantData);
       }

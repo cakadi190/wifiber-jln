@@ -383,7 +383,11 @@ class CustomerDetailModal extends StatelessWidget {
       shape: const RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => CustomerDetailModal(customer: customer),
+      builder: (context) => SafeArea(
+        top: false,
+        bottom: true,
+        child: CustomerDetailModal(customer: customer),
+      ),
     );
   }
 }

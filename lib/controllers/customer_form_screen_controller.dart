@@ -324,6 +324,8 @@ class CustomerFormController extends SafeChangeNotifier {
       ),
       builder: (BuildContext ctx) {
         return SafeArea(
+          top: false,
+          bottom: true,
           child: Padding(
             padding: const EdgeInsets.symmetric(vertical: 16),
             child: Column(

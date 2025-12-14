@@ -40,14 +40,18 @@ class _CreateComplaintScreenState extends State<CreateComplaintScreen>
         borderRadius: BorderRadius.vertical(top: Radius.circular(16)),
       ),
       builder: (context) {
-        return CustomerSearchModal(
-          title: 'Pilih Pelanggan',
-          selectedCustomer: selectedCustomer,
-          onCustomerSelected: (customer) {
-            setState(() {
-              selectedCustomer = customer;
-            });
-          },
+        return SafeArea(
+          top: false,
+          bottom: true,
+          child: CustomerSearchModal(
+            title: 'Pilih Pelanggan',
+            selectedCustomer: selectedCustomer,
+            onCustomerSelected: (customer) {
+              setState(() {
+                selectedCustomer = customer;
+              });
+            },
+          ),
         );
       },
     );

@@ -111,10 +111,12 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
         String? tempSelectedRouterId = _selectedRouterId;
         String? tempSelectedRouterName = _selectedRouterName;
 
-        return StatefulBuilder(
-          builder: (context, setModalState) {
-            return SafeArea(
-              child: Padding(
+        return SafeArea(
+          top: false,
+          bottom: true,
+          child: StatefulBuilder(
+            builder: (context, setModalState) {
+              return Padding(
                 padding: EdgeInsets.only(
                   bottom: MediaQuery.of(context).viewInsets.bottom + 16,
                   left: 16,
@@ -240,9 +242,9 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                     ),
                   ],
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         );
       },
     );
@@ -359,63 +361,67 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
         String? fileName;
         bool isLoading = false;
 
-        return StatefulBuilder(
-          builder: (context, setState) {
-            Future<void> pickFile() async {
-              try {
-                final result = await FilePicker.platform.pickFiles(
-                  type: FileType.custom,
-                  allowedExtensions: ['xls', 'xlsx'],
-                  allowMultiple: false,
-                );
+        return SafeArea(
+          top: false,
+          bottom: true,
+          child: StatefulBuilder(
+            builder: (context, setState) {
+              Future<void> pickFile() async {
+                try {
+                  final result = await FilePicker.platform.pickFiles(
+                    type: FileType.custom,
+                    allowedExtensions: ['xls', 'xlsx'],
+                    allowMultiple: false,
+                  );
 
-                if (result != null) {
-                  setState(() {
-                    selectedFile = File(result.files.single.path!);
-                    fileName = result.files.single.name;
-                  });
-                }
-              } catch (e) {
-                if (!context.mounted) return;
-                SnackBars.error(
-                  context,
-                  'Gagal memilih berkas: ${e.toString()}',
-                ).clearSnackBars();
-              }
-            }
-
-            Future<void> upload() async {
-              if (selectedFile == null) return;
-              setState(() {
-                isLoading = true;
-              });
-
-              final provider = _customerProvider;
-              try {
-                final message = await provider?.importCustomers(selectedFile!);
-                if (!context.mounted) return;
-                Navigator.of(context).pop();
-                if (message != null) {
-                  SnackBars.success(context, message).clearSnackBars();
-                  provider?.refresh();
-                } else if (provider?.error != null) {
-                  SnackBars.error(context, provider!.error!).clearSnackBars();
-                }
-              } catch (e) {
-                if (context.mounted) {
-                  SnackBars.error(context, e.toString()).clearSnackBars();
-                }
-              } finally {
-                if (context.mounted) {
-                  setState(() {
-                    isLoading = false;
-                  });
+                  if (result != null) {
+                    setState(() {
+                      selectedFile = File(result.files.single.path!);
+                      fileName = result.files.single.name;
+                    });
+                  }
+                } catch (e) {
+                  if (!context.mounted) return;
+                  SnackBars.error(
+                    context,
+                    'Gagal memilih berkas: ${e.toString()}',
+                  ).clearSnackBars();
                 }
               }
-            }
 
-            return SafeArea(
-              child: Padding(
+              Future<void> upload() async {
+                if (selectedFile == null) return;
+                setState(() {
+                  isLoading = true;
+                });
+
+                final provider = _customerProvider;
+                try {
+                  final message = await provider?.importCustomers(
+                    selectedFile!,
+                  );
+                  if (!context.mounted) return;
+                  Navigator.of(context).pop();
+                  if (message != null) {
+                    SnackBars.success(context, message).clearSnackBars();
+                    provider?.refresh();
+                  } else if (provider?.error != null) {
+                    SnackBars.error(context, provider!.error!).clearSnackBars();
+                  }
+                } catch (e) {
+                  if (context.mounted) {
+                    SnackBars.error(context, e.toString()).clearSnackBars();
+                  }
+                } finally {
+                  if (context.mounted) {
+                    setState(() {
+                      isLoading = false;
+                    });
+                  }
+                }
+              }
+
+              return Padding(
                 padding: EdgeInsets.only(
                   bottom: MediaQuery.of(context).viewInsets.bottom + 16,
                   left: 16,
@@ -455,9 +461,9 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                     ),
                   ],
                 ),
-              ),
-            );
-          },
+              );
+            },
+          ),
         );
       },
     );

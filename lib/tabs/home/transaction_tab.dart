@@ -205,9 +205,10 @@ class TransactionTab extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => StatefulBuilder(
-        builder: (context, setState) => SafeArea(
-          child: Padding(
+      builder: (context) => SafeArea(
+        top: false,
+        child: StatefulBuilder(
+          builder: (context, setState) => Padding(
             padding: EdgeInsets.only(
               bottom: MediaQuery.of(context).viewInsets.bottom,
               left: 16,
@@ -668,142 +669,148 @@ class TransactionTab extends StatelessWidget {
     showModalBottomSheet(
       context: context,
       backgroundColor: Colors.transparent,
-      builder: (context) => Container(
-        decoration: const BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
+      builder: (context) => SafeArea(
+        top: false,
+        bottom: true,
+        child: Container(
+          decoration: const BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
           ),
-        ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Container(
-              margin: const EdgeInsets.only(top: 12),
-              width: 40,
-              height: 4,
-              decoration: BoxDecoration(
-                color: Colors.grey[300],
-                borderRadius: BorderRadius.circular(2),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                margin: const EdgeInsets.only(top: 12),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
               ),
-            ),
 
-            Padding(
-              padding: const EdgeInsets.all(24),
-              child: Column(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(16),
-                    decoration: BoxDecoration(
-                      color: Colors.red.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(50),
+              Padding(
+                padding: const EdgeInsets.all(24),
+                child: Column(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: Colors.red.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(50),
+                      ),
+                      child: const Icon(
+                        Icons.delete_outline,
+                        color: Colors.red,
+                        size: 32,
+                      ),
                     ),
-                    child: const Icon(
-                      Icons.delete_outline,
-                      color: Colors.red,
-                      size: 32,
+                    const SizedBox(height: 16),
+                    const Text(
+                      'Hapus Transaksi',
+                      style: TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black87,
+                      ),
                     ),
-                  ),
-                  const SizedBox(height: 16),
-                  const Text(
-                    'Hapus Transaksi',
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.black87,
+                    const SizedBox(height: 8),
+                    Text(
+                      'Apakah Anda yakin ingin menghapus data transaksi "#${transaction.id}" ini?',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 16, color: Colors.grey[600]),
                     ),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Apakah Anda yakin ingin menghapus data transaksi "#${transaction.id}" ini?',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 16, color: Colors.grey[600]),
-                  ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'Tindakan ini tidak dapat dibatalkan.',
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 14,
-                      color: Colors.red[400],
-                      fontWeight: FontWeight.w500,
+                    const SizedBox(height: 8),
+                    Text(
+                      'Tindakan ini tidak dapat dibatalkan.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Colors.red[400],
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
 
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Column(
-                children: [
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: () async {
-                        Navigator.pop(context);
-                        final provider = context.read<TransactionProvider>();
-                        try {
-                          await provider.deleteTransaction(transaction.id);
-                          controller.refreshTransactions();
-                        } catch (e) {
-                          if (context.mounted) {
-                            ScaffoldMessenger.of(context).showSnackBar(
-                              SnackBar(
-                                content: Text('Gagal menghapus transaksi: $e'),
-                              ),
-                            );
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 24),
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton(
+                        onPressed: () async {
+                          Navigator.pop(context);
+                          final provider = context.read<TransactionProvider>();
+                          try {
+                            await provider.deleteTransaction(transaction.id);
+                            controller.refreshTransactions();
+                          } catch (e) {
+                            if (context.mounted) {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                    'Gagal menghapus transaksi: $e',
+                                  ),
+                                ),
+                              );
+                            }
                           }
-                        }
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red,
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                        },
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: Colors.red,
+                          foregroundColor: Colors.white,
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
+                          elevation: 0,
                         ),
-                        elevation: 0,
-                      ),
-                      child: const Text(
-                        'Ya, Hapus Transaksi',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w600,
+                        child: const Text(
+                          'Ya, Hapus Transaksi',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w600,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(height: 12),
+                    const SizedBox(height: 12),
 
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton(
-                      onPressed: () => Navigator.of(context).pop(),
-                      style: OutlinedButton.styleFrom(
-                        foregroundColor: Colors.grey[700],
-                        side: BorderSide(color: Colors.grey[300]!),
-                        padding: const EdgeInsets.symmetric(vertical: 16),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
+                    SizedBox(
+                      width: double.infinity,
+                      child: OutlinedButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        style: OutlinedButton.styleFrom(
+                          foregroundColor: Colors.grey[700],
+                          side: BorderSide(color: Colors.grey[300]!),
+                          padding: const EdgeInsets.symmetric(vertical: 16),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12),
+                          ),
                         ),
-                      ),
-                      child: const Text(
-                        'Batal',
-                        style: TextStyle(
-                          fontSize: 16,
-                          fontWeight: FontWeight.w500,
+                        child: const Text(
+                          'Batal',
+                          style: TextStyle(
+                            fontSize: 16,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
-            ),
 
-            SizedBox(height: MediaQuery.of(context).padding.bottom + 24),
-          ],
+              SizedBox(height: MediaQuery.of(context).padding.bottom + 24),
+            ],
+          ),
         ),
       ),
     );
@@ -848,101 +855,109 @@ class TransactionTab extends StatelessWidget {
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
       ),
-      builder: (context) => Padding(
-        padding: EdgeInsets.only(
-          bottom: MediaQuery.of(context).viewInsets.bottom,
-          left: 16,
-          right: 16,
-          top: 16,
-        ),
-        child: SingleChildScrollView(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Container(
-                margin: const EdgeInsets.symmetric(vertical: 8),
-                height: 4,
-                width: 40,
-                decoration: BoxDecoration(
-                  color: Colors.grey.shade300,
-                  borderRadius: BorderRadius.circular(2),
-                ),
-              ),
-              SizedBox(height: 8),
-
-              _buildDetailRow(
-                context,
-                'ID Keuangan',
-                '#${transaction.id.toString()}',
-                Icons.tag,
-              ),
-              SizedBox(height: 16),
-
-              _buildDetailRow(
-                context,
-                'Tipe Transaksi',
-                transaction.type == 'income' ? 'Pemasukan' : 'Pengeluaran',
-                transaction.type == 'income'
-                    ? Icons.arrow_downward
-                    : Icons.arrow_upward,
-                color: transaction.type == 'income' ? Colors.green : Colors.red,
-              ),
-              SizedBox(height: 16),
-
-              _buildDetailRow(
-                context,
-                'Deskripsi',
-                transaction.description,
-                Icons.description,
-              ),
-              SizedBox(height: 16),
-
-              _buildDetailRow(
-                context,
-                'Dibuat Oleh',
-                transaction.createdBy ?? '-',
-                Icons.person,
-              ),
-              SizedBox(height: 16),
-
-              _buildDetailRow(
-                context,
-                'Jumlah',
-                CurrencyHelper.formatCurrency(transaction.nominal),
-                Icons.attach_money,
-                color: transaction.type == 'income' ? Colors.green : Colors.red,
-              ),
-              SizedBox(height: 16),
-
-              _buildDetailRow(
-                context,
-                'Tanggal',
-                DateHelper.formatDate(transaction.createdAt, format: 'full'),
-                Icons.calendar_month,
-              ),
-              SizedBox(height: 32),
-
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () => Navigator.pop(context),
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    padding: EdgeInsets.symmetric(vertical: 16),
+      builder: (context) => SafeArea(
+        top: false,
+        bottom: true,
+        child: Padding(
+          padding: EdgeInsets.only(
+            bottom: MediaQuery.of(context).viewInsets.bottom,
+            left: 16,
+            right: 16,
+            top: 16,
+          ),
+          child: SingleChildScrollView(
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                Container(
+                  margin: const EdgeInsets.symmetric(vertical: 8),
+                  height: 4,
+                  width: 40,
+                  decoration: BoxDecoration(
+                    color: Colors.grey.shade300,
+                    borderRadius: BorderRadius.circular(2),
                   ),
-                  child: Text(
-                    'Tutup',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
+                ),
+                SizedBox(height: 8),
+
+                _buildDetailRow(
+                  context,
+                  'ID Keuangan',
+                  '#${transaction.id.toString()}',
+                  Icons.tag,
+                ),
+                SizedBox(height: 16),
+
+                _buildDetailRow(
+                  context,
+                  'Tipe Transaksi',
+                  transaction.type == 'income' ? 'Pemasukan' : 'Pengeluaran',
+                  transaction.type == 'income'
+                      ? Icons.arrow_downward
+                      : Icons.arrow_upward,
+                  color: transaction.type == 'income'
+                      ? Colors.green
+                      : Colors.red,
+                ),
+                SizedBox(height: 16),
+
+                _buildDetailRow(
+                  context,
+                  'Deskripsi',
+                  transaction.description,
+                  Icons.description,
+                ),
+                SizedBox(height: 16),
+
+                _buildDetailRow(
+                  context,
+                  'Dibuat Oleh',
+                  transaction.createdBy ?? '-',
+                  Icons.person,
+                ),
+                SizedBox(height: 16),
+
+                _buildDetailRow(
+                  context,
+                  'Jumlah',
+                  CurrencyHelper.formatCurrency(transaction.nominal),
+                  Icons.attach_money,
+                  color: transaction.type == 'income'
+                      ? Colors.green
+                      : Colors.red,
+                ),
+                SizedBox(height: 16),
+
+                _buildDetailRow(
+                  context,
+                  'Tanggal',
+                  DateHelper.formatDate(transaction.createdAt, format: 'full'),
+                  Icons.calendar_month,
+                ),
+                SizedBox(height: 32),
+
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () => Navigator.pop(context),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      padding: EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: Text(
+                      'Tutup',
+                      style: TextStyle(
+                        color: Colors.white,
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
-              ),
-              SizedBox(height: 16),
-            ],
+                SizedBox(height: 16),
+              ],
+            ),
           ),
         ),
       ),
