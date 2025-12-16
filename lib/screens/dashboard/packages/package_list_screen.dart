@@ -9,6 +9,8 @@ import 'package:wifiber/models/package.dart';
 import 'package:wifiber/providers/package_provider.dart';
 import 'package:wifiber/screens/dashboard/packages/package_form_screen.dart';
 import 'package:wifiber/components/reusables/options_bottom_sheet.dart';
+import 'package:wifiber/mixins/scroll_to_hide_fab_mixin.dart';
+import 'package:wifiber/components/reusables/hideable_fab_wrapper.dart';
 
 class PackageListScreen extends StatefulWidget {
   const PackageListScreen({super.key});
@@ -17,7 +19,8 @@ class PackageListScreen extends StatefulWidget {
   State<PackageListScreen> createState() => _PackageListScreenState();
 }
 
-class _PackageListScreenState extends State<PackageListScreen> {
+class _PackageListScreenState extends State<PackageListScreen>
+    with ScrollToHideFabMixin {
   @override
   void initState() {
     super.initState();
@@ -40,14 +43,17 @@ class _PackageListScreenState extends State<PackageListScreen> {
         child: Scaffold(
           backgroundColor: AppColors.primary,
           appBar: AppBar(title: const Text('Paket')),
-          floatingActionButton: PermissionWidget(
-            permissions: const ['package'],
-            child: FloatingActionButton(
-              onPressed: () => _openForm(context),
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              tooltip: 'Tambah Paket',
-              child: const Icon(Icons.add),
+          floatingActionButton: HideableFabWrapper(
+            visible: isFabVisible,
+            child: PermissionWidget(
+              permissions: const ['package'],
+              child: FloatingActionButton(
+                onPressed: () => _openForm(context),
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                tooltip: 'Tambah Paket',
+                child: const Icon(Icons.add),
+              ),
             ),
           ),
           body: SafeArea(
@@ -79,6 +85,7 @@ class _PackageListScreenState extends State<PackageListScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(8),
                       child: ListView.builder(
+                        controller: scrollController,
                         itemCount: packages.length,
                         itemBuilder: (context, index) {
                           final PackageModel package = packages[index];

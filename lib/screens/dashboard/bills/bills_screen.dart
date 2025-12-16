@@ -17,6 +17,8 @@ import 'package:wifiber/screens/dashboard/bills/bills_create_screen.dart';
 import 'package:wifiber/screens/dashboard/bills/bills_update_screen.dart';
 import 'package:wifiber/services/http_service.dart';
 import 'package:wifiber/middlewares/auth_middleware.dart';
+import 'package:wifiber/mixins/scroll_to_hide_fab_mixin.dart';
+import 'package:wifiber/components/reusables/hideable_fab_wrapper.dart';
 
 class BillsScreen extends StatefulWidget {
   const BillsScreen({super.key});
@@ -25,7 +27,7 @@ class BillsScreen extends StatefulWidget {
   State<BillsScreen> createState() => _BillsScreenState();
 }
 
-class _BillsScreenState extends State<BillsScreen> {
+class _BillsScreenState extends State<BillsScreen> with ScrollToHideFabMixin {
   String _selectedFilter = 'all';
   String? _selectedCustomerName;
 
@@ -109,22 +111,25 @@ class _BillsScreenState extends State<BillsScreen> {
       child: AuthGuard(
         requiredPermissions: const ['bill'],
         child: Scaffold(
-          floatingActionButton: PermissionWidget(
-            permissions: const ['bill'],
-            child: FloatingActionButton(
-              backgroundColor: AppColors.primary,
-              child: const Icon(Icons.add),
-              onPressed: () async {
-                final provider = context.read<BillsProvider>();
-                await Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const BillsCreateScreen(),
-                  ),
-                );
+          floatingActionButton: HideableFabWrapper(
+            visible: isFabVisible,
+            child: PermissionWidget(
+              permissions: const ['bill'],
+              child: FloatingActionButton(
+                backgroundColor: AppColors.primary,
+                child: const Icon(Icons.add),
+                onPressed: () async {
+                  final provider = context.read<BillsProvider>();
+                  await Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const BillsCreateScreen(),
+                    ),
+                  );
 
-                await provider.refresh();
-              },
+                  await provider.refresh();
+                },
+              ),
             ),
           ),
           backgroundColor: AppColors.primary,
@@ -387,6 +392,7 @@ class _BillsScreenState extends State<BillsScreen> {
                                   }
                                 },
                                 child: ListView.builder(
+                                  controller: scrollController,
                                   itemCount: displayedBills.length,
                                   itemBuilder: (context, index) {
                                     final bill = displayedBills[index];

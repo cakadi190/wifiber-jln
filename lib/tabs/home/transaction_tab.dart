@@ -10,28 +10,40 @@ import 'package:wifiber/providers/transaction_provider.dart';
 import 'package:wifiber/helpers/role.dart';
 import 'package:wifiber/screens/dashboard/transactions/transaction_form_screen.dart';
 
-class TransactionTab extends StatelessWidget {
+import 'package:wifiber/mixins/scroll_to_hide_fab_mixin.dart';
+import 'package:wifiber/components/reusables/hideable_fab_wrapper.dart';
+
+class TransactionTab extends StatefulWidget {
   final TransactionTabController controller;
 
   const TransactionTab({super.key, required this.controller});
 
   @override
+  State<TransactionTab> createState() => _TransactionTabState();
+}
+
+class _TransactionTabState extends State<TransactionTab>
+    with ScrollToHideFabMixin {
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.primary,
       appBar: AppBar(title: const Text('Keuangan')),
-      floatingActionButton: FloatingActionButton(
-        backgroundColor: AppColors.primary,
-        onPressed: () async {
-          final result = await Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const TransactionFormScreen()),
-          );
-          if (result == true) {
-            controller.refreshTransactions();
-          }
-        },
-        child: const Icon(Icons.add),
+      floatingActionButton: HideableFabWrapper(
+        visible: isFabVisible,
+        child: FloatingActionButton(
+          backgroundColor: AppColors.primary,
+          onPressed: () async {
+            final result = await Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const TransactionFormScreen()),
+            );
+            if (result == true) {
+              widget.controller.refreshTransactions();
+            }
+          },
+          child: const Icon(Icons.add),
+        ),
       ),
       body: RoleGuardWidget(
         permissions: 'finance',
@@ -439,10 +451,10 @@ class TransactionTab extends StatelessWidget {
       return _buildErrorWidget(context, provider.error!);
     }
 
-    final transactions = controller.filteredTransactions;
+    final transactions = widget.controller.filteredTransactions;
 
     return RefreshIndicator(
-      onRefresh: () => controller.refreshTransactions(),
+      onRefresh: () => widget.controller.refreshTransactions(),
       child: _buildTransactionList(context, transactions, provider),
     );
   }
@@ -539,7 +551,7 @@ class TransactionTab extends StatelessWidget {
                         ),
                         elevation: 2,
                       ),
-                      onPressed: () => controller.refreshTransactions(),
+                      onPressed: () => widget.controller.refreshTransactions(),
                       child: Text(
                         "Muat Ulang",
                         style: TextStyle(
@@ -558,6 +570,7 @@ class TransactionTab extends StatelessWidget {
     }
 
     return ListView.builder(
+      controller: scrollController,
       itemCount: transactions.length,
       itemBuilder: (_, i) {
         final tx = transactions[i];
@@ -647,7 +660,7 @@ class TransactionTab extends StatelessWidget {
               ),
             );
             if (result == true) {
-              controller.refreshTransactions();
+              widget.controller.refreshTransactions();
             }
           },
         ),
@@ -750,7 +763,7 @@ class TransactionTab extends StatelessWidget {
                           final provider = context.read<TransactionProvider>();
                           try {
                             await provider.deleteTransaction(transaction.id);
-                            controller.refreshTransactions();
+                            widget.controller.refreshTransactions();
                           } catch (e) {
                             if (context.mounted) {
                               ScaffoldMessenger.of(context).showSnackBar(
@@ -836,7 +849,7 @@ class TransactionTab extends StatelessWidget {
             Text(error, textAlign: TextAlign.center),
             if (error.contains("401"))
               TextButton(
-                onPressed: () => controller.logout(context),
+                onPressed: () => widget.controller.logout(context),
                 child: Text("Autentikasi ulang"),
               ),
           ],

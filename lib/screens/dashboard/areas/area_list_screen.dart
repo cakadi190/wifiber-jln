@@ -8,6 +8,8 @@ import 'package:wifiber/models/area.dart';
 import 'package:wifiber/providers/area_provider.dart';
 import 'package:wifiber/screens/dashboard/areas/area_form_screen.dart';
 import 'package:wifiber/components/reusables/options_bottom_sheet.dart';
+import 'package:wifiber/mixins/scroll_to_hide_fab_mixin.dart';
+import 'package:wifiber/components/reusables/hideable_fab_wrapper.dart';
 
 class AreaListScreen extends StatefulWidget {
   const AreaListScreen({super.key});
@@ -16,7 +18,8 @@ class AreaListScreen extends StatefulWidget {
   State<AreaListScreen> createState() => _AreaListScreenState();
 }
 
-class _AreaListScreenState extends State<AreaListScreen> {
+class _AreaListScreenState extends State<AreaListScreen>
+    with ScrollToHideFabMixin {
   @override
   void initState() {
     super.initState();
@@ -39,14 +42,17 @@ class _AreaListScreenState extends State<AreaListScreen> {
         child: Scaffold(
           backgroundColor: AppColors.primary,
           appBar: AppBar(title: const Text('Area')),
-          floatingActionButton: PermissionWidget(
-            permissions: const ['area'],
-            child: FloatingActionButton(
-              onPressed: () => _openForm(context),
-              backgroundColor: AppColors.primary,
-              foregroundColor: Colors.white,
-              tooltip: 'Tambah Area',
-              child: const Icon(Icons.add),
+          floatingActionButton: HideableFabWrapper(
+            visible: isFabVisible,
+            child: PermissionWidget(
+              permissions: const ['area'],
+              child: FloatingActionButton(
+                onPressed: () => _openForm(context),
+                backgroundColor: AppColors.primary,
+                foregroundColor: Colors.white,
+                tooltip: 'Tambah Area',
+                child: const Icon(Icons.add),
+              ),
             ),
           ),
           body: Container(
@@ -77,6 +83,7 @@ class _AreaListScreenState extends State<AreaListScreen> {
                   child: Padding(
                     padding: const EdgeInsets.all(8),
                     child: ListView.builder(
+                      controller: scrollController,
                       itemCount: areas.length,
                       itemBuilder: (context, index) {
                         final AreaModel area = areas[index];

@@ -13,6 +13,8 @@ import 'package:wifiber/screens/dashboard/mikrotik/monitor_mikrotik_screen.dart'
 import 'package:wifiber/screens/dashboard/mikrotik/widgets/mikrotik_form_sheet.dart';
 import 'package:wifiber/screens/dashboard/mikrotik/widgets/monitor_login_sheet.dart';
 import 'package:wifiber/middlewares/auth_middleware.dart';
+import 'package:wifiber/mixins/scroll_to_hide_fab_mixin.dart';
+import 'package:wifiber/components/reusables/hideable_fab_wrapper.dart';
 
 class ListMikrotikScreen extends StatefulWidget {
   const ListMikrotikScreen({super.key});
@@ -21,7 +23,8 @@ class ListMikrotikScreen extends StatefulWidget {
   State<ListMikrotikScreen> createState() => _ListMikrotikScreenState();
 }
 
-class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
+class _ListMikrotikScreenState extends State<ListMikrotikScreen>
+    with ScrollToHideFabMixin {
   @override
   void initState() {
     super.initState();
@@ -42,14 +45,17 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
         requiredPermissions: const ['integration'],
         child: Scaffold(
           backgroundColor: AppColors.primary,
-          floatingActionButton: PermissionWidget(
-            permissions: const ['integration'],
-            child: FloatingActionButton(
-              backgroundColor: AppColors.primary,
-              onPressed: () async {
-                await _openMikrotikForm();
-              },
-              child: const Icon(Icons.add),
+          floatingActionButton: HideableFabWrapper(
+            visible: isFabVisible,
+            child: PermissionWidget(
+              permissions: const ['integration'],
+              child: FloatingActionButton(
+                backgroundColor: AppColors.primary,
+                onPressed: () async {
+                  await _openMikrotikForm();
+                },
+                child: const Icon(Icons.add),
+              ),
             ),
           ),
           appBar: AppBar(
@@ -196,6 +202,7 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen> {
     }
 
     return ListView.builder(
+      controller: scrollController,
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 24),
       itemCount: provider.routers.length,
       itemBuilder: (context, index) {

@@ -10,6 +10,8 @@ import 'package:wifiber/screens/dashboard/employees/employee_form_screen.dart';
 import 'package:wifiber/screens/dashboard/employees/employee_detail_modal.dart';
 import 'package:wifiber/screens/dashboard/employees/employee_delete_modal.dart';
 import 'package:wifiber/components/reusables/options_bottom_sheet.dart';
+import 'package:wifiber/mixins/scroll_to_hide_fab_mixin.dart';
+import 'package:wifiber/components/reusables/hideable_fab_wrapper.dart';
 
 class EmployeeListScreen extends StatefulWidget {
   const EmployeeListScreen({super.key});
@@ -18,7 +20,8 @@ class EmployeeListScreen extends StatefulWidget {
   State<EmployeeListScreen> createState() => _EmployeeListScreenState();
 }
 
-class _EmployeeListScreenState extends State<EmployeeListScreen> {
+class _EmployeeListScreenState extends State<EmployeeListScreen>
+    with ScrollToHideFabMixin {
   final TextEditingController _searchController = TextEditingController();
 
   @override
@@ -140,10 +143,13 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
         requiredPermissions: const ['employee'],
         child: Scaffold(
           backgroundColor: AppColors.primary,
-          floatingActionButton: FloatingActionButton(
-            onPressed: () => _navigateToForm(),
-            backgroundColor: AppColors.primary,
-            child: const Icon(Icons.add),
+          floatingActionButton: HideableFabWrapper(
+            visible: isFabVisible,
+            child: FloatingActionButton(
+              onPressed: () => _navigateToForm(),
+              backgroundColor: AppColors.primary,
+              child: const Icon(Icons.add),
+            ),
           ),
           appBar: AppBar(
             title: const Text('Karyawan'),
@@ -197,6 +203,7 @@ class _EmployeeListScreenState extends State<EmployeeListScreen> {
                         return RefreshIndicator(
                           onRefresh: () => provider.refresh(),
                           child: ListView.builder(
+                            controller: scrollController,
                             padding: const EdgeInsets.symmetric(
                               horizontal: 16,
                               vertical: 8,

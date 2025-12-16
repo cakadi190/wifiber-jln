@@ -8,6 +8,8 @@ import 'package:wifiber/screens/dashboard/registrants/registrant_detail_modal.da
 import 'package:wifiber/screens/dashboard/registrants/registrant_delete_modal.dart';
 import 'package:wifiber/services/registrant_service.dart';
 import 'package:wifiber/middlewares/auth_middleware.dart';
+import 'package:wifiber/mixins/scroll_to_hide_fab_mixin.dart';
+import 'package:wifiber/components/reusables/hideable_fab_wrapper.dart';
 
 class RegistrantListScreen extends StatefulWidget {
   const RegistrantListScreen({super.key});
@@ -16,7 +18,8 @@ class RegistrantListScreen extends StatefulWidget {
   State<RegistrantListScreen> createState() => _RegistrantListScreenState();
 }
 
-class _RegistrantListScreenState extends State<RegistrantListScreen> {
+class _RegistrantListScreenState extends State<RegistrantListScreen>
+    with ScrollToHideFabMixin {
   final TextEditingController _searchController = TextEditingController();
   RegistrantStatus? _selectedStatus;
 
@@ -332,6 +335,7 @@ class _RegistrantListScreenState extends State<RegistrantListScreen> {
                       return RefreshIndicator(
                         onRefresh: provider.refresh,
                         child: ListView.builder(
+                          controller: scrollController,
                           itemCount: provider.registrants.length,
                           itemBuilder: (context, index) {
                             final registrant = provider.registrants[index];
@@ -410,14 +414,17 @@ class _RegistrantListScreenState extends State<RegistrantListScreen> {
             ),
           ),
         ),
-        floatingActionButton: PermissionWidget(
-          permissions: const ['registrant'],
-          child: FloatingActionButton(
-            onPressed: () => _navigateToForm(),
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
-            tooltip: 'Tambah Calon Pelanggan',
-            child: const Icon(Icons.add),
+        floatingActionButton: HideableFabWrapper(
+          visible: isFabVisible,
+          child: PermissionWidget(
+            permissions: const ['registrant'],
+            child: FloatingActionButton(
+              onPressed: () => _navigateToForm(),
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              tooltip: 'Tambah Calon Pelanggan',
+              child: const Icon(Icons.add),
+            ),
           ),
         ),
       ),

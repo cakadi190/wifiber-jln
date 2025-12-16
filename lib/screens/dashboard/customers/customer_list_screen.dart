@@ -16,6 +16,8 @@ import 'package:wifiber/screens/dashboard/customers/customer_detail_modal.dart';
 import 'package:wifiber/screens/dashboard/customers/customer_form_screen.dart';
 import 'package:wifiber/services/customer_service.dart';
 import 'package:wifiber/middlewares/auth_middleware.dart';
+import 'package:wifiber/mixins/scroll_to_hide_fab_mixin.dart';
+import 'package:wifiber/components/reusables/hideable_fab_wrapper.dart';
 
 class CustomerListScreen extends StatefulWidget {
   final CustomerStatus? initialStatus;
@@ -26,7 +28,8 @@ class CustomerListScreen extends StatefulWidget {
   State<CustomerListScreen> createState() => _CustomerListScreenState();
 }
 
-class _CustomerListScreenState extends State<CustomerListScreen> {
+class _CustomerListScreenState extends State<CustomerListScreen>
+    with ScrollToHideFabMixin {
   final TextEditingController _searchController = TextEditingController();
 
   String? _selectedAreaId;
@@ -737,6 +740,7 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                       return RefreshIndicator(
                         onRefresh: provider.refresh,
                         child: ListView.builder(
+                          controller: scrollController,
                           itemCount: provider.customers.length,
                           itemBuilder: (context, index) {
                             final customer = provider.customers[index];
@@ -802,14 +806,17 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
             ),
           ),
         ),
-        floatingActionButton: PermissionWidget(
-          permissions: const ['customer'],
-          child: FloatingActionButton(
-            onPressed: () => _navigateToForm(),
-            backgroundColor: AppColors.primary,
-            foregroundColor: Colors.white,
-            tooltip: 'Tambah Pelanggan',
-            child: const Icon(Icons.add),
+        floatingActionButton: HideableFabWrapper(
+          visible: isFabVisible,
+          child: PermissionWidget(
+            permissions: const ['customer'],
+            child: FloatingActionButton(
+              onPressed: () => _navigateToForm(),
+              backgroundColor: AppColors.primary,
+              foregroundColor: Colors.white,
+              tooltip: 'Tambah Pelanggan',
+              child: const Icon(Icons.add),
+            ),
           ),
         ),
       ),
