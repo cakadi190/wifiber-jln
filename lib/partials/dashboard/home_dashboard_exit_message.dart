@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:wifiber/components/ui/snackbars.dart';
 
 class HomeDashboardExitMessage extends StatelessWidget {
   const HomeDashboardExitMessage({super.key, required this.visible});
@@ -11,25 +12,13 @@ class HomeDashboardExitMessage extends StatelessWidget {
       return const SizedBox.shrink();
     }
 
-    return Positioned(
-      bottom: 100,
-      left: 16,
-      right: 16,
-      child: Material(
-        color: Colors.transparent,
-        child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          decoration: BoxDecoration(
-            color: Colors.black87,
-            borderRadius: BorderRadius.circular(8),
-          ),
-          child: const Text(
-            'Tekan tombol kembali sekali lagi untuk keluar dari aplikasi',
-            style: TextStyle(color: Colors.white, fontSize: 14),
-            textAlign: TextAlign.center,
-          ),
-        ),
-      ),
-    );
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      SnackBars.dark(
+        context,
+        'Tekan tombol kembali sekali lagi untuk keluar dari aplikasi.',
+      );
+    });
+
+    return const SizedBox.shrink();
   }
 }

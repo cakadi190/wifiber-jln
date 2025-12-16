@@ -750,10 +750,14 @@ class _CustomerListScreenState extends State<CustomerListScreen> {
                                 ),
                                 title: Row(
                                   children: [
-                                    Text(
-                                      customer.name,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
+                                    Expanded(
+                                      child: Text(
+                                        customer.name,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                        maxLines: 1,
+                                        overflow: TextOverflow.ellipsis,
                                       ),
                                     ),
                                     const SizedBox(width: 8),
