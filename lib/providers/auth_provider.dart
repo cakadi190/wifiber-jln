@@ -6,6 +6,9 @@ class AuthProvider extends SafeChangeNotifier {
   AuthUser? user;
   bool isLoading = true;
 
+  bool _isManualLogout = false;
+  bool get isManualLogout => _isManualLogout;
+
   AuthProvider() {
     _initUser();
   }
@@ -35,6 +38,7 @@ class AuthProvider extends SafeChangeNotifier {
   Future<void> logout() async {
     await AuthService.logout();
     user = null;
+    _isManualLogout = true;
     notifyListeners();
   }
 

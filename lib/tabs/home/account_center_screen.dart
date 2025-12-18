@@ -339,30 +339,82 @@ class _AccountCenterScreenState extends State<AccountCenterScreen> {
                   onPressed: () async {
                     final navigator = Navigator.of(dialogContext);
 
+                    // Close the confirmation dialog
+                    navigator.pop();
+
+                    if (!mounted) return;
+
+                    // Show success dialog
+                    await showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (successContext) {
+                        return AlertDialog(
+                          contentPadding: const EdgeInsets.all(24),
+                          content: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              PhosphorIcon(
+                                PhosphorIcons.checkCircle(
+                                  PhosphorIconsStyle.duotone,
+                                ),
+                                color: Colors.green,
+                                size: 64,
+                              ),
+                              const SizedBox(height: 16),
+                              Text(
+                                "Berhasil Keluar",
+                                textAlign: TextAlign.center,
+                                style: Theme.of(successContext)
+                                    .textTheme
+                                    .titleMedium
+                                    ?.copyWith(
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.green,
+                                    ),
+                              ),
+                              const SizedBox(height: 12),
+                              Text(
+                                "Anda telah berhasil keluar dari sesi ini. Sampai jumpa kembali!",
+                                textAlign: TextAlign.center,
+                                style: Theme.of(
+                                  successContext,
+                                ).textTheme.bodyMedium,
+                              ),
+                            ],
+                          ),
+                          actions: [
+                            SizedBox(
+                              width: double.infinity,
+                              child: ElevatedButton(
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: Colors.green,
+                                  foregroundColor: Colors.white,
+                                  padding: const EdgeInsets.symmetric(
+                                    vertical: 14,
+                                  ),
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(8),
+                                  ),
+                                ),
+                                onPressed: () {
+                                  Navigator.of(successContext).pop();
+                                },
+                                child: const Text("OK"),
+                              ),
+                            ),
+                          ],
+                        );
+                      },
+                    );
+
+                    if (!mounted) return;
+
                     try {
                       await authProvider.logout();
-
-                      if (!mounted || !dialogContext.mounted) {
-                        return;
-                      }
-
-                      navigator.pop();
-
-                      SnackBars.success(
-                        context,
-                        "Berhasil mengeluarkan anda dari sesi saat ini. Sampai jumpa di lain waktu!",
-                      ).clearSnackBars();
-
                       widget.onLogoutTap?.call();
                     } catch (e) {
-                      if (!dialogContext.mounted) {
-                        return;
-                      }
-
-                      navigator.pop();
-
                       if (!mounted) return;
-
                       SnackBars.error(
                         context,
                         "Gagal mengeluarkan anda dari sesi saat ini. Silahkan coba lagi.",

@@ -32,10 +32,12 @@ class AuthGuard extends StatelessWidget {
     if (!authProvider.isLoggedIn) {
       WidgetsBinding.instance.addPostFrameCallback((_) {
         if (ModalRoute.of(context)?.isCurrent ?? false) {
-          SnackBars.info(
-            context,
-            "Silahkan login terlebih dahulu untuk melanjutkan.",
-          ).clearSnackBars();
+          if (!authProvider.isManualLogout) {
+            SnackBars.info(
+              context,
+              "Silahkan login terlebih dahulu untuk melanjutkan.",
+            ).clearSnackBars();
+          }
 
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(builder: (_) => const LoginScreen()),
