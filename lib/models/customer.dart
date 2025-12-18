@@ -1,4 +1,4 @@
-import 'package:flutter/cupertino.dart';
+import 'package:flutter/material.dart';
 import 'package:wifiber/helpers/currency_helper.dart';
 
 class Customer {
@@ -62,32 +62,32 @@ class Customer {
     debugPrint(json.toString());
 
     return Customer(
-      id: json['id'].toString(),
-      customerId: json['customer_id'].toString(),
-      name: json['name'],
-      nickname: json['nickname'],
-      phone: json['phone'],
-      identityNumber: json['identity_number'],
-      address: json['address'],
-      status: json['status'],
-      ktpPhoto: json['ktp_photo'],
-      locationPhoto: json['location_photo'],
-      packageId: json['package_id'].toString(),
-      areaId: json['area_id'].toString(),
+      id: json['id']?.toString() ?? '',
+      customerId: json['customer_id']?.toString() ?? '',
+      name: json['name']?.toString() ?? '',
+      nickname: json['nickname']?.toString(),
+      phone: json['phone']?.toString() ?? '',
+      identityNumber: json['identity_number']?.toString() ?? '',
+      address: json['address']?.toString() ?? '',
+      status: json['status']?.toString() ?? '',
+      ktpPhoto: json['ktp_photo']?.toString(),
+      locationPhoto: json['location_photo']?.toString(),
+      packageId: json['package_id']?.toString() ?? '',
+      areaId: json['area_id']?.toString() ?? '',
       routerId: json['router_id']?.toString(),
-      pppoeSecret: json['pppoe_secret'],
-      dueDate: json['due_date'].toString(),
-      createdAt: json['created_at'],
+      pppoeSecret: json['pppoe_secret']?.toString() ?? '',
+      dueDate: json['due_date']?.toString() ?? '',
+      createdAt: json['created_at']?.toString() ?? '',
       odpId: json['odp_id']?.toString(),
-      latitude: json['latitude'],
-      longitude: json['longitude'],
-      discount: json['discount'].toString(),
-      packageName: json['package_name'],
-      packagePrice: json['package_price'].toString(),
-      packagePpn: json['package_ppn'].toString(),
-      routerName: json['router_name'],
-      routerHost: json['router_host'],
-      areaName: json['area_name'],
+      latitude: json['latitude']?.toString(),
+      longitude: json['longitude']?.toString(),
+      discount: json['discount']?.toString() ?? '0',
+      packageName: json['package_name']?.toString() ?? '',
+      packagePrice: json['package_price']?.toString() ?? '0',
+      packagePpn: json['package_ppn']?.toString() ?? '0',
+      routerName: json['router_name']?.toString(),
+      routerHost: json['router_host']?.toString(),
+      areaName: json['area_name']?.toString(),
     );
   }
 
@@ -138,9 +138,13 @@ class CustomerResponse {
 
   factory CustomerResponse.fromJson(Map<String, dynamic> json) {
     return CustomerResponse(
-      success: json['success'],
-      message: json['message'],
-      data: List<Customer>.from(json['data'].map((x) => Customer.fromJson(x))),
+      success: json['success'] ?? false,
+      message: json['message']?.toString() ?? '',
+      data: json['data'] != null
+          ? List<Customer>.from(
+              (json['data'] as List).map((x) => Customer.fromJson(x)),
+            )
+          : [],
       error: json['error'],
     );
   }

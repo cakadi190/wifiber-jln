@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:wifiber/components/reusables/options_bottom_sheet.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/providers/registrant_provider.dart';
 import 'package:wifiber/models/registrant.dart';
@@ -120,62 +121,65 @@ class _RegistrantListScreenState extends State<RegistrantListScreen>
   }
 
   void _showOptionsMenu(Registrant registrant) {
-    showModalBottomSheet<void>(
+    showOptionModalBottomSheet<void>(
       context: context,
-      builder: (context) => SafeArea(
-        top: false,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Padding(
-              padding: EdgeInsets.all(16),
-              child: Card(
-                elevation: 0,
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      backgroundColor: _getStatusColor(registrant.status),
-                      child: const Icon(Icons.person, color: Colors.white),
-                    ),
-                    const SizedBox(width: 16),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text(
-                            registrant.name,
-                            style: const TextStyle(fontWeight: FontWeight.bold),
-                          ),
-                          const SizedBox(height: 4),
-                          Text(registrant.phone),
-                        ],
-                      ),
-                    ),
-                  ],
+      header: Row(
+        children: [
+          CircleAvatar(
+            backgroundColor: _getStatusColor(registrant.status),
+            child: const Icon(Icons.verified_user, color: Colors.white),
+          ),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  registrant.name,
+                  style: const TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.w600,
+                  ),
                 ),
-              ),
+                Text(
+                  registrant.phone,
+                  style: const TextStyle(fontSize: 14, color: Colors.grey),
+                ),
+              ],
             ),
-
-            ListTile(
-              leading: const Icon(Icons.edit),
-              title: const Text('Edit'),
-              onTap: () {
-                Navigator.of(context).pop();
-                _navigateToForm(registrant: registrant);
-              },
-            ),
-            ListTile(
-              leading: const Icon(Icons.delete, color: Colors.red),
-              title: const Text('Hapus', style: TextStyle(color: Colors.red)),
-              onTap: () {
-                Navigator.of(context).pop();
-
-                RegistrantDeleteModal.show(context, registrant);
-              },
-            ),
-          ],
-        ),
+          ),
+        ],
       ),
+      items: [
+        OptionMenuItem(
+          icon: Icons.visibility,
+          title: 'Lihat Data',
+          subtitle: 'Lihat data pelanggan',
+          onTap: () {
+            Navigator.pop(context);
+            _showRegistrantDetail(registrant);
+          },
+        ),
+        OptionMenuItem(
+          icon: Icons.edit,
+          title: 'Ubah Data',
+          subtitle: 'Ubah data pelanggan',
+          onTap: () {
+            Navigator.pop(context);
+            _navigateToForm(registrant: registrant);
+          },
+        ),
+        OptionMenuItem(
+          icon: Icons.delete,
+          title: 'Hapus Data',
+          subtitle: 'Hapus data dari daftar',
+          isDestructive: true,
+          onTap: () {
+            Navigator.pop(context);
+            RegistrantDeleteModal.show(context, registrant);
+          },
+        ),
+      ],
     );
   }
 

@@ -34,10 +34,66 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen>
   late RegistrantFormController _controller;
   LatLng? _selectedLocation;
   String? _locationError;
+  final ScrollController _scrollController = ScrollController();
+
+  final Map<String, GlobalKey> _fieldKeys = {
+    'name': GlobalKey(),
+    'nickname': GlobalKey(),
+    'phone': GlobalKey(),
+    'identity-number': GlobalKey(),
+    'address': GlobalKey(),
+    'status': GlobalKey(),
+    'package': GlobalKey(),
+    'area': GlobalKey(),
+    'router': GlobalKey(),
+    'pppoe_secret': GlobalKey(),
+    'due-date': GlobalKey(),
+    'odp': GlobalKey(),
+    'discount': GlobalKey(),
+    'ktp-photo': GlobalKey(),
+    'location-photo': GlobalKey(),
+  };
+
+  final List<String> _orderedFields = [
+    'name',
+    'nickname',
+    'phone',
+    'identity-number',
+    'address',
+    'status',
+    'package',
+    'area',
+    'router',
+    'pppoe_secret',
+    'due-date',
+    'odp',
+    'discount',
+    'ktp-photo',
+    'location-photo',
+  ];
+
+  void _scrollToFirstError(Map<String, dynamic> errors) {
+    for (final field in _orderedFields) {
+      if (errors.containsKey(field) && _fieldKeys.containsKey(field)) {
+        final key = _fieldKeys[field];
+        if (key?.currentContext != null) {
+          Scrollable.ensureVisible(
+            key!.currentContext!,
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+          );
+          break;
+        }
+      }
+    }
+  }
 
   @override
   void initState() {
     super.initState();
+
+    debugPrint(widget.registrant?.toJson().toString());
+
     _controller = RegistrantFormController();
     _controller.initializeWithRegistrant(widget.registrant);
     if (widget.registrant?.latitude != null &&
@@ -59,6 +115,7 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen>
   @override
   void dispose() {
     _controller.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -366,7 +423,10 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen>
                           context,
                           isEdit: widget.isEdit,
                           registrant: widget.registrant,
-                          onValidationError: setBackendErrors,
+                          onValidationError: (errors) {
+                            setBackendErrors(errors);
+                            _scrollToFirstError(errors);
+                          },
                         );
                       }
                     },
@@ -390,6 +450,7 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen>
                     Form(
                       key: _formKey,
                       child: ListView(
+                        controller: _scrollController,
                         padding: const EdgeInsets.all(16),
                         children: [
                           Card(
@@ -412,6 +473,7 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen>
                                   ),
                                   const SizedBox(height: 16),
                                   TextFormField(
+                                    key: _fieldKeys['name'],
                                     controller: controller.nameController,
                                     decoration: const InputDecoration(
                                       labelText: 'Nama Lengkap',
@@ -428,6 +490,7 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen>
                                   ),
                                   const SizedBox(height: 16),
                                   TextFormField(
+                                    key: _fieldKeys['nickname'],
                                     controller: controller.nicknameController,
                                     decoration: const InputDecoration(
                                       labelText: 'Nama Panggilan',
@@ -437,6 +500,7 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen>
                                   ),
                                   const SizedBox(height: 16),
                                   TextFormField(
+                                    key: _fieldKeys['phone'],
                                     controller: controller.phoneController,
                                     decoration: const InputDecoration(
                                       labelText: 'Nomor Telepon',
@@ -462,6 +526,7 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen>
                                   ),
                                   const SizedBox(height: 20),
                                   TextFormField(
+                                    key: _fieldKeys['identity-number'],
                                     controller:
                                         controller.identityNumberController,
                                     decoration: const InputDecoration(
@@ -480,6 +545,7 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen>
                                   ),
                                   const SizedBox(height: 16),
                                   TextFormField(
+                                    key: _fieldKeys['address'],
                                     controller: controller.addressController,
                                     decoration: const InputDecoration(
                                       labelText: 'Alamat',
@@ -497,12 +563,15 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen>
                                   ),
                                   const SizedBox(height: 16),
                                   DropdownButtonFormField<RegistrantStatus>(
+                                    key: _fieldKeys['status'],
                                     initialValue: controller.selectedStatus,
                                     decoration: const InputDecoration(
                                       labelText: 'Status',
                                       border: OutlineInputBorder(),
                                       prefixIcon: Icon(Icons.info),
                                     ),
+                                    validator: (value) =>
+                                        backendErrorFor('status'),
                                     items: RegistrantStatus.values.map((
                                       status,
                                     ) {
@@ -555,6 +624,7 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen>
                                   ),
                                   const SizedBox(height: 16),
                                   PackageButtonSelector(
+                                    key: _fieldKeys['package'],
                                     selectedPackageId:
                                         controller.selectedPackageId,
                                     selectedPackageName:
@@ -563,11 +633,13 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen>
                                         controller.onPackageSelected,
                                   ),
                                   if (controller.validatePackageSelection() !=
-                                      null)
+                                          null ||
+                                      backendErrorFor('package') != null)
                                     Padding(
                                       padding: const EdgeInsets.only(top: 8),
                                       child: Text(
-                                        controller.validatePackageSelection()!,
+                                        controller.validatePackageSelection() ??
+                                            backendErrorFor('package')!,
                                         style: TextStyle(
                                           color: Colors.red.shade600,
                                           fontSize: 12,
@@ -576,17 +648,20 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen>
                                     ),
                                   const SizedBox(height: 16),
                                   AreaButtonSelector(
+                                    key: _fieldKeys['area'],
                                     selectedAreaId: controller.selectedAreaId,
                                     selectedAreaName:
                                         controller.selectedAreaName,
                                     onAreaSelected: controller.onAreaSelected,
                                   ),
                                   if (controller.validateAreaSelection() !=
-                                      null)
+                                          null ||
+                                      backendErrorFor('area') != null)
                                     Padding(
                                       padding: const EdgeInsets.only(top: 8),
                                       child: Text(
-                                        controller.validateAreaSelection()!,
+                                        controller.validateAreaSelection() ??
+                                            backendErrorFor('area')!,
                                         style: TextStyle(
                                           color: Colors.red.shade600,
                                           fontSize: 12,
@@ -595,6 +670,7 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen>
                                     ),
                                   const SizedBox(height: 16),
                                   RouterButtonSelector(
+                                    key: _fieldKeys['router'],
                                     selectedRouterId:
                                         controller.selectedRouterId,
                                     selectedRouterName:
@@ -603,11 +679,13 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen>
                                         controller.onRouterSelected,
                                   ),
                                   if (controller.validateRouterSelection() !=
-                                      null)
+                                          null ||
+                                      backendErrorFor('router') != null)
                                     Padding(
                                       padding: const EdgeInsets.only(top: 8),
                                       child: Text(
-                                        controller.validateRouterSelection()!,
+                                        controller.validateRouterSelection() ??
+                                            backendErrorFor('router')!,
                                         style: TextStyle(
                                           color: Colors.red.shade600,
                                           fontSize: 12,
@@ -616,6 +694,7 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen>
                                     ),
                                   const SizedBox(height: 16),
                                   TextFormField(
+                                    key: _fieldKeys['pppoe_secret'],
                                     controller:
                                         controller.pppoeSecretController,
                                     decoration: const InputDecoration(
@@ -633,6 +712,7 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen>
                                   ),
                                   const SizedBox(height: 16),
                                   TextFormField(
+                                    key: _fieldKeys['due-date'],
                                     controller: controller.dueDateController,
                                     keyboardType: TextInputType.number,
                                     decoration: const InputDecoration(
@@ -659,15 +739,19 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen>
 
                                   const SizedBox(height: 20),
                                   OdpButtonSelector(
+                                    key: _fieldKeys['odp'],
                                     selectedOdpId: controller.selectedOdpId,
                                     selectedOdpName: controller.selectedOdpName,
                                     onOdpSelected: controller.onOdpSelected,
                                   ),
-                                  if (controller.validateOdpSelection() != null)
+                                  if (controller.validateOdpSelection() !=
+                                          null ||
+                                      backendErrorFor('odp') != null)
                                     Padding(
                                       padding: const EdgeInsets.only(top: 8),
                                       child: Text(
-                                        controller.validateOdpSelection()!,
+                                        controller.validateOdpSelection() ??
+                                            backendErrorFor('odp')!,
                                         style: TextStyle(
                                           color: Colors.red.shade600,
                                           fontSize: 12,
@@ -676,6 +760,7 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen>
                                     ),
                                   const SizedBox(height: 16),
                                   TextFormField(
+                                    key: _fieldKeys['discount'],
                                     controller: controller.discountController,
                                     decoration: const InputDecoration(
                                       labelText: 'Diskon',
@@ -793,30 +878,38 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen>
                                 ),
                                 const SizedBox(height: 16),
 
-                                _buildPhotoSelector(
-                                  context: context,
-                                  title: 'Foto KTP',
-                                  subtitle:
-                                      'Upload foto KTP pelanggan (opsional)',
-                                  selectedFile: controller.ktpPhotoFile,
-                                  urlPreview: controller.ktpPhotoUrl,
-                                  onTap: () => controller.showImagePickerModal(
-                                    context,
-                                    forKtp: true,
+                                Container(
+                                  key: _fieldKeys['ktp-photo'],
+                                  child: _buildPhotoSelector(
+                                    context: context,
+                                    title: 'Foto KTP',
+                                    subtitle:
+                                        'Upload foto KTP pelanggan (opsional)',
+                                    selectedFile: controller.ktpPhotoFile,
+                                    urlPreview: controller.ktpPhotoUrl,
+                                    onTap: () =>
+                                        controller.showImagePickerModal(
+                                          context,
+                                          forKtp: true,
+                                        ),
                                   ),
                                 ),
                                 const SizedBox(height: 16),
 
-                                _buildPhotoSelector(
-                                  context: context,
-                                  title: 'Foto Lokasi',
-                                  urlPreview: controller.locationPhotoUrl,
-                                  subtitle:
-                                      'Upload foto lokasi pemasangan (opsional)',
-                                  selectedFile: controller.locationPhotoFile,
-                                  onTap: () => controller.showImagePickerModal(
-                                    context,
-                                    forKtp: false,
+                                Container(
+                                  key: _fieldKeys['location-photo'],
+                                  child: _buildPhotoSelector(
+                                    context: context,
+                                    title: 'Foto Lokasi',
+                                    urlPreview: controller.locationPhotoUrl,
+                                    subtitle:
+                                        'Upload foto lokasi pemasangan (opsional)',
+                                    selectedFile: controller.locationPhotoFile,
+                                    onTap: () =>
+                                        controller.showImagePickerModal(
+                                          context,
+                                          forKtp: false,
+                                        ),
                                   ),
                                 ),
                               ],
@@ -852,8 +945,10 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen>
                                               context,
                                               isEdit: widget.isEdit,
                                               registrant: widget.registrant,
-                                              onValidationError:
-                                                  setBackendErrors,
+                                              onValidationError: (errors) {
+                                                setBackendErrors(errors);
+                                                _scrollToFirstError(errors);
+                                              },
                                             );
                                           }
                                         },

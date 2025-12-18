@@ -185,7 +185,7 @@ class CustomerService {
             .map((entry) => MapEntry(entry.key, entry.value.toString())),
       );
 
-      final streamedResponse = await _http.putUpload(
+      final streamedResponse = await _http.postUpload(
         '$path/$id',
         fields: fields,
         files: files,
@@ -218,7 +218,13 @@ class CustomerService {
       if (statusCode == 200) {
         final jsonData = json.decode(responseBody);
         if (jsonData['success'] == true) {
-          return Customer.fromJson(jsonData['data']);
+          if (jsonData['data'] != null &&
+              jsonData['data'] is Map<String, dynamic>) {
+            return Customer.fromJson(jsonData['data']);
+          } else {
+            // Fallback: if backend doesn't return data on update, fetch it manually
+            return await getCustomerById(id);
+          }
         } else {
           throw Exception(
             'Failed to update customer: ${jsonData['message'] ?? 'Unknown error'}',
