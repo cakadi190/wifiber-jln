@@ -54,6 +54,8 @@ class RouterPppoeSecret {
   final String? lastDisconnectReason;
   final bool disabled;
   final String? uptime;
+  final String? customerName;
+  final String? customerId;
 
   RouterPppoeSecret({
     required this.id,
@@ -71,6 +73,8 @@ class RouterPppoeSecret {
     this.lastDisconnectReason,
     required this.disabled,
     this.uptime,
+    this.customerName,
+    this.customerId,
   });
 
   factory RouterPppoeSecret.fromJson(
@@ -92,6 +96,8 @@ class RouterPppoeSecret {
       lastCallerId: json['last-caller-id']?.toString(),
       lastDisconnectReason: json['last-disconnect-reason']?.toString(),
       disabled: _parseBool(json['disabled']),
+      customerName: json['customer_name']?.toString(),
+      customerId: json['customer_id']?.toString(),
       uptime: json['uptime']?.toString(),
     );
   }
@@ -113,6 +119,8 @@ class RouterPppoeSecret {
       'last-disconnect-reason': lastDisconnectReason,
       'disabled': disabled,
       'uptime': uptime,
+      'customer_name': customerName,
+      'customer_id': customerId,
     };
   }
 

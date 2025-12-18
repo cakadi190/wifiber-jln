@@ -217,9 +217,19 @@ class _EmployeeListScreenState extends State<EmployeeListScreen>
                                 child: ListTile(
                                   title: Text(employee.name),
                                   subtitle: Text(employee.username ?? ''),
-                                  trailing: const Icon(
-                                    Icons.more_vert,
-                                    color: Colors.grey,
+                                  trailing: InkWell(
+                                    child: Container(
+                                      padding: const EdgeInsets.all(8),
+                                      decoration: BoxDecoration(
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Icon(
+                                        Icons.more_vert,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    onTap: () =>
+                                        _showActionBottomSheet(employee),
                                   ),
                                   onTap: () => _showDetail(employee),
                                   onLongPress: () =>

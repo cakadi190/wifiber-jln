@@ -1144,6 +1144,8 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen>
             ],
           ),
           const SizedBox(height: 8),
+          _buildPppoeInfoRow('Nama Pelanggan', secret.customerName),
+          _buildPppoeInfoRow('ID Pelanggan', secret.customerId),
           _buildPppoeInfoRow('Profil', secret.profile),
           _buildPppoeInfoRow('ID Pemanggil', secret.callerId),
           if (isActive)
