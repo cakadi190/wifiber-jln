@@ -18,6 +18,7 @@ import 'package:wifiber/services/customer_service.dart';
 import 'package:wifiber/middlewares/auth_middleware.dart';
 import 'package:wifiber/mixins/scroll_to_hide_fab_mixin.dart';
 import 'package:wifiber/components/reusables/hideable_fab_wrapper.dart';
+import 'package:wifiber/utils/file_picker_validator.dart';
 
 class CustomerListScreen extends StatefulWidget {
   final CustomerStatus? initialStatus;
@@ -377,18 +378,65 @@ class _CustomerListScreenState extends State<CustomerListScreen>
                     allowMultiple: false,
                   );
 
-                  if (result != null) {
-                    setState(() {
-                      selectedFile = File(result.files.single.path!);
-                      fileName = result.files.single.name;
-                    });
+                  if (!context.mounted) return;
+
+                  if (result == null || result.files.isEmpty) {
+                    // User membatalkan pemilihan
+                    return;
                   }
+
+                  final file = File(result.files.single.path!);
+
+                  // Validasi ukuran file (maks 10MB untuk Excel)
+                  const excelConfig = FilePickerConfig(
+                    allowedExtensions: ['xls', 'xlsx'],
+                    maxFileSizeBytes: 10 * 1024 * 1024, // 10MB
+                    fileTypeLabel: 'File Excel',
+                  );
+
+                  final validationResult =
+                      await FilePickerValidator.validateFile(file, excelConfig);
+
+                  if (!context.mounted) return;
+
+                  if (!validationResult.isValid) {
+                    validationResult.showErrorIfInvalid(context);
+                    return;
+                  }
+
+                  setState(() {
+                    selectedFile = file;
+                    fileName = result.files.single.name;
+                  });
                 } catch (e) {
                   if (!context.mounted) return;
-                  SnackBars.error(
-                    context,
-                    'Gagal memilih berkas: ${e.toString()}',
-                  ).clearSnackBars();
+                  ScaffoldMessenger.of(context)
+                    ..clearSnackBars()
+                    ..showSnackBar(
+                      SnackBar(
+                        content: Row(
+                          children: [
+                            const Icon(
+                              Icons.error_outline,
+                              color: Colors.white,
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'Gagal memilih berkas: ${e.toString().replaceAll('Exception: ', '')}',
+                              ),
+                            ),
+                          ],
+                        ),
+                        backgroundColor: Colors.red.shade600,
+                        duration: const Duration(seconds: 4),
+                        behavior: SnackBarBehavior.floating,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        margin: const EdgeInsets.all(16),
+                      ),
+                    );
                 }
               }
 

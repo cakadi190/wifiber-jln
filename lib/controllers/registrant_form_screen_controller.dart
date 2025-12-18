@@ -11,6 +11,7 @@ import 'package:wifiber/providers/registrant_provider.dart';
 import 'package:wifiber/services/registrant_service.dart';
 import 'package:wifiber/services/http_service.dart';
 import 'package:wifiber/services/location_service.dart';
+import 'package:wifiber/utils/file_picker_validator.dart';
 import 'package:wifiber/utils/safe_change_notifier.dart';
 
 class RegistrantFormController extends SafeChangeNotifier {
@@ -281,12 +282,31 @@ class RegistrantFormController extends SafeChangeNotifier {
       bool granted = await _requestCameraPermission();
       if (!granted) {
         if (!context.mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Izin kamera diperlukan untuk mengambil foto'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            SnackBar(
+              content: const Row(
+                children: [
+                  Icon(Icons.lock, color: Colors.white),
+                  SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Izin kamera diperlukan untuk mengambil foto. '
+                      'Silakan aktifkan izin kamera di pengaturan.',
+                    ),
+                  ),
+                ],
+              ),
+              backgroundColor: Colors.red.shade600,
+              duration: const Duration(seconds: 4),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              margin: const EdgeInsets.all(16),
+            ),
+          );
         return;
       }
     }
@@ -301,25 +321,79 @@ class RegistrantFormController extends SafeChangeNotifier {
 
       if (!context.mounted) return;
 
-      if (image != null) {
-        if (forKtp) {
-          ktpPhotoFile = image;
-        } else {
-          locationPhotoFile = image;
-        }
-
-        notifyListeners();
-        Navigator.pop(context);
+      if (image == null) {
+        // User membatalkan pemilihan, tidak perlu tampilkan error
+        return;
       }
-    } catch (e) {
+
+      // Validasi file menggunakan FilePickerValidator
+      final config = forKtp
+          ? FilePickerConfig.ktpPhoto
+          : FilePickerConfig.locationPhoto;
+
+      final validationResult = await FilePickerValidator.validate(
+        image,
+        config,
+      );
+
+      if (!context.mounted) return;
+
+      if (!validationResult.isValid) {
+        // Tampilkan error dengan snackbar yang informatif
+        validationResult.showErrorIfInvalid(context);
+        Navigator.pop(context);
+        return;
+      }
+
+      // Validasi berhasil, simpan file
+      if (forKtp) {
+        ktpPhotoFile = image;
+      } else {
+        locationPhotoFile = image;
+      }
+
+      notifyListeners();
+      Navigator.pop(context);
+    } on Exception catch (e) {
       if (!context.mounted) return;
       Navigator.pop(context);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Gagal mengambil foto: $e'),
-          backgroundColor: Colors.red,
-        ),
-      );
+
+      String errorMessage = 'Gagal mengambil foto';
+
+      // Handle specific exceptions
+      if (e.toString().contains('permission')) {
+        errorMessage =
+            'Izin akses galeri/kamera ditolak. '
+            'Silakan berikan izin di pengaturan aplikasi.';
+      } else if (e.toString().contains('storage')) {
+        errorMessage =
+            'Penyimpanan tidak mencukupi. '
+            'Silakan kosongkan beberapa ruang penyimpanan.';
+      } else {
+        errorMessage =
+            'Gagal mengambil foto: ${e.toString().replaceAll('Exception: ', '')}';
+      }
+
+      ScaffoldMessenger.of(context)
+        ..clearSnackBars()
+        ..showSnackBar(
+          SnackBar(
+            content: Row(
+              children: [
+                const Icon(Icons.error_outline, color: Colors.white),
+                const SizedBox(width: 12),
+                Expanded(child: Text(errorMessage)),
+              ],
+            ),
+            backgroundColor: Colors.red.shade600,
+            duration: const Duration(seconds: 4),
+            behavior: SnackBarBehavior.floating,
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(8),
+            ),
+            margin: const EdgeInsets.all(16),
+          ),
+        );
     }
   }
 

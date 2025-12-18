@@ -12,6 +12,7 @@ import 'package:wifiber/models/bills.dart';
 import 'package:wifiber/providers/bills_provider.dart';
 import 'package:wifiber/middlewares/auth_middleware.dart';
 import 'package:wifiber/components/forms/backend_validation_mixin.dart';
+import 'package:wifiber/utils/file_picker_validator.dart';
 
 class BillsUpdateScreen extends StatefulWidget {
   final Bills bill;
@@ -106,18 +107,56 @@ class _BillsUpdateScreenState extends State<BillsUpdateScreen>
 
       if (!mounted) return;
 
-      if (picked != null) {
-        setState(() {
-          selectedPaymentProof = File(picked.path);
-          paymentProofFileName = picked.name;
-        });
+      if (picked == null) {
+        // User membatalkan pemilihan
+        return;
       }
+
+      // Validasi file menggunakan FilePickerValidator
+      final xFile = XFile(picked.path);
+      final validationResult = await FilePickerValidator.validate(
+        xFile,
+        FilePickerConfig.paymentProof,
+      );
+
+      if (!mounted) return;
+
+      if (!validationResult.isValid) {
+        // Tampilkan error dengan snackbar yang informatif
+        validationResult.showErrorIfInvalid(context);
+        return;
+      }
+
+      setState(() {
+        selectedPaymentProof = File(picked.path);
+        paymentProofFileName = picked.name;
+      });
     } catch (e) {
       if (mounted) {
-        SnackBars.error(
-          context,
-          "Gagal memilih berkas: ${e.toString()}",
-        ).clearSnackBars();
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Gagal memilih berkas: ${e.toString().replaceAll('Exception: ', '')}',
+                    ),
+                  ),
+                ],
+              ),
+              backgroundColor: Colors.red.shade600,
+              duration: const Duration(seconds: 4),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              margin: const EdgeInsets.all(16),
+            ),
+          );
       }
     }
   }
@@ -131,18 +170,56 @@ class _BillsUpdateScreenState extends State<BillsUpdateScreen>
 
       if (!mounted) return;
 
-      if (picked != null) {
-        setState(() {
-          selectedPaymentProof = File(picked.path);
-          paymentProofFileName = picked.name;
-        });
+      if (picked == null) {
+        // User membatalkan pemilihan
+        return;
       }
+
+      // Validasi file menggunakan FilePickerValidator
+      final xFile = XFile(picked.path);
+      final validationResult = await FilePickerValidator.validate(
+        xFile,
+        FilePickerConfig.paymentProof,
+      );
+
+      if (!mounted) return;
+
+      if (!validationResult.isValid) {
+        // Tampilkan error dengan snackbar yang informatif
+        validationResult.showErrorIfInvalid(context);
+        return;
+      }
+
+      setState(() {
+        selectedPaymentProof = File(picked.path);
+        paymentProofFileName = picked.name;
+      });
     } catch (e) {
       if (mounted) {
-        SnackBars.error(
-          context,
-          "Gagal mengambil foto: ${e.toString()}",
-        ).clearSnackBars();
+        ScaffoldMessenger.of(context)
+          ..clearSnackBars()
+          ..showSnackBar(
+            SnackBar(
+              content: Row(
+                children: [
+                  const Icon(Icons.error_outline, color: Colors.white),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: Text(
+                      'Gagal mengambil foto: ${e.toString().replaceAll('Exception: ', '')}',
+                    ),
+                  ),
+                ],
+              ),
+              backgroundColor: Colors.red.shade600,
+              duration: const Duration(seconds: 4),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              margin: const EdgeInsets.all(16),
+            ),
+          );
       }
     }
   }

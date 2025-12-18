@@ -41,6 +41,7 @@ class _LoginScreenState extends State<LoginScreen> with BackendValidationMixin {
 
   Future<void> _getPublicIp() async {
     final ip = await NetworkHelper.getPublicIp();
+    if (!mounted) return;
     setState(() {
       _ipAddress = ip ?? 'Unknown';
       _loadingIpAddress = false;
@@ -92,8 +93,12 @@ class _LoginScreenState extends State<LoginScreen> with BackendValidationMixin {
     clearBackendErrors();
 
     _controller.submitForm(
-      onLoading: () => setState(() => _controller.formLoading = true),
+      onLoading: () {
+        if (!mounted) return;
+        setState(() => _controller.formLoading = true);
+      },
       onComplete: () {
+        if (!mounted) return;
         setState(() => _controller.formLoading = false);
         _saveCredentialsToPasswordManager();
       },
