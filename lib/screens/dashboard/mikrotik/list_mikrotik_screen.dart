@@ -443,25 +443,15 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen>
       final success = await provider.deleteRouter(router.id);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(
-              success
-                  ? 'Router ${router.name} berhasil dihapus'
-                  : 'Gagal menghapus router ${router.name}',
-            ),
-            backgroundColor: success ? Colors.green : Colors.red,
-          ),
-        );
+        if (success) {
+          SnackBars.success(context, 'Router ${router.name} berhasil dihapus');
+        } else {
+          SnackBars.error(context, 'Gagal menghapus router ${router.name}');
+        }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Error: ${e.toString()}'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        SnackBars.error(context, 'Error: ${e.toString()}');
       }
     }
   }

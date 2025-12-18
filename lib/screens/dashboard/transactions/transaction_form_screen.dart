@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';
+import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/models/transaction.dart';
 import 'package:wifiber/providers/transaction_provider.dart';
@@ -139,7 +140,6 @@ class _TransactionFormScreenState extends State<TransactionFormScreen>
     setState(() => _isLoading = true);
     final provider = context.read<TransactionProvider>();
     final navigator = Navigator.of(context);
-    final messenger = ScaffoldMessenger.of(context);
 
     try {
       final nominal = int.parse(_nominalController.text.trim());
@@ -173,14 +173,10 @@ class _TransactionFormScreenState extends State<TransactionFormScreen>
     } on ValidationException catch (e) {
       if (!mounted) return;
       setBackendErrors(e.errors);
-      messenger.showSnackBar(
-        SnackBar(content: Text(e.message), backgroundColor: Colors.red),
-      );
+      SnackBars.error(context, e.message);
     } catch (e) {
       if (!mounted) return;
-      messenger.showSnackBar(
-        SnackBar(content: Text('Gagal menyimpan transaksi: $e')),
-      );
+      SnackBars.error(context, 'Gagal menyimpan transaksi: $e');
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);

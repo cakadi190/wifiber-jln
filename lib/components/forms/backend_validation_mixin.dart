@@ -1,22 +1,16 @@
 import 'package:flutter/material.dart';
 
-/// Mixin to handle backend validation errors and display them
-/// directly in form fields.
 mixin BackendValidationMixin<T extends StatefulWidget> on State<T> {
-  /// Stores backend errors mapped by field name.
   final Map<String, String?> _backendErrors = {};
 
-  /// Key of the form that should be validated when errors change.
   GlobalKey<FormState> get formKey;
 
-  /// Clears currently stored backend errors.
   void clearBackendErrors() {
     if (_backendErrors.isNotEmpty) {
       setState(() => _backendErrors.clear());
     }
   }
 
-  /// Set new backend errors and trigger form validation to show them.
   void setBackendErrors(Map<String, dynamic> errors) {
     _backendErrors
       ..clear()
@@ -27,7 +21,6 @@ mixin BackendValidationMixin<T extends StatefulWidget> on State<T> {
     formKey.currentState?.validate();
   }
 
-  /// Returns validator that combines local validation with backend errors.
   String? Function(String?) validator(
     String field, [
     String? Function(String?)? localValidator,
@@ -39,7 +32,6 @@ mixin BackendValidationMixin<T extends StatefulWidget> on State<T> {
     };
   }
 
-  /// Retrieves backend error message for a specific field without running validation.
   String? backendErrorFor(String field) => _backendErrors[field];
 
   String? _parseFirstError(dynamic value) {

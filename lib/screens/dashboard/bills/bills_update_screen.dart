@@ -133,30 +133,10 @@ class _BillsUpdateScreenState extends State<BillsUpdateScreen>
       });
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-          ..clearSnackBars()
-          ..showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(Icons.error_outline, color: Colors.white),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Gagal memilih berkas: ${e.toString().replaceAll('Exception: ', '')}',
-                    ),
-                  ),
-                ],
-              ),
-              backgroundColor: Colors.red.shade600,
-              duration: const Duration(seconds: 4),
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              margin: const EdgeInsets.all(16),
-            ),
-          );
+        SnackBars.error(
+          context,
+          'Gagal memilih berkas: ${e.toString().replaceAll('Exception: ', '')}',
+        );
       }
     }
   }
@@ -196,30 +176,10 @@ class _BillsUpdateScreenState extends State<BillsUpdateScreen>
       });
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context)
-          ..clearSnackBars()
-          ..showSnackBar(
-            SnackBar(
-              content: Row(
-                children: [
-                  const Icon(Icons.error_outline, color: Colors.white),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Gagal mengambil foto: ${e.toString().replaceAll('Exception: ', '')}',
-                    ),
-                  ),
-                ],
-              ),
-              backgroundColor: Colors.red.shade600,
-              duration: const Duration(seconds: 4),
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              margin: const EdgeInsets.all(16),
-            ),
-          );
+        SnackBars.error(
+          context,
+          'Gagal mengambil foto: ${e.toString().replaceAll('Exception: ', '')}',
+        );
       }
     }
   }

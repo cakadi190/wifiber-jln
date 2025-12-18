@@ -79,7 +79,6 @@ class _LocationPickerWidgetState extends State<LocationPickerWidget> {
     super.dispose();
   }
 
-  /// Helper untuk memindahkan peta
   void _moveMapToLocation(LatLng location, {double zoom = 15.0}) {
     if (_mapController != null && mounted) {
       WidgetsBinding.instance.addPostFrameCallback((_) {

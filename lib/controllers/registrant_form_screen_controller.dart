@@ -282,31 +282,11 @@ class RegistrantFormController extends SafeChangeNotifier {
       bool granted = await _requestCameraPermission();
       if (!granted) {
         if (!context.mounted) return;
-        ScaffoldMessenger.of(context)
-          ..clearSnackBars()
-          ..showSnackBar(
-            SnackBar(
-              content: const Row(
-                children: [
-                  Icon(Icons.lock, color: Colors.white),
-                  SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      'Izin kamera diperlukan untuk mengambil foto. '
-                      'Silakan aktifkan izin kamera di pengaturan.',
-                    ),
-                  ),
-                ],
-              ),
-              backgroundColor: Colors.red.shade600,
-              duration: const Duration(seconds: 4),
-              behavior: SnackBarBehavior.floating,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(8),
-              ),
-              margin: const EdgeInsets.all(16),
-            ),
-          );
+        SnackBars.error(
+          context,
+          'Izin kamera diperlukan untuk mengambil foto. '
+          'Silakan aktifkan izin kamera di pengaturan.',
+        );
         return;
       }
     }
@@ -374,26 +354,7 @@ class RegistrantFormController extends SafeChangeNotifier {
             'Gagal mengambil foto: ${e.toString().replaceAll('Exception: ', '')}';
       }
 
-      ScaffoldMessenger.of(context)
-        ..clearSnackBars()
-        ..showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.error_outline, color: Colors.white),
-                const SizedBox(width: 12),
-                Expanded(child: Text(errorMessage)),
-              ],
-            ),
-            backgroundColor: Colors.red.shade600,
-            duration: const Duration(seconds: 4),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            margin: const EdgeInsets.all(16),
-          ),
-        );
+      SnackBars.error(context, errorMessage);
     }
   }
 
@@ -523,9 +484,28 @@ class RegistrantFormController extends SafeChangeNotifier {
     } on ValidationException catch (e) {
       isLoading = false;
       notifyListeners();
-      onValidationError?.call(e.errors);
+
+      // Filter out optional photo errors if photos were not selected
+      final filteredErrors = _filterOptionalPhotoErrors(e.errors);
+
+      if (filteredErrors.isEmpty) {
+        // All errors were optional photo errors, treat as success or show generic message
+        if (!context.mounted) return false;
+        SnackBars.error(
+          context,
+          'Terjadi kesalahan validasi di sisi server',
+        ).clearSnackBars();
+        return false;
+      }
+
+      onValidationError?.call(filteredErrors);
       if (!context.mounted) return false;
-      SnackBars.error(context, e.message).clearSnackBars();
+
+      // Format error message to show specific validation errors
+      final errorMessage = _formatValidationErrors(
+        ValidationException(errors: filteredErrors, message: e.message),
+      );
+      SnackBars.error(context, errorMessage).clearSnackBars();
       return false;
     }
 
@@ -553,6 +533,86 @@ class RegistrantFormController extends SafeChangeNotifier {
       ).clearSnackBars();
       return false;
     }
+  }
+
+  /// Filter out photo-related errors if photos were not selected (since they're optional)
+  Map<String, dynamic> _filterOptionalPhotoErrors(Map<String, dynamic> errors) {
+    // List of optional photo field keys
+    const optionalPhotoFields = [
+      'ktp-photo',
+      'ktp_photo',
+      'ktpPhoto',
+      'location-photo',
+      'location_photo',
+      'locationPhoto',
+    ];
+
+    // Only filter if photos were not selected
+    final filteredErrors = Map<String, dynamic>.from(errors);
+
+    for (final field in optionalPhotoFields) {
+      // Remove photo errors only if the corresponding photo was not selected
+      if (field.contains('ktp') && ktpPhotoFile == null) {
+        filteredErrors.remove(field);
+      } else if (field.contains('location') && locationPhotoFile == null) {
+        filteredErrors.remove(field);
+      }
+    }
+
+    return filteredErrors;
+  }
+
+  /// Format validation errors to be displayed in a user-friendly way
+  String _formatValidationErrors(ValidationException e) {
+    if (e.errors.isEmpty) {
+      return e.message;
+    }
+
+    final List<String> errorMessages = [];
+
+    // Map field names to Indonesian labels
+    final fieldLabels = {
+      'name': 'Nama',
+      'nickname': 'Nama Panggilan',
+      'phone': 'Nomor Telepon',
+      'identity-number': 'Nomor KTP',
+      'identity_number': 'Nomor KTP',
+      'address': 'Alamat',
+      'status': 'Status',
+      'package': 'Paket Internet',
+      'area': 'Area',
+      'router': 'Router',
+      'pppoe_secret': 'PPPoE Secret',
+      'due-date': 'Tanggal Jatuh Tempo',
+      'due_date': 'Tanggal Jatuh Tempo',
+      'odp': 'ODP',
+      'discount': 'Diskon',
+      'coordinate': 'Koordinat',
+      'ktp-photo': 'Foto KTP',
+      'ktp_photo': 'Foto KTP',
+      'location-photo': 'Foto Lokasi',
+      'location_photo': 'Foto Lokasi',
+      'is-prorate': 'Prorata',
+      'is_prorate': 'Prorata',
+    };
+
+    e.errors.forEach((field, messages) {
+      final label = fieldLabels[field] ?? field;
+      if (messages is List && messages.isNotEmpty) {
+        for (final message in messages) {
+          errorMessages.add('$label: $message');
+        }
+      } else if (messages is String) {
+        errorMessages.add('$label: $messages');
+      }
+    });
+
+    if (errorMessages.isEmpty) {
+      return e.message;
+    }
+
+    // Return first error for snackbar, full list is shown in form fields
+    return errorMessages.first;
   }
 
   String? validateRequired(String? value, String fieldName) {

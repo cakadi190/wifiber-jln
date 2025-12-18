@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/models/employee.dart';
 import 'package:wifiber/providers/employee_provider.dart';
 
@@ -28,19 +29,9 @@ class _EmployeeDeleteContent extends StatelessWidget {
     if (!context.mounted) return;
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Karyawan berhasil dihapus'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      SnackBars.success(context, 'Karyawan berhasil dihapus');
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(provider.error ?? 'Gagal menghapus karyawan'),
-          backgroundColor: Colors.red,
-        ),
-      );
+      SnackBars.error(context, provider.error ?? 'Gagal menghapus karyawan');
     }
   }
 

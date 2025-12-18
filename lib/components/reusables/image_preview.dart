@@ -2,9 +2,6 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 
-/// Displays a full screen preview of an image. Supports both network and
-/// file-based images. Optional [headers] can be provided for network images,
-/// such as an Authorization bearer token.
 void showImagePreview(
   BuildContext context, {
   String? imageUrl,
@@ -27,10 +24,7 @@ void showImagePreview(
           fit: BoxFit.contain,
         );
       } else {
-        imageWidget = Image.file(
-          imageFile!,
-          fit: BoxFit.contain,
-        );
+        imageWidget = Image.file(imageFile!, fit: BoxFit.contain);
       }
 
       return GestureDetector(
@@ -38,12 +32,9 @@ void showImagePreview(
         child: Container(
           color: Colors.transparent,
           alignment: Alignment.center,
-          child: InteractiveViewer(
-            child: imageWidget,
-          ),
+          child: InteractiveViewer(child: imageWidget),
         ),
       );
     },
   );
 }
-

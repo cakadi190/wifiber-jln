@@ -7,6 +7,7 @@ import 'package:wifiber/layouts/auth_layout.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:wifiber/components/forms/backend_validation_mixin.dart';
+import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/partials/login/login_body.dart';
 import 'package:wifiber/partials/login/login_footer.dart';
 import 'package:wifiber/partials/login/login_header.dart';
@@ -77,11 +78,9 @@ class _LoginScreenState extends State<LoginScreen> with BackendValidationMixin {
 
     if (args?['showLogoutMessage'] == true) {
       SchedulerBinding.instance.addPostFrameCallback((_) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Berhasil mengeluarkan anda dari sesi sebelumnya!'),
-            backgroundColor: Colors.green,
-          ),
+        SnackBars.success(
+          context,
+          'Berhasil mengeluarkan anda dari sesi sebelumnya!',
         );
       });
     }

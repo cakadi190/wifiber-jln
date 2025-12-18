@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/providers/registrant_provider.dart';
 import 'package:wifiber/models/registrant.dart';
 
@@ -51,20 +52,11 @@ class _RegistrantDeleteContent extends StatelessWidget {
     if (!context.mounted) return;
 
     if (success) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Calon Pelanggan berhasil dihapus'),
-          backgroundColor: Colors.green,
-        ),
-      );
+      SnackBars.success(context, 'Calon Pelanggan berhasil dihapus');
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            registrantProvider.error ?? 'Gagal menghapus pelanggan',
-          ),
-          backgroundColor: Colors.red,
-        ),
+      SnackBars.error(
+        context,
+        registrantProvider.error ?? 'Gagal menghapus pelanggan',
       );
     }
   }

@@ -311,7 +311,7 @@ class _CustomerListScreenState extends State<CustomerListScreen>
                   ),
                 ),
                 Text(
-                  customer.phone,
+                  "${customer.customerId} - ${customer.phone}",
                   style: const TextStyle(fontSize: 14, color: Colors.grey),
                 ),
               ],
@@ -410,33 +410,10 @@ class _CustomerListScreenState extends State<CustomerListScreen>
                   });
                 } catch (e) {
                   if (!context.mounted) return;
-                  ScaffoldMessenger.of(context)
-                    ..clearSnackBars()
-                    ..showSnackBar(
-                      SnackBar(
-                        content: Row(
-                          children: [
-                            const Icon(
-                              Icons.error_outline,
-                              color: Colors.white,
-                            ),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                'Gagal memilih berkas: ${e.toString().replaceAll('Exception: ', '')}',
-                              ),
-                            ),
-                          ],
-                        ),
-                        backgroundColor: Colors.red.shade600,
-                        duration: const Duration(seconds: 4),
-                        behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        margin: const EdgeInsets.all(16),
-                      ),
-                    );
+                  SnackBars.error(
+                    context,
+                    'Gagal memilih berkas: ${e.toString().replaceAll('Exception: ', '')}',
+                  );
                 }
               }
 
@@ -803,13 +780,27 @@ class _CustomerListScreenState extends State<CustomerListScreen>
                                 title: Row(
                                   children: [
                                     Expanded(
-                                      child: Text(
-                                        customer.name,
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                        maxLines: 1,
-                                        overflow: TextOverflow.ellipsis,
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Text(
+                                            customer.customerId,
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                            ),
+                                          ),
+                                          const SizedBox(height: 4),
+                                          Text(
+                                            customer.name,
+                                            style: const TextStyle(
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ],
                                       ),
                                     ),
                                     const SizedBox(width: 8),
@@ -824,6 +815,25 @@ class _CustomerListScreenState extends State<CustomerListScreen>
                                       ),
                                       child: Text(
                                         _getStatusDisplayName(customer.status),
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 8,
+                                        vertical: 4,
+                                      ),
+                                      decoration: BoxDecoration(
+                                        color: Colors.blue,
+                                        borderRadius: BorderRadius.circular(12),
+                                      ),
+                                      child: Text(
+                                        customer.pppoeSecret,
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 12,

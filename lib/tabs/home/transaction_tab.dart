@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/reusables/options_bottom_sheet.dart';
+import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/controllers/tabs/transaction_tab.dart';
 import 'package:wifiber/helpers/currency_helper.dart';
@@ -766,12 +767,9 @@ class _TransactionTabState extends State<TransactionTab>
                             widget.controller.refreshTransactions();
                           } catch (e) {
                             if (context.mounted) {
-                              ScaffoldMessenger.of(context).showSnackBar(
-                                SnackBar(
-                                  content: Text(
-                                    'Gagal menghapus transaksi: $e',
-                                  ),
-                                ),
+                              SnackBars.error(
+                                context,
+                                'Gagal menghapus transaksi: $e',
                               );
                             }
                           }

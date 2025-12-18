@@ -5,61 +5,34 @@ import 'package:image_picker/image_picker.dart';
 import 'package:path/path.dart' as path;
 import 'package:provider/provider.dart';
 import 'package:wifiber/components/reusables/image_preview.dart';
+import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/providers/auth_provider.dart';
 import 'package:wifiber/utils/file_picker_validator.dart';
 
-/// Tipe foto yang akan dipilih
-enum PhotoType {
-  /// Foto KTP
-  ktp,
+enum PhotoType { ktp, location, paymentProof, profile, general }
 
-  /// Foto Lokasi
-  location,
-
-  /// Bukti Pembayaran
-  paymentProof,
-
-  /// Foto Profil
-  profile,
-
-  /// Foto Umum
-  general,
-}
-
-/// Widget untuk memilih foto dengan error handling yang sudah terintegrasi
 class PhotoSelectorWidget extends StatefulWidget {
-  /// Judul widget
   final String title;
 
-  /// Subtitle/deskripsi
   final String subtitle;
 
-  /// Tipe foto
   final PhotoType photoType;
 
-  /// File yang sudah dipilih (XFile dari image_picker)
   final XFile? selectedFile;
 
-  /// URL preview dari server (untuk mode edit)
   final String? urlPreview;
 
-  /// Callback ketika foto dipilih
   final ValueChanged<XFile?> onPhotoSelected;
 
-  /// Callback ketika terjadi error
   final ValueChanged<String>? onError;
 
-  /// Konfigurasi validasi custom (opsional)
   final FilePickerConfig? customConfig;
 
-  /// Apakah foto wajib dipilih
   final bool isRequired;
 
-  /// Error message dari validasi form (opsional)
   final String? errorMessage;
 
-  /// Apakah widget dalam keadaan loading
   final bool isLoading;
 
   const PhotoSelectorWidget({
@@ -86,7 +59,6 @@ class _PhotoSelectorWidgetState extends State<PhotoSelectorWidget> {
   String? _internalError;
   bool _isProcessing = false;
 
-  /// Mendapatkan konfigurasi validasi berdasarkan tipe foto
   FilePickerConfig get _config {
     if (widget.customConfig != null) return widget.customConfig!;
 
@@ -108,7 +80,6 @@ class _PhotoSelectorWidgetState extends State<PhotoSelectorWidget> {
     }
   }
 
-  /// Mendapatkan icon berdasarkan tipe foto
   IconData get _icon {
     switch (widget.photoType) {
       case PhotoType.ktp:
@@ -124,7 +95,6 @@ class _PhotoSelectorWidgetState extends State<PhotoSelectorWidget> {
     }
   }
 
-  /// Menampilkan modal bottom sheet untuk memilih sumber foto
   void _showImagePickerModal() {
     showModalBottomSheet(
       context: context,
@@ -189,7 +159,6 @@ class _PhotoSelectorWidgetState extends State<PhotoSelectorWidget> {
     );
   }
 
-  /// Memilih gambar dari sumber tertentu
   Future<void> _pickImage(ImageSource source) async {
     if (_isProcessing) return;
 
@@ -265,30 +234,10 @@ class _PhotoSelectorWidgetState extends State<PhotoSelectorWidget> {
 
       widget.onError?.call(errorMessage);
 
-      ScaffoldMessenger.of(context)
-        ..clearSnackBars()
-        ..showSnackBar(
-          SnackBar(
-            content: Row(
-              children: [
-                const Icon(Icons.error_outline, color: Colors.white),
-                const SizedBox(width: 12),
-                Expanded(child: Text(errorMessage)),
-              ],
-            ),
-            backgroundColor: Colors.red.shade600,
-            duration: const Duration(seconds: 4),
-            behavior: SnackBarBehavior.floating,
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(8),
-            ),
-            margin: const EdgeInsets.all(16),
-          ),
-        );
+      SnackBars.error(context, errorMessage);
     }
   }
 
-  /// Menghapus foto yang dipilih
   void _removePhoto() {
     setState(() {
       _internalError = null;
@@ -296,18 +245,15 @@ class _PhotoSelectorWidgetState extends State<PhotoSelectorWidget> {
     widget.onPhotoSelected(null);
   }
 
-  /// Apakah ada gambar yang ditampilkan
   bool get _hasImage {
     return widget.selectedFile != null ||
         (widget.urlPreview != null && widget.urlPreview!.isNotEmpty);
   }
 
-  /// Error yang ditampilkan (prioritas: external > internal)
   String? get _displayError {
     return widget.errorMessage ?? _internalError;
   }
 
-  /// Apakah dalam keadaan loading
   bool get _isLoading => widget.isLoading || _isProcessing;
 
   @override
@@ -583,7 +529,6 @@ class _PhotoSelectorWidgetState extends State<PhotoSelectorWidget> {
     );
   }
 
-  /// Widget placeholder untuk error loading gambar
   Widget _buildErrorPlaceholder(String message) {
     return Container(
       height: 120,

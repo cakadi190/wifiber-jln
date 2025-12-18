@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
+import 'package:wifiber/components/ui/snackbars.dart';
 import 'package:wifiber/config/app_colors.dart';
 import 'package:wifiber/providers/company_provider.dart';
 
@@ -76,12 +77,7 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Gagal memilih gambar: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
+        SnackBars.error(context, 'Gagal memilih gambar: $e');
       }
     }
   }
@@ -109,27 +105,15 @@ class _CompanyProfileScreenState extends State<CompanyProfileScreen> {
 
       if (mounted) {
         if (success) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Data perusahaan berhasil disimpan'),
-              backgroundColor: Colors.green,
-            ),
-          );
+          SnackBars.success(context, 'Data perusahaan berhasil disimpan');
           Navigator.pop(context);
         } else {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text(provider.error ?? 'Gagal menyimpan data'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          SnackBars.error(context, provider.error ?? 'Gagal menyimpan data');
         }
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Error: $e'), backgroundColor: Colors.red),
-        );
+        SnackBars.error(context, 'Error: $e');
       }
     }
   }
