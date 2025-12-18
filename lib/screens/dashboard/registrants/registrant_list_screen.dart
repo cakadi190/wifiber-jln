@@ -358,16 +358,17 @@ class _RegistrantListScreenState extends State<RegistrantListScreen>
                                     Text(
                                       registrant.customerId,
                                       style: TextStyle(
-                                        fontSize: 11,
-                                        color: Colors.grey.shade600,
+                                        fontSize: 14,
+                                        color: Colors.grey,
                                       ),
                                     ),
                                     const SizedBox(height: 2),
+
                                     Text(
                                       registrant.name,
                                       style: const TextStyle(
                                         fontWeight: FontWeight.bold,
-                                        fontSize: 15,
+                                        fontSize: 16,
                                       ),
                                       maxLines: 1,
                                       overflow: TextOverflow.ellipsis,
@@ -384,7 +385,7 @@ class _RegistrantListScreenState extends State<RegistrantListScreen>
                                       Text(
                                         "${registrant.phone}${registrant.areaName != null ? ' - ${registrant.areaName}' : ''}",
                                         style: TextStyle(
-                                          fontSize: 13,
+                                          fontSize: 14,
                                           color: Colors.grey.shade700,
                                         ),
                                       ),
@@ -409,8 +410,8 @@ class _RegistrantListScreenState extends State<RegistrantListScreen>
                                               ),
                                               style: const TextStyle(
                                                 color: Colors.white,
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.w500,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
                                               ),
                                             ),
                                           ),
@@ -429,8 +430,8 @@ class _RegistrantListScreenState extends State<RegistrantListScreen>
                                               registrant.pppoeSecret,
                                               style: const TextStyle(
                                                 color: Colors.white,
-                                                fontSize: 10,
-                                                fontWeight: FontWeight.w500,
+                                                fontSize: 14,
+                                                fontWeight: FontWeight.bold,
                                               ),
                                             ),
                                           ),
