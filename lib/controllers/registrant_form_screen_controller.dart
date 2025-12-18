@@ -411,6 +411,18 @@ class RegistrantFormController extends SafeChangeNotifier {
     isLoading = true;
     notifyListeners();
 
+    // Validasi foto wajib saat create (bukan edit)
+    if (!isEdit) {
+      final photoError = validatePhotoSelection();
+      if (photoError != null) {
+        isLoading = false;
+        notifyListeners();
+        if (!context.mounted) return false;
+        SnackBars.error(context, photoError).clearSnackBars();
+        return false;
+      }
+    }
+
     if (latitudeController.text.trim().isEmpty ||
         longitudeController.text.trim().isEmpty) {
       try {
@@ -485,8 +497,11 @@ class RegistrantFormController extends SafeChangeNotifier {
       isLoading = false;
       notifyListeners();
 
-      // Filter out optional photo errors if photos were not selected
-      final filteredErrors = _filterOptionalPhotoErrors(e.errors);
+      // Filter out optional photo errors only if in edit mode (photos are optional when editing)
+      final filteredErrors = _filterOptionalPhotoErrors(
+        e.errors,
+        isEdit: isEdit,
+      );
 
       if (filteredErrors.isEmpty) {
         // All errors were optional photo errors, treat as success or show generic message
@@ -535,9 +550,18 @@ class RegistrantFormController extends SafeChangeNotifier {
     }
   }
 
-  /// Filter out photo-related errors if photos were not selected (since they're optional)
-  Map<String, dynamic> _filterOptionalPhotoErrors(Map<String, dynamic> errors) {
-    // List of optional photo field keys
+  /// Filter out photo-related errors if photos were not selected
+  /// Only applicable when editing (isEdit = true), since photos are optional during updates
+  Map<String, dynamic> _filterOptionalPhotoErrors(
+    Map<String, dynamic> errors, {
+    required bool isEdit,
+  }) {
+    // If creating new data, photos are required - don't filter any errors
+    if (!isEdit) {
+      return errors;
+    }
+
+    // List of optional photo field keys (only optional during edit)
     const optionalPhotoFields = [
       'ktp-photo',
       'ktp_photo',
@@ -547,7 +571,7 @@ class RegistrantFormController extends SafeChangeNotifier {
       'locationPhoto',
     ];
 
-    // Only filter if photos were not selected
+    // Only filter if photos were not selected (during edit mode)
     final filteredErrors = Map<String, dynamic>.from(errors);
 
     for (final field in optionalPhotoFields) {
@@ -659,6 +683,18 @@ class RegistrantFormController extends SafeChangeNotifier {
   String? validateOdpSelection() {
     if (selectedOdpId == null || selectedOdpId!.isEmpty) {
       return 'ODP wajib dipilih';
+    }
+    return null;
+  }
+
+  /// Validate photo selection - required when creating new registrant
+  /// Returns error message if validation fails, null if valid
+  String? validatePhotoSelection() {
+    if (ktpPhotoFile == null) {
+      return 'Foto KTP wajib diunggah untuk data baru';
+    }
+    if (locationPhotoFile == null) {
+      return 'Foto Lokasi wajib diunggah untuk data baru';
     }
     return null;
   }

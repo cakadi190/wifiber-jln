@@ -127,8 +127,6 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
           })
           .toList(growable: false);
 
-      debugPrint("ISP interfaces: $ispInterfaces");
-
       final availableSlots = math.max(
         0,
         _maxInterfacesForTraffic - ispInterfaces.length,
@@ -161,8 +159,6 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
               '.proplist': 'rx-bits-per-second,tx-bits-per-second',
             },
           );
-
-          debugPrint("Result from $ifaceName: $result");
 
           if (result.isEmpty) {
             continue;
@@ -767,8 +763,6 @@ class _MonitorMikrotikScreenState extends State<MonitorMikrotikScreen>
   }
 
   String _formatMbps(double value) {
-    debugPrint(value.toString());
-
     if (value >= 100) {
       return value.toStringAsFixed(0);
     }

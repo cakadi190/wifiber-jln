@@ -92,8 +92,6 @@ class _RegistrantFormScreenState extends State<RegistrantFormScreen>
   void initState() {
     super.initState();
 
-    debugPrint(widget.registrant?.toJson().toString());
-
     _controller = RegistrantFormController();
     _controller.initializeWithRegistrant(widget.registrant);
     if (widget.registrant?.latitude != null &&

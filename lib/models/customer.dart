@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:wifiber/helpers/currency_helper.dart';
 
 class Customer {
@@ -59,8 +58,6 @@ class Customer {
   });
 
   factory Customer.fromJson(Map<String, dynamic> json) {
-    debugPrint(json.toString());
-
     return Customer(
       id: json['id']?.toString() ?? '',
       customerId: json['customer_id']?.toString() ?? '',

@@ -1,5 +1,3 @@
-import 'package:flutter/material.dart';
-
 class Registrant {
   final String id;
   final String customerId;
@@ -60,8 +58,6 @@ class Registrant {
   });
 
   factory Registrant.fromJson(Map<String, dynamic> json) {
-    debugPrint(json.toString());
-
     return Registrant(
       id: json['id'].toString(),
       customerId: json['customer_id'].toString(),

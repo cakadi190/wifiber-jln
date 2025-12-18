@@ -4,7 +4,6 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
-import 'package:flutter/material.dart';
 
 class RouterOsApiException implements Exception {
   final String message;
@@ -63,9 +62,6 @@ class RouterOsApiClient {
       }
       _socket?.setOption(SocketOption.tcpNoDelay, true);
       _resetSocketState();
-      if (verbose) {
-        debugPrint('Connected to $host:$port (${useSsl ? 'ssl' : 'tcp'})');
-      }
     } on SocketException catch (error) {
       await close();
       throw RouterOsApiException(
@@ -101,10 +97,7 @@ class RouterOsApiClient {
 
         _isLoggedIn = !firstAttempt.hasTrap;
         return _isLoggedIn;
-      } on RouterOsApiException catch (error) {
-        if (verbose) {
-          debugPrint('RouterOS login error: ${error.message}');
-        }
+      } on RouterOsApiException {
         return false;
       }
     });

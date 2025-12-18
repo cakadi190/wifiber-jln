@@ -1,6 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/foundation.dart';
 import 'package:latlong2/latlong.dart';
 import 'package:wifiber/models/customer.dart';
 import 'package:wifiber/models/infrastructure.dart';
@@ -252,8 +251,9 @@ class InfrastructureProvider extends SafeChangeNotifier {
   Customer? getNearestCustomer() {
     if (_userLocation == null || _customers.isEmpty) return null;
 
-    final validCustomers =
-        _customers.where((customer) => customer.hasValidCoordinates()).toList();
+    final validCustomers = _customers
+        .where((customer) => customer.hasValidCoordinates())
+        .toList();
 
     if (validCustomers.isEmpty) return null;
 
@@ -296,7 +296,9 @@ class InfrastructureProvider extends SafeChangeNotifier {
   }
 
   List<Customer> getCustomersWithValidCoordinates() {
-    return _customers.where((customer) => customer.hasValidCoordinates()).toList();
+    return _customers
+        .where((customer) => customer.hasValidCoordinates())
+        .toList();
   }
 
   List<LatLng> getActiveCoordinates() {
@@ -387,7 +389,6 @@ class InfrastructureProvider extends SafeChangeNotifier {
         throw Exception('Failed to load ODCs: ${response.statusCode}');
       }
     } catch (e) {
-      debugPrint('Error loading ODCs: $e');
       throw Exception('Error loading ODCs: ${e.toString()}');
     }
   }
@@ -403,16 +404,13 @@ class InfrastructureProvider extends SafeChangeNotifier {
         final data = jsonDecode(response.body);
         final List<dynamic> customersData = data['data'] ?? [];
 
-        return customersData
-            .map((item) => Customer.fromJson(item))
-            .toList();
+        return customersData.map((item) => Customer.fromJson(item)).toList();
       } else if (response.statusCode == 404) {
         return [];
       } else {
         throw Exception('Failed to load customers: ${response.statusCode}');
       }
     } catch (e) {
-      debugPrint('Error loading customers: $e');
       throw Exception('Error loading customers: ${e.toString()}');
     }
   }

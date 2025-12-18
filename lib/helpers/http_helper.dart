@@ -1,7 +1,5 @@
 import 'dart:convert';
 
-import 'package:flutter/material.dart';
-
 class HttpHelper {
   static const String host = "wifiber.web.id";
   static const String scheme = "https";
@@ -55,8 +53,6 @@ class HttpHelper {
             ? queryParameters
             : null,
       );
-
-      debugPrint(uri.toString());
 
       return uri;
     } catch (e) {

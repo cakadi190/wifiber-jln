@@ -381,16 +381,14 @@ class _CustomerListScreenState extends State<CustomerListScreen>
                   if (!context.mounted) return;
 
                   if (result == null || result.files.isEmpty) {
-                    // User membatalkan pemilihan
                     return;
                   }
 
                   final file = File(result.files.single.path!);
 
-                  // Validasi ukuran file (maks 10MB untuk Excel)
                   const excelConfig = FilePickerConfig(
                     allowedExtensions: ['xls', 'xlsx'],
-                    maxFileSizeBytes: 10 * 1024 * 1024, // 10MB
+                    maxFileSizeBytes: 10 * 1024 * 1024,
                     fileTypeLabel: 'File Excel',
                   );
 
@@ -781,58 +779,6 @@ class _CustomerListScreenState extends State<CustomerListScreen>
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    // Badge row (Status + PPPoE)
-                                    Row(
-                                      children: [
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 2,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: _getStatusColor(
-                                              customer.status,
-                                            ),
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                          child: Text(
-                                            _getStatusDisplayName(
-                                              customer.status,
-                                            ),
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ),
-                                        const SizedBox(width: 6),
-                                        Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 2,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color: Colors.blue,
-                                            borderRadius: BorderRadius.circular(
-                                              8,
-                                            ),
-                                          ),
-                                          child: Text(
-                                            customer.pppoeSecret,
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 10,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                          ),
-                                        ),
-                                      ],
-                                    ),
-                                    const SizedBox(height: 4),
-                                    // Customer ID
                                     Text(
                                       customer.customerId,
                                       style: TextStyle(
@@ -841,7 +787,7 @@ class _CustomerListScreenState extends State<CustomerListScreen>
                                       ),
                                     ),
                                     const SizedBox(height: 2),
-                                    // Customer Name
+
                                     Text(
                                       customer.name,
                                       style: const TextStyle(
@@ -855,12 +801,68 @@ class _CustomerListScreenState extends State<CustomerListScreen>
                                 ),
                                 subtitle: Padding(
                                   padding: const EdgeInsets.only(top: 4),
-                                  child: Text(
-                                    "${customer.phone}${customer.areaName != null ? ' - ${customer.areaName}' : ''}",
-                                    style: TextStyle(
-                                      fontSize: 13,
-                                      color: Colors.grey.shade700,
-                                    ),
+                                  child: Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Text(
+                                        "${customer.phone}${customer.areaName != null ? ' - ${customer.areaName}' : ''}",
+                                        style: TextStyle(
+                                          fontSize: 13,
+                                          color: Colors.grey.shade700,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 6),
+
+                                      Row(
+                                        children: [
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 2,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: _getStatusColor(
+                                                customer.status,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                              _getStatusDisplayName(
+                                                customer.status,
+                                              ),
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 6),
+                                          Container(
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 8,
+                                              vertical: 2,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: Colors.blue,
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            child: Text(
+                                              customer.pppoeSecret,
+                                              style: const TextStyle(
+                                                color: Colors.white,
+                                                fontSize: 10,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ],
                                   ),
                                 ),
                                 trailing: IconButton(

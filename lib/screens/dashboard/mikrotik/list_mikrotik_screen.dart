@@ -476,10 +476,8 @@ class _ListMikrotikScreenState extends State<ListMikrotikScreen>
             minChildSize: 0.5,
             maxChildSize: 0.95,
             expand: false,
-
             snap: true,
-
-            snapSizes: const [0.4, 0.6, 0.8],
+            snapSizes: const [0.5, 0.7, 0.95],
 
             builder: (context, scrollController) {
               WidgetsBinding.instance.addPostFrameCallback((_) {
