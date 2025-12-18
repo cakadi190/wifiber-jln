@@ -21,7 +21,10 @@ class RouterPppoeSecrets {
       return data.map(
         (key, value) => MapEntry(
           key,
-          RouterPppoeSecret.fromJson(value as Map<String, dynamic>, nameOverride: key),
+          RouterPppoeSecret.fromJson(
+            value as Map<String, dynamic>,
+            nameOverride: key,
+          ),
         ),
       );
     }
@@ -91,6 +94,26 @@ class RouterPppoeSecret {
       disabled: _parseBool(json['disabled']),
       uptime: json['uptime']?.toString(),
     );
+  }
+
+  Map<String, dynamic> toJson() {
+    return {
+      '.id': id,
+      'name': name,
+      'service': service,
+      'caller-id': callerId,
+      'password': password,
+      'profile': profile,
+      'routes': routes,
+      'ipv6-routes': ipv6Routes,
+      'limit-bytes-in': limitBytesIn,
+      'limit-bytes-out': limitBytesOut,
+      'last-logged-out': lastLoggedOut,
+      'last-caller-id': lastCallerId,
+      'last-disconnect-reason': lastDisconnectReason,
+      'disabled': disabled,
+      'uptime': uptime,
+    };
   }
 
   static bool _parseBool(dynamic value) {
