@@ -136,7 +136,8 @@ class AuthService {
       }
 
       final storedData = jsonDecode(storedJson);
-      final user = currentUser ??
+      final user =
+          currentUser ??
           _cachedUser ??
           AuthUser.fromJson(Map<String, dynamic>.from(storedData));
 
@@ -146,11 +147,7 @@ class AuthService {
 
       final response = await _http.post(
         refreshTokenPath,
-        headers: {
-          'Authorization': 'Bearer ${user.refreshToken}',
-          'Accept': 'application/json',
-          'Content-Type': 'application/json',
-        },
+        body: jsonEncode({'refresh_token': user.refreshToken}),
       );
 
       if (response.statusCode == 401 || response.statusCode == 403) {
