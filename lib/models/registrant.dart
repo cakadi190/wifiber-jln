@@ -27,6 +27,7 @@ class Registrant {
   final String packagePpn;
   final String? routerName;
   final String? routerHost;
+  final String? areaName;
 
   Registrant({
     required this.id,
@@ -55,6 +56,7 @@ class Registrant {
     required this.packagePpn,
     this.routerName,
     this.routerHost,
+    this.areaName,
   });
 
   factory Registrant.fromJson(Map<String, dynamic> json) {
@@ -88,6 +90,7 @@ class Registrant {
       packagePpn: json['package_ppn'].toString(),
       routerName: json['router_name'],
       routerHost: json['router_host'],
+      areaName: json['area_name'],
     );
   }
 
@@ -119,6 +122,7 @@ class Registrant {
       'package_ppn': packagePpn,
       'router_name': routerName,
       'router_host': routerHost,
+      'area_name': areaName,
     };
   }
 }

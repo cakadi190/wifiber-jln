@@ -142,7 +142,7 @@ class _RegistrantListScreenState extends State<RegistrantListScreen>
                   ),
                 ),
                 Text(
-                  registrant.phone,
+                  "${registrant.customerId} - ${registrant.phone}",
                   style: const TextStyle(fontSize: 14, color: Colors.grey),
                 ),
               ],
@@ -351,54 +351,91 @@ class _RegistrantListScreenState extends State<RegistrantListScreen>
                                   vertical: 8,
                                   horizontal: 16,
                                 ),
-                                leading: CircleAvatar(
-                                  backgroundColor: _getStatusColor(
-                                    registrant.status,
-                                  ),
-                                  child: Text(
-                                    registrant.name.isNotEmpty
-                                        ? registrant.name[0].toUpperCase()
-                                        : 'N',
-                                    style: const TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ),
-                                title: Text(
-                                  registrant.name,
-                                  style: const TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                subtitle: Row(
+                                title: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
-                                    Text(registrant.phone),
-                                    const SizedBox(width: 8),
-                                    Container(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 4,
-                                      ),
-                                      decoration: BoxDecoration(
-                                        color: _getStatusColor(
-                                          registrant.status,
+                                    // Badge row (Status + PPPoE)
+                                    Row(
+                                      children: [
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 2,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: _getStatusColor(
+                                              registrant.status,
+                                            ),
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            _getStatusDisplayName(
+                                              registrant.status,
+                                            ),
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
                                         ),
-                                        borderRadius: BorderRadius.circular(12),
-                                      ),
-                                      child: Text(
-                                        _getStatusDisplayName(
-                                          registrant.status,
+                                        const SizedBox(width: 6),
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 2,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.blue,
+                                            borderRadius: BorderRadius.circular(
+                                              8,
+                                            ),
+                                          ),
+                                          child: Text(
+                                            registrant.pppoeSecret,
+                                            style: const TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 10,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
                                         ),
-                                        style: const TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                          fontWeight: FontWeight.w500,
-                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 4),
+                                    // Registrant ID
+                                    Text(
+                                      registrant.customerId,
+                                      style: TextStyle(
+                                        fontSize: 11,
+                                        color: Colors.grey.shade600,
                                       ),
                                     ),
+                                    const SizedBox(height: 2),
+                                    // Registrant Name
+                                    Text(
+                                      registrant.name,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 15,
+                                      ),
+                                      maxLines: 1,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ],
+                                ),
+                                subtitle: Padding(
+                                  padding: const EdgeInsets.only(top: 4),
+                                  child: Text(
+                                    "${registrant.phone}${registrant.areaName != null ? ' - ${registrant.areaName}' : ''}",
+                                    style: TextStyle(
+                                      fontSize: 13,
+                                      color: Colors.grey.shade700,
+                                    ),
+                                  ),
                                 ),
                                 trailing: IconButton(
                                   icon: const Icon(Icons.more_vert),
