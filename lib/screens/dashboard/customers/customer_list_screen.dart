@@ -835,7 +835,7 @@ class _CustomerListScreenState extends State<CustomerListScreen>
                                               ),
                                               style: const TextStyle(
                                                 color: Colors.white,
-                                                fontSize: 10,
+                                                fontSize: 16,
                                                 fontWeight: FontWeight.w500,
                                               ),
                                             ),
@@ -855,7 +855,7 @@ class _CustomerListScreenState extends State<CustomerListScreen>
                                               customer.pppoeSecret,
                                               style: const TextStyle(
                                                 color: Colors.white,
-                                                fontSize: 10,
+                                                fontSize: 16,
                                                 fontWeight: FontWeight.w500,
                                               ),
                                             ),
